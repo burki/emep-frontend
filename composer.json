@@ -1,0 +1,43 @@
+{
+    "config": {
+        "platform": {
+            "php": "5.6.23"
+        }
+    },
+
+    "require": {
+        "symfony/yaml": "^3.3",
+        "symfony/console": "^3.3",
+        "symfony/framework-bundle": "^3.3",
+
+        "symfony/asset": "^3.3",
+        "symfony/templating": "^3.3",
+        "symfony/translation": "^3.3",
+        "symfony/twig-bundle": "^3.3",
+
+        "symfony/web-profiler-bundle": "^3.3",
+        "symfony/debug-bundle": "^3.3",
+
+        "symfony/validator": "^3.3",
+        "symfony/form": "^3.3",
+
+        "symfony/swiftmailer-bundle": "@stable",
+        "sensio/framework-extra-bundle": "@stable",
+        "knplabs/knp-menu-bundle": "@stable",
+        "symfony/assetic-bundle": "@stable",
+        "leafo/scssphp": "~0.6",
+
+        "cocur/slugify": "@stable",
+
+        "doctrine/doctrine-bundle": "@stable",
+        "doctrine/orm": "@stable",
+
+        "kphoen/rulerz": "@stable"
+    },
+
+    "autoload": {
+        "psr-4": {
+            "AppBundle\\": "src/AppBundle/"
+        }
+    }
+}

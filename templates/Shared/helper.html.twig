@@ -1,0 +1,8 @@
+{% macro exhibition_period(exhibition) %}
+    {% if exhibition.displaydate is not empty %}
+        {{ exhibition.displaydate }}
+    {% else %}
+        {{ exhibition.startdate|dateincomplete }}
+        {% if exhibition.startdate != exhibition.enddate and exhibition.enddate is not empty %} - {{  exhibition.enddate|dateincomplete  }}{% endif %}
+    {% endif %}
+{% endmacro %}

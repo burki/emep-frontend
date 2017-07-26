@@ -1,0 +1,112 @@
+<!doctype html>
+<html class="no-js" lang="{{ app.request.getLocale() }}"
+      prefix="og: http://ogp.me/ns# profile: http://ogp.me/ns/profile# place: http://ogp.me/ns/place# books: http://ogp.me/ns/books#">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+        {% if pageTitle is defined %}
+            {{ pageTitle }} |
+        {% endif %}
+        {{ siteName|trans }}
+        </title>
+
+        {% if pageMeta is defined %}
+            {% if pageMeta.og is defined %}
+                {% for prop, val in pageMeta.og %}
+                    {% if val is iterable %}
+                        {% for single_val in val %}
+        <meta property="{{ prop }}" content="{{ single_val }}">
+                        {% endfor %}
+                    {% else %}
+        <meta property="{{ prop }}" content="{{ val }}">
+                    {% endif %}
+                {% endfor %}
+                {% if pageMeta.og['og:url'] is defined %}
+        <link rel="canonical" href="{{ pageMeta.og['og:url'] }}">
+                {% endif %}
+            {% endif %}
+            {% if pageMeta.twitter is defined %}
+                {% for prop, val in pageMeta.twitter %}
+                    {% if val is iterable %}
+                        {% for single_val in val %}
+        <meta name="{{ prop }}" content="{{ single_val }}">
+                        {% endfor %}
+                    {% else %}
+        <meta name="{{ prop }}" content="{{ val }}">
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            {% if pageMeta.jsonLd is defined %}
+        <script type="application/ld+json">
+            {{ pageMeta.jsonLd|json_encode|raw }}
+        </script>
+            {% endif %}
+        {% elseif pageTitle is defined %}
+        <meta property="og:title" content="{{ pageTitle }}">
+        {% endif %}
+
+        <script src="{{ app.request.basepath }}/js/jquery-2.2.3.min.js"></script>
+
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="{{ app.request.basepath }}/vendor/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+
+        {% include 'AppBundle:Shared:stylesheets.html.twig' %}
+        <style>
+        </style>
+        {% block head %}{% endblock %}
+    </head>
+
+    <body role="document" class="route-{{ app.request.get('_route') | replace({'_' : '-'}) }}">
+        <nav class="navbar navbar-inverse navbar-static-top">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-12" style="text-align: right; font-size: 1rem">
+                        {{ knp_menu_render('top') }}
+                    </div>
+                    <div class="col-sm-12" id="site-name">
+                        <h1><a href="{{ path('home') }}">{{ siteName|trans }}</a></h1>
+                    </div>
+                    <div class="col-sm-9">
+                        {{ knp_menu_render('main', { 'currentClass': 'active', 'template': 'Base/knp_menu.html.twig' }) }}
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        {% block contenttop %}
+        {#% embed 'Base/contenttop_skeleton.html.twig' %}{% endembed %#}
+        {% endblock %}
+
+        <div class="container wrapper">
+        {% block body %}{% endblock %}
+        </div>
+
+        <footer>
+            {#% if twitterSite is not empty %}
+            <div id="footer-social" class="container-fluid">
+                <div class="row">
+                    <div class="col-xs-12" style="z-index: 1; text-align: center">
+                    <a class="twitter" target="_blank" href="https://twitter.com/@{{ twitterSite }}" title="@{{ twitterSite }}"> </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %#}
+            <div id="footer-navigation" class="container">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-8" style="z-index: 1">
+                        {{ knp_menu_render('footer-main', { 'currentClass': 'active', 'template': 'Base/knp_menu.html.twig' }) }}
+                    </div>
+                    <div id="footer-fwf" class="col-sm-4">
+                        <a href="http://pf.fwf.ac.at/de/wissenschaft-konkret/project-finder/40238" target="_blank">
+                            <img src="{{ app.request.basepath }}/img/fwf-logo-color-transparent.gif" style="width: 165px; height: auto" alt="FWF - Der Wissenschaftsfond." />
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </body>
+</html>

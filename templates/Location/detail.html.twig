@@ -1,0 +1,116 @@
+{% extends 'Base/base.html.twig' %}
+
+{% import 'Shared/helper.html.twig' as helper %}
+{% import 'Shared/map-leaflet.html.twig' as map %}
+
+{% block head %}
+    {{ map.head() }}
+    <script src="{{ app.request.basepath }}/js/seealso.js"></script>
+    <script>
+        var service = new SeeAlsoCollection();
+        service.services = {
+            'pndaks' : new SeeAlsoService('http://beacon.findbuch.de/seealso/pnd-aks/-lemo@ap/-jgo-hsd-personen')
+        };
+        service.views = {
+            'seealso-ul' : new SeeAlsoUL({
+                                linkTarget: '_blank',
+                                maxItems: 100 })
+        };
+        service.replaceTagsOnLoad();
+    </script>
+{% endblock %}
+
+{% block body %}
+    <h1>
+        {{ location.name }}
+    </h1>
+    <div class="row">
+        <div class="col-sm-8">
+            <dl>
+            {% if location.place is not null %}
+                <dt>{{ 'Place'|trans }}:</dt>
+                <dd>
+                    <a href="{% if location.place.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : location.place.tgn }) }}{% else %}{{ path('place', { 'id' : location.place.id }) }}{% endif %}">
+                    {{ location.place.nameLocalized }}
+                    </a>
+                    <br />
+                    TODO: Address(es)
+                </dd>
+            {% endif %}
+            {% if location.url is not empty %}
+                <dt>{{ 'Homepage'|trans }}:</dt>
+                <dd>
+                    <a href="{{ location.url }}" target="_blank">{{ location.url|prettifyurl }}</a>
+                </dd>
+            {% endif %}
+            </dl>
+
+            <p>{#{ location.description|nl2br  }#}</p>
+            {% if location.exhibitions is not empty %}
+            <h3>Exhibitions</h3>
+            <ul class="list-group">
+                {% for exhibition in location.exhibitions %}
+                <li class="list-group-item">
+                    <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
+                        <b>
+                            {{ exhibition.title }}
+                        </b>
+                    </a>
+                    {{ helper.exhibition_period(exhibition) }}
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+
+        <div class="col-sm-4 sidebar">
+            {% if false and (birthPlace.geo is not empty or deathPlace.geo is not empty) %}
+            <div id="map" class="col-sm-12" style="width: 100%; min-height: 360px; border-bottom: 20px solid white;"></div>
+
+            <script>
+            function adjustMapSize() {
+                /*
+                $('#map').height(function(index, height) {
+                    return window.innerHeight - $(this).offset().top;
+                });
+                */
+            }
+
+            $( window ).resize(adjustMapSize);
+            adjustMapSize();
+
+            var map = L.map('map');
+
+            {% if birthPlace.geo is not empty and deathPlace.geo is not empty and birthPlace.geo != deathPlace.geo %}
+            map.fitBounds([ [ {{ birthPlace.geo }} ],
+                            [ {{ deathPlace.geo }} ] ]);
+            L.marker([ {{ birthPlace.geo }} ]).addTo(map);
+            L.marker([ {{ deathPlace.geo }} ]).addTo(map);
+            {% else %}
+            map.setView([{% if birthPlace.geo is not empty %}{{ birthPlace.geo }}{% else %}{{ deathPlace.geo }}{% endif %}], 10);
+            L.marker([ {% if birthPlace.geo is not empty %}{{ birthPlace.geo }}{% else %}{{ deathPlace.geo }}{% endif %} ]).addTo(map)
+            {% endif %}
+
+            {{ map.addTileLayer() }}
+            </script>
+            {% endif %}
+
+            {% if location.gnd is not empty %}
+            <div class="container-fluid box">
+                <div class="row box-color-title">
+                    <div class="col-sm-12">
+                        <h4>
+                            {% if location.gnd is not empty %}
+                            {{ 'Integrated Authority File'|trans }}
+                            <br /><a href="http://d-nb.info/gnd/{{ location.gnd }}" target="_blank">{{ location.gnd }}</a>
+                            {% else %}
+                            {{ 'Additional Information'|trans }}
+                            {% endif %}
+                        </h4>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div><!-- .row -->
+{% endblock %}

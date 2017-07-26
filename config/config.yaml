@@ -1,0 +1,109 @@
+imports:
+    - { resource: parameters.yaml }
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# http://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
+parameters:
+    locale: en
+    # knp_menu.voter.router.class: Knp\Menu\Matcher\Voter\RegexVoter
+    
+framework:
+    secret: %kernel.secret%
+    # JMS\TranslationBundle\JMSTranslationBundle needs validation
+    # validation: ~
+    templating:
+        engines: ['twig']
+    # needs translate bundle
+    # translator: { fallbacks: ['%locale%'], logging: false }
+    # needs form bundle
+    # form: ~
+
+twig:
+    globals:
+        siteName: "Exhibitions of Modern European Painting 1905-1915"
+        slugify: "@cocur_slugify"
+        webDir: "%kernel.project_dir%/web"
+    paths:
+        '%kernel.project_dir%/templates': __main__
+    #form:
+    #    resources: ['bootstrap_3_horizontal_layout.html.twig']
+        
+# Doctrine Configuration
+doctrine:
+    dbal:
+        default_connection: default
+        connections:
+            default:
+                host:     '%database.host%'
+                port:     '%database.port%'
+                dbname:   '%database.name%'
+                user:     '%database.user%'
+                password: '%database.password%'
+                #driver:  pdo_mysql
+                charset:  '%database.charset%' # UTF8
+                options:
+                        1002: "SET NAMES '%database.charset%' COLLATE '%database.charset%_unicode_ci'"
+                default_table_options:
+                    charset: %database.charset%
+                    collate: '%database.charset%_unicode_ci'
+                    engine:  MyISAM     # InnoDB
+    orm:
+        # TODO: set a cache, see http://www.craftitonline.com/2015/04/doctrine-file-system-caching-with-doctrine-cache-bundle/
+        connection: default        
+        auto_generate_proxy_classes: '%kernel.debug%'
+        auto_mapping: true 
+        dql:
+            string_functions:
+              REPLACE: DoctrineExtensions\Query\Mysql\Replace
+
+assetic:
+    debug:          '%kernel.debug%'
+    use_controller: '%kernel.debug%'
+    # assetic scans bundles to find assetic tags
+    # that's why we set it in
+    # AppBundle\Resources\views\Shared\stylesheets.html.twig
+    # and not directly in temples/Base/base.html.twig
+    # bundles: [ AppBundle ]
+    filters:
+        cssrewrite: ~
+        # see http://symfony.com/doc/current/cookbook/assetic/php.html
+        scssphp:
+            formatter: 'Leafo\ScssPhp\Formatter\Compressed'
+                        
+#knp_paginator:
+#    page_range: 5                      # default page range used in pagination control
+#    default_options:
+#        page_name: page                # page query parameter name
+#        sort_field_name: sort          # sort field query parameter name
+#        sort_direction_name: direction # sort direction query parameter name
+#        #distinct: true                 # ensure distinct results, useful when ORM queries are using GROUP BY statements
+#    template:
+#        # pagination: KnpPaginatorBundle:Pagination:sliding.html.twig     # sliding pagination controls template
+#        pagination: KnpPaginatorBundle:Pagination:twitter_bootstrap_v3_pagination.html.twig
+#        sortable: KnpPaginatorBundle:Pagination:sortable_link.html.twig # sort link template
+                   
+swiftmailer:
+    # disable_delivery:  true
+    # delivery_address: daniel.burckhardt@sur-gmbh.ch
+    # or use: delivery_whitelist
+    transport: '%mailer.transport%'
+    host: '%mailer.host%'
+    port: '%mailer.port%'
+    username: '%mailer.username%'
+    password: '%mailer.password%'
+    encryption: ssl
+    # self-signed, see https://github.com/swiftmailer/swiftmailer/issues/544
+    stream_options:
+        ssl:
+            allow_self_signed: true
+            verify_peer: false
+            verify_peer_name: false
+
+knp_menu:
+    # use "twig: false" to disable the Twig extension and the TwigRenderer
+    twig:
+        template: KnpMenuBundle::menu.html.twig
+    #  if true, enables the helper for PHP templates
+    templating: false
+    # the renderer to use, list is also available by default
+    default_renderer: twig

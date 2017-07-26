@@ -1,0 +1,61 @@
+{% extends 'Base/base.html.twig' %}
+{% block body %}
+    <h1>{{ pageTitle }}</h1>
+    <div class="row">
+        <div class="col-sm-8">
+        {% if persons is not empty %}
+        {% set last_initial = '' %}
+        {% for person in persons %}
+            {% set initial = slugify.slugify(person.fullname|first)|upper %}
+            {% if initial != last_initial %}
+                {% if last_initial != '' %}
+            </ul>
+                {% endif %}
+            <h2>{{ initial }} </h2>
+            {% set last_initial = initial %}
+            <ul class="list-group">
+            {% endif %}
+            <li class="list-group-item">
+                <a href="{% if person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : person.ulan }) }}{% elseif person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : person.gnd }) }}{% else %}{{ path('person', { 'id' : person.id }) }}{% endif %}">
+                <b>{{ person.fullname }}</b>
+                </a>
+
+            {% set birthPlace = person.birthPlaceInfo(app.request.locale) %}
+            {% set deathPlace = person.deathPlaceInfo(app.request.locale) %}
+            {% if birthPlace is not empty or person.birthDate is not empty
+               or deathPlace is not empty or person.deathDate is not empty %}
+            ({% if birthPlace is not empty or person.birthDate is not empty %}
+                    {{ person.birthDate|dateincomplete -}}
+                    {% if birthPlace is not empty %}{% if person.birthDate is not empty %}{{- ',' }}{% endif %}
+                        {% if birthPlace.id is not empty %}
+                            <a href="{% if birthPlace.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : birthPlace.tgn }) }}{% else %}{{ path('place', { 'id' : birthPlace.id }) }}{% endif %}">
+                            {{ birthPlace['name'] }}
+                            </a>
+                        {% else %}
+                            {{ birthPlace['name'] }}
+                        {% endif %}
+                    {% endif %}
+            {% endif %}
+            {% if deathPlace is not empty or person.deathDate is not empty %}
+                -
+                    {{ person.deathDate|dateincomplete -}}
+                    {% if deathPlace is not empty %}{% if person.deathDate is not empty %}{{- ',' }}{% endif %}
+                        {% if deathPlace.id is not empty %}
+                            <a href="{% if deathPlace.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : deathPlace.tgn }) }}{% else %}{{ path('place', { 'id' : deathPlace.id }) }}{% endif %}">
+                            {{ deathPlace['name'] }}
+                            </a>
+                        {% else %}
+                            {{ deathPlace['name'] }}
+                        {% endif %}
+                    {% endif %}
+            {% endif %})
+            {% endif %}
+            </li>
+        {% endfor %}
+            </ul>
+        {% else %}
+            No persons found
+        {% endif %}
+        </div>
+    </div><!-- .row -->
+{% endblock %}

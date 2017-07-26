@@ -1,0 +1,197 @@
+$color-color-dark: #070E44;
+$color-color-medium: #99A0B4;
+
+$color-color-topic: #970376;
+$color-color-map: #f29000;
+$color-color-chronology: #3da2da;
+$color-color-lookup: #9B9B9B;
+
+/* $color-gray-dark: #9B9B9B; */
+$color-gray-dark: #8E8E8E;
+$color-gray-medium: #C0C0C0;
+$color-gray-light: #E0DFE0;
+$color-gray-ultralight: #E9E9E9;
+
+$color-text: #333;
+
+@import url('https://fonts.googleapis.com/css?family=Arimo:400,400i,700,700i&amp;subset=cyrillic,cyrillic-ext,greek,latin-ext');
+
+$font-stack-sans: 'Arimo', Arial, "Arial Unicode MS", sans-serif;
+
+/* see https://github.com/twbs/bootstrap-sass/blob/master/assets/stylesheets/bootstrap/_variables.scss */
+$screen-sm-size: 768px;
+
+/* sticky footer, see https://gist.github.com/seyDoggy/e919a429b2459aedf509 */
+html,body {
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    display: table;
+}
+
+.container.wrapper {
+    height: auto;
+    margin-bottom: 20px;
+}
+
+footer {
+    display: table-row;
+    height: 1px;
+}
+
+/* general styles */
+
+body {
+    font-family: $font-stack-sans;
+}
+
+/********************************************************/
+/* Styling for the page header                          */
+/********************************************************/
+nav {
+    &.navbar-inverse {
+        background-color: rgb(0, 99, 166);
+        border-bottom: none;
+    }
+
+    a {
+        color: white;
+    }
+
+    #site-name {
+        h1 {
+            margin-top: 5px;
+            font-size: 22px;
+            padding: 0;
+            a:hover {
+                color: white * 0.9;
+                text-decoration: none;
+            }
+        }
+    }
+
+    /* css drop-down, see also https://gist.github.com/nateevans/9958390 */
+    ul.nav {
+        li {
+            position: relative;
+            &:hover, &.active {
+                z-index: 999 !important;
+                a {
+                    background-color: inherit !important; /* override bootstrap */
+                }
+            }
+        }
+
+        li .menu_level_1 {
+            min-width: 100%;
+            display: none;
+            position: absolute;
+            z-index: 999;
+            left: 0;
+            list-style: none;
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+
+        li:hover .menu_level_1 {
+            display: block;
+            a {
+                padding-right: 5px;
+            }
+        }
+    }
+
+    #menu-top {
+        li:hover .menu_level_1 {
+            white-space: nowrap;
+            a {
+            }
+            a:hover {
+                color: white;
+            }
+        }
+    }
+
+    #menu-main {
+        margin-left: 0;
+
+        & > li {
+            margin-right: 4px;
+            /* border-bottom: 2px solid transparent; */
+            padding: 0;
+            a {
+                padding: 5px;
+                padding-right: 5px;
+                color: white;
+            }
+            &:hover, &.active {
+                background-color: rgb(0, 99, 166) * 0.7;
+            }
+        }
+
+        li:hover .menu_level_1 {
+            padding-top: 2px;
+            padding-bottom: 2px;
+            white-space: nowrap;
+            margin-left: 0px;
+            background-color: gray;
+        }
+    }
+}
+
+/* footer */
+footer {
+    font-size: 1.2rem;
+    background-color: $color-gray-dark;
+    a, a:visited {
+        color: white;
+        &:hover {
+            color: $color-color-dark;
+        }
+    }
+    margin-top: 1rem;
+    /*
+    margin-bottom: 2rem;
+    */
+
+    #footer-social {
+        background-color: $color-gray-light;
+        padding-top: 12px;
+        line-height: 32px;
+
+        a.twitter {
+            background: url("../img/icon/twitter.png") no-repeat;
+            background-size: cover;
+            height: 32px;
+            width: 32px;
+            display: inline-block;
+        }
+    }
+
+    #footer-navigation {
+        padding-top: 2rem;
+        padding-bottom: 1rem;
+    }
+
+    ul {
+        list-style-type: none;
+        padding-left: 0;
+
+        &#menu-main-footer {
+            text-transform: uppercase;
+        }
+    }
+
+    ul ul {
+        padding-left: 20px;
+    }
+}
+
+@media print {
+    /* http://drupal.stackexchange.com/a/59908*/
+    a[href]:after {
+        content: none;
+    }
+}

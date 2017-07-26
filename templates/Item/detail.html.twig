@@ -1,0 +1,72 @@
+{% extends 'Base/base.html.twig' %}
+{% import 'Shared/helper.html.twig' as helper %}
+
+{% block head %}
+    <!-- justifiedGallery, http://miromannino.github.io/Justified-Gallery/ -->
+    <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/justified-gallery/justifiedGallery.min.css">
+    <script src="{{ app.request.basepath }}/vendor/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    <script>
+        $( document ).ready(function() {
+            $('.gallery').justifiedGallery();
+        })
+    </script>
+{% endblock %}
+
+{% block body %}
+    <h1>
+        {{ item.title }}
+    </h1>
+    <div class="row">
+        <div class="col-sm-8">
+            {% if item.creators is not empty %}
+                {% for person in item.creators %}
+                <a href="{% if person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : person.ulan }) }}{% elseif person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : person.gnd }) }}{% else %}{{ path('person', { 'id' : person.id }) }}{% endif %}">
+                <b>{{ person.fullname(true) }}</b>
+                </a>
+            {% endfor %}
+            {% endif %}
+
+            {% if item.displaydate is not empty %}
+                {{ item.displaydate }}
+            {% else %}
+                ({{ item.earliestdate|dateincomplete }}{# - {{  item.latestdate|dateincomplete  }}#})
+            {% endif %}
+
+            {% set preview = item.previewImg %}
+            {% if preview is not null %}
+                {% set imgUrl = 'https://exhibitions05-15.kugb.univie.ac.at/uploads/' ~  preview.imgUrl %}
+                <img class="img-responsive" src="{{ imgUrl }}" />
+            {% endif %}
+        </div>
+
+        <div class="col-sm-4 sidebar">
+            {% if item.exhibitions is not empty %}
+                <h3>Exhibited</h3>
+                <ul class="list-group">
+                {% for exhibition in item.exhibitions %}
+                    <li class="list-group-item">
+                        <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
+                            <b>{{ exhibition.title }}</b>
+                        </a>
+
+                        {{ helper.exhibition_period(exhibition) }}
+
+                        {% if exhibition.location is not null %}
+                            {% set location = exhibition.location %}
+                            <div>
+                            {% if location.place is not null %}
+                                <a href="{% if location.place.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : location.place.tgn }) }}{% else %}{{ path('place', { 'id' : location.place.id }) }}{% endif %}">
+                                {{ location.place.nameLocalized }}
+                                </a>:
+                            {% endif %}
+                            <a href="{{ path('location', { 'id' : location.id }) }}">
+                                {{ location.name }}</a>
+                            </div>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </div><!-- .row -->
+{% endblock %}

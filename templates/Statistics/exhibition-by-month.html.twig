@@ -1,0 +1,98 @@
+{% extends 'Base/base.html.twig' %}
+{% block head %}
+    <script src="{{ app.request.basepath }}/vendor/highcharts/highcharts.js"></script>
+    <script src="{{ app.request.basepath }}/vendor/highcharts/modules/exporting.js"></script>
+    <!--
+    <script src="{{ app.request.basepath }}/vendor/highcharts/themes/sand-signika.js"></script>
+    -->
+    <script type="text/javascript">
+    var chart;
+
+    $(document).ready(function() {
+        $('#container').highcharts({
+            chart: {
+                // renderTo: 'container',
+                zoomType: 'xy'
+            },
+            title: {
+                text: 'Number of Exhibitions by Month'
+            },
+            subtitle: {
+                text: 'Average: {{ data_avg }} exhibitions per month'
+            },
+            xAxis: {
+                categories: {{ categories|raw }},
+                labels: {
+                    rotation: -45,
+                    step: 3, // this will show one label for every quarter
+                    align: 'right'
+                }
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Number of Exhibitions',
+                }
+            },
+            legend: {
+                enabled: false
+            },
+            tooltip: {
+                // headerFormat: '{point.key}',
+                pointFormat: '{point.y} Exhibitions'
+            },
+
+            series: [
+                {
+                    type: 'column',
+                    data: {{ data|raw }}
+                }
+            ]
+        });
+
+
+        // see http://jsfiddle.net/KmPJE/1/
+        $('#container2').highcharts({
+            chart: {
+                defaultSeriesType: 'scatter'
+            },
+
+            title: {
+                text: "\n"
+            },
+
+            xAxis: {
+                categories: ['Jan','Feb','Mar','Apr','May','Jun','Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            },
+
+            yAxis: {
+                categories: {{ scatter_categories|raw }},
+            },
+
+            tooltip: {
+                    formatter: function() {
+                        // console.log(this);
+                        return '<b>'
+                            + this.point.count
+                            + ' exhibitions '
+                            + ' in '
+                            + this.x + ' ' + this.point.year
+                            + '</b>';
+                    }
+                },
+
+            series: [{
+                name: 'Exhibitions',
+                data: {{ scatter_data|raw }}
+            }]
+        });
+
+    });
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div id="container" style="min-width: 800px; height: 400px; margin: 0 auto;"></div>
+
+    <div id="container2" style="min-width: 800px; height: 400px; margin: 0 auto;"></div>
+{% endblock %}

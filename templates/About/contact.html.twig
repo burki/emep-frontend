@@ -1,0 +1,7 @@
+{% extends 'Base/base.html.twig' %}
+
+{% block body %}
+    {% form_theme form 'bootstrap_3_horizontal_layout.html.twig' %}
+    {# renders all fields *and* the form start and end tags #}
+    {{ form(form) }}
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'Base/base.html.twig' %}
+
+{% block body %}
+    <h1>{{ pageTitle }}</h1>
+    <div class="row">
+        <div class="col-sm-8">
+        {% if locations is not empty %}
+        {% set last_place = null %}
+            <ul class="list-unstyled">
+        {% for location in locations %}
+            {% if location.place is not empty %}
+                {% set place = location.place %}
+                {% if place != last_place %}
+                    {% if last_place != null %}
+                </ul>
+                    {% endif %}
+                <h4>
+                    <a href="{{ path('place', { 'id': place.id }) }}">
+                        {{ place.nameLocalized(app.request.locale) }} ({{ place.countryCode}})
+                </h4></b>
+                {% set last_place = place %}
+                <ul class="list-group">
+                {% endif %}
+            {% endif %}
+            <li class="list-group-item">
+                <a href="{{ path('location', { 'id' : location.id }) }}">
+                {{ location.name }}
+                </a>
+            </li>
+        {% endfor %}
+            </ul>
+        {% else %}
+            No Works found
+        {% endif %}
+        </div>
+    </div><!-- .row -->
+{% endblock %}

@@ -1,0 +1,19 @@
+imports:
+    - { resource: config.yaml }
+
+framework:
+    profiler:
+        enabled: false # true by default
+        only_exceptions: false
+
+#web_profiler:
+#    toolbar: false
+#    intercept_redirects: false
+
+#monolog:
+#    handlers:
+#        console:
+#            type:   console
+#            verbosity_levels:
+#                VERBOSITY_NORMAL: NOTICE # DEBUG
+
