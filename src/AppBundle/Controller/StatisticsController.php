@@ -271,11 +271,4 @@ class StatisticsController extends Controller
             'exhibitions' => json_encode(array_values($total['exhibitions'])),
         ]);
     }
-
-    /**
-     * @Route("/work/by-person", name="item-by-person")
-     */
-    public function itemByPlace()
-    {
-    }
 }
