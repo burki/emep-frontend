@@ -12,13 +12,13 @@
             $('.gallery').justifiedGallery();
         })
     </script>
-    
+
     {{ map.head() }}
     <script src="{{ app.request.basepath }}/js/seealso.js"></script>
     <script>
         var service = new SeeAlsoCollection();
         service.services = {
-            'pndaks' : new SeeAlsoService('http://beacon.findbuch.de/seealso/pnd-aks/-lemo@ap/-jgo-hsd-personen')
+            'pndaks' : new SeeAlsoService('https://beacon.findbuch.de/seealso/pnd-aks/-lemo@ap')
         };
         service.views = {
             'seealso-ul' : new SeeAlsoUL({

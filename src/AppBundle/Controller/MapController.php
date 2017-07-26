@@ -19,7 +19,7 @@ class MapController extends Controller
     {
         $em = $this->getDoctrine()->getEntityManager();
         $dbconn = $em->getConnection();
-        $querystr = "SELECT Person.id, Person.lastname, Person.firstname, COALESCE(Geoname.name_variant, Geoname.name) AS place, Geoname.tgn, latitude, longitude"
+        $querystr = "SELECT Person.id AS person_id, Person.lastname, Person.firstname, birthdate, deathdate, COALESCE(Geoname.name_variant, Geoname.name) AS place, Geoname.tgn, latitude, longitude"
                   . " FROM Person"
                   . " INNER JOIN Geoname ON Person.birthplace_tgn=Geoname.tgn"
                   . " WHERE"
@@ -39,14 +39,18 @@ class MapController extends Controller
                     'latitude' => (double)$row['latitude'],
                     'longitude' => (double)$row['longitude'],
                     'place' => sprintf('<a href="%s">%s</a>',
-                                       '#',
-                                       $row['place']),
+                                       htmlspecialchars($this->generateUrl('place-by-tgn', [
+                                            'tgn' => $row['tgn'],
+                                       ])),
+                                       htmlspecialchars($row['place'])),
                     'persons' => [],
                 ];
             }
             $values[$key]['persons'][] = sprintf('<a href="%s">%s</a>',
-                                                 '#',
-                                                 $row['lastname'] . ', ' . $row['firstname']);
+                                                 htmlspecialchars($this->generateUrl('person', [
+                                                    'id' => $row['person_id'],
+                                                ])),
+                                                $row['lastname'] . ', ' . $row['firstname']);
         }
         $values_final = [];
         foreach ($values as $key => $value) {
