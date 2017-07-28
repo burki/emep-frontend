@@ -52,15 +52,14 @@
                     formatter: function() {
                         // console.log(this);
                         var label;
-                        if (this.series.name == 'Number of Works') {
-                            label = 'works';
-                            //code
+                        if (this.series.name == 'Exhibitions') {
+                            label = 'exhibitions';
                         }
                         else if (this.series.name == 'Number of Exhibition Displays') {
-                            label = 'catalogue entries'
+                            label = 'catalogue entries';
                         }
                         else {
-                            label = 'exhibitions';
+                            label = this.series.name + ' works';
                         }
                         return '<b>'
                             + Highcharts.numberFormat(this.y, 0)
@@ -80,17 +79,17 @@
                     }
                 },
                 series: [
+                    {% for style in styles %}
                     {
-                        //dashStyle: 'Solid', // 'shortdot',
                         marker: {
                             enabled: false
                         },
                         yAxis: 1,
-                        name: 'Number of Works',
-                        data: {{ works|raw }},
+                        name: '{{ style }}',
+                        data: {{ works[style]|json_encode|raw }},
                         stack: 'works',
-                        color: '#e6550d'
                     },
+                    {% endfor %}
                     {
                         // type: 'line',
                         yAxis: 0,
@@ -242,8 +241,10 @@
         {% for person in persons_by_place_persons %}
         <td>
             {% if persons_by_place[person] is not empty %}
-                {{ persons_by_place[person]['how_many_exhibition'] }} exh.
-                / {{ persons_by_place[person]['how_many_item'] }} works
+                {#{ dump(persons_by_place[person])}#}
+                {{ persons_by_place[person]['total_exhibition'] }} exhibition{% if persons_by_place[person]['total_exhibition'] != 1 %}s{% endif %}<br/>
+                {{ persons_by_place[person]['total_item'] }} work{% if persons_by_place[person]['total_item'] != 1 %}s{% endif %}
+                ({{ persons_by_place[person]['Figurative'] }} fig., {{ persons_by_place[person]['Abstract'] }} abst.)
             {% endif %}
         </th>
         {% endfor %}

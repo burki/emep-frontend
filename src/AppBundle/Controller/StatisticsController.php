@@ -211,9 +211,10 @@ class StatisticsController extends Controller
 
         // by person
         $data = [];
+        $styles = [];
         foreach (['works', 'works_exhibited', 'exhibitions' ] as $key) {
             if ('works_exhibited' == $key) {
-                $querystr = 'SELECT COUNT(ItemExhibition.id) AS how_many, Person.lastname, Person.firstname'
+                $querystr = "SELECT COUNT(ItemExhibition.id) AS how_many, Person.lastname, Person.firstname"
                           . ' FROM Person'
                           . ' INNER JOIN ItemPerson ON Person.id=ItemPerson.id_person'
                           . ' INNER JOIN Item ON ItemPerson.id_item = Item.id'
@@ -235,22 +236,33 @@ class StatisticsController extends Controller
                           ;
             }
             else {
-                $querystr = 'SELECT COUNT(Item.id) AS how_many, Person.lastname, Person.firstname'
+                $querystr = "SELECT COUNT(Item.id) AS how_many, Person.lastname, Person.firstname, IFNULL(Term.name, 'unknown') AS style"
                           . ' FROM Person'
                           . ' INNER JOIN ItemPerson ON Person.id=ItemPerson.id_person'
                           . ' INNER JOIN Item ON ItemPerson.id_item = Item.id'
+                          . ' LEFT OUTER JOIN Term ON Item.style=Term.id'
                           . ' WHERE Person.status <> -1 AND Item.status <> -1'
-                          . ' GROUP BY Person.id'
-                          . ' ORDER BY Person.lastname, Person.firstname, Person.id'
+                          . ' GROUP BY Person.id, style'
+                          . ' ORDER BY Person.lastname, Person.firstname, Person.id, style'
                           ;
             }
             $stmt = $dbconn->query($querystr);
 
             while ($row = $stmt->fetch()) {
                 $fullname = $row['lastname'] . ', ' . $row['firstname'];
-                $data[$fullname][$key] = $row['how_many'];
+                if ('works' == $key) {
+                    $style = $row['style'];
+                    if (!in_array($style, $styles)) {
+                        $styles[] = $style;
+                    }
+                    $data[$fullname][$key][$style] = $row['how_many'];
+                }
+                else {
+                    $data[$fullname][$key] = $row['how_many'];
+                }
             }
         }
+
 
         $total = [];
         $categories = array_keys($data);
@@ -258,11 +270,22 @@ class StatisticsController extends Controller
             $category = $categories[$i];
             foreach (['works', 'works_exhibited','exhibitions']
                      as $key) {
-                $total[$key][$category] = [
-                    'name' => $category,
-                    'y' => isset($data[$category][$key])
-                        ? intval($data[$category][$key]) : 0,
-                ];
+                if ('works' == $key) {
+                    foreach ($styles as $style) {
+                        $total[$key][$style][] = [
+                            'name' => $category,
+                            'y' => isset($data[$category][$key]) && isset($data[$category][$key][$style])
+                                ? intval($data[$category][$key][$style]) : 0,
+                        ];
+                    }
+                }
+                else {
+                    $total[$key][$category] = [
+                        'name' => $category,
+                        'y' => isset($data[$category][$key])
+                            ? intval($data[$category][$key]) : 0,
+                    ];
+                }
             }
         }
 
@@ -331,35 +354,63 @@ class StatisticsController extends Controller
         }
 
         // for table
-        $querystr = 'SELECT COUNT(DISTINCT Exhibition.id) AS how_many_exhibition, COUNT(DISTINCT ItemExhibition.id) AS how_many_cat, COUNT(DISTINCT Item.id) AS how_many_item, COALESCE(Geoname.name_variant, Geoname.name) AS place, Person.lastname, Person.firstname'
+        $querystr = "SELECT Exhibition.id AS exhibition_id, Item.id AS item_id, COALESCE(Geoname.name_variant, Geoname.name) AS place, Geoname.country_code AS cc, Person.lastname, Person.firstname, IFNULL(Term.name, 'unknown') AS style"
                     . " FROM Exhibition"
                     . " INNER JOIN Location ON Location.id=Exhibition.id_location"
                     . " INNER JOIN Geoname ON Geoname.tgn=Location.place_tgn"
                     . ' INNER JOIN ItemExhibition ON ItemExhibition.id_exhibition=Exhibition.id'
                     . ' INNER JOIN Item ON Item.id=ItemExhibition.id_item AND Item.id <> -1'
+                    . ' LEFT OUTER JOIN Term ON Item.style=Term.id'
                     . ' INNER JOIN ItemPerson ON Item.id=ItemPerson.id_item'
                     . ' INNER JOIN Person ON ItemPerson.id_person=Person.id AND Person.status <> -1'
                     . " WHERE Exhibition.status <> -1"
-                  . ' GROUP BY Geoname.tgn, Person.id'
-                  . ' ORDER BY Geoname.country_code, place'
+                  . ' ORDER BY Geoname.country_code, place, place_tgn, Person.id, exhibition_id'
                   ;
 
         $stmt = $dbconn->query($querystr);
 
         $persons_by_place = [];
         while ($row = $stmt->fetch()) {
-            if (!array_key_exists($row['place'], $persons_by_place)) {
-                $persons_by_place[$row['place']] = [];
+            $place_key = $row['place'] . ' (' . $row['cc'] . ')';
+
+            if (!array_key_exists($place_key, $persons_by_place)) {
+                // new place
+                $persons_by_place[$place_key] = [];
             }
             $fullname = $row['lastname'] . ', ' . $row['firstname'];
-            $persons_by_place[$row['place']][$fullname] = $row;
+
+            if (!array_key_exists($fullname, $persons_by_place[$place_key])) {
+                // new person in this place
+                $persons_by_place[$place_key][$fullname] = $row;
+                $persons_by_place[$place_key][$fullname]['Figurative']
+                  = $persons_by_place[$place_key][$fullname]['Abstract'] = 0;
+                $persons_by_place[$place_key][$fullname]['total_item']
+                    = $persons_by_place[$place_key][$fullname]['total_exhibition']
+                    = 0;
+                $persons_by_place[$place_key][$fullname]['exhibition_ids']
+                    = $persons_by_place[$place_key][$fullname]['item_ids']
+                    = [];
+            }
+            if (!array_key_exists($row['style'], $persons_by_place[$place_key][$fullname])) {
+                $persons_by_place[$place_key][$fullname][$row['style']] = 0;
+            }
+
+            if (!in_array($row['exhibition_id'], $persons_by_place[$place_key][$fullname]['exhibition_ids'])) {
+                $persons_by_place[$place_key][$fullname]['exhibition_ids'][] = $row['exhibition_id'];
+                $persons_by_place[$place_key][$fullname]['total_exhibition'] += 1;
+            }
+            if (!in_array($row['item_id'], $persons_by_place[$place_key][$fullname]['item_ids'])) {
+                $persons_by_place[$place_key][$fullname]['item_ids'][] = $row['item_id'];
+                $persons_by_place[$place_key][$fullname]['total_item'] += 1;
+                $persons_by_place[$place_key][$fullname][$row['style']] += 1;
+            }
         }
 
         return $this->render('Statistics/item-by-person.html.twig', [
             'subtitle' => json_encode($subtitle = 'TODO'),
 
             'person_categories' => json_encode($categories),
-            'works' => json_encode(array_values($total['works'])),
+            'works' => $total['works'], 'styles' => $styles,
             'works_exhibited' => json_encode(array_values($total['works_exhibited'])),
             'exhibitions' => json_encode(array_values($total['exhibitions'])),
 
