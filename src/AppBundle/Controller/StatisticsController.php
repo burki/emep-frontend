@@ -13,7 +13,7 @@ class StatisticsController extends Controller
     /**
      * @Route("/exhibition/by-month", name="exhibition-by-month")
      */
-    public function reportsPerMonth()
+    public function exhibitionByMonth()
     {
         $em = $this->getDoctrine()->getEntityManager();
 
@@ -184,6 +184,8 @@ class StatisticsController extends Controller
     }
 
     /**
+     * TODO: rename since we added cities as well
+     *
      * @Route("/work/by-person", name="item-by-person")
      */
     public function itemByPerson()
@@ -207,6 +209,7 @@ class StatisticsController extends Controller
         }
         $subtitle = implode(' out of ', $subtitle_parts) . ' persons';
 
+        // by person
         $data = [];
         foreach (['works', 'works_exhibited', 'exhibitions' ] as $key) {
             if ('works_exhibited' == $key) {
@@ -263,12 +266,110 @@ class StatisticsController extends Controller
             }
         }
 
+        // by place
+        $place_data = [];
+        foreach (['works', 'works_exhibited', 'exhibitions' ] as $key) {
+            if ('works_exhibited' == $key) {
+                $querystr = 'SELECT COUNT(ItemExhibition.id) AS how_many, COALESCE(Geoname.name_variant, Geoname.name) AS place'
+                            . " FROM Exhibition"
+                            . " INNER JOIN Location ON Location.id=Exhibition.id_location"
+                            . " INNER JOIN Geoname ON Geoname.tgn=Location.place_tgn"
+                            . ' INNER JOIN ItemExhibition ON ItemExhibition.id_exhibition=Exhibition.id'
+                            . ' INNER JOIN Item ON Item.id=ItemExhibition.id_item AND Item.id <> -1'
+                            . " WHERE"
+                            . " Exhibition.status <> -1"
+                          . ' GROUP BY Geoname.tgn'
+                          . ' ORDER BY Geoname.country_code, place'
+                          ;
+            }
+            else if ('exhibitions' == $key) {
+                $querystr = 'SELECT COUNT(DISTINCT Exhibition.id) AS how_many, COALESCE(Geoname.name_variant, Geoname.name) AS place'
+                            . " FROM Exhibition"
+                            . " INNER JOIN Location ON Location.id=Exhibition.id_location"
+                            . " INNER JOIN Geoname ON Geoname.tgn=Location.place_tgn"
+                            . ' INNER JOIN ItemExhibition ON ItemExhibition.id_exhibition=Exhibition.id'
+                            . ' INNER JOIN Item ON Item.id=ItemExhibition.id_item AND Item.id <> -1'
+                            . " WHERE"
+                            . " Exhibition.status <> -1"
+                          . ' GROUP BY Geoname.tgn'
+                          . ' ORDER BY Geoname.country_code, place'
+                          ;
+            }
+            else {
+                $querystr = 'SELECT COUNT(DISTINCT Item.id) AS how_many, COALESCE(Geoname.name_variant, Geoname.name) AS place'
+                            . " FROM Exhibition"
+                            . " INNER JOIN Location ON Location.id=Exhibition.id_location"
+                            . " INNER JOIN Geoname ON Geoname.tgn=Location.place_tgn"
+                            . ' INNER JOIN ItemExhibition ON ItemExhibition.id_exhibition=Exhibition.id'
+                            . ' INNER JOIN Item ON Item.id=ItemExhibition.id_item AND Item.id <> -1'
+                            . " WHERE"
+                            . " Exhibition.status <> -1"
+                          . ' GROUP BY Geoname.tgn'
+                          . ' ORDER BY Geoname.country_code, place'
+                          ;
+            }
+            $stmt = $dbconn->query($querystr);
+
+            while ($row = $stmt->fetch()) {
+                $fullname = $row['place'];
+                $place_data[$fullname][$key] = $row['how_many'];
+            }
+        }
+
+        $place_total = [];
+        $place_categories = array_keys($place_data);
+        for ($i = 0; $i < count($place_categories); $i++) {
+            $category = $place_categories[$i];
+            foreach (['works', 'works_exhibited','exhibitions']
+                     as $key) {
+                $place_total[$key][$category] = [
+                    'name' => $category,
+                    'y' => isset($place_data[$category][$key])
+                        ? intval($place_data[$category][$key]) : 0,
+                ];
+            }
+        }
+
+        // for table
+        $querystr = 'SELECT COUNT(DISTINCT Exhibition.id) AS how_many_exhibition, COUNT(DISTINCT ItemExhibition.id) AS how_many_cat, COUNT(DISTINCT Item.id) AS how_many_item, COALESCE(Geoname.name_variant, Geoname.name) AS place, Person.lastname, Person.firstname'
+                    . " FROM Exhibition"
+                    . " INNER JOIN Location ON Location.id=Exhibition.id_location"
+                    . " INNER JOIN Geoname ON Geoname.tgn=Location.place_tgn"
+                    . ' INNER JOIN ItemExhibition ON ItemExhibition.id_exhibition=Exhibition.id'
+                    . ' INNER JOIN Item ON Item.id=ItemExhibition.id_item AND Item.id <> -1'
+                    . ' INNER JOIN ItemPerson ON Item.id=ItemPerson.id_item'
+                    . ' INNER JOIN Person ON ItemPerson.id_person=Person.id AND Person.status <> -1'
+                    . " WHERE Exhibition.status <> -1"
+                  . ' GROUP BY Geoname.tgn, Person.id'
+                  . ' ORDER BY Geoname.country_code, place'
+                  ;
+
+        $stmt = $dbconn->query($querystr);
+
+        $persons_by_place = [];
+        while ($row = $stmt->fetch()) {
+            if (!array_key_exists($row['place'], $persons_by_place)) {
+                $persons_by_place[$row['place']] = [];
+            }
+            $fullname = $row['lastname'] . ', ' . $row['firstname'];
+            $persons_by_place[$row['place']][$fullname] = $row;
+        }
+
         return $this->render('Statistics/item-by-person.html.twig', [
             'subtitle' => json_encode($subtitle = 'TODO'),
-            'categories' => json_encode($categories),
+
+            'person_categories' => json_encode($categories),
             'works' => json_encode(array_values($total['works'])),
             'works_exhibited' => json_encode(array_values($total['works_exhibited'])),
             'exhibitions' => json_encode(array_values($total['exhibitions'])),
+
+            'place_categories' => json_encode($place_categories),
+            'place_works' => json_encode(array_values($place_total['works'])),
+            'place_works_exhibited' => json_encode(array_values($place_total['works_exhibited'])),
+            'place_exhibitions' => json_encode(array_values($place_total['exhibitions'])),
+
+            'persons_by_place_persons' => $categories,
+            'persons_by_place' => $persons_by_place,
         ]);
     }
 }

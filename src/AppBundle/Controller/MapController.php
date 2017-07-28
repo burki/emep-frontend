@@ -77,7 +77,7 @@ class MapController extends Controller
      * @Route("/exhibition/by-place", name="exhibition-by-place")
      * @Route("/location/by-place", name="location-by-place")
      */
-    public function exhibitionPlaces(Request $request)
+    public function exhibitionByPlace(Request $request)
     {
         $em = $this->getDoctrine()->getEntityManager();
         $dbconn = $em->getConnection();
