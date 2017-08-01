@@ -74,7 +74,7 @@ class ItemController extends Controller
                 ->leftJoin('I.creators', 'P')
                 ->innerJoin('I.style', 'T')
                 ->where('I.status <> -1 AND P.status <> -1')
-                ->orderBy('styleSort, dateSort, nameSort, catSort')
+                ->orderBy('styleSort DESC, dateSort, nameSort, catSort')
                 ;
             $qbPerson
                 ->innerJoin('I.style', 'T');
@@ -102,7 +102,7 @@ class ItemController extends Controller
             }
             $persons = $qbPerson->getQuery()->getResult();
         }
-        
+
         $results = $qb->getQuery()
             // ->setMaxResults(10) // for testing
             ->getResult();

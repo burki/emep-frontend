@@ -383,7 +383,9 @@ class StatisticsController extends Controller
                 // new person in this place
                 $persons_by_place[$place_key][$fullname] = $row;
                 $persons_by_place[$place_key][$fullname]['Figurative']
-                  = $persons_by_place[$place_key][$fullname]['Abstract'] = 0;
+                  = $persons_by_place[$place_key][$fullname]['Abstracted']
+                  = $persons_by_place[$place_key][$fullname]['Abstract']
+                  = 0;
                 $persons_by_place[$place_key][$fullname]['total_item']
                     = $persons_by_place[$place_key][$fullname]['total_exhibition']
                     = 0;
