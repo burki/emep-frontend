@@ -95,7 +95,7 @@ class ItemController extends Controller
         }
 
         $persons = null;
-        if (!is_null($qbPerson)) {
+        if (isset($qbPerson)) {
             $person = $request->get('person');
             if (!empty($person) && intval($person) > 0) {
                 $qb->andWhere(sprintf('P.id=%d', intval($person)));
