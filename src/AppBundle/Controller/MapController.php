@@ -76,6 +76,7 @@ class MapController extends Controller
     /**
      * @Route("/exhibition/by-place", name="exhibition-by-place")
      * @Route("/location/by-place", name="location-by-place")
+     * @Route("/work/by-place", name="item-by-place")
      */
     public function exhibitionByPlace(Request $request)
     {
@@ -83,6 +84,7 @@ class MapController extends Controller
         $dbconn = $em->getConnection();
 
         $route = $request->get('_route');
+        $persons = null;
         if ('location-by-place' == $route) {
             $maxDisplay = 15;
             $querystr = "SELECT Location.id AS location_id, Location.name AS location_name, COALESCE(Geoname.name_variant, Geoname.name) AS place, Geoname.tgn, Geoname.latitude, Geoname.longitude"
@@ -95,13 +97,41 @@ class MapController extends Controller
         }
         else {
             $maxDisplay = 10;
-            $querystr = "SELECT Exhibition.id AS exhibition_id, Exhibition.title, startdate, enddate, displaydate, Location.id AS location_id, Location.name AS location_name, COALESCE(Geoname.name_variant, Geoname.name) AS place, Geoname.tgn, Geoname.latitude, Geoname.longitude"
+            $querystr = "SELECT DISTINCT Exhibition.id AS exhibition_id, Exhibition.title, startdate, enddate, Exhibition.displaydate AS displaydate, Location.id AS location_id, Location.name AS location_name, COALESCE(Geoname.name_variant, Geoname.name) AS place, Geoname.tgn, Geoname.latitude, Geoname.longitude"
                       . " FROM Exhibition"
                       . " INNER JOIN Location ON Location.id=Exhibition.id_location"
-                      . " INNER JOIN Geoname ON Geoname.tgn=Location.place_tgn"
-                      . " WHERE"
+                      . " INNER JOIN Geoname ON Geoname.tgn=Location.place_tgn";
+
+            if ('item-by-place' == $route) {
+                $querystr .= ' INNER JOIN ItemExhibition ON ItemExhibition.id_exhibition=Exhibition.id'
+                           . ' INNER JOIN Item ON ItemExhibition.id_item=Item.id AND Item.status <> -1'
+                           ;
+
+                $person = $request->get('person');
+                if (!empty($person) && intval($person) > 0) {
+                    $querystr .= ' INNER JOIN ItemPerson ON Item.id=ItemPerson.id_item'
+                               . sprintf(' AND ItemPerson.id_person=%d', intval($person));
+                }
+
+                $qbPerson = $this->getDoctrine()
+                        ->getManager()
+                        ->createQueryBuilder();
+
+                $qbPerson->select('P')
+                    ->distinct()
+                    ->from('AppBundle:Person', 'P')
+                    ->innerJoin('AppBundle:ItemPerson', 'IP', 'WITH', 'IP.person=P')
+                    ->innerJoin('AppBundle:Item', 'I', 'WITH', 'IP.item=I')
+                    ->innerJoin('I.exhibitions', 'E')
+                    ->where('I.status <> -1')
+                    ->orderBy('P.familyName');
+                $persons = $qbPerson->getQuery()->getResult();
+            }
+
+            $querystr
+                     .= " WHERE"
                       . " Exhibition.status <> -1"
-                      . " ORDER BY tgn, location_name, Exhibition.startdate, Exhibition.title"
+                      . " ORDER BY tgn, Exhibition.startdate, location_name, Exhibition.title"
                       ;
         }
 
@@ -176,6 +206,7 @@ class MapController extends Controller
                 [ 60, -120 ],
                 [ -15, 120 ],
             ],
+            'persons' => $persons,
         ]);
     }
 }
@@ -229,5 +260,4 @@ class ExhibitionDisplayHelper
       return implode($joiner, [ $from, $until ]);
     }
   }
-
 }

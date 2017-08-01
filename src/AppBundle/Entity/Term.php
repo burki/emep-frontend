@@ -99,8 +99,13 @@ class Term
         }
     }
 
-    public function __toString()
+    public function getName()
     {
         return $this->name;
+    }
+
+    public function __toString()
+    {
+        return $this->getName();
     }
 }

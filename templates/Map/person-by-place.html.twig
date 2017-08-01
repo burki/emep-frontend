@@ -7,6 +7,18 @@
 
 {% block body %}
     {% if pageTitle is not empty %}<h1>{{ pageTitle }}</h1>{% endif %}
+        {% if persons is not null %}
+            <form method="get">
+                <select name="person" onchange="this.form.submit()">
+                    <option value="">-- all --</option>
+                    {% for person in persons %}
+                        <option value="{{ person.id }}"{% if app.request.get('person') == person.id %} selected="selected"{% endif %}>
+                            {{ person.fullname }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </form>
+        {% endif %}
     <div id="map-container">
         <div id="map" style="width: 100%; min-height: 480px"></div>
     </div>

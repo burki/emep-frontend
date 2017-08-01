@@ -535,6 +535,11 @@ class Item
      */
     private $keywords;
 
+    /**
+     * @ORM\OneToOne(targetEntity="Term", fetch="EAGER")
+     * @ORM\JoinColumn(name="style", referencedColumnName="id")
+     */
+    private $style;
 
     /**
      * @ORM\OneToMany(targetEntity="ItemMedia", mappedBy="item", fetch="EAGER")
@@ -585,6 +590,11 @@ class Item
     public function getDisplaydate()
     {
         return $this->displaydate;
+    }
+
+    public function getStyle()
+    {
+        return $this->style;
     }
 
     public function getPreviewImg()
@@ -676,5 +686,4 @@ class Item
 
         return $result;
     }
-
 }

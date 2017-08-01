@@ -86,6 +86,12 @@ class Builder
         $menu['Works']->addChild('List by Exhibition', [
             'route' => 'item-by-exhibition',
         ]);
+        $menu['Works']->addChild('List by Style', [
+            'route' => 'item-by-style',
+        ]);
+        $menu['Works']->addChild('Exhibition Map', [
+            'route' => 'item-by-place',
+        ]);
         $menu['Works']->addChild('Stats by Artist', [
             'route' => 'item-by-person',
         ]);

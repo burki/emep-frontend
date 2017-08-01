@@ -1,5 +1,4 @@
 {% extends 'Base/base.html.twig' %}
-{% import 'Shared/helper.html.twig' as helper %}
 
 {% block head %}
     <!-- justifiedGallery, http://miromannino.github.io/Justified-Gallery/ -->
@@ -29,35 +28,18 @@
                 </select>
             </form>
         {% endif %}
-        {% set last_exhibition = null %}
-        {% for exhibition in results %}
-            {% if exhibition != last_exhibition %}
-                {% if last_exhibition != null %}
-                </div><!-- .gallery -->
+        {% set last_style = null %}
+        {% for item in results %}
+            {% set style = item.style.name %}
+            {% if style != last_style %}
+                {% if last_style != null %}
+            </div><!-- .gallery -->
                 {% endif %}
-                <h4 style="margin: 0;">
-                    <a href="{{ path('exhibition', { 'id': exhibition.id }) }}">
-                        {{ exhibition.title }}
-                    </a>
-                </h4>
-                {{ helper.exhibition_period(exhibition) }}
-
-                {% if exhibition.location is not null %}
-                    {% set location = exhibition.location %}
-                    {% if location.place is not null %}
-                        <a href="{% if location.place.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : location.place.tgn }) }}{% else %}{{ path('place', { 'id' : location.place.id }) }}{% endif %}">
-                        {{ location.place.nameLocalized }}
-                        </a>:
-                    {% endif %}
-                    <a href="{{ path('location', { 'id' : location.id }) }}">
-                        {{ location.name }}</a>
-                {% endif %}
-                {% set last_exhibition = exhibition %}
-                <div class="gallery" style="margin-bottom: 2em">
+            <h4>{{ style }}</h4>
+            {% set last_style = style %}
+            <div class="gallery">
             {% endif %}
-            {% if exhibition.items is not empty %}
-                {% for item in exhibition.items %}
-                <a href="{{ path('item', { 'id' : item.id }) }}">
+            <a href="{{ path('item', { 'id' : item.id }) }}">
                 {% set preview = item.previewImg %}
                 {% if preview is not null %}
                     {% set imgUrl = 'https://exhibitions05-15.kugb.univie.ac.at/uploads/' ~  preview.imgUrl('preview') %}
@@ -77,11 +59,9 @@
                     ({{ item.earliestdate|dateincomplete }}{# - {{  item.latestdate|dateincomplete  }}#})
                 {% endif %}
                 </div>
-                </a>
-                {% endfor %}
-            {% endif %}
+            </a>
         {% endfor %}
-            </div><!-- .gallery -->
+            </div>
         {% else %}
             No Works found
         {% endif %}
