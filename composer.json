@@ -32,6 +32,11 @@
         "doctrine/doctrine-bundle": "@stable",
         "doctrine/orm": "@stable",
 
+        "easyrdf/easyrdf": "@stable",
+
+        "ddeboer/data-import": "0.20.*",
+        "phpoffice/phpexcel": "1.8.*",
+
         "kphoen/rulerz": "@stable"
     },
 
