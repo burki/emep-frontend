@@ -202,6 +202,12 @@ class Exhibition
      */
     protected $items;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="Person", mappedBy="exhibitions")
+     * @ORM\OrderBy({"familyName" = "ASC", "givenName" = "ASC"})
+     */
+    protected $artists;
+
     public static function stripTime($datetime)
     {
         if (is_null($datetime)) {
@@ -244,10 +250,15 @@ class Exhibition
     {
         return $this->location;
     }
-    
+
     public function getItems()
     {
         return $this->items;
+    }
+
+    public function getArtists()
+    {
+        return $this->artists;
     }
 
     /* make private properties public through a generic __get / __set */

@@ -44,6 +44,76 @@ class PersonController extends Controller
         ]);
     }
 
+    /* TODO: try to merge with inverse method in ExhibitionController */
+    protected function findSimilar($entity)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $dbconn = $em->getConnection();
+
+        // build all the ids
+        $exhibitionIds = [];
+        foreach ($entity->getExhibitions() as $exhibition) {
+            if ($exhibition->getStatus() <> -1) {
+                $exhibitionIds[] = $exhibition->getId();
+            }
+        }
+
+        $numExhibitions = count($exhibitionIds);
+        if (0 == $numExhibitions) {
+            return [];
+        }
+
+        $querystr = "SELECT DISTINCT id_person, id_exhibition"
+                  . " FROM ItemExhibition"
+                  . " WHERE id_exhibition IN (" . join(', ', $exhibitionIds) . ')'
+                  . " AND id_person <> " . $entity->getId()
+                  . " ORDER BY id_person";
+
+        $exhibitionsByPerson = [];
+        $stmt = $dbconn->query($querystr);
+        while ($row = $stmt->fetch()) {
+            if (!array_key_exists($row['id_person'], $exhibitionsByPerson)) {
+                $exhibitionsByPerson[$row['id_person']] = [];
+            }
+            $exhibitionsByPerson[$row['id_person']][] = $row['id_exhibition'];
+        }
+
+        $jaccardIndex = [];
+        $personIds = array_keys($exhibitionsByPerson);
+        if (count($personIds) > 0) {
+            $querystr = "SELECT CONCAT(COALESCE(lastname,firstname), ' ', COALESCE(firstname, '')) AS name, id_person, COUNT(DISTINCT id_exhibition) AS num_exhibitions"
+                      . " FROM ItemExhibition"
+                      . " LEFT OUTER JOIN Person ON ItemExhibition.id_person=Person.id"
+                      . " WHERE id_person IN (" . join(', ', $personIds) . ')'
+                      . " GROUP BY id_person";
+            $stmt = $dbconn->query($querystr);
+            while ($row = $stmt->fetch()) {
+                $numShared = count($exhibitionsByPerson[$row['id_person']]);
+
+                $jaccardIndex[$row['id_person']] = [
+                    'name' => $row['name'],
+                    'count' => $numShared,
+                    'coefficient' =>
+                          1.0
+                          * $numShared // shared
+                          /
+                          ($row['num_exhibitions'] + $numExhibitions - $numShared),
+                ];
+            }
+
+            uasort($jaccardIndex,
+                function ($a, $b) {
+                    if ($a['coefficient'] == $b['coefficient']) {
+                        return 0;
+                    }
+                    // highest first
+                    return $a['coefficient'] < $b['coefficient'] ? 1 : -1;
+                }
+            );
+        }
+        return $jaccardIndex;
+    }
+
     /**
      * @Route("/person/ulan/{ulan}", requirements={"ulan" = "[0-9]+"}, name="person-by-ulan")
      * @Route("/person/gnd/{gnd}", requirements={"gnd" = "[0-9xX]+"}, name="person-by-gnd")
@@ -51,7 +121,8 @@ class PersonController extends Controller
      */
     public function detailAction(Request $request, $id = null, $ulan = null, $gnd = null)
     {
-        $routeName = 'person'; $routeParams = [];
+        $routeName = 'person';
+        $routeParams = [];
 
         $personRepo = $this->getDoctrine()
                 ->getRepository('AppBundle:Person');
@@ -81,6 +152,7 @@ class PersonController extends Controller
         return $this->render('Person/detail.html.twig', [
             'pageTitle' => $person->getFullname(true), // TODO: lifespan in brackets
             'person' => $person,
+            'similar' => $this->findSimilar($person),
             'pageMeta' => [
                 'jsonLd' => $person->jsonLdSerialize($locale),
                 'og' => $this->buildOg($person, $routeName, $routeParams),

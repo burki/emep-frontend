@@ -121,6 +121,14 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
      * @ORM\JoinColumn(name="birthplace_tgn", referencedColumnName="tgn")
      */
     protected $birthPlace;
+
+    /**
+     * @var string Name of the birthplace.
+     *
+     * @ORM\Column(nullable=true,name="birthplace")
+     */
+    protected $birthPlaceLabel;
+
     /**
      * @var Place The place where the person died.
      *
@@ -128,6 +136,14 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
      * @ORM\JoinColumn(name="deathplace_tgn", referencedColumnName="tgn")
      */
     protected $deathPlace;
+
+    /**
+     * @var string Name of the deathplace.
+     *
+     * @ORM\Column(nullable=true,name="deathplace")
+     */
+    protected $deathPlaceLabel;
+
     /**
      * TODO: rename to honorificPrefix
      * @var string
@@ -190,6 +206,18 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
      * @ORM\OrderBy({"earliestdate" = "ASC", "catalogueId" = "ASC"})
      */
     protected $items;
+
+    /**
+     * @var ArrayCollection<Exhibition> The exhibition(s) of this person.
+     *
+     * @ORM\ManyToMany(targetEntity="Exhibition", inversedBy="artists")
+     * @ORM\JoinTable(name="ItemExhibition",
+     *      joinColumns={@ORM\JoinColumn(name="id_person", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="id_exhibition", referencedColumnName="id")}
+     * )
+     * @ORM\OrderBy({"startdate" = "ASC", "title" = "ASC"})
+     */
+    public $exhibitions;
 
     /**
      * Sets id.
@@ -543,6 +571,16 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
         return $this->birthPlace;
     }
 
+    /**
+     * Gets birthPlace.
+     *
+     * @return Place
+     */
+    public function getBirthPlaceLabel()
+    {
+        return $this->birthPlaceLabel;
+    }
+
     private static function buildPlaceInfo($place, $locale)
     {
         $placeInfo = [
@@ -623,6 +661,16 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
     }
 
     /**
+     * Gets deathPlace.
+     *
+     * @return string
+     */
+    public function getDeathPlaceLabel()
+    {
+        return $this->deathPlaceLabel;
+    }
+
+    /**
      * Gets deathPlace info
      *
      */
@@ -638,7 +686,6 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
         if (!is_null($this->additional) && array_key_exists('wikidata', $this->additional)) {
             return self::buildPlaceInfoFromWikidata($this->additional['wikidata']['de'],
                                                     'placeOfDeath');
-
         }
     }
 
@@ -878,17 +925,22 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
         return $this->items;
     }
 
+    public function getExhibitions()
+    {
+        return $this->exhibitions;
+    }
+
     public function jsonSerialize()
     {
         return [
-                 'id' => $this->id,
-                 'fullname' => $this->getFullname(),
-                 'honoricPrefix' => $this->getHonoricPrefix(),
-                 'description' => $this->getDescription(),
-                 'gender' => $this->getGender(),
-                 'gnd' => $this->gnd,
-                 'slug' => $this->slug,
-                 ];
+            'id' => $this->id,
+            'fullname' => $this->getFullname(),
+            'honoricPrefix' => $this->getHonoricPrefix(),
+            'description' => $this->getDescription(),
+            'gender' => $this->getGender(),
+            'gnd' => $this->gnd,
+            'slug' => $this->slug,
+        ];
     }
 
     public function jsonLdSerialize($locale, $omitContext = false)

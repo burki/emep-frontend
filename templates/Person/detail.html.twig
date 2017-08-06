@@ -1,6 +1,6 @@
 {% extends 'Base/base.html.twig' %}
 
-{#% import 'AppBundle:Shared:helper.html.twig' as helper %#}
+{% import 'Shared/helper.html.twig' as helper %}
 {% import 'Shared/map-leaflet.html.twig' as map %}
 
 {% block head %}
@@ -101,7 +101,55 @@
             </a>
                 {% endfor %}
             </div>
-            {% endif %}
+        {% endif %}
+
+        {% if person.exhibitions|length > 0 %}
+            <h3>Exhibitions</h3>
+            <ul>
+            {% for exhibition in person.exhibitions %}
+                <li>
+                <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
+                    <b>{{ exhibition.title }}</b>
+                </a>
+
+                {{ helper.exhibition_period(exhibition) }}
+
+                {% if exhibition.location is not null %}
+                    {% set location = exhibition.location %}
+                    <div>
+                    {% if location.place is not null %}
+                        <a href="{% if location.place.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : location.place.tgn }) }}{% else %}{{ path('place', { 'id' : location.place.id }) }}{% endif %}">
+                        {{ location.place.nameLocalized }}
+                        </a>:
+                    {% endif %}
+                    <a href="{{ path('location', { 'id' : location.id }) }}">
+                        {{ location.name }}
+                    </a>
+                    </div>
+                {% endif %}
+                </li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+
+        {% if similar|length > 0 %}
+           {% set similar_keys = similar|keys %}
+           {% set similar_found = false %}
+           {% for person_id in similar_keys %}
+               {% if similar[person_id]['count'] > 1 %}
+                   {% if not similar_found %}
+                       {% set similar_found = true %}
+           <h3>Frequent co-appearances</h3>
+           <ul class="listing">
+                   {% endif %}
+               <li><a href="{{ path('person', { 'id': person_id }) }}">{{  similar[person_id]['name'] }}</a> ({{ similar[person_id]['count'] }} exhibitions)</li>
+               {% endif %}
+           {% endfor %}
+           {% if similar_found %}
+           </ul>
+           {% endif %}
+       {% endif %}
+
         </div>
 
         <div class="col-sm-4 sidebar">

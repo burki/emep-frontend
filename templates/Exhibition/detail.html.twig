@@ -63,39 +63,39 @@
                 </a>
                 {% endfor %}
             </div><!-- .gallery -->
-            {% endif %}
+        {% endif %}
+
         </div>
 
         <div class="col-sm-4 sidebar">
-            {% if false and (birthPlace.geo is not empty or deathPlace.geo is not empty) %}
-            <div id="map" class="col-sm-12" style="width: 100%; min-height: 360px; border-bottom: 20px solid white;"></div>
-
-            <script>
-            function adjustMapSize() {
-                /*
-                $('#map').height(function(index, height) {
-                    return window.innerHeight - $(this).offset().top;
-                });
-                */
-            }
-
-            $( window ).resize(adjustMapSize);
-            adjustMapSize();
-
-            var map = L.map('map');
-
-            {% if birthPlace.geo is not empty and deathPlace.geo is not empty and birthPlace.geo != deathPlace.geo %}
-            map.fitBounds([ [ {{ birthPlace.geo }} ],
-                            [ {{ deathPlace.geo }} ] ]);
-            L.marker([ {{ birthPlace.geo }} ]).addTo(map);
-            L.marker([ {{ deathPlace.geo }} ]).addTo(map);
-            {% else %}
-            map.setView([{% if birthPlace.geo is not empty %}{{ birthPlace.geo }}{% else %}{{ deathPlace.geo }}{% endif %}], 10);
-            L.marker([ {% if birthPlace.geo is not empty %}{{ birthPlace.geo }}{% else %}{{ deathPlace.geo }}{% endif %} ]).addTo(map)
+            {% if exhibition.artists|length > 0 %}
+                <h3>Artists</h3>
+                <ul>
+                {% for person in exhibition.artists %}
+                    <li>
+                    <a href="{% if person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : person.ulan }) }}{% elseif person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : person.gnd }) }}{% else %}{{ path('person', { 'id' : person.id }) }}{% endif %}">
+                        <b>{{ person.fullname }}</b>
+                    </a>
+                    </li>
+                {% endfor %}
+                </ul>
             {% endif %}
-
-            {{ map.addTileLayer() }}
-            </script>
+            {% if similar|length > 0 %}
+                {% set similar_keys = similar|keys %}
+                {% set found = false %}
+                {% for exhibition_id in similar_keys %}
+                    {% if similar[exhibition_id]['count'] > 1 %}
+                        {% if not found %}
+                            {% set found = true %}
+                            <h3>Other Exhibitions with these Artists</h2>
+                            <ul class="listing">
+                        {% endif %}
+                    <li><a href="{{ path('exhibition', { 'id': exhibition_id }) }}">{{  similar[exhibition_id]['title'] }}</a> ({{ similar[exhibition_id]['count'] }} artists)</li>
+                    {% endif %}
+                {% endfor %}
+                {% if found %}
+                </ul>
+                {% endif %}
             {% endif %}
         </div>
     </div><!-- .row -->

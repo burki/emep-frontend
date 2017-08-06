@@ -43,6 +43,73 @@ class ExhibitionController extends Controller
         ]);
     }
 
+    /* TODO: try to merge with inverse method in PersonController */
+    protected function findSimilar($entity)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $dbconn = $em->getConnection();
+
+        // build all the ids
+        $personIds = [];
+        foreach ($entity->getArtists() as $person) {
+            if ($person->getStatus() <> -1) {
+                $personIds[] = $person->getId();
+            }
+        }
+
+        $numArtists = count($personIds);
+        if (0 == $numArtists) {
+            return [];
+        }
+        $querystr = "SELECT DISTINCT id_person, id_exhibition"
+                  . " FROM ItemExhibition"
+                  . " WHERE id_person IN (" . join(', ', $personIds) . ')'
+                  . " AND id_exhibition <> " . $entity->getId()
+                  . " ORDER BY id_exhibition";
+
+        $personsByExhibition = [];
+        $stmt = $dbconn->query($querystr);
+        while ($row = $stmt->fetch()) {
+            if (!array_key_exists($row['id_exhibition'], $personsByExhibition)) {
+                $personsByExhibition[$row['id_exhibition']] = [];
+            }
+            $personsByExhibition[$row['id_exhibition']][] = $row['id_person'];
+        }
+
+        $jaccardIndex = [];
+        $exhibitionIds = array_keys($personsByExhibition);
+        if (count($exhibitionIds) > 0) {
+            $querystr = "SELECT Exhibition.title AS title, id_exhibition, COUNT(DISTINCT id_person) AS num_artists"
+                      . " FROM ItemExhibition"
+                      . " LEFT OUTER JOIN Exhibition ON ItemExhibition.id_exhibition=Exhibition.id AND Exhibition.status <> -1"
+                      . " WHERE id_exhibition IN (" . join(', ', $exhibitionIds) . ')'
+                      . " GROUP BY id_exhibition";
+            $stmt = $dbconn->query($querystr);
+            while ($row = $stmt->fetch()) {
+                $numShared = count($personsByExhibition[$row['id_exhibition']]);
+                $jaccardIndex[$row['id_exhibition']] = [
+                    'title' => $row['title'],
+                    'count' => $numShared,
+                    'coefficient' =>
+                          1.0
+                          * $numShared // shared
+                          /
+                          ($row['num_artists'] + $numArtists - $numShared),
+                ];
+            }
+            uasort($jaccardIndex,
+                function ($a, $b) {
+                    if ($a['coefficient'] == $b['coefficient']) {
+                        return 0;
+                    }
+                    // highest first
+                    return $a['coefficient'] < $b['coefficient'] ? 1 : -1;
+                }
+            );
+        }
+        return $jaccardIndex;
+    }
+
     /**
      * @Route("/exhibition/{id}", requirements={"id" = "\d+"}, name="exhibition")
      */
@@ -70,6 +137,7 @@ class ExhibitionController extends Controller
         return $this->render('Exhibition/detail.html.twig', [
             'pageTitle' => $exhibition->title, // TODO: dates in brackets
             'exhibition' => $exhibition,
+            'similar' => $this->findSimilar($exhibition),
             'pageMeta' => [
                 /*
                 'jsonLd' => $exhibition->jsonLdSerialize($locale),
