@@ -87,7 +87,7 @@
                     {% if similar[exhibition_id]['count'] > 1 %}
                         {% if not found %}
                             {% set found = true %}
-                            <h3>Other Exhibitions with these Artists</h2>
+                            <h3>Other Exhibitions with multiple matching Artists</h2>
                             <ul class="listing">
                         {% endif %}
                     <li><a href="{{ path('exhibition', { 'id': exhibition_id }) }}">{{  similar[exhibition_id]['title'] }}</a> ({{ similar[exhibition_id]['count'] }} artists)</li>
