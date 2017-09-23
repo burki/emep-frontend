@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Intl\Intl;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -11,9 +12,38 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 /**
  *
  */
-class ExhibitionController extends Controller
+class ExhibitionController
+extends CrudController
 {
     use SharingBuilderTrait;
+
+    protected function buildCountries()
+    {
+        $qb = $this->getDoctrine()
+                ->getManager()
+                ->createQueryBuilder();
+
+        $qb->select([
+                'P.countryCode',
+            ])
+            ->distinct()
+            ->from('AppBundle:Exhibition', 'E')
+            ->leftJoin('E.location', 'L')
+            ->leftJoin('L.place', 'P')
+            ->where('E.status <> -1 AND P.countryCode IS NOT NULL')
+            ;
+
+        $countriesActive = [];
+
+        foreach ($qb->getQuery()->getResult() as $result) {
+            $countryCode = $result['countryCode'];
+            $countriesActive[$countryCode] = Intl::getRegionBundle()->getCountryName($countryCode);
+        }
+
+        asort($countriesActive);
+
+        return $countriesActive;
+    }
 
     /**
      * @Route("/exhibition", name="exhibition-index")
@@ -28,18 +58,36 @@ class ExhibitionController extends Controller
 
         $qb->select([
                 'E',
-                "E.startdate HIDDEN dateSort"
+                "E.startdate HIDDEN dateSort",
+                "CONCAT(COALESCE(P.alternateName, P.name), E.startdate) HIDDEN placeSort"
             ])
             ->from('AppBundle:Exhibition', 'E')
+            ->leftJoin('E.location', 'L')
+            ->leftJoin('L.place', 'P')
             ->where('E.status <> -1')
             ->orderBy('dateSort')
             ;
 
-        $exhibitions = $qb->getQuery()->getResult();
+        $form = $this->get('form.factory')->create(\AppBundle\Filter\ExhibitionFilterType::class, [
+            'choices' => array_flip($this->buildCountries()),
+        ]);
+
+        if ($request->query->has($form->getName())) {
+            // manually bind values from the request
+            $form->submit($request->query->get($form->getName()));
+
+            // build the query from the given form object
+            $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($form, $qb);
+        }
+
+        $pagination = $this->buildPagination($request, $qb->getQuery(), [
+            'defaultSortFieldName' => 'dateSort', 'defaultSortDirection' => 'asc',
+        ]);
 
         return $this->render('Exhibition/index.html.twig', [
             'pageTitle' => $this->get('translator')->trans('Exhibitions'),
-            'exhibitions' => $exhibitions,
+            'pagination' => $pagination,
+            'form' => $form->createView(),
         ]);
     }
 

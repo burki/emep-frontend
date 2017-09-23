@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Intl\Intl;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -11,9 +12,36 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 /**
  *
  */
-class PersonController extends Controller
+class PersonController
+extends CrudController
 {
     use SharingBuilderTrait;
+
+    protected function buildCountries()
+    {
+        $qb = $this->getDoctrine()
+                ->getManager()
+                ->createQueryBuilder();
+
+        $qb->select([
+                'P.nationality',
+            ])
+            ->distinct()
+            ->from('AppBundle:Person', 'P')
+            ->where('P.status <> -1 AND P.nationality IS NOT NULL')
+            ;
+
+        $countriesActive = [];
+
+        foreach ($qb->getQuery()->getResult() as $result) {
+            $countryCode = $result['nationality'];
+            $countriesActive[$countryCode] = Intl::getRegionBundle()->getCountryName($countryCode);
+        }
+
+        asort($countriesActive);
+
+        return $countriesActive;
+    }
 
     /**
      * @Route("/person", name="person-index")
@@ -36,11 +64,26 @@ class PersonController extends Controller
             ->orderBy('nameSort')
             ;
 
-        $persons = $qb->getQuery()->getResult();
+        $form = $this->get('form.factory')->create(\AppBundle\Filter\PersonFilterType::class, [
+            'choices' => array_flip($this->buildCountries()),
+        ]);
+
+        if ($request->query->has($form->getName())) {
+            // manually bind values from the request
+            $form->submit($request->query->get($form->getName()));
+
+            // build the query from the given form object
+            $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($form, $qb);
+        }
+
+        $pagination = $this->buildPagination($request, $qb->getQuery(), [
+            'defaultSortFieldName' => 'nameSort', 'defaultSortDirection' => 'asc',
+        ]);
 
         return $this->render('Person/index.html.twig', [
             'pageTitle' => $this->get('translator')->trans('Artists'),
-            'persons' => $persons,
+            'pagination' => $pagination,
+            'form' => $form->createView(),
         ]);
     }
 
@@ -162,7 +205,7 @@ class PersonController extends Controller
     }
 
     /*
-     * TODO: mode=tgn
+     * TODO: mode=ulan
      */
     public function beaconAction($mode = 'gnd')
     {

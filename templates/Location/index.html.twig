@@ -1,37 +1,76 @@
 {% extends 'Base/base.html.twig' %}
 
+{% import 'Shared/helper.html.twig' as helper %}
+
 {% block body %}
     <h1>{{ pageTitle }}</h1>
     <div class="row">
         <div class="col-sm-8">
-        {% if locations is not empty %}
-        {% set last_place = null %}
+        {% if pagination.getTotalItemCount > 0 %}
+        {{ helper.pagination_count(pagination) }}
+
+        <!--
+        <div>
+            {% set sortField = app.request.get('sort') %}
+            Sort by:
+            {{ knp_pagination_sortable(pagination, 'Place', 'placeSort') }}
+            {{ knp_pagination_sortable(pagination, 'Name', 'nameSort') }}
+        </div>
+        -->
+
+        {% set last_initial = '' %}
+        {% for location in pagination %}
             <ul class="list-unstyled">
-        {% for location in locations %}
-            {% if location.place is not empty %}
-                {% set place = location.place %}
-                {% if place != last_place %}
-                    {% if last_place != null %}
+            {% if location.placeLabel is not empty %}
+                {% if location.placeLabel != last_initial %}
+                    {% set place = location.place %}
+                    {% if last_initial != null %}
                 </ul>
                     {% endif %}
                 <h4>
-                    <a href="{{ path('place', { 'id': place.id }) }}">
+                    {% if place is not null %}<a href="{{ path('place', { 'id': place.id }) }}">{% endif %}
                         {{ place.nameLocalized(app.request.locale) }} ({{ place.countryCode}})
-                </h4></b>
-                {% set last_place = place %}
+                    {% if place is not null %}</a>{% endif %}
+                </h4>
+                {% set last_initial = location.placeLabel %}
                 <ul class="list-group">
                 {% endif %}
             {% endif %}
             <li class="list-group-item">
                 <a href="{{ path('location', { 'id' : location.id }) }}">
-                {{ location.name }}
+                    <b>{{ location.name }}</b>
                 </a>
+                {% set count = location.exhibitions|length %}
+                {% if count > 0 %}
+                    {% set divId = 'exhibitions' ~ location. id %}
+                    <a class="badge" style="color: white" href="#{{ divId }}" data-toggle="collapse">{{ count }}</a>
+                    <div id="{{ divId }}" class="collapse">
+                    {% for exhibition in location.exhibitions %}
+                        <p>
+                            <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
+                               {{ exhibition.title }}
+                            </a>
+                            {{ helper.exhibition_period(exhibition) }}
+                        </p>
+                    {% endfor %}
+                    </div>
+                {% endif %}
             </li>
         {% endfor %}
             </ul>
+            {# display navigation #}
+            <div class="navigation">
+                {{ knp_pagination_render(pagination) }}
+            </div>
         {% else %}
-            No Works found
+            No Venues found
         {% endif %}
+        </div>
+        <div class="col-sm-4">
+            <form class="filter" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
+                {{ form_rest(form) }}
+                <input type="submit" name="submit-filter" value="filter" />
+            </form>
         </div>
     </div><!-- .row -->
 {% endblock %}

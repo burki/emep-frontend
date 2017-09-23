@@ -12,7 +12,7 @@ class MicroKernel extends Kernel
     /*
      * Set an Environment Variable in Apache Configuration
      *   SetEnv APP_ENVIRONMENT prod
-     * for production setting instead of having www/app.php and ww/app_dev.php
+     * for production setting instead of having www/app.php and www/app_dev.php
      * This approach is described int
      *   https://www.pmg.com/blog/symfony-no-app-dev/
      */
@@ -26,6 +26,10 @@ class MicroKernel extends Kernel
         else {
             $debug = filter_var(getenv('APP_DEBUG'), FILTER_VALIDATE_BOOLEAN);
         }
+
+        // hack to access backend session
+        session_name('sid-emep');
+        session_start();
 
         return new self($env, $debug);
     }
@@ -57,6 +61,10 @@ class MicroKernel extends Kernel
             // menu
             // see http://symfony.com/doc/current/bundles/KnpMenuBundle/index.html
             new Knp\Bundle\MenuBundle\KnpMenuBundle(),
+
+            // search / filter / paginate
+            new Lexik\Bundle\FormFilterBundle\LexikFormFilterBundle(),
+            new Knp\Bundle\PaginatorBundle\KnpPaginatorBundle(),
 
             // contact
             new Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle(),

@@ -40,10 +40,12 @@ implements \JsonSerializable, JsonLdSerializable
         if (empty($type)) {
             return '';
         }
+
         $label = self::buildTypeLabel($type);
         if ($count > 1) {
             $label = \Doctrine\Common\Inflector\Inflector::pluralize($label);
         }
+
         return ucfirst($label);
     }
 
@@ -89,18 +91,21 @@ implements \JsonSerializable, JsonLdSerializable
      *
      */
     protected $id;
+
     /**
      * @var integer
      *
      * @ORM\Column(type="integer", nullable=false)
      */
     protected $status = 0;
+
     /**
      * @var string
      *
      * @ORM\Column(type="string", nullable=false)
      */
     protected $type = 'inhabited place';
+
     /**
      * @var double The latitude of the place.
      *
@@ -108,6 +113,7 @@ implements \JsonSerializable, JsonLdSerializable
      *
      */
     protected $latitude;
+
     /**
      * @var double The longitude of the place.
      *
@@ -115,12 +121,14 @@ implements \JsonSerializable, JsonLdSerializable
      *
      */
     protected $longitude;
+
     /**
      * @var string The name of the item.
      *
      * @ORM\Column(nullable=false)
      */
     protected $name;
+
     /**
      * @var array An alias for the item.
      *
@@ -508,6 +516,7 @@ implements \JsonSerializable, JsonLdSerializable
         if (!empty($this->alternateName)) {
             return $this->alternateName;
         }
+        
         return $this->getName();
     }
 

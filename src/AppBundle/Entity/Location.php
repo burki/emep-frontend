@@ -41,30 +41,35 @@ implements \JsonSerializable, JsonLdSerializable
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
+
     /**
      * @var integer
      *
      * @ORM\Column(type="integer", nullable=false)
      */
     protected $status = 0;
+
     /**
      * @var string A short description of the item.
      *
      * @ORM\Column(type="json_array", nullable=true)
      */
     protected $description;
+
     /**
      * @var string The date that this organization was dissolved.
      *
      * #ORM\Column(type="string", nullable=true)
      */
     protected $dissolutionDate;
+
     /**
      * @var string The date that this organization was founded.
      *
      * #ORM\Column(type="string", nullable=true)
      */
     protected $foundingDate;
+
     /**
      * @var string The name of the item.
      *
@@ -72,6 +77,7 @@ implements \JsonSerializable, JsonLdSerializable
      * @ORM\Column(nullable=true)
      */
     protected $name;
+
     /**
      * @var string URL of the item.
      *
@@ -79,6 +85,7 @@ implements \JsonSerializable, JsonLdSerializable
      * @ORM\Column(nullable=true)
      */
     protected $url;
+
     /**
      * @var Place The place of the location
      *
@@ -88,11 +95,18 @@ implements \JsonSerializable, JsonLdSerializable
     protected $place;
 
     /**
+     * @var string Label of the place.
+     *
+     * @ORM\Column(nullable=true,name="place")
+     */
+    protected $placeLabel;
+
+    /**
      * @var string
-     * #ORM\Column(type="string", length=32, nullable=true)
+     *
+     * @ORM\Column(type="string", length=32, nullable=true)
      */
     protected $gnd;
-
 
     /**
      * @var \DateTime
@@ -118,9 +132,9 @@ implements \JsonSerializable, JsonLdSerializable
      */
     protected $slug;
 
-
     /**
      * @ORM\OneToMany(targetEntity="Exhibition", mappedBy="location",cascade={"all"}, fetch="EAGER")
+     * @ORM\OrderBy({"startdate" = "ASC"})
      */
     protected $exhibitions;
 
@@ -337,6 +351,16 @@ implements \JsonSerializable, JsonLdSerializable
     }
 
     /**
+     * Gets place label.
+     *
+     * @return string
+     */
+    public function getPlaceLabel()
+    {
+        return $this->placeLabel;
+    }
+
+    /**
      * Sets gnd.
      *
      * @param string $gnd
@@ -420,10 +444,10 @@ implements \JsonSerializable, JsonLdSerializable
     public function jsonSerialize()
     {
         return [
-                 'id' => $this->id,
-                 'name' => $this->name,
-                 'gnd' => $this->gnd,
-                 ];
+                'id' => $this->id,
+                'name' => $this->name,
+                'gnd' => $this->gnd,
+        ];
     }
 
     public function jsonLdSerialize($locale, $omitContext = false)

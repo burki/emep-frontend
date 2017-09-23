@@ -141,6 +141,44 @@ nav {
     }
 }
 
+/* listings */
+.sort-control {
+    a {
+        margin-right: 1em;
+        margin-left: 0.5em;
+    }
+
+    a.asc::after, a.desc::after {
+        /* from .glyphicon */
+        display: inline-block;
+        font-family: "Glyphicons Halflings";
+        font-style: normal;
+        font-weight: 400;
+        line-height: 1;
+        position: relative;
+        top: 1px;
+        left: 5px;
+        color: $color-gray-medium;
+    }
+
+    a.asc::after {
+        content: "\e155";
+    }
+
+    a.desc::after {
+        content: "\e156";
+    }
+}
+
+form.filter {
+    label {
+        min-width: 6em;
+    }
+    select {
+        margin-left: 4px;
+    }
+}
+
 /* footer */
 footer {
     font-size: 1.2rem;

@@ -7,6 +7,8 @@ namespace AppBundle\Menu;
 use Knp\Menu\FactoryInterface;
 
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\PhpBridgeSessionStorage;
 
 class Builder
 {
@@ -50,6 +52,8 @@ class Builder
 
     public function createMainMenu(array $options)
     {
+        $showWorks = !empty($_SESSION['user']);
+
         // for translation, see http://symfony.com/doc/master/bundles/KnpMenuBundle/i18n.html
         $menu = $this->factory->createItem('home', [
             'label' => 'Home',
@@ -68,6 +72,14 @@ class Builder
             'route' => 'exhibition-by-month',
         ]);
 
+        $menu->addChild('Venues', ['route' => 'location']);
+        $menu['Venues']->addChild('List', [
+            'route' => 'location',
+        ]);
+        $menu['Venues']->addChild('Map', [
+            'route' => 'location-by-place',
+        ]);
+
         $menu->addChild('Artists', ['route' => 'person']);
         $menu['Artists']->addChild('List', [
             'route' => 'person',
@@ -79,30 +91,24 @@ class Builder
             'route' => 'person-by-year',
         ]);
 
-        $menu->addChild('Works', ['route' => 'item']);
-        $menu['Works']->addChild('List by Artist', [
-            'route' => 'item',
-        ]);
-        $menu['Works']->addChild('List by Exhibition', [
-            'route' => 'item-by-exhibition',
-        ]);
-        $menu['Works']->addChild('List by Style', [
-            'route' => 'item-by-style',
-        ]);
-        $menu['Works']->addChild('Exhibition Map', [
-            'route' => 'item-by-place',
-        ]);
-        $menu['Works']->addChild('Stats by Artist', [
-            'route' => 'item-by-person',
-        ]);
-
-        $menu->addChild('Venues', ['route' => 'location']);
-        $menu['Venues']->addChild('List', [
-            'route' => 'location',
-        ]);
-        $menu['Venues']->addChild('Map', [
-            'route' => 'location-by-place',
-        ]);
+        if ($showWorks) {
+            $menu->addChild('Works', ['route' => 'item']);
+            $menu['Works']->addChild('List by Artist', [
+                'route' => 'item',
+            ]);
+            $menu['Works']->addChild('List by Exhibition', [
+                'route' => 'item-by-exhibition',
+            ]);
+            $menu['Works']->addChild('List by Style', [
+                'route' => 'item-by-style',
+            ]);
+            $menu['Works']->addChild('Exhibition Map', [
+                'route' => 'item-by-place',
+            ]);
+            $menu['Works']->addChild('Stats by Artist', [
+                'route' => 'item-by-person',
+            ]);
+        }
 
         $menu->addChild('Places', ['route' => 'place']);
         $menu['Places']->addChild('List', [

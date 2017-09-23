@@ -64,9 +64,32 @@ extends Controller
             return new JsonLdResponse($place->jsonLdSerialize($locale));
         }
 
+        // get the persons associated with this place, currently birthplace / deathplace
+        // TODO: places of activity
+        $qb = $this->getDoctrine()
+                ->getManager()
+                ->createQueryBuilder();
+
+        $qb->select([
+                'P',
+                "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort"
+            ])
+            ->from('AppBundle:Person', 'P')
+            ->where("P.birthPlace = :place OR P.deathPlace = :place")
+            ->andWhere('P.status <> -1')
+            ->orderBy('P.birthDate')
+            ->addOrderBy('nameSort')
+            ;
+
+        $persons = $qb->getQuery()
+            ->setParameter('place', $place)
+            ->getResult();
+
+
         return $this->render('Place/detail.html.twig', [
             'pageTitle' => $place->getNameLocalized($locale),
             'place' => $place,
+            'persons' => $persons,
             'em' => $this->getDoctrine()->getManager(),
             'pageMeta' => [
                 'jsonLd' => $place->jsonLdSerialize($locale),

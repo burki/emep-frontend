@@ -1,6 +1,7 @@
 {% extends 'Base/base.html.twig' %}
 
 {% import 'Shared/map-leaflet.html.twig' as map %}
+{% import 'Shared/helper.html.twig' as helper %}
 
 {% block head %}
     {{ map.head() }}
@@ -45,14 +46,40 @@
         {% for location in place.locations %}
             <li class="list-group-item">
                 <a href="{{ path('location', { 'id' : location.id }) }}">
-                {{ location.name }}
+                    <b>{{ location.name }}</b>
                 </a>
+            {% set count = location.exhibitions|length %}
+            {% if count > 0 %}
+                {% set divId = 'exhibitions' ~ location. id %}
+                <a class="badge" style="color: white" href="#{{ divId }}" data-toggle="collapse">{{ count }}</a>
+                <div id="{{ divId }}" class="collapse">
+                {% for exhibition in location.exhibitions %}
+                    <p>
+                        <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
+                           {{ exhibition.title }}
+                        </a>
+
+                        {{ helper.exhibition_period(exhibition) }}
+                    </p>
+                {% endfor %}
+                </div>
+            {% endif %}
+            </li>
+        {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% if persons is not empty %}
+        <h3>Artists</h3>
+        <ul class="list-group">
+        {% for person in persons %}
+            <li class="list-group-item">
+                {{ helper.person_list_item(person) }}
             </li>
         {% endfor %}
         </ul>
         {% endif %}
         </div>
-
         <div class="col-sm-4 sidebar">
             <div class="container-fluid box">
                 <div class="row box-color-title">

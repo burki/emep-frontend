@@ -9,12 +9,13 @@
     <script>
         var service = new SeeAlsoCollection();
         service.services = {
-            'pndaks' : new SeeAlsoService('https://beacon.findbuch.de/seealso/pnd-aks/-lemo@ap')
+            'gndaks' : new SeeAlsoService('http://beacon.findbuch.de/seemore/gnd-aks/-dewp@wd')
         };
         service.views = {
             'seealso-ul' : new SeeAlsoUL({
-                                linkTarget: '_blank',
-                                maxItems: 100 })
+                linkTarget: '_blank',
+                maxItems: 100
+            })
         };
         service.replaceTagsOnLoad();
     </script>
@@ -93,7 +94,7 @@
 
             {{ map.addTileLayer() }}
             </script>
-            {% endif %}
+        {% endif %}
 
             {% if location.gnd is not empty %}
             <div class="container-fluid box">
@@ -107,6 +108,9 @@
                             {{ 'Additional Information'|trans }}
                             {% endif %}
                         </h4>
+                    </div>
+                    <div class="col-sm-12">
+                        <div title="{{ location.gnd }}" class="gndaks seealso-ul"></div>
                     </div>
                 </div>
             </div>

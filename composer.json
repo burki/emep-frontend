@@ -27,10 +27,14 @@
         "symfony/assetic-bundle": "@stable",
         "leafo/scssphp": "~0.6",
 
+        "lexik/form-filter-bundle": "@stable",
+        "knplabs/knp-paginator-bundle": "@stable",
+
         "cocur/slugify": "@stable",
 
         "doctrine/doctrine-bundle": "@stable",
         "doctrine/orm": "@stable",
+        "beberlei/DoctrineExtensions": "@stable",
 
         "easyrdf/easyrdf": "@stable",
 

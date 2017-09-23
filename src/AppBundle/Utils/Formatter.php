@@ -11,35 +11,54 @@ class Formatter
     /** No instances */
     private function __construct() {}
 
+    public static function dateDecade($datestr, $locale = 'en')
+    {
+        $dateParts = preg_split('/\-/', $datestr);
+        if (empty($dateParts) || !is_numeric($dateParts[0])) {
+            return '';
+        }
+
+        switch ($locale) {
+            case 'de':
+                $append = 'er';
+                break;
+
+            default:
+                $append = 's';
+        }
+
+        return ($dateParts[0] - $dateParts[0] % 10) . $append;
+    }
+
     public static function dateIncomplete($datestr, $locale = 'en')
     {
-        $date_parts = preg_split('/\-/', $datestr);
+        $dateParts = preg_split('/\-/', $datestr);
 
-        $date_parts_formatted = [];
-        for ($i = 0; $i < count($date_parts); $i++) {
-            if (0 == $date_parts[$i]) {
+        $dateParts_formatted = [];
+        for ($i = 0; $i < count($dateParts); $i++) {
+            if (0 == $dateParts[$i]) {
                 break;
             }
-            $date_parts_formatted[] = $date_parts[$i];
+            $dateParts_formatted[] = $dateParts[$i];
         }
-        if (empty($date_parts_formatted)) {
+        if (empty($dateParts_formatted)) {
             return '';
         }
 
         $separator = '.';
-        if ('en' == $locale && count($date_parts_formatted) > 1) {
-            $dateObj  = \DateTime::createFromFormat('!m', $date_parts_formatted[1]);
+        if ('en' == $locale && count($dateParts_formatted) > 1) {
+            $dateObj  = \DateTime::createFromFormat('!m', $dateParts_formatted[1]);
             $monthName = $dateObj->format('F'); // March
             $ret = [ $monthName ];
-            if (count($date_parts_formatted) > 2) {
-                $ret[] = $date_parts_formatted[2] . ','; // day
+            if (count($dateParts_formatted) > 2) {
+                $ret[] = $dateParts_formatted[2] . ','; // day
             }
-            $ret[] = $date_parts_formatted[0]; // year
+            $ret[] = $dateParts_formatted[0]; // year
             return join(' ', $ret);
         }
 
-        $date_parts_formatted = array_reverse($date_parts_formatted);
+        $dateParts_formatted = array_reverse($dateParts_formatted);
 
-        return implode($separator, $date_parts_formatted);
+        return implode($separator, $dateParts_formatted);
     }
 }

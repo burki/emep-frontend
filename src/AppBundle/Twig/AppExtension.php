@@ -46,6 +46,7 @@ class AppExtension extends \Twig_Extension
         return [
             // general
             new \Twig_SimpleFilter('dateincomplete', [ $this, 'dateincompleteFilter' ]),
+            new \Twig_SimpleFilter('datedecade', [ $this, 'datedecadeFilter' ]),
             new \Twig_SimpleFilter('epoch', [ $this, 'epochFilter' ]),
             new \Twig_SimpleFilter('prettifyurl', [ $this, 'prettifyurlFilter' ]),
 
@@ -64,7 +65,7 @@ class AppExtension extends \Twig_Extension
         if (is_null($this->translator)) {
             return 'en_US';
         }
-        
+
         return $this->translator->getLocale();
     }
 
@@ -79,6 +80,19 @@ class AppExtension extends \Twig_Extension
         }
 
         return \AppBundle\Utils\Formatter::dateIncomplete($datestr, $locale);
+    }
+
+    public function datedecadeFilter($datestr, $locale = null)
+    {
+        if (is_null($locale)) {
+            $locale = $this->getLocale();
+        }
+
+        if (is_object($datestr) && $datestr instanceof \DateTime) {
+            $datestr = $datestr->format('Y-m-d');
+        }
+
+        return \AppBundle\Utils\Formatter::dateDecade($datestr, $locale);
     }
 
     public function epochFilter($epoch, $class, $locale = null)
