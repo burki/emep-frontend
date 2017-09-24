@@ -105,9 +105,9 @@
 
         {% if person.exhibitions|length > 0 %}
             <h3>Exhibitions</h3>
-            <ul>
+            <ul class="list-group">
             {% for exhibition in person.exhibitions %}
-                <li>
+            <li class="list-group-item">
                 <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
                     <b>{{ exhibition.title }}</b>
                 </a>
@@ -127,7 +127,7 @@
                     </a>
                     </div>
                 {% endif %}
-                </li>
+            </li>
             {% endfor %}
             </ul>
         {% endif %}

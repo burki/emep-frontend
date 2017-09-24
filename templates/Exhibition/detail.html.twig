@@ -63,23 +63,6 @@
                 </a>
                 {% endfor %}
             </div><!-- .gallery -->
-        {% endif %}
-
-        </div>
-
-        <div class="col-sm-4 sidebar">
-            {% if exhibition.artists|length > 0 %}
-                <h3>Artists</h3>
-                <ul>
-                {% for person in exhibition.artists %}
-                    <li>
-                    <a href="{% if person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : person.ulan }) }}{% elseif person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : person.gnd }) }}{% else %}{{ path('person', { 'id' : person.id }) }}{% endif %}">
-                        <b>{{ person.fullname }}</b>
-                    </a>
-                    </li>
-                {% endfor %}
-                </ul>
-            {% endif %}
             {% if similar|length > 0 %}
                 {% set similar_keys = similar|keys %}
                 {% set found = false %}
@@ -96,6 +79,23 @@
                 {% if found %}
                 </ul>
                 {% endif %}
+            {% endif %}
+        {% endif %}
+
+        </div>
+
+        <div class="col-sm-4 sidebar">
+            {% if exhibition.artists|length > 0 %}
+                <h3>Artists</h3>
+                <ul>
+                {% for person in exhibition.artists %}
+                    <li>
+                    <a href="{% if person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : person.ulan }) }}{% elseif person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : person.gnd }) }}{% else %}{{ path('person', { 'id' : person.id }) }}{% endif %}">
+                        <b>{{ person.fullname }}</b>
+                    </a>
+                    </li>
+                {% endfor %}
+                </ul>
             {% endif %}
         </div>
     </div><!-- .row -->
