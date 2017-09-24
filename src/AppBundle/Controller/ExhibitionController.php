@@ -178,7 +178,19 @@ extends CrudController
             ->setParameter('exhibition', $exhibition)
             ->getResult();
 
-        // TODO: sort by catalogueId
+        // sort, either catalogueId or person first
+        $sortPersonFirst = 0 <> ($exhibition->flags & 0x20);
+
+        usort($results, function ($a, $b) use ($sortPersonFirst) {
+            $sortPartsA = [ $a->catalogueId, $a->getPerson()->getFullname() ];
+            $sortPartsB = [ $b->catalogueId, $b->getPerson()->getFullname() ];
+            if ($sortPersonFirst) {
+                $sortPartsA = array_reverse($sortPartsA);
+                $sortPartsB = array_reverse($sortPartsB);
+            }
+
+            return strnatcmp(implode('', $sortPartsA), implode('', $sortPartsB));
+        });
 
         return $results;
     }
