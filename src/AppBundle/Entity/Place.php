@@ -170,6 +170,7 @@ implements \JsonSerializable, JsonLdSerializable
 
     /**
      * @ORM\OneToMany(targetEntity="Location", mappedBy="place",cascade={"all"}, fetch="EAGER")
+     * @ORM\OrderBy({"name" = "ASC"})
      */
     protected $locations;
 
@@ -516,7 +517,7 @@ implements \JsonSerializable, JsonLdSerializable
         if (!empty($this->alternateName)) {
             return $this->alternateName;
         }
-        
+
         return $this->getName();
     }
 

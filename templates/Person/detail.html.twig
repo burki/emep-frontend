@@ -68,6 +68,16 @@
                     {% endif %}
                 </dd>
             {% endif %}
+
+            {% set addresses = person.addressesSeparated %}
+            {% if addresses is not empty %}
+                <dt>{{ 'Places of Activity'|trans }}:</dt>
+                <dd>
+                    {% for address in addresses %}
+                        {{ address['info']|replace({ "\n" : ", " }) }}<br />
+                    {% endfor %}
+                </dd>
+            {% endif %}
             {% if person.url is not empty %}
                 <dt>{{ 'Homepage'|trans }}:</dt>
                 <dd>
@@ -77,7 +87,7 @@
             </dl>
 
             <p>{{ person.description|nl2br  }}</p>
-            {% if person.items is not empty %}
+            {% if showWorks and person.items is not empty %}
             <h3>Works</h3>
             <div class="gallery">
                 {% for item in person.items %}
@@ -108,11 +118,19 @@
             <ul class="list-group">
             {% for exhibition in person.exhibitions %}
             <li class="list-group-item">
+                {{ helper.exhibition_period(exhibition) }}
                 <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
                     <b>{{ exhibition.title }}</b>
                 </a>
-
-                {{ helper.exhibition_period(exhibition) }}
+                {% if catalogueEntries[exhibition.id] is defined %}
+                    {% set count = catalogueEntries[exhibition.id]|length %}
+                    {% if count > 0 %}
+                        {% set divId = 'entries' ~ exhibition.id %}
+                        <a class="badge" style="color: white" href="#{{ divId }}" data-toggle="collapse">{{ count }}</a>
+                    {% endif %}
+                {% else %}
+                    {% set count = 0 %}
+                {% endif %}
 
                 {% if exhibition.location is not null %}
                     {% set location = exhibition.location %}
@@ -125,6 +143,16 @@
                     <a href="{{ path('location', { 'id' : location.id }) }}">
                         {{ location.name }}
                     </a>
+                    </div>
+                {% endif %}
+
+                {% if count > 0 %}
+                    <div id="{{ divId }}" class="collapse">
+                    {% for catalogueEntry in catalogueEntries[exhibition.id] %}
+                        <p>
+                            {{ catalogueEntry.titleFull }}
+                        </p>
+                    {% endfor %}
                     </div>
                 {% endif %}
             </li>

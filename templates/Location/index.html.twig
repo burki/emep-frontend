@@ -42,7 +42,7 @@
                 </a>
                 {% set count = location.exhibitions|length %}
                 {% if count > 0 %}
-                    {% set divId = 'exhibitions' ~ location. id %}
+                    {% set divId = 'exhibitions' ~ location.id %}
                     <a class="badge" style="color: white" href="#{{ divId }}" data-toggle="collapse">{{ count }}</a>
                     <div id="{{ divId }}" class="collapse">
                     {% for exhibition in location.exhibitions %}

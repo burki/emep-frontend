@@ -29,13 +29,15 @@
         <div class="col-sm-8">
             <dl>
             {% if location.place is not null %}
-                <dt>{{ 'Place'|trans }}:</dt>
+                <!-- <dt>{{ 'Place'|trans }}:</dt> -->
                 <dd>
                     <a href="{% if location.place.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : location.place.tgn }) }}{% else %}{{ path('place', { 'id' : location.place.id }) }}{% endif %}">
                     {{ location.place.nameLocalized }}
                     </a>
-                    <br />
-                    TODO: Address(es)
+                    {% set addresses = location.addressesSeparated %}
+                    {% for address in addresses %}
+                        <br />{{ address['info']|replace({ "\n" : ", " }) }}
+                    {% endfor %}
                 </dd>
             {% endif %}
             {% if location.url is not empty %}
@@ -52,12 +54,13 @@
             <ul class="list-group">
                 {% for exhibition in location.exhibitions %}
                 <li class="list-group-item">
+                    {{ helper.exhibition_period(exhibition) }}
                     <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
                         <b>
                             {{ exhibition.title }}
                         </b>
+                        {{ exhibition.titleAppend }}
                     </a>
-                    {{ helper.exhibition_period(exhibition) }}
                 </li>
                 {% endfor %}
             </ul>

@@ -15,7 +15,7 @@ extends CrudFilterType
         $this->addSearchFilter($builder, [
             // Exhibition.title,Exhibition.title_short,Exhibition.title_translit,Exhibition.title_alternate,Exhibition.subtitle,
             // Location.name,Location.place,Person.lastname,Person.firstname,Exhibition.organizer,Exhibition.organizing_committee,Exhibition.description,Exhibition.comment_internal
-            'E.title', 'E.titleTranslit',
+            'E.title', 'E.titleTransliterated', 'E.titleAlternate',
             'L.name', 'L.placeLabel',
         ]);
 

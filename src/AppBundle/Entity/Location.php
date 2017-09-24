@@ -18,6 +18,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Location
 implements \JsonSerializable, JsonLdSerializable
 {
+    use AddressesTrait;
+
     static function formatDateIncomplete($dateStr)
     {
         if (preg_match('/^\d{4}$/', $dateStr)) {
@@ -100,6 +102,13 @@ implements \JsonSerializable, JsonLdSerializable
      * @ORM\Column(nullable=true,name="place")
      */
     protected $placeLabel;
+
+    /**
+     * @var string Addresses.
+     *
+     * @ORM\Column(name="address_additional", type="json_array", nullable=true)
+     */
+    protected $addresses;
 
     /**
      * @var string
@@ -415,6 +424,11 @@ implements \JsonSerializable, JsonLdSerializable
     public function getAdditional()
     {
         return $this->additional;
+    }
+
+    public function getAddressesSeparated()
+    {
+        return $this->buildAddresses($this->addresses);
     }
 
     /**

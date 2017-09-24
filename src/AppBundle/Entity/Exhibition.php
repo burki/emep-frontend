@@ -73,6 +73,20 @@ class Exhibition
     /**
      * @var string
      *
+     * @ORM\Column(name="title_translit", type="string", length=255, nullable=true)
+     */
+    private $titleTransliterated;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="title_alternate", type="text", nullable=true)
+     */
+    private $titleAlternate;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="title_extended", type="string", length=255, nullable=true)
      */
     private $titleExtended;
@@ -80,9 +94,9 @@ class Exhibition
     /**
      * @var string
      *
-     * @ORM\Column(name="title_alternate", type="string", length=255, nullable=true)
+     * @ORM\Column(name="subtitle", type="string", length=255, nullable=true)
      */
-    private $titleAlternate;
+    private $subtitle;
 
     /**
      * @var string
@@ -169,13 +183,6 @@ class Exhibition
     private $titleShort;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="organizer_type", type="string", length=30, nullable=true)
-     */
-    private $organizerType;
-
-    /**
      * @var integer
      *
      * @ORM\Column(name="flags", type="integer", nullable=false)
@@ -185,16 +192,37 @@ class Exhibition
     /**
      * @var string
      *
-     * @ORM\Column(name="title_translit", type="string", length=255, nullable=true)
+     * @ORM\Column(name="organizer_type", type="string", length=30, nullable=true)
      */
-    private $titleTranslit;
+    private $organizerType;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="organizer", type="string", length=4095, nullable=true)
+     * @ORM\Column(name="organizer", type="string", length=1025, nullable=true)
      */
     private $organizer;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="organizing_committee", type="string", nullable=true)
+     */
+    private $organizingCommittee;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="price_catalogue", type="string", nullable=true)
+     */
+    private $cataloguePrice;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="preface", type="string", nullable=true)
+     */
+    private $preface;
 
     /**
      * @ORM\ManyToMany(targetEntity="Item", mappedBy="exhibitions")
@@ -226,6 +254,27 @@ class Exhibition
         return $this->title;
     }
 
+    public function getTitleAppend()
+    {
+        if (!empty($this->titleTransliterated) || !empty($this->titleAlternate)) {
+            $append = [];
+
+            if (!empty(!empty($this->titleTransliterated))) {
+                $append[] = $this->titleTransliterated;
+            }
+            if (!empty(!empty($this->titleAlternate))) {
+                $append[] = $this->titleAlternate;
+            }
+
+            return sprintf('[%s]', implode(' : ', $append));
+        }
+    }
+
+    public function getSubtitle()
+    {
+        return $this->subtitle;
+    }
+
     public function getStatus()
     {
         return $this->status;
@@ -249,6 +298,41 @@ class Exhibition
     public function getLocation()
     {
         return $this->location;
+    }
+
+    public function getNote()
+    {
+        return $this->description;
+    }
+
+    public function getOrganizer()
+    {
+        return $this->organizer;
+    }
+
+    public function getOrganizerType()
+    {
+        return $this->organizerType;
+    }
+
+    public function getOrganizingCommittee()
+    {
+        return $this->organizingCommittee;
+    }
+
+    public function getPrice()
+    {
+        return $this->price;
+    }
+
+    public function getCataloguePrice()
+    {
+        return $this->cataloguePrice;
+    }
+
+    public function getPreface()
+    {
+        return $this->preface;
     }
 
     public function getItems()

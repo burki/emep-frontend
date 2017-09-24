@@ -20,12 +20,15 @@
     <h1>
         {{ exhibition.title }}
     </h1>
+    {{ exhibition.subtitle }}
+    {{ exhibition.titleAppend }}
+
     <div class="row">
         <div class="col-sm-8">
+            <p>
             {{ helper.exhibition_period(exhibition) }}
 
             {% if exhibition.location is not null %}
-            <div>
                 {% set location = exhibition.location %}
                 {% if location.place is not null %}
                     <a href="{% if location.place.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : location.place.tgn }) }}{% else %}{{ path('place', { 'id' : location.place.id }) }}{% endif %}">
@@ -33,10 +36,40 @@
                     </a>:
                 {% endif %}
                 <a href="{{ path('location', { 'id' : location.id }) }}">{{ location.name }}</a>
-            </div>
+            {% endif %}
+            </p>
+
+            <p>
+            {% if exhibition.organizer is not empty %}
+                Organized by: {{ exhibition.organizer|replace({"\n" : ' / ' }) }}
+                {% if exhibition.organizerType is not empty %}
+                    [{{ exhibition.organizerType }}]
+                {% endif %}<br />
             {% endif %}
 
-            {% if exhibition.items is not empty %}
+            {% if exhibition.organizingCommittee is not empty %}
+                Organizing Committee: {{ exhibition.organizingCommittee|nl2br }}<br />
+            {% endif %}
+
+            {% if exhibition.price is not empty %}
+                Ticket Price: {{ exhibition.price }}
+            {% endif %}
+            </p>
+
+            <p>
+            {% if exhibition.cataloguePrice is not empty %}
+                Catalogue Price: {{ exhibition.cataloguePrice }}<br />
+            {% endif %}
+            {% if exhibition.preface is not empty %}
+                Preface: {{ exhibition.preface|nl2br }}
+            {% endif %}
+            </p>
+
+            {% if exhibition.note is not empty %}
+                <p>Note: {{ exhibition.note|nl2br }}</p>
+            {% endif %}
+
+            {% if showWorks and exhibition.items is not empty %}
             <h3>Works</h3>
                 <div class="gallery" style="margin-bottom: 2em">
                 {% for item in exhibition.items %}

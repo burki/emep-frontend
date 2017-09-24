@@ -157,6 +157,41 @@ extends CrudController
         return $jaccardIndex;
     }
 
+    protected function findCatalogueEntries($person)
+    {
+        // get the catalogue entries by exhibition
+        $qb = $this->getDoctrine()
+                ->getManager()
+                ->createQueryBuilder();
+
+        $qb->select([
+                'IE',
+                'E.id',
+            ])
+            ->from('AppBundle:ItemExhibition', 'IE')
+            ->innerJoin('IE.exhibition', 'E')
+            ->where("IE.person = :person")
+            ;
+
+        $results = $qb->getQuery()
+            ->setParameter('person', $person)
+            ->getResult();
+
+        $entriesByExhibition = [];
+        foreach ($results as $result) {
+            $catalogueEntry = $result[0];
+            $exhibitionId = $result['id'];
+            if (!array_key_exists($exhibitionId, $entriesByExhibition)) {
+                $entriesByExhibition[$exhibitionId] = [];
+            }
+            $entriesByExhibition[$exhibitionId][] = $catalogueEntry;
+        }
+
+        // TODO: sort each exhibition by catalogueId
+
+        return $entriesByExhibition;
+    }
+
     /**
      * @Route("/person/ulan/{ulan}", requirements={"ulan" = "[0-9]+"}, name="person-by-ulan")
      * @Route("/person/gnd/{gnd}", requirements={"gnd" = "[0-9xX]+"}, name="person-by-gnd")
@@ -195,6 +230,8 @@ extends CrudController
         return $this->render('Person/detail.html.twig', [
             'pageTitle' => $person->getFullname(true), // TODO: lifespan in brackets
             'person' => $person,
+            'showWorks' => !empty($_SESSION['user']),
+            'catalogueEntries' => $this->findCatalogueEntries($person),
             'similar' => $this->findSimilar($person),
             'pageMeta' => [
                 'jsonLd' => $person->jsonLdSerialize($locale),

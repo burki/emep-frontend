@@ -16,6 +16,8 @@ use Gedmo\Mapping\Annotation as Gedmo; // alias for Gedmo extensions annotations
 class Person
 implements \JsonSerializable, JsonLdSerializable, OgSerializable
 {
+    use AddressesTrait;
+
     static function formatDateIncomplete($dateStr)
     {
         if (preg_match('/^\d{4}$/', $dateStr)) {
@@ -143,6 +145,13 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
      * @ORM\Column(nullable=true,name="deathplace")
      */
     protected $deathPlaceLabel;
+
+    /**
+     * @var
+     *
+     * @ORM\Column(name="actionplace", type="json_array", nullable=true)
+     */
+    protected $addresses;
 
     /**
      * TODO: rename to honorificPrefix
@@ -579,6 +588,11 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
     public function getBirthPlaceLabel()
     {
         return $this->birthPlaceLabel;
+    }
+
+    public function getAddressesSeparated()
+    {
+        return $this->buildAddresses($this->addresses, true);
     }
 
     private static function buildPlaceInfo($place, $locale)

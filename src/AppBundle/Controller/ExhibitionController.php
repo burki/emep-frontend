@@ -185,6 +185,7 @@ extends CrudController
         return $this->render('Exhibition/detail.html.twig', [
             'pageTitle' => $exhibition->title, // TODO: dates in brackets
             'exhibition' => $exhibition,
+            'showWorks' => !empty($_SESSION['user']),
             'similar' => $this->findSimilar($exhibition),
             'pageMeta' => [
                 /*
