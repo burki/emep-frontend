@@ -66,6 +66,7 @@ class MapController extends Controller
         return $this->render('Map/person-by-place.html.twig', [
             'pageTitle' => 'Artists by Birth Place',
             'data' => json_encode($values_final),
+            'disableClusteringAtZoom' => 7,
             'bounds' => [
                 [ 60, -120 ],
                 [ -15, 120 ],

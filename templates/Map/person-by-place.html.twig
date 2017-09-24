@@ -48,8 +48,9 @@
 
 //              return L.divIcon({ html: n, className: 'mycluster', iconSize: L.point(40, 40) });
             },
-            // spiderfyOnMaxZoom: false, showCoverageOnHover: false, zoomToBoundsOnClick: false,
-            disableClusteringAtZoom: 17
+            spiderfyOnMaxZoom: false,
+            // showCoverageOnHover: false, zoomToBoundsOnClick: false,
+            disableClusteringAtZoom: {% if disableClusteringAtZoom is not empty %}{{ disableClusteringAtZoom }}{% else %}5{% endif %}
         });
 
         var addressPoints = {{ data|raw }};
