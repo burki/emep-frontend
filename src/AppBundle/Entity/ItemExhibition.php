@@ -157,6 +157,10 @@ class ItemExhibition
             $parts[] = sprintf('[%s]', implode(' : ', $append));
         }
 
+        if (!empty($this->displaydate)) {
+            $parts[count($parts) - 1] .= ', ' . $this->displaydate;
+        }
+
         return implode(' ', $parts);
     }
 }

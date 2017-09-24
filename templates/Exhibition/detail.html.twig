@@ -96,6 +96,28 @@
                 </a>
                 {% endfor %}
             </div><!-- .gallery -->
+            {% endif %}
+
+            {% if catalogueEntries is not empty %}
+            {% set last_initial = '' %}
+            <h3>Catalogue Entries</h3>
+            {% for catalogueEntry in catalogueEntries %}
+                {% set initial = catalogueEntry.person.fullname %}
+                {% if initial != last_initial %}
+                    {% if last_initial != '' %}
+            </ul>
+                    {% endif %}
+            <h4><a href="{% if person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : person.ulan }) }}{% elseif person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : person.gnd }) }}{% else %}{{ path('person', { 'id' : person.id }) }}{% endif %}">{{ catalogueEntry.person.fullname }}</a></h4>
+                {% set last_initial = initial %}
+            <ul class="list-group">
+                {% endif %}
+            <li class="list-group-item">
+                {{ catalogueEntry.titleFull }}
+            </li>
+            {% endfor %}
+            </ul>
+            {% endif %}
+
             {% if similar|length > 0 %}
                 {% set similar_keys = similar|keys %}
                 {% set found = false %}
@@ -113,8 +135,6 @@
                 </ul>
                 {% endif %}
             {% endif %}
-        {% endif %}
-
         </div>
 
         <div class="col-sm-4 sidebar">

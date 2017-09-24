@@ -158,6 +158,31 @@ extends CrudController
         return $jaccardIndex;
     }
 
+    protected function findCatalogueEntries($exhibition)
+    {
+        // get the catalogue entries by exhibition
+        $qb = $this->getDoctrine()
+                ->getManager()
+                ->createQueryBuilder();
+
+        $qb->select([
+                'IE',
+            ])
+            ->from('AppBundle:ItemExhibition', 'IE')
+            ->leftJoin('IE.person', 'P')
+            ->where("IE.exhibition = :exhibition")
+            ->andWhere('IE.title IS NOT NULL')
+            ;
+
+        $results = $qb->getQuery()
+            ->setParameter('exhibition', $exhibition)
+            ->getResult();
+
+        // TODO: sort by catalogueId
+
+        return $results;
+    }
+
     /**
      * @Route("/exhibition/{id}", requirements={"id" = "\d+"}, name="exhibition")
      */
@@ -185,6 +210,7 @@ extends CrudController
         return $this->render('Exhibition/detail.html.twig', [
             'pageTitle' => $exhibition->title, // TODO: dates in brackets
             'exhibition' => $exhibition,
+            'catalogueEntries' => $this->findCatalogueEntries($exhibition),
             'showWorks' => !empty($_SESSION['user']),
             'similar' => $this->findSimilar($exhibition),
             'pageMeta' => [
