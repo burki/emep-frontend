@@ -107,7 +107,7 @@
                     {% if last_initial != '' %}
             </ul>
                     {% endif %}
-            <h4><a href="{% if person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : person.ulan }) }}{% elseif person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : person.gnd }) }}{% else %}{{ path('person', { 'id' : person.id }) }}{% endif %}">{{ catalogueEntry.person.fullname }}</a></h4>
+            <h4><a href="{% if catalogueEntry.person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : catalogueEntry.person.ulan }) }}{% elseif catalogueEntry.person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : catalogueEntry.person.gnd }) }}{% else %}{{ path('person', { 'id' : catalogueEntry.person.id }) }}{% endif %}">{{ catalogueEntry.person.fullname }}</a></h4>
                 {% set last_initial = initial %}
             <ul class="list-group">
                 {% endif %}
