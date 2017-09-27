@@ -90,6 +90,9 @@ class Builder
         $menu['Artists']->addChild('Chart: Birth/Death', [
             'route' => 'person-by-year',
         ]);
+        $menu['Artists']->addChild('Chart: Exhibiting Age', [
+            'route' => 'person-exhibition-age',
+        ]);
 
         if ($showWorks) {
             $menu->addChild('Works', ['route' => 'item']);

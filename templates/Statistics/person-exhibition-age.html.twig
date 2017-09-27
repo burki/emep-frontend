@@ -1,0 +1,81 @@
+{% extends 'Base/base.html.twig' %}
+{% block head %}
+    <script src="{{ app.request.basepath }}/vendor/highcharts/highcharts.js"></script>
+    <script src="{{ app.request.basepath }}/vendor/highcharts/modules/exporting.js"></script>
+    <!--
+    <script src="{{ app.request.basepath }}/vendor/highcharts/themes/sand-signika.js"></script>
+    -->
+    <script type="text/javascript">
+        var chart;
+
+        $(document).ready(function() {
+            chart = new Highcharts.Chart({
+                chart: {
+                    renderTo: 'container',
+                    defaultSeriesType: 'column'
+                    /*, margin: [ 50, 50, 100, 80] */
+                },
+                title: {
+                    text: 'Artists\' Age at Exhibition Start'
+                },
+                /*
+                subtitle: {
+                    text: {{ subtitle|raw }}
+                },
+                */
+                xAxis: {
+                    categories: {{ categories|raw }},
+                    labels: {
+                        rotation: -45,
+                        align: 'right',
+                        style: {
+                            font: 'normal 13px Verdana, sans-serif'
+                        }
+                    }
+                },
+                yAxis: [
+                    {
+                        title: {
+                            text: 'Count'
+                        },
+                        min: 0,
+                        // max: 600
+                        // opposite: true
+                    },
+                ],
+                tooltip: {
+                    formatter: function() {
+                        // console.log(this);
+                        return '<b>'
+                            + Highcharts.numberFormat(this.y, 0)
+                            + ' persons exhibiting at age '
+                            + this.point.name
+                            + '</b>';
+                    }
+                },
+                plotOptions: {
+                    series: {
+                        stacking: 'normal',
+                        borderWidth: 1,
+                        groupPadding: 0,
+                        pointPadding: 0
+                    }
+                },
+                series: [
+                    {
+                        yAxis: 0,
+                        name: 'Age',
+                        data: {{ age_at_exhibition|raw }},
+                        stack: 'age'
+                    },
+                ]
+        });
+    });
+
+    </script>
+{% endblock %}
+
+{% block body %}
+    <!--<h1>Artists' Age at Exhibition</h1>-->
+    <div id="container" style="min-width: 800px; height: 400px; margin: 0 auto"></div>
+{% endblock %}

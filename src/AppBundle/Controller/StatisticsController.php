@@ -162,7 +162,8 @@ class StatisticsController extends Controller
             foreach (['birth', 'death',
                            // 'works',
                       'works_issued_base', 'works_issued_extended']
-                     as $key) {
+                     as $key)
+            {
                 $total[$key][$year] = [
                     'name' => $year,
                     'y' => isset($data[$year][$key])
@@ -183,6 +184,55 @@ class StatisticsController extends Controller
         ]);
     }
 
+    /**
+     * @Route("/person/exhibition-age", name="person-exhibition-age")
+     */
+    public function personExhibitionAgeAction()
+    {
+        // display the artists by birth-year, the catalog-entries by exhibition-year
+        $em = $this->getDoctrine()->getEntityManager();
+
+        $dbconn = $em->getConnection();
+        $querystr = <<<EOT
+SELECT COUNT(*) AS how_many, YEAR(EB.startdate) - YEAR(EB.birthdate) AS age
+FROM
+(SELECT DISTINCT Exhibition.startdate AS startdate, Person.birthdate AS birthdate
+FROM Exhibition
+INNER JOIN ItemExhibition ON ItemExhibition.id_exhibition=Exhibition.id
+INNER JOIN Person ON ItemExhibition.id_person=Person.id AND Person.birthdate IS NOT NULL
+GROUP BY Exhibition.id, Person.id) AS EB
+GROUP BY age
+ORDER BY age, how_many
+EOT;
+
+        $min_age = $max_age = 0;
+
+        $stmt = $dbconn->query($querystr);
+        $ageCount = [];
+        while ($row = $stmt->fetch()) {
+            if (0 == $min_age) {
+                $min_age = $row['age'];
+            }
+            $ageCount[$max_age = $row['age']] = $row['how_many'];
+        }
+
+        $categories = $total = [];
+        for ($age = $min_age; $age <= $max_age && $age < 150; $age++) {
+            $categories[] = $age; // 0 == $age % 5 ? $year : '';
+
+            $total['age'][$age] = [
+                'name' => $age,
+                'y' => isset($ageCount[$age])
+                    ? intval($ageCount[$age]) : 0,
+            ];
+        }
+
+        // display the static content
+        return $this->render('Statistics/person-exhibition-age.html.twig', [
+            'categories' => json_encode($categories),
+            'age_at_exhibition' => json_encode(array_values($total['age'])),
+        ]);
+    }
 
     /**
      * @Route("/person/birth-death", name="person-birth-death")
