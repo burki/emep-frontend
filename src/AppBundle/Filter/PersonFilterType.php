@@ -18,6 +18,14 @@ extends CrudFilterType
             // name_variant_ulan,occupation,cv
         ]);
 
+        $builder->add('gender', Filters\ChoiceFilterType::class, [
+            'choices' => [
+                '- all - ' => '',
+                'female' => 'F',
+                'male' => 'M',
+            ],
+        ]);
+
         $builder->add('nationality', Filters\ChoiceFilterType::class, [
             'choices' => [ '- all - ' => '' ] + $options['data']['choices'],
         ]);
