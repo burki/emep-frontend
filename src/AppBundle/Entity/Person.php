@@ -229,6 +229,13 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
     public $exhibitions;
 
     /**
+     * @var ArrayCollection<ItemExhibition> The catalogue entri(s) of this person.
+     *
+     * @ORM\OneToMany(targetEntity="ItemExhibition", mappedBy="person")
+     */
+    public $catalogueEntries;
+
+    /**
      * Sets id.
      *
      * @param int $id

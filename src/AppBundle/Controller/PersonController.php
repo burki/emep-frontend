@@ -57,10 +57,15 @@ extends CrudController
 
         $qb->select([
                 'P',
+                'COUNT(DISTINCT E.id) AS numExhibitionSort',
+                'COUNT(DISTINCT IE.id) AS numCatEntrySort',
                 "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort"
             ])
             ->from('AppBundle:Person', 'P')
+            ->leftJoin('P.exhibitions', 'E')
+            ->leftJoin('P.catalogueEntries', 'IE')
             ->where('P.status <> -1')
+            ->groupBy('P.id') // for Count
             ->orderBy('nameSort')
             ;
 

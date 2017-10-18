@@ -6,7 +6,7 @@ namespace AppBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * ItemPerson
+ * ItemExhibition
  *
  * @ORM\Table(name="ItemExhibition")
  * @ORM\Entity

@@ -1,0 +1,58 @@
+{% extends 'Base/base.html.twig' %}
+
+{% block head %}
+    <script src="{{ app.request.basepath }}/vendor/highcharts/highcharts.js"></script>
+    <script src="{{ app.request.basepath }}/vendor/highcharts/modules/exporting.js"></script>
+    <!--
+    <script src="{{ app.request.basepath }}/vendor/highcharts/themes/sand-signika.js"></script>
+    -->
+    <script type="text/javascript">
+    var chart;
+
+    $(document).ready(function() {
+        $('#container').highcharts({
+            chart: {
+                // renderTo: 'container',
+                zoomType: 'xy'
+            },
+            title: {
+                text: 'Number of Works per Exhibition'
+            },
+            subtitle: {
+                text: 'Median: {{ data_median }}'
+            },
+            xAxis: {
+                min: 1,
+                max: 150,
+                tickInterval: 1
+            },
+
+            yAxis: {
+                min: 1
+            },
+            legend: {
+                enabled: false
+            },
+            tooltip: {
+                headerFormat: '', // '<b>{series.name}</b><br />',
+                pointFormat: '{point.y} Exhibitions with {point.x} works'
+            },
+
+            series: [
+            {
+                type: 'column',
+                data: {{ data|raw }},
+                pointStart: 1
+            }
+            ]
+        });
+
+    });
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div id="container" style="min-width: 800px; height: 400px; margin: 0 auto;"></div>
+
+    <!--<div id="container2" style="min-width: 800px; height: 400px; margin: 0 auto;"></div>-->
+{% endblock %}

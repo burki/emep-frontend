@@ -14,16 +14,20 @@
             Sort by:
             {{ knp_pagination_sortable(pagination, 'Date', 'dateSort') }}
             {{ knp_pagination_sortable(pagination, 'Place', 'placeSort') }}
+            {{ knp_pagination_sortable(pagination, '# Cat. Entries', 'numCatEntrySort') }}
         </div>
 
         {% set last_initial = '' %}
-        {% for exhibition in pagination %}
+        {% for row in pagination %}
+            {% set exhibition = row[0] %}
             {% if 'placeSort' == sortField %}
                 {% if exhibition.location is not null and exhibition.location.place is not null %}
                     {% set initial = exhibition.location.place.nameLocalized %}
                 {% else %}
                     {% set initial = '' %}
                 {% endif %}
+            {% elseif 'numCatEntrySort' == sortField %}
+                {% set initial = row['numCatEntrySort'] %}
             {% else %}
                 {% set initial = slugify.slugify(person.fullname|first)|upper %}
             {% endif %}
@@ -37,7 +41,7 @@
             {% endif %}
             <li class="list-group-item">
                 {{ helper.exhibition_period(exhibition) }}
-                
+
                 <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
                     <b>{{ exhibition.title }}</b> {{ exhibition.titleAppend }}
                 </a>

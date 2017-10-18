@@ -231,6 +231,13 @@ class Exhibition
     protected $items;
 
     /**
+     * @var ArrayCollection<ItemExhibition> The catalogue entri(s) of this exhibition.
+     *
+     * @ORM\OneToMany(targetEntity="ItemExhibition", mappedBy="exhibition")
+     */
+    public $catalogueEntries;
+
+    /**
      * @ORM\ManyToMany(targetEntity="Person", mappedBy="exhibitions")
      * @ORM\OrderBy({"familyName" = "ASC", "givenName" = "ASC"})
      */

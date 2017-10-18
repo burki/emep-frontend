@@ -314,6 +314,134 @@ EOT;
     }
 
     /**
+     * @Route("/exhibition/distribution", name="exhibition-distribution")
+     */
+    public function itemPersonPerExhibition(\Symfony\Component\HttpFoundation\Request $request)
+    {
+        $em = $this->getDoctrine()->getEntityManager();
+
+        $dbconn = $em->getConnection();
+
+        $data = [ 'person' => [], 'item' => [] ];
+        $data_median = [];
+
+        foreach ([ 'person', 'item' ] as $type) {
+            $what = 'item' == $type ? '*' : 'DISTINCT id_person';
+
+            $querystr = "SELECT id_exhibition, COUNT({$what}) AS how_many"
+                      . " FROM ItemExhibition INNER JOIN Exhibition ON Exhibition.id=ItemExhibition.id_exhibition AND Exhibition.status <> -1 AND 0 = (Exhibition.flags & 0x100)"
+                      . " WHERE ItemExhibition.title IS NOT NULL"
+                      . " GROUP BY id_exhibition"
+                      . " HAVING how_many >= 1"
+                      ;
+            $stmt = $dbconn->query($querystr);
+            $frequency_count = [];
+            while ($row = $stmt->fetch()) {
+                $how_many = (int)$row['how_many'];
+                if (!array_key_exists($how_many, $frequency_count)) {
+                    $frequency_count[$how_many] = 0;
+                }
+                ++$frequency_count[$how_many];
+            }
+            ksort($frequency_count);
+            $keys = array_keys($frequency_count);
+            $min = $keys[0]; $max = $keys[count($keys) - 1];
+
+            $sum = 0;
+            for ($i = $min; $i <= $max; $i++) {
+                $count = array_key_exists($i, $frequency_count) ? $frequency_count[$i] : 0;
+                $data[$type][] = $count;
+                $sum += $count;
+            }
+
+            // find the index for which we reach half the sum
+            $sum_half = $sum / 2.0;
+            $sum = 0;
+            for ($i = $min; $i <= $max; $i++) {
+                $count = array_key_exists($i, $frequency_count) ? $frequency_count[$i] : 0;
+                if ($sum + $count >= $sum_half) {
+                    $delta_left = $sum_half - $sum;
+                    $delta_right = $sum + $count - $sum_half;
+                    $data_median[$type] = $delta_left < $delta_right ? $i - 1 : $i;
+                    break;
+                }
+
+                $sum += $count;
+            }
+        }
+
+        // display the static content
+        return $this->render('Statistics/exhibition-distribution.html.twig', [
+            'data' => json_encode($data['item']),
+            'data_median' => $data_median['item'],
+        ]);
+    }
+
+    /**
+     * @Route("/person/distribution", name="person-distribution")
+     */
+    public function exhibitionPerPerson(\Symfony\Component\HttpFoundation\Request $request)
+    {
+        $em = $this->getDoctrine()->getEntityManager();
+
+        $dbconn = $em->getConnection();
+
+        $data = [ 'exhibition' => [], 'item' => [] ];
+        $data_median = [];
+
+        foreach ([ 'exhibition', 'item' ] as $type) {
+            $what = 'item' == $type ? '*' : 'DISTINCT id_exhibition';
+
+            $querystr = "SELECT id_person, COUNT({$what}) AS how_many"
+                      . " FROM ItemExhibition INNER JOIN Exhibition ON Exhibition.id=ItemExhibition.id_exhibition AND Exhibition.status <> -1 AND 0 = (Exhibition.flags & 0x100)"
+                      . " WHERE ItemExhibition.title IS NOT NULL"
+                      . " GROUP BY id_person"
+                      . " HAVING how_many >= 1"
+                      ;
+            $stmt = $dbconn->query($querystr);
+            $frequency_count = [];
+            while ($row = $stmt->fetch()) {
+                $how_many = (int)$row['how_many'];
+                if (!array_key_exists($how_many, $frequency_count)) {
+                    $frequency_count[$how_many] = 0;
+                }
+                ++$frequency_count[$how_many];
+            }
+            ksort($frequency_count);
+            $keys = array_keys($frequency_count);
+            $min = $keys[0]; $max = $keys[count($keys) - 1];
+
+            $sum = 0;
+            for ($i = $min; $i <= $max; $i++) {
+                $count = array_key_exists($i, $frequency_count) ? $frequency_count[$i] : 0;
+                $data[$type][] = $count;
+                $sum += $count;
+            }
+
+            // find the index for which we reach half the sum
+            $sum_half = $sum / 2.0;
+            $sum = 0;
+            for ($i = $min; $i <= $max; $i++) {
+                $count = array_key_exists($i, $frequency_count) ? $frequency_count[$i] : 0;
+                if ($sum + $count >= $sum_half) {
+                    $delta_left = $sum_half - $sum;
+                    $delta_right = $sum + $count - $sum_half;
+                    $data_median[$type] = $delta_left < $delta_right ? $i - 1 : $i;
+                    break;
+                }
+
+                $sum += $count;
+            }
+        }
+
+        // display the static content
+        return $this->render('Statistics/person-distribution.html.twig', [
+            'data' => json_encode($data['exhibition']),
+            'data_median' => $data_median['exhibition'],
+        ]);
+    }
+
+    /**
      * TODO: rename since we added cities as well
      *
      * @Route("/work/by-person", name="item-by-person")
