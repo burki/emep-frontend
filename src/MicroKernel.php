@@ -47,8 +47,6 @@ class MicroKernel extends Kernel
 
             new \Symfony\Bundle\TwigBundle\TwigBundle(),
 
-            // new Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle(),
-
             new \Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
             // new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
 
