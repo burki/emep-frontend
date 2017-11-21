@@ -25,12 +25,13 @@
         "sensio/framework-extra-bundle": "@stable",
         "knplabs/knp-menu-bundle": "@stable",
         "symfony/assetic-bundle": "@stable",
-        "leafo/scssphp": "~0.6",
+        "leafo/scssphp": "@stable",
 
         "lexik/form-filter-bundle": "@stable",
         "knplabs/knp-paginator-bundle": "@stable",
 
         "cocur/slugify": "@stable",
+        "twig/extensions": "@stable",
 
         "doctrine/doctrine-bundle": "@stable",
         "doctrine/orm": "@stable",
