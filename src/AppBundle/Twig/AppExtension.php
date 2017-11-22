@@ -38,6 +38,7 @@ class AppExtension extends \Twig_Extension
     {
         return [
             new \Twig_SimpleFunction('file_exists', 'file_exists'),
+            new \Twig_SimpleFunction('daterangeincomplete', [ $this, 'daterangeincompleteFunction' ]),
         ];
     }
 
@@ -63,7 +64,7 @@ class AppExtension extends \Twig_Extension
     private function getLocale()
     {
         if (is_null($this->translator)) {
-            return 'en_US';
+            return 'en';
         }
 
         return $this->translator->getLocale();
@@ -80,6 +81,23 @@ class AppExtension extends \Twig_Extension
         }
 
         return \AppBundle\Utils\Formatter::dateIncomplete($datestr, $locale);
+    }
+
+    public function daterangeincompleteFunction($datestrFrom, $datestrUntil, $locale = null)
+    {
+        if (is_null($locale)) {
+            $locale = $this->getLocale();
+        }
+
+        if (is_object($datestrFrom) && $datestrFrom instanceof \DateTime) {
+            $datestrFrom = $datestrFrom->format('Y-m-d');
+        }
+
+        if (is_object($datestrUntil) && $datestrUntil instanceof \DateTime) {
+            $datestrUntil = $datestrUntil->format('Y-m-d');
+        }
+
+        return \AppBundle\Utils\Formatter::daterangeIncomplete($datestrFrom, $datestrUntil, $locale);
     }
 
     public function datedecadeFilter($datestr, $locale = null)
@@ -153,6 +171,7 @@ class AppExtension extends \Twig_Extension
 
         $citeProc = new \AcademicPuma\CiteProc\CiteProc(file_get_contents($path),
                                                         $locale);
+
         return $citeProc->render(json_decode($encoded));
     }
 
@@ -161,6 +180,7 @@ class AppExtension extends \Twig_Extension
         if (is_null($locale)) {
             $locale = $this->getLocale();
         }
+
         return \AppBundle\Entity\Place::buildPluralizedTypeLabel($placeType, $count);
     }
 
