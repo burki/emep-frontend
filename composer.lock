@@ -4,8 +4,64 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "a904b7b242cecd9849952438e853ff2a",
+    "content-hash": "46a91e8f6483d82de7458dc687ea378c",
     "packages": [
+        {
+            "name": "academicpuma/locales",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/seboettg/locales.git",
+                "reference": "e5985dbc979f6a285e74006466daab40fd53573f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/seboettg/locales/zipball/e5985dbc979f6a285e74006466daab40fd53573f",
+                "reference": "e5985dbc979f6a285e74006466daab40fd53573f",
+                "shasum": ""
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Creative Commons Attribution-ShareAlike 3.0 License"
+            ],
+            "authors": [
+                {
+                    "name": "seboettg",
+                    "email": "boettger@cs.uni-kassel.de"
+                }
+            ],
+            "description": "Citation Style Language (CSL) Locales Repository",
+            "time": "2015-09-08T14:33:33+00:00"
+        },
+        {
+            "name": "academicpuma/styles",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/seboettg/styles.git",
+                "reference": "24a0ab9277d3cc7d344e621721b2f4c2ed2f2ecc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/seboettg/styles/zipball/24a0ab9277d3cc7d344e621721b2f4c2ed2f2ecc",
+                "reference": "24a0ab9277d3cc7d344e621721b2f4c2ed2f2ecc",
+                "shasum": ""
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Creative Commons Attribution-ShareAlike 3.0 License"
+            ],
+            "authors": [
+                {
+                    "name": "seboettg",
+                    "email": "boettger@cs.uni-kassel.de"
+                }
+            ],
+            "description": "Citation Style Language (CSL) Stylesheet Repository",
+            "time": "2015-09-08T14:22:08+00:00"
+        },
         {
             "name": "beberlei/DoctrineExtensions",
             "version": "v1.0.19",
@@ -1035,6 +1091,53 @@
                 "sparql"
             ],
             "time": "2015-02-27T09:45:49+00:00"
+        },
+        {
+            "name": "fale/isbn",
+            "version": "3.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Fale/isbn.git",
+                "reference": "b4489d2e6d7477d88867f476fcf7424cb7052b74"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Fale/isbn/zipball/b4489d2e6d7477d88867f476fcf7424cb7052b74",
+                "reference": "b4489d2e6d7477d88867f476fcf7424cb7052b74",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "3.7.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Isbn": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "AGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Fabio Alessandro Locati",
+                    "email": "me@fale.io",
+                    "homepage": "https://fale.io",
+                    "role": "lead"
+                }
+            ],
+            "description": "ISBN library",
+            "homepage": "http://github.com/fale/isbn",
+            "keywords": [
+                "ISBN",
+                "ISBN-10",
+                "ISBN-13"
+            ],
+            "time": "2017-11-21T12:55:20+00:00"
         },
         {
             "name": "hoa/compiler",
@@ -2736,6 +2839,49 @@
                 "simple-cache"
             ],
             "time": "2017-01-02T13:31:39+00:00"
+        },
+        {
+            "name": "seboettg/citeproc-php",
+            "version": "dev-name-as-sort-order-fix",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/burki/citeproc-php.git",
+                "reference": "bf446dc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/burki/citeproc-php/zipball/bf446dc",
+                "reference": "bf446dc",
+                "shasum": ""
+            },
+            "require": {
+                "academicpuma/locales": ">=1.0",
+                "academicpuma/styles": ">=1.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "3.7.*",
+                "phpunit/phpunit-skeleton-generator": "2.0.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "AcademicPuma\\CiteProc\\": "src/"
+                }
+            },
+            "license": [
+                "GPL v3"
+            ],
+            "authors": [
+                {
+                    "name": "Sebastian Böttger",
+                    "email": "boettger@cs.uni-kassel.de"
+                }
+            ],
+            "description": "This is an effort to implement a full-featured standalone CSL processor in PHP. The code based on the implementation of Ron Jerome.",
+            "support": {
+                "source": "https://github.com/burki/citeproc-php/tree/name-as-sort-order-fix"
+            },
+            "time": "2016-11-07T16:38:05+00:00"
         },
         {
             "name": "sensio/framework-extra-bundle",
@@ -5409,6 +5555,7 @@
         "doctrine/orm": 0,
         "beberlei/doctrineextensions": 0,
         "easyrdf/easyrdf": 0,
+        "seboettg/citeproc-php": 20,
         "kphoen/rulerz": 0
     },
     "prefer-stable": false,

@@ -39,7 +39,6 @@ class ItemController extends Controller
             ->where('I.status <> -1')
             ->orderBy('P.familyName');
 
-
         $templateAppend = '';
         if ('item-by-exhibition' == $route) {
             $templateAppend = '-by-exhibition';

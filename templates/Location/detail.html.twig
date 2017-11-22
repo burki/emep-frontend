@@ -25,11 +25,13 @@
     <h1>
         {{ location.name }}
     </h1>
+    {{ location.nameAppend }}
+
     <div class="row">
         <div class="col-sm-8">
-            <dl>
+            <dl class="dl-horizontal">
             {% if location.place is not null %}
-                <!-- <dt>{{ 'Place'|trans }}:</dt> -->
+                <dt>{{ 'Place'|trans }}:</dt>
                 <dd>
                     <a href="{% if location.place.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : location.place.tgn }) }}{% else %}{{ path('place', { 'id' : location.place.id }) }}{% endif %}">
                     {{ location.place.nameLocalized }}
@@ -68,7 +70,7 @@
         </div>
 
         <div class="col-sm-4 sidebar">
-            {% if false and (birthPlace.geo is not empty or deathPlace.geo is not empty) %}
+            {% if location.geo is not empty %}
             <div id="map" class="col-sm-12" style="width: 100%; min-height: 360px; border-bottom: 20px solid white;"></div>
 
             <script>
@@ -85,19 +87,12 @@
 
             var map = L.map('map');
 
-            {% if birthPlace.geo is not empty and deathPlace.geo is not empty and birthPlace.geo != deathPlace.geo %}
-            map.fitBounds([ [ {{ birthPlace.geo }} ],
-                            [ {{ deathPlace.geo }} ] ]);
-            L.marker([ {{ birthPlace.geo }} ]).addTo(map);
-            L.marker([ {{ deathPlace.geo }} ]).addTo(map);
-            {% else %}
-            map.setView([{% if birthPlace.geo is not empty %}{{ birthPlace.geo }}{% else %}{{ deathPlace.geo }}{% endif %}], 10);
-            L.marker([ {% if birthPlace.geo is not empty %}{{ birthPlace.geo }}{% else %}{{ deathPlace.geo }}{% endif %} ]).addTo(map)
-            {% endif %}
+            map.setView([{{ location.geo }}], 10);
+            L.marker([ {{ location.geo }} ]).addTo(map);
 
             {{ map.addTileLayer() }}
             </script>
-        {% endif %}
+            {% endif %}
 
             {% if location.gnd is not empty %}
             <div class="container-fluid box">

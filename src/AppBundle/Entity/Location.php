@@ -8,7 +8,7 @@ use Gedmo\Mapping\Annotation as Gedmo; // alias for Gedmo extensions annotations
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Exhibtion
+ * Location
  *
  * @see TODO: http://schema.org/EventVenue Documentation on Schema.org
  *
@@ -81,6 +81,13 @@ implements \JsonSerializable, JsonLdSerializable
     protected $name;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="name_translit", type="string", length=255, nullable=true)
+     */
+    private $nameTransliterated;
+
+    /**
      * @var string URL of the item.
      *
      * @Assert\Url
@@ -102,6 +109,13 @@ implements \JsonSerializable, JsonLdSerializable
      * @ORM\Column(nullable=true,name="place")
      */
     protected $placeLabel;
+
+    /**
+     * @var string Latitude, longitude of the (current) address.
+     *
+     * @ORM\Column(name="place_geo", nullable=true)
+     */
+    protected $geo;
 
     /**
      * @var string Addresses.
@@ -308,21 +322,40 @@ implements \JsonSerializable, JsonLdSerializable
     }
 
     /**
-     * Gets localized name.
+     * Sets nameTransliterated.
+     *
+     * @param string $nameTransliterated
+     *
+     * @return $this
+     */
+    public function setNameTransliterated($nameTransliterated)
+    {
+        $this->nameTransliterated = $nameTransliterated;
+
+        return $this;
+    }
+
+    /**
+     * Gets nameTransliterated.
      *
      * @return string
      */
-    public function getNameLocalized($locale = 'en')
+    public function getNameTransliterated()
     {
-        if (is_array($this->alternateName)
-            && array_key_exists($locale, $this->alternateName)) {
-            $name = $this->alternateName[$locale];
-        }
-        else {
-            $name = $this->getName();
-        }
+        return $this->nameTransliterated;
+    }
 
-        return self::stripAt($name);
+    public function getNameAppend()
+    {
+        if (!empty($this->nameTransliterated)) {
+            $append = [];
+
+            if (!empty(!empty($this->nameTransliterated))) {
+                $append[] = $this->nameTransliterated;
+            }
+
+            return sprintf('[%s]', implode(' : ', $append));
+        }
     }
 
     /**
@@ -367,6 +400,16 @@ implements \JsonSerializable, JsonLdSerializable
     public function getPlaceLabel()
     {
         return $this->placeLabel;
+    }
+
+    /**
+     * Gets geo.
+     *
+     * @return string
+     */
+    public function getGeo()
+    {
+        return $this->geo;
     }
 
     /**
@@ -458,9 +501,9 @@ implements \JsonSerializable, JsonLdSerializable
     public function jsonSerialize()
     {
         return [
-                'id' => $this->id,
-                'name' => $this->name,
-                'gnd' => $this->gnd,
+            'id' => $this->id,
+            'name' => $this->name,
+            'gnd' => $this->gnd,
         ];
     }
 
@@ -469,7 +512,7 @@ implements \JsonSerializable, JsonLdSerializable
         $ret = [
             '@context' => 'http://schema.org',
             '@type' => 'Organization',
-            'name' => $this->getNameLocalized($locale),
+            'name' => $this->getName(),
         ];
         if ($omitContext) {
             unset($ret['@context']);

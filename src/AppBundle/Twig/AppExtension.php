@@ -119,7 +119,7 @@ class AppExtension extends \Twig_Extension
             $locale = $this->getLocale();
         }
 
-        return $this->translator->trans($class, [
+        return /** @Ignore */ $this->translator->trans($class, [
             '%epoch%' => $epoch,
             '%century%' => intval($epoch / 100) + 1,
             '%decade%' => $epoch % 100,
@@ -167,7 +167,7 @@ class AppExtension extends \Twig_Extension
     {
         $locale = $this->getLocale();
 
-        $path = __DIR__ . '/../Resources/data/csl/jgo-infoclio-de.csl.xml';
+        $path = __DIR__ . '/../Resources/csl/infoclio-de.csl.xml';
 
         $citeProc = new \AcademicPuma\CiteProc\CiteProc(file_get_contents($path),
                                                         $locale);

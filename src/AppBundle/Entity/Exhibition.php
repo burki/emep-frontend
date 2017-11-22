@@ -352,6 +352,32 @@ class Exhibition
         return $this->artists;
     }
 
+    public function findBibitem($em, $role = null)
+    {
+        $qb = $em->createQueryBuilder();
+        $qb->select([
+                'B',
+                "COALESCE(B.author, B.editor) HIDDEN creatorSort",
+            ])
+            ->distinct()
+            ->from('AppBundle:Bibitem', 'B')
+            ->innerJoin('AppBundle:BibitemExhibition', 'BE', 'WITH', 'BE.bibitem=B')
+            ->innerJoin('AppBundle:Exhibition', 'E', 'WITH', 'BE.exhibition=E')
+            ->where('E = :exhibition AND B.status <> -1')
+            ->orderBy('creatorSort, B.datePublished, B.title');
+
+        if (!is_null($role)) {
+            $qb->andWhere('BE.role = :role')
+                ->setParameter('role', $role);
+        }
+
+        $results = $qb->getQuery()
+            ->setParameter('exhibition', $this)
+            ->getResult();
+
+        return $results;
+    }
+
     /* make private properties public through a generic __get / __set */
     public function __get($name)
     {

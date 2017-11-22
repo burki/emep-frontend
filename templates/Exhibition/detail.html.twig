@@ -111,6 +111,14 @@
             </dl>
 
             <dl class="dl-horizontal">
+            {% if catalogue is not empty %}
+                <dt>Catalogue:</dt>
+                <dd>
+                    {% for bibitem in catalogue %}
+                        {{ bibitem.renderCitationAsHtml(citeProc, false)|raw }}
+                    {% endfor %}
+                </dd>
+            {% endif %}
             {% if exhibition.cataloguePrice is not empty %}
                 <dt>Catalogue Price:</dt>
                 <dd>{{ exhibition.cataloguePrice }}</dd>

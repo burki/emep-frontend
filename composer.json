@@ -5,6 +5,12 @@
         }
     },
 
+    "repositories": [
+        {
+            "url": "https://github.com/burki/citeproc-php.git",
+            "type": "vcs"
+        }
+	],
     "require": {
         "symfony/yaml": "^3.3",
         "symfony/console": "^3.3",
@@ -38,6 +44,8 @@
         "beberlei/DoctrineExtensions": "@stable",
 
         "easyrdf/easyrdf": "@stable",
+        "seboettg/citeproc-php": "dev-name-as-sort-order-fix#bf446dc",
+        "fale/isbn": "3.*",
 
         "ddeboer/data-import": "0.20.*",
         "phpoffice/phpexcel": "1.8.*",
