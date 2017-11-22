@@ -10,7 +10,7 @@ services:
         public: false
         tags:
             - { name: twig.extension }
-            
+ 
     app.menu_builder:
         class: AppBundle\Menu\Builder
         arguments: ["@knp_menu.factory", "@request_stack"]

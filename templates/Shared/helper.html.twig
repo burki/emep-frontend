@@ -2,8 +2,7 @@
     {% if exhibition.displaydate is not empty %}
         {{ exhibition.displaydate }}
     {% else %}
-        {{ exhibition.startdate|dateincomplete }}
-        {% if exhibition.startdate != exhibition.enddate and exhibition.enddate is not empty %} - {{  exhibition.enddate|dateincomplete  }}{% endif %}
+        {{ daterangeincomplete(exhibition.startdate, exhibition.enddate) }}
     {% endif %}
 {% endmacro %}
 

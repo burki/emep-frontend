@@ -179,6 +179,14 @@ form.filter {
     }
 }
 
+/* detail */
+
+.dl-horizontal {
+    dt {
+        color: $color-gray-dark;
+    }
+}
+
 /* footer */
 footer {
     font-size: 1.2rem;

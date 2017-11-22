@@ -35,7 +35,7 @@
     </h1>
     <div class="row">
         <div class="col-sm-8">
-            <dl>
+            <dl class="dl-horizontal">
             {% set birthPlace = person.birthPlaceInfo(app.request.locale) %}
             {% if birthPlace is not empty or person.birthDate is not empty %}
                 <dt>{{ 'Born'|trans }}:</dt>

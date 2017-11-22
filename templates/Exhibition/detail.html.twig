@@ -10,8 +10,55 @@
     <script>
         $( document ).ready(function() {
             $('.gallery').justifiedGallery();
-        })
+        });
+
+        $(document).ready(function() {
+            // Configure/customize these variables.
+            var showChar = 300;  // How many characters are shown by default
+            var ellipsestext = "...";
+            var moretext = "Show more >";
+            var lesstext = "Show less";
+
+
+            $('.more').each(function() {
+                var content = $(this).html();
+
+                if (content.length > showChar) {
+
+                    var c = content.substr(0, showChar);
+                    var h = content.substr(showChar, content.length - showChar);
+
+                    var html = c + '<span class="moreellipses">' + ellipsestext + '&nbsp;</span><span class="morecontent"><span>' + h + '</span>&nbsp;&nbsp;<a href="" class="morelink">' + moretext + '</a></span>';
+
+                    $(this).html(html);
+                }
+            });
+
+            $(".morelink").click(function(){
+                if ($(this).hasClass("less")) {
+                    $(this).removeClass("less");
+                    $(this).html(moretext);
+                }
+                else {
+                    $(this).addClass("less");
+                    $(this).html(lesstext);
+                }
+                $(this).parent().prev().toggle();
+                $(this).prev().toggle();
+
+                return false;
+            });
+        });
     </script>
+
+    <style>
+    .morecontent span {
+        display: none;
+    }
+    .morelink {
+        display: block;
+    }
+    </style>
 
     {{ map.head() }}
 {% endblock %}
@@ -39,34 +86,52 @@
             {% endif %}
             </p>
 
-            <p>
+            <dl class="dl-horizontal">
             {% if exhibition.organizer is not empty %}
-                Organized by: {{ exhibition.organizer|replace({"\n" : ' / ' }) }}
+                <dt>Organized by:</dt>
+                <dd>
+                {{ exhibition.organizer|replace({"\n" : ' / ' }) }}
                 {% if exhibition.organizerType is not empty %}
                     [{{ exhibition.organizerType }}]
-                {% endif %}<br />
+                {% endif %}
+                </dd>
             {% endif %}
 
             {% if exhibition.organizingCommittee is not empty %}
-                Organizing Committee: {{ exhibition.organizingCommittee|nl2br }}<br />
+                <dt>Organizing Committee:</dt>
+                <dd>
+                {{ exhibition.organizingCommittee|nl2br }}
+                </dd>
             {% endif %}
 
             {% if exhibition.price is not empty %}
-                Ticket Price: {{ exhibition.price }}
+                <dt>Ticket Price:</dt>
+                <dd>{{ exhibition.price }}</dd>
             {% endif %}
-            </p>
+            </dl>
 
-            <p>
+            <dl class="dl-horizontal">
             {% if exhibition.cataloguePrice is not empty %}
-                Catalogue Price: {{ exhibition.cataloguePrice }}<br />
+                <dt>Catalogue Price:</dt>
+                <dd>{{ exhibition.cataloguePrice }}</dd>
             {% endif %}
             {% if exhibition.preface is not empty %}
-                Preface: {{ exhibition.preface|nl2br }}
+                <dt>Preface:</dt>
+                <dd>
+                    <span class="more">
+                    {{ exhibition.preface|nl2br }}
+                    </span>
+                </dd>
             {% endif %}
-            </p>
+            </dl>
 
             {% if exhibition.note is not empty %}
-                <p>Note: {{ exhibition.note|nl2br }}</p>
+            <dl class="dl-horizontal">
+                <dt>Note:</dt>
+                <dd>
+                    {{ exhibition.note|nl2br }}
+                </dd>
+            </dl>
             {% endif %}
 
             {% if showWorks and exhibition.items is not empty %}
@@ -107,8 +172,13 @@
                     {% if last_initial != '' %}
             </ul>
                     {% endif %}
-            <h4><a href="{% if catalogueEntry.person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : catalogueEntry.person.ulan }) }}{% elseif catalogueEntry.person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : catalogueEntry.person.gnd }) }}{% else %}{{ path('person', { 'id' : catalogueEntry.person.id }) }}{% endif %}">{{ catalogueEntry.person.fullname }}</a></h4>
                 {% set last_initial = initial %}
+
+                <h4>
+                    <a href="{% if catalogueEntry.person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : catalogueEntry.person.ulan }) }}{% elseif catalogueEntry.person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : catalogueEntry.person.gnd }) }}{% else %}{{ path('person', { 'id' : catalogueEntry.person.id }) }}{% endif %}">
+                        {{ catalogueEntry.person.fullname(true) }}
+                    </a>
+                </h4>
             <ul class="list-group">
                 {% endif %}
             <li class="list-group-item">
