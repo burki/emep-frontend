@@ -37,6 +37,7 @@ class AppExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
+            new \Twig_SimpleFunction('countryName', array($this, 'getCountryName')),
             new \Twig_SimpleFunction('file_exists', 'file_exists'),
             new \Twig_SimpleFunction('daterangeincomplete', [ $this, 'daterangeincompleteFunction' ]),
         ];
@@ -81,6 +82,12 @@ class AppExtension extends \Twig_Extension
         }
 
         return \AppBundle\Utils\Formatter::dateIncomplete($datestr, $locale);
+    }
+
+    // see https://github.com/symfony/symfony/issues/13641
+    public function getCountryName($country, $displayLocale = null)
+    {
+        return \Symfony\Component\Intl\Intl::getRegionBundle()->getCountryName($country, $displayLocale);
     }
 
     public function daterangeincompleteFunction($datestrFrom, $datestrUntil, $locale = null)

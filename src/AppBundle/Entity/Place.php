@@ -29,6 +29,7 @@ implements \JsonSerializable, JsonLdSerializable
         if ('root' == $type) {
             return '';
         }
+
         if ('inhabited place' == $type) {
             return 'place';
         }
@@ -142,6 +143,14 @@ implements \JsonSerializable, JsonLdSerializable
      *
      */
     protected $countryCode;
+
+    /**
+     * @var Country|null
+     *
+     * @ORM\ManyToOne(targetEntity="Country", fetch="EAGER")
+     * @ORM\JoinColumn(name="country_code", referencedColumnName="cc", nullable=true)
+     */
+    protected $country;
 
     /**
      * @var string

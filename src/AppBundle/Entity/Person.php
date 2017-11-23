@@ -610,6 +610,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
             'tgn' => $place->getTgn(),
             'geo' => $place->getGeo(),
         ];
+
         return $placeInfo;
     }
 
@@ -654,7 +655,17 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
         if (!is_null($this->birthPlace)) {
             return self::buildPlaceInfo($this->birthPlace, $locale);
         }
-        return self::buildPlaceInfoFromEntityfacts($this->getEntityfacts($locale), 'placeOfBirth');
+
+        $placeInfo = self::buildPlaceInfoFromEntityfacts($this->getEntityfacts($locale), 'placeOfBirth');
+        if (!empty($placeInfo)) {
+            return $placeInfo;
+        }
+
+        if (!empty($this->birthPlaceLabel)) {
+            return [
+                'name' => $this->birthPlaceLabel,
+            ];
+        }
     }
 
     /**
@@ -700,13 +711,23 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
         if (!is_null($this->deathPlace)) {
             return self::buildPlaceInfo($this->deathPlace, $locale);
         }
+
         $placeInfo = self::buildPlaceInfoFromEntityfacts($this->getEntityfacts($locale), 'placeOfDeath');
         if (!empty($placeInfo)) {
             return $placeInfo;
         }
+
+        /*
         if (!is_null($this->additional) && array_key_exists('wikidata', $this->additional)) {
             return self::buildPlaceInfoFromWikidata($this->additional['wikidata']['de'],
                                                     'placeOfDeath');
+        }
+        */
+
+        if (!empty($this->deathPlaceLabel)) {
+            return [
+                'name' => $this->deathPlaceLabel,
+            ];
         }
     }
 

@@ -2,19 +2,49 @@
 
 namespace AppBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Intl\Intl;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 /**
  *
  */
 class PlaceController
-extends Controller
+extends CrudController
 {
+    protected $pageSize = 3000; // all on one page
+
+    protected function buildCountries()
+    {
+        $qb = $this->getDoctrine()
+                ->getManager()
+                ->createQueryBuilder();
+
+        $qb->select([
+                'P.countryCode',
+            ])
+            ->distinct()
+            ->from('AppBundle:Place', 'P')
+            ->where("P.type IN ('inhabited places') AND P.countryCode IS NOT NULL")
+            ;
+
+        $countriesActive = [];
+
+        foreach ($qb->getQuery()->getResult() as $result) {
+            $countryCode = $result['countryCode'];
+            $countriesActive[$countryCode] = Intl::getRegionBundle()->getCountryName($countryCode);
+        }
+
+        asort($countriesActive);
+
+        return $countriesActive;
+    }
+
     /**
      * @Route("/place", name="place-index")
      */
-    public function indexAction()
+    public function indexAction(Request $request)
     {
         $qb = $this->getDoctrine()
                 ->getManager()
@@ -22,18 +52,35 @@ extends Controller
 
         $qb->select([
                 'P',
-                "COALESCE(P.alternateName,P.name) HIDDEN nameSort"
+                "COALESCE(P.alternateName,P.name) HIDDEN nameSort",
+                "CONCAT(C.name, COALESCE(P.alternateName,P.name)) HIDDEN countrySort",
             ])
             ->from('AppBundle:Place', 'P')
+            ->leftJoin('P.country', 'C')
             ->where("P.type IN ('inhabited places')")
             ->orderBy('nameSort')
             ;
 
-        $places = $qb->getQuery()->getResult();
+        $form = $this->get('form.factory')->create(\AppBundle\Filter\PlaceFilterType::class, [
+            'choices' => array_flip($this->buildCountries()),
+        ]);
+
+        if ($request->query->has($form->getName())) {
+            // manually bind values from the request
+            $form->submit($request->query->get($form->getName()));
+
+            // build the query from the given form object
+            $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($form, $qb);
+        }
+
+        $pagination = $this->buildPagination($request, $qb->getQuery(), [
+            'defaultSortFieldName' => 'nameSort', 'defaultSortDirection' => 'asc',
+        ]);
 
         return $this->render('Place/index.html.twig', [
             'pageTitle' => $this->get('translator')->trans('Places'),
-            'places' => $places,
+            'pagination' => $pagination,
+            'form' => $form->createView(),
         ]);
     }
 

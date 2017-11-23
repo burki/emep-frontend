@@ -38,7 +38,7 @@
                 {% endif %}
         {% endif %}
         {% if deathPlace is not empty or person.deathDate is not empty %}
-            -
+            &ndash;
                 {{ person.deathDate|dateincomplete -}}
                 {% if deathPlace is not empty %}{% if person.deathDate is not empty %}{{- ',' }}{% endif %}
                     {% if deathPlace.id is not empty %}
