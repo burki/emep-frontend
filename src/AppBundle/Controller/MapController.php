@@ -63,7 +63,7 @@ class MapController extends Controller
         }
 
         // display
-        return $this->render('Map/person-by-place.html.twig', [
+        return $this->render('Map/place-map.html.twig', [
             'pageTitle' => 'Artists by Birth Place',
             'data' => json_encode($values_final),
             'disableClusteringAtZoom' => 7,
@@ -78,6 +78,7 @@ class MapController extends Controller
      * @Route("/exhibition/by-place", name="exhibition-by-place")
      * @Route("/location/by-place", name="location-by-place")
      * @Route("/work/by-place", name="item-by-place")
+     * @Route("/place/map", name="place-map")
      */
     public function exhibitionByPlace(Request $request)
     {
@@ -86,6 +87,9 @@ class MapController extends Controller
 
         $route = $request->get('_route');
         $persons = null;
+        $maxDisplay = 10;
+        $disableClusteringAtZoom = 5;
+
         if ('location-by-place' == $route) {
             $maxDisplay = 15;
             $querystr = "SELECT Location.id AS location_id, Location.name AS location_name, COALESCE(Geoname.name_variant, Geoname.name) AS place, Geoname.tgn, Geoname.latitude, Geoname.longitude"
@@ -96,8 +100,17 @@ class MapController extends Controller
                       . " ORDER BY tgn, location_name"
                       ;
         }
+        else if ('place-map' == $route) {
+            $disableClusteringAtZoom = 7;
+
+            $querystr = "SELECT COALESCE(Geoname.name_variant, Geoname.name) AS place, Geoname.tgn, Geoname.latitude, Geoname.longitude"
+                      . " FROM Geoname"
+                      . " WHERE"
+                      . " Geoname.type IN ('inhabited places')"
+                      ;
+
+        }
         else {
-            $maxDisplay = 10;
             $querystr = "SELECT DISTINCT Exhibition.id AS exhibition_id, Exhibition.title, startdate, enddate, Exhibition.displaydate AS displaydate, Location.id AS location_id, Location.name AS location_name, COALESCE(Geoname.name_variant, Geoname.name) AS place, Geoname.tgn, Geoname.latitude, Geoname.longitude"
                       . " FROM Exhibition"
                       . " INNER JOIN Location ON Location.id=Exhibition.id_location"
@@ -158,6 +171,7 @@ class MapController extends Controller
                     'exhibitions' => [],
                 ];
             }
+
             if ('location-by-place' == $route) {
                 $values[$key]['exhibitions'][] =
                     sprintf('<a href="%s">%s</a>',
@@ -167,7 +181,7 @@ class MapController extends Controller
                             htmlspecialchars($row['location_name'])
                     );
             }
-            else {
+            else if ('place-map' != $route) {
                 $values[$key]['exhibitions'][] =
                     sprintf('<a href="%s">%s</a> at <a href="%s">%s</a> (%s)',
                             htmlspecialchars($this->generateUrl('exhibition', [
@@ -182,6 +196,7 @@ class MapController extends Controller
                     );
             }
         }
+
         $values_final = [];
         foreach ($values as $key => $value) {
             $count_entries = count($value['exhibitions']);
@@ -196,13 +211,14 @@ class MapController extends Controller
                 $value['latitude'], $value['longitude'],
                 $value['place'],
                 $entry_list,
-                count($value['exhibitions']),
+                'place-map' == $route ? 1 : count($value['exhibitions']),
             ];
         }
 
         // display
-        return $this->render('Map/person-by-place.html.twig', [
+        return $this->render('Map/place-map.html.twig', [
             'data' => json_encode($values_final),
+            'disableClusteringAtZoom' => $disableClusteringAtZoom,
             'bounds' => [
                 [ 60, -120 ],
                 [ -15, 120 ],
@@ -215,50 +231,11 @@ class MapController extends Controller
 /* TODO: move to general util */
 class ExhibitionDisplayHelper
 {
-  function buildDisplayDate ($row) {
-    if (!empty($row['displaydate'])) {
-      return $row['displaydate'];
-    }
-    return $this->formatDateRange($row['startdate'],
-                                  $row['enddate']);
-  }
+    function buildDisplayDate ($row) {
+        if (!empty($row['displaydate'])) {
+            return $row['displaydate'];
+        }
 
-  function formatDateIncomplete ($date, $joiner = '.') {
-    $ret = [];
-    $parts = date_parse($date);
-    foreach ([ 'day', 'month', 'year' ] as $part) {
-      if (0 != $parts[$part]) {
-        $ret[] = sprintf('year' == $part ? '%04d' : '%02d',
-                         $parts[$part]);
-      }
+        return \AppBundle\Utils\Formatter::daterangeIncomplete($row['startdate'], $row['enddate']);
     }
-    return implode($joiner, $ret);
-  }
-
-  function formatDateRange ($date_from, $date_until) {
-    // TODO: make configurable, multilingual
-    $joiner = '-';
-    $date_format = 'dd.MM.yyyy';
-
-    if (is_object($date_from)) {
-      $from = $date_from->toString($date_format);
-    }
-    else {
-      $from = $this->formatDateIncomplete($date_from);
-    }
-
-    if (is_object($date_from)) {
-      $until = $date_until->toString($date_format);
-    }
-    else {
-      $until = $this->formatDateIncomplete($date_until);
-    }
-
-    if ($from == $until || empty($until)) {
-      return $from;
-    }
-    else {
-      return implode($joiner, [ $from, $until ]);
-    }
-  }
 }

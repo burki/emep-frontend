@@ -120,6 +120,9 @@ class Builder
         $menu['Places']->addChild('List', [
             'route' => 'place',
         ]);
+        $menu['Places']->addChild('Map', [
+            'route' => 'place-map',
+        ]);
 
         // find the matching parent
         // TODO: maybe use a voter, see https://gist.github.com/nateevans/9958390
