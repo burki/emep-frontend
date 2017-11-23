@@ -1094,16 +1094,16 @@
         },
         {
             "name": "fale/isbn",
-            "version": "3.0.2",
+            "version": "3.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Fale/isbn.git",
-                "reference": "b4489d2e6d7477d88867f476fcf7424cb7052b74"
+                "reference": "4edeafed9a701fc812a89d6464effb26a62c6b0c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Fale/isbn/zipball/b4489d2e6d7477d88867f476fcf7424cb7052b74",
-                "reference": "b4489d2e6d7477d88867f476fcf7424cb7052b74",
+                "url": "https://api.github.com/repos/Fale/isbn/zipball/4edeafed9a701fc812a89d6464effb26a62c6b0c",
+                "reference": "4edeafed9a701fc812a89d6464effb26a62c6b0c",
                 "shasum": ""
             },
             "require": {
@@ -1137,7 +1137,7 @@
                 "ISBN-10",
                 "ISBN-13"
             ],
-            "time": "2017-11-21T12:55:20+00:00"
+            "time": "2017-11-21T18:28:38+00:00"
         },
         {
             "name": "hoa/compiler",
