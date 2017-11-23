@@ -16,10 +16,10 @@
 
         {% set last_initial = '' %}
         {% for place in pagination %}
-            {% if 'nameSort' == sortField %}
-                {% set initial = slugify.slugify(place.nameLocalized(app.request.locale)|first)|upper %}
-            {% else %}
+            {% if 'countrySort' == sortField %}
                 {% set initial = countryName(place.countryCode) %}
+            {% else %}
+                {% set initial = slugify.slugify(place.nameLocalized(app.request.locale)|first)|upper %}
             {% endif %}
             {% if initial != last_initial %}
                 {% if last_initial != '' %}
