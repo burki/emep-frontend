@@ -1,5 +1,7 @@
 {% extends 'Base/base.html.twig' %}
 
+{% import 'Shared/helper.html.twig' as helper %}
+
 {% block body %}
     <h1>{{ 'Places' | trans }}</h1>
     <div class="row">
@@ -30,15 +32,11 @@
             <ul class="list-group">
             {% endif %}
             <li class="list-group-item">
-                <a href="{% if false and place.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : place.tgn }) }}{% else %}{{ path('place', { 'id' : place.id }) }}{% endif %}">
-                    {{ place.nameLocalized(app.request.locale) }}
-                </a>
+                {{ helper.place_linked(place) }}
                 {#% if place.children|length > 0 %}
                     <ul>
                         {% for child in place.children %}
-                        <li><a href="{% if child.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : child.tgn }) }}{% else %}{{ path('place', { 'id' : child.id }) }}{% endif %}">
-                            {{ child.name }}
-                        </a></li>
+                        <li>{{ helper.place_linked(child) }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %#}

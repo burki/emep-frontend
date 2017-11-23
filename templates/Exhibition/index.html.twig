@@ -43,16 +43,14 @@
                 {{ helper.exhibition_period(exhibition) }}
 
                 <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
-                    <b>{{ exhibition.title }}</b> {{ exhibition.titleAppend }}
-                </a>
+                    <b>{{ exhibition.title }}</b> {{ exhibition.titleAppend }}</a>
+                {% if 'numCatEntrySort' != sortField %}{{ row['numCatEntrySort'] }} entr.{% endif %}
 
                 {% if exhibition.location is not null %}
                     {% set location = exhibition.location %}
                     <div>
                     {% if location.place is not null %}
-                        <a href="{% if location.place.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : location.place.tgn }) }}{% else %}{{ path('place', { 'id' : location.place.id }) }}{% endif %}">
-                        {{ location.place.nameLocalized }}
-                        </a>:
+                        {{ helper.place_linked(location.place) }}:
                     {% endif %}
                     <a href="{{ path('location', { 'id' : location.id }) }}">
                         {{ location.name }}</a>

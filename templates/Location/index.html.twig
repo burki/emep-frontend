@@ -9,48 +9,68 @@
         {% if pagination.getTotalItemCount > 0 %}
         {{ helper.pagination_count(pagination) }}
 
-        <!--
-        <div>
+        <div class="sort-control">
             {% set sortField = app.request.get('sort') %}
             Sort by:
-            {{ knp_pagination_sortable(pagination, 'Place', 'placeSort') }}
+            {{ knp_pagination_sortable(pagination, 'Place', 'countryPlaceNameSort') }}
             {{ knp_pagination_sortable(pagination, 'Name', 'nameSort') }}
+            {{ knp_pagination_sortable(pagination, '# Exhibitions', 'numExhibitionSort') }}
+            {{ knp_pagination_sortable(pagination, '# Cat. Entries', 'numCatEntrySort') }}
         </div>
-        -->
 
         {% set last_initial = '' %}
-        {% for location in pagination %}
+        {% for row in pagination %}
+            {% set location = row[0] %}
+            {% set place = location.place %}
             <ul class="list-unstyled">
-            {% if location.placeLabel is not empty %}
-                {% if location.placeLabel != last_initial %}
-                    {% set place = location.place %}
-                    {% if last_initial != null %}
-                </ul>
-                    {% endif %}
-                <h4>
-                    {% if place is not null %}<a href="{{ path('place', { 'id': place.id }) }}">{% endif %}
-                        {{ place.nameLocalized(app.request.locale) }} ({{ place.countryCode}})
-                    {% if place is not null %}</a>{% endif %}
-                </h4>
-                {% set last_initial = location.placeLabel %}
-                <ul class="list-group">
+            {% if 'nameSort' == sortField %}
+                {# ignore #}
+            {% elseif 'numExhibitionSort' == sortField %}
+                {% set initial = row['numExhibitionSort'] %}
+            {% elseif 'numCatEntrySort' == sortField %}
+                {% set initial = row['numCatEntrySort'] %}
+            {% else %}
+                {% set sortField = 'countryPlaceNameSort' %}
+                {% if location.placeLabel is not empty %}
+                    {% set initial = location.placeLabel %}
                 {% endif %}
+            {% endif %}
+            {% if initial != last_initial %}
+                {% if last_initial != null %}
+                </ul>
+                {% endif %}
+                <h4>
+                    {% if 'countryPlaceNameSort' == sortField %}
+                        {% if place is not null %}
+                            {{ helper.place_linked(place) }}
+                        {% endif %}
+                    {% else %}
+                        {{ initial }}
+                    {% endif %}
+                </h4>
+                {% set last_initial = initial %}
+                <ul class="list-group">
             {% endif %}
             <li class="list-group-item">
                 <a href="{{ path('location', { 'id' : location.id }) }}">
                     <b>{{ location.name }}</b>
                 </a>
+                {% if 'countryPlaceNameSort' != sortField and place is not null %}
+                    ({{ helper.place_linked(place) }})
+                {% endif %}
+
                 {% set count = location.exhibitions|length %}
                 {% if count > 0 %}
                     {% set divId = 'exhibitions' ~ location.id %}
-                    <a class="badge" style="color: white" href="#{{ divId }}" data-toggle="collapse">{{ count }}</a>
+                    <a class="badge" style="color: white" href="#{{ divId }}" data-toggle="collapse">{{ count }} - {{ row['numCatEntrySort'] }}</a>
                     <div id="{{ divId }}" class="collapse">
                     {% for exhibition in location.exhibitions %}
                         <p>
-                            <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
-                               {{ exhibition.title }}
-                            </a>
                             {{ helper.exhibition_period(exhibition) }}
+                            <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
+                                {{ exhibition.title }}
+                                {{ exhibition.titleAppend }}
+                            </a>
                         </p>
                     {% endfor %}
                     </div>

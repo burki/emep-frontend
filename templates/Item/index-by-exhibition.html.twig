@@ -37,17 +37,14 @@
                 {% endif %}
                 <h4 style="margin: 0;">
                     <a href="{{ path('exhibition', { 'id': exhibition.id }) }}">
-                        {{ exhibition.title }}
-                    </a>
+                        {{ exhibition.title }} <span class="font-weight: regular">{{ exhibition.titleAppend }}</span></a>
                 </h4>
                 {{ helper.exhibition_period(exhibition) }}
 
                 {% if exhibition.location is not null %}
                     {% set location = exhibition.location %}
                     {% if location.place is not null %}
-                        <a href="{% if location.place.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : location.place.tgn }) }}{% else %}{{ path('place', { 'id' : location.place.id }) }}{% endif %}">
-                        {{ location.place.nameLocalized }}
-                        </a>:
+                        {{ helper.place_linked(location.place) }}:
                     {% endif %}
                     <a href="{{ path('location', { 'id' : location.id }) }}">
                         {{ location.name }}</a>

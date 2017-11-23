@@ -33,9 +33,7 @@
             {% if location.place is not null %}
                 <dt>{{ 'Place'|trans }}:</dt>
                 <dd>
-                    <a href="{% if location.place.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : location.place.tgn }) }}{% else %}{{ path('place', { 'id' : location.place.id }) }}{% endif %}">
-                    {{ location.place.nameLocalized }}
-                    </a>
+                    {{ helper.place_linked(location.place) }}
                     {% set addresses = location.addressesSeparated %}
                     {% for address in addresses %}
                         <br />{{ address['info']|replace({ "\n" : ", " }) }}
@@ -57,12 +55,8 @@
                 {% for exhibition in location.exhibitions %}
                 <li class="list-group-item">
                     {{ helper.exhibition_period(exhibition) }}
-                    <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
-                        <b>
-                            {{ exhibition.title }}
-                        </b>
-                        {{ exhibition.titleAppend }}
-                    </a>
+                    <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}"><b>{{ exhibition.title }}</b>{{ exhibition.titleAppend }}</a>{% if exhibitionStats[ exhibition.id ] is defined -%}, {{ exhibitionStats[exhibition.id].numCatEntrySort }} entr. by {{ exhibitionStats[exhibition.id].numPersonSort }} art.
+                    {% endif %}
                 </li>
                 {% endfor %}
             </ul>
@@ -92,6 +86,17 @@
 
             {{ map.addTileLayer() }}
             </script>
+            {% endif %}
+            {% if artists|length > 0 %}
+                <h3>Artists</h3>
+                <ul class="list-unstyled">
+                {% for row in artists %}
+                    {% set person = row[0 ]%}
+                    <li><b>{{ helper.person_linked(person) }}</b>
+                        ({{ row['numExhibitionSort']}} exh., {{ row['numCatEntrySort'] }} entr.)
+                    </li>
+                {% endfor %}
+                </ul>
             {% endif %}
 
             {% if location.gnd is not empty %}

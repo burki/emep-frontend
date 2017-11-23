@@ -78,9 +78,7 @@
             {% if exhibition.location is not null %}
                 {% set location = exhibition.location %}
                 {% if location.place is not null %}
-                    <a href="{% if location.place.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : location.place.tgn }) }}{% else %}{{ path('place', { 'id' : location.place.id }) }}{% endif %}">
-                    {{ location.place.nameLocalized }}
-                    </a>:
+                    {{ helper.place_linked(location.place) }}:
                 {% endif %}
                 <a href="{{ path('location', { 'id' : location.id }) }}">{{ location.name }}</a>
             {% endif %}
@@ -218,13 +216,9 @@
         <div class="col-sm-4 sidebar">
             {% if exhibition.artists|length > 0 %}
                 <h3>Artists</h3>
-                <ul>
+                <ul class="list-unstyled">
                 {% for person in exhibition.artists %}
-                    <li>
-                    <a href="{% if person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : person.ulan }) }}{% elseif person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : person.gnd }) }}{% else %}{{ path('person', { 'id' : person.id }) }}{% endif %}">
-                        <b>{{ person.fullname }}</b>
-                    </a>
-                    </li>
+                    <li><b>{{ helper.person_linked(person) }}</b></li>
                 {% endfor %}
                 </ul>
             {% endif %}

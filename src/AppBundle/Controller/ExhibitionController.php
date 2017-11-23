@@ -67,7 +67,6 @@ extends CrudController
             ->leftJoin('E.location', 'L')
             ->leftJoin('L.place', 'P')
             // ->leftJoin('E.artists', 'A')
-            // ->leftJoin('E.catalogueEntries', 'IE')
             ->leftJoin('AppBundle:ItemExhibition', 'IE',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'IE.exhibition = E AND IE.title IS NOT NULL')
@@ -117,6 +116,7 @@ extends CrudController
         if (0 == $numArtists) {
             return [];
         }
+
         $querystr = "SELECT DISTINCT id_person, id_exhibition"
                   . " FROM ItemExhibition"
                   . " WHERE id_person IN (" . join(', ', $personIds) . ')'
@@ -153,6 +153,7 @@ extends CrudController
                           ($row['num_artists'] + $numArtists - $numShared),
                 ];
             }
+
             uasort($jaccardIndex,
                 function ($a, $b) {
                     if ($a['coefficient'] == $b['coefficient']) {
@@ -163,6 +164,7 @@ extends CrudController
                 }
             );
         }
+
         return $jaccardIndex;
     }
 

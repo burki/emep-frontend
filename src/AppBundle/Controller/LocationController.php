@@ -59,11 +59,20 @@ extends CrudController
         $qb->select([
                 'L',
                 "CONCAT(P.countryCode, COALESCE(P.alternateName,P.name),L.name) HIDDEN countryPlaceNameSort",
+                "L.name HIDDEN nameSort",
+                'COUNT(DISTINCT E.id) AS numExhibitionSort',
+                'COUNT(DISTINCT IE.id) AS numCatEntrySort',
             ])
             ->from('AppBundle:Location', 'L')
-            // ->leftJoin('L.exhibitions', 'E')
             ->leftJoin('L.place', 'P')
+            ->leftJoin('AppBundle:Exhibition', 'E',
+                       \Doctrine\ORM\Query\Expr\Join::WITH,
+                       'E.location = L AND E.status <> -1')
+            ->leftJoin('AppBundle:ItemExhibition', 'IE',
+                       \Doctrine\ORM\Query\Expr\Join::WITH,
+                       'IE.exhibition = E AND IE.title IS NOT NULL')
             ->where('L.status <> -1')
+            ->groupBy('L.id')
             ->orderBy('countryPlaceNameSort')
             ;
 
@@ -116,9 +125,58 @@ extends CrudController
             return new JsonLdResponse($person->jsonLdSerialize($locale));
         }
 
+        // artists this venue
+        $qb = $this->getDoctrine()
+                ->getManager()
+                ->createQueryBuilder();
+
+        $qb->select([
+                'P',
+                'COUNT(DISTINCT E.id) AS numExhibitionSort',
+                'COUNT(DISTINCT IE.id) AS numCatEntrySort',
+                "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort"
+            ])
+            ->from('AppBundle:Person', 'P')
+            ->innerJoin('AppBundle:ItemExhibition', 'IE',
+                       \Doctrine\ORM\Query\Expr\Join::WITH,
+                       'IE.person = P AND IE.title IS NOT NULL')
+            ->innerJoin('IE.exhibition', 'E')
+            ->where('E.location = :location AND E.status <> -1')
+            ->setParameter('location', $location)
+            ->groupBy('P.id')
+            ->orderBy('nameSort')
+            ;
+        $artists = $qb->getQuery()->getResult();
+
+        // stats
+        $qb = $this->getDoctrine()
+                ->getManager()
+                ->createQueryBuilder();
+        $qb->select([
+                'E.id AS id',
+                'COUNT(DISTINCT IE.id) AS numCatEntrySort',
+                'COUNT(DISTINCT P.id) AS numPersonSort',
+            ])
+            ->from('AppBundle:Exhibition', 'E')
+            ->leftJoin('E.location', 'L')
+            ->leftJoin('AppBundle:ItemExhibition', 'IE',
+                       \Doctrine\ORM\Query\Expr\Join::WITH,
+                       'IE.exhibition = E AND IE.title IS NOT NULL')
+            ->leftJoin('IE.person', 'P')
+            ->where('E.location = :location AND E.status <> -1')
+            ->setParameter('location', $location)
+            ->groupBy('E.id')
+            ;
+        $exhibitionStats = [];
+        foreach ($qb->getQuery()->getResult() as $row) {
+           $exhibitionStats[$row['id']] = $row;
+        }
+
         return $this->render('Location/detail.html.twig', [
             'pageTitle' => $location->getName(),
             'location' => $location,
+            'exhibitionStats' => $exhibitionStats,
+            'artists' => $artists,
             'pageMeta' => [
                 /*
                 'jsonLd' => $exhibition->jsonLdSerialize($locale),

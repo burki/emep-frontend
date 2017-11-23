@@ -129,7 +129,7 @@ extends CrudController
         $jaccardIndex = [];
         $personIds = array_keys($exhibitionsByPerson);
         if (count($personIds) > 0) {
-            $querystr = "SELECT CONCAT(COALESCE(lastname,firstname), ' ', COALESCE(firstname, '')) AS name, id_person, COUNT(DISTINCT id_exhibition) AS num_exhibitions"
+            $querystr = "SELECT CONCAT(COALESCE(firstname, ''), ' ', COALESCE(lastname,firstname)) AS name, id_person, COUNT(DISTINCT id_exhibition) AS num_exhibitions"
                       . " FROM ItemExhibition"
                       . " LEFT OUTER JOIN Person ON ItemExhibition.id_person=Person.id"
                       . " WHERE id_person IN (" . join(', ', $personIds) . ')'
