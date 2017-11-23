@@ -19,6 +19,23 @@
         };
         service.replaceTagsOnLoad();
     </script>
+
+    <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.css">
+    <script src="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.js"></script>
+    <script>
+        $( document ).ready(function() {
+            $('#artists').DataTable({
+                paging: false,
+                searching: false,
+                info: false,
+                "columns": [
+                    null,
+                    { "orderSequence": [ "desc", "asc" ] },
+                    { "orderSequence": [ "desc", "asc" ] }
+                ]
+            });
+        })
+    </script>
 {% endblock %}
 
 {% block body %}
@@ -61,6 +78,30 @@
                 {% endfor %}
             </ul>
             {% endif %}
+
+
+            {% if artists|length > 0 %}
+                <h3>Artists showing at this Venue</h3>
+                <table id="artists" class="table table-striped table-bordered dataTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Number of Exhibitions</th>
+                            <th>Number of Cat. Entries</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                {% for row in artists %}
+                    {% set person = row[0] %}
+                        <tr>
+                            <td><b>{{ helper.person_linked(person) }}</b></td>
+                            <td>{{ row['numExhibitionSort'] }}</td>
+                            <td>{{ row['numCatEntrySort'] }}</td>
+                        </tr>
+                {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
         </div>
 
         <div class="col-sm-4 sidebar">
@@ -87,7 +128,7 @@
             {{ map.addTileLayer() }}
             </script>
             {% endif %}
-            {% if artists|length > 0 %}
+            {#% if artists|length > 0 %}
                 <h3>Artists</h3>
                 <ul class="list-unstyled">
                 {% for row in artists %}
@@ -97,7 +138,7 @@
                     </li>
                 {% endfor %}
                 </ul>
-            {% endif %}
+            {% endif %#}
 
             {% if location.gnd is not empty %}
             <div class="container-fluid box">
