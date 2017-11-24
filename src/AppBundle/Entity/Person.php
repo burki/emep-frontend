@@ -597,9 +597,9 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
         return $this->birthPlaceLabel;
     }
 
-    public function getAddressesSeparated()
+    public function getAddressesSeparated($filterExhibition = null)
     {
-        return $this->buildAddresses($this->addresses, true);
+        return $this->buildAddresses($this->addresses, false, $filterExhibition);
     }
 
     private static function buildPlaceInfo($place, $locale)

@@ -67,8 +67,10 @@
     <h1>
         {{ exhibition.title }}
     </h1>
+    {% if exhibition.titleAppend is not empty %}
+    <h2 style="margin-top: -0.8rem"><span class="small">{{ exhibition.titleAppend }}</span></h2>
+    {% endif %}
     {{ exhibition.subtitle }}
-    {{ exhibition.titleAppend }}
 
     <div class="row">
         <div class="col-sm-8">
@@ -98,8 +100,15 @@
             {% if exhibition.organizingCommittee is not empty %}
                 <dt>Organizing Committee:</dt>
                 <dd>
-                {{ exhibition.organizingCommittee|nl2br }}
+                    <span class="more">
+                    {{ exhibition.organizingCommittee|nl2br }}
+                    </span>
                 </dd>
+            {% endif %}
+
+            {% if exhibition.hours is not empty %}
+                <dt>Opening Hours:</dt>
+                <dd>{{ exhibition.hours }}</dd>
             {% endif %}
 
             {% if exhibition.price is not empty %}
@@ -129,14 +138,28 @@
                     </span>
                 </dd>
             {% endif %}
+            {% if exhibition.catalogueStructure is not empty %}
+                <dt>Catalogue Structure:</dt>
+                <dd>
+                    {{ exhibition.catalogueStructure|nl2br }}
+                </dd>
+            {% endif %}
             </dl>
 
-            {% if exhibition.note is not empty %}
+            {% if exhibition.note is not empty or exhibition.hasInfo %}
             <dl class="dl-horizontal">
+                {% if exhibition.note is not empty %}
                 <dt>Note:</dt>
                 <dd>
                     {{ exhibition.note|nl2br }}
                 </dd>
+                {% endif %}
+                {% if exhibition.hasInfo %}
+                <dt>Additional Notes:</dt>
+                <dd>
+                    {{ helper.render_info(exhibition.infoExpanded) }}
+                </dd>
+                {% endif %}
             </dl>
             {% endif %}
 
@@ -182,13 +205,43 @@
 
                 <h4>
                     <a href="{% if catalogueEntry.person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : catalogueEntry.person.ulan }) }}{% elseif catalogueEntry.person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : catalogueEntry.person.gnd }) }}{% else %}{{ path('person', { 'id' : catalogueEntry.person.id }) }}{% endif %}">
-                        {{ catalogueEntry.person.fullname(true) }}
-                    </a>
+                        {{ catalogueEntry.person.fullname(true) }}</a>
+                    {% set addresses = catalogueEntry.person.addressesSeparated(exhibition.id) %}
+                    {% if addresses is not empty %}
+                        <span class="small">
+                    {% for address in addresses %}
+                        {{ address['info']|replace({ "\n" : ", " }) }}{% if not loop.last %}; {% endif %}
+                    {% endfor %}
+                        </span>
+                    {% endif %}
                 </h4>
+
             <ul class="list-group">
                 {% endif %}
             <li class="list-group-item">
+                {% if catalogueEntry.displaylocation is not null %}
+                <div style="float: right">
+                    <span class="small" title="Gallery/Room" style="color:#333">{{ catalogueEntry.displaylocation }}</span>
+                </div>
+                {% endif %}
                 {{ catalogueEntry.titleFull }}
+                <span class="small">
+                    {% if catalogueEntry.displayDate is not empty %}{{ catalogueEntry.displayDate }}{% endif %}
+                    {% if catalogueEntry.isForsale %}<sup><i class="glyphicon glyphicon-asterisk" title="For Sale"></i></sup>{% endif %}
+                    {% if catalogueEntry.price is not empty %}<span title="Price as in Catalogue">{{ catalogueEntry.price }}</span>{% endif %}
+                </span>
+                <div class="small">
+                {% if catalogueEntry.previewImg is not null %}<i class="glyphicon glyphicon-picture" title="Catalogue Illustration available"></i> {% endif %}
+                {{ catalogueEntry.typeParts }}
+                {% if catalogueEntry.ownerFull is not empty %}
+                    <i style="color: #ccc" class="glyphicon glyphicon-user" title="Owner as in Catalogue"></i>
+                    {{ catalogueEntry.ownerFull }}
+                {% endif %}
+                {% if catalogueEntry.description is not empty %}
+                    <i style="color: #ccc" class="glyphicon glyphicon-info-sign"></i>
+                    {{ catalogueEntry.description|nl2br }}
+                {% endif %}
+                </div>
             </li>
             {% endfor %}
             </ul>

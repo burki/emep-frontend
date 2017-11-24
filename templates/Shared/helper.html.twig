@@ -60,3 +60,12 @@
 {% macro person_linked(person) -%}
     <a href="{% if person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : person.ulan }) }}{% elseif person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : person.gnd }) }}{% else %}{{ path('person', { 'id' : person.id }) }}{% endif %}">{{ person.fullname }}</a>
 {%- endmacro %}
+
+{% macro render_info(entries) -%}
+    {% for entry in entries %}
+        {{ entry.note }}
+        {% if entry.citation is not empty %}{{ entry.citation|raw }}{% endif %}
+        {% if entry.url is not empty %}{{ entry.url|converturls }}{% endif %}
+        {% if not loop.last %}<br />{% endif %}
+    {% endfor %}
+{% endmacro %}

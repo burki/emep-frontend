@@ -237,11 +237,17 @@ extends CrudController
             return new JsonLdResponse($person->jsonLdSerialize($locale));
         }
 
+        $citeProc = $this->instantiateCiteProc($request->getLocale());
+        if ($exhibition->hasInfo()) {
+            // expand the publications
+            $exhibition->buildInfoFull($this->getDoctrine()->getManager(), $citeProc);
+        }
+
         return $this->render('Exhibition/detail.html.twig', [
             'pageTitle' => $exhibition->title, // TODO: dates in brackets
             'exhibition' => $exhibition,
             'catalogue' => $exhibition->findBibitem($this->getDoctrine()->getManager(), 1),
-            'citeProc' => $this->instantiateCiteProc($request->getLocale()),
+            'citeProc' => $citeProc,
             'catalogueEntries' => $this->findCatalogueEntries($exhibition),
             'showWorks' => !empty($_SESSION['user']),
             'similar' => $this->findSimilar($exhibition),

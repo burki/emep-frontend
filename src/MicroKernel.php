@@ -64,6 +64,9 @@ class MicroKernel extends Kernel
             new Lexik\Bundle\FormFilterBundle\LexikFormFilterBundle(),
             new Knp\Bundle\PaginatorBundle\KnpPaginatorBundle(),
 
+            // converturls filter
+            new Liip\UrlAutoConverterBundle\LiipUrlAutoConverterBundle(),
+
             // contact
             new Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle(),
 

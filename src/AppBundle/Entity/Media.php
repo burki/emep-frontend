@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="Media")
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="type", type="integer")
- * @ORM\DiscriminatorMap({"0" = "ItemMedia", "10" = "PersonMedia", "30" = "ExhibitionMedia"})
+ * @ORM\DiscriminatorMap({"0" = "ItemMedia","10" = "PersonMedia","30" = "ExhibitionMedia","90" = "ItemExhibitionMedia"})
  * @ORM\Entity
  */
 abstract class Media

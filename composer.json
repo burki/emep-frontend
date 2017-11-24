@@ -9,8 +9,13 @@
         {
             "url": "https://github.com/burki/citeproc-php.git",
             "type": "vcs"
+        },
+        {
+            "url": "https://github.com/burki/LiipUrlAutoConverterBundle.git",
+            "type": "vcs"
         }
-	],
+    ],
+
     "require": {
         "symfony/yaml": "^3.3",
         "symfony/console": "^3.3",
@@ -38,6 +43,7 @@
 
         "cocur/slugify": "@stable",
         "twig/extensions": "@stable",
+        "liip/url-auto-converter-bundle": "dev-master",
 
         "doctrine/doctrine-bundle": "@stable",
         "doctrine/orm": "@stable",

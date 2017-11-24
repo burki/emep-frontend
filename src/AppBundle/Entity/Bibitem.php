@@ -188,6 +188,13 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
     /**
      * @var string The number of pages of the book
      *
+     * @ORM\Column(name="pages", type="string", nullable=true)
+     */
+    protected $pagination;
+
+    /**
+     * @var string The number of pages of the book
+     *
      * @ORM\Column(name="number_of_pages", type="string", nullable=true)
      */
     protected $numberOfPages;
@@ -813,9 +820,12 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
         return $this->url;
     }
 
-    public function renderCitationAsHtml($citeProc, $purgeSeparator = false)
+    public function renderCitationAsHtml($citeProc, $purgeSeparator = false, $mode = null)
     {
-        $ret = $citeProc->render(json_decode(json_encode($this->jsonSerialize())));
+        $data = json_decode(json_encode($this->jsonSerialize()));
+        // var_dump($data);
+
+        $ret = $citeProc->render($data, $mode);
 
         /* vertical-align: super doesn't render nicely:
            http://stackoverflow.com/a/1530819/2114681
@@ -849,7 +859,8 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
                 $ret);
         }
 
-        return $ret;
+        return preg_replace('~^<div class="csl\-bib\-body"><div style="text\-indent: \-25px; padding\-left: 25px;"><div class="csl-entry">(.*?)</div></div></div>$~',
+                            '\1', $ret);
     }
 
     private static function mb_ucfirst($string, $encoding = 'UTF-8')
@@ -1003,8 +1014,8 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
                 'date-parts' => [ $this->buildDateParts($this->datePublished) ],
                 'literal' => $this->datePublished,
             ],
-            'page' => 'book' != $this->itemType ? $this->numberOfPages : null,
-            'number-of-pages' => 'book' == $this->itemType ? $this->numberOfPages : null,
+            'page' => $this->pagination,
+            'number-of-pages' => $this->numberOfPages,
             // 'DOI' => $this->doi,
             'ISBN' => $this->isbn,
             'ISSN' => $this->issn,

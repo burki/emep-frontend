@@ -99,7 +99,6 @@ class Item
      */
     private $materials;
 
-
     /**
      * @var string
      *
@@ -545,7 +544,7 @@ class Item
      * @ORM\OneToMany(targetEntity="ItemMedia", mappedBy="item", fetch="EAGER")
      * @ORM\OrderBy({"name" = "ASC", "ord" = "ASC"})
      */
-    public $media;
+    private $media;
 
     /* make private properties public through a generic __get / __set */
     public function __get($name)
@@ -602,6 +601,7 @@ class Item
         if (is_null($this->media)) {
             return null;
         }
+
         foreach ($this->media as $img) {
             if ($img->getStatus() == -1) {
                 continue;

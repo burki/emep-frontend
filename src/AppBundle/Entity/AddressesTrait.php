@@ -41,9 +41,9 @@ trait AddressesTrait
      *
      *
      */
-    function buildAddresses($json, $showCountry = false)
+    function buildAddresses($entries, $showCountry = false, $filterExhibition = null)
     {
-        $addresses = self::splitAddresses($json);
+        $addresses = self::splitAddresses($entries);
         if (empty($addresses)) {
             return [];
         }
@@ -51,11 +51,24 @@ trait AddressesTrait
         $numAddresses = empty($addresses) ? 0 : count($addresses['place']);
         $fields = [];
         for ($i = 0; $i < $numAddresses; $i++) {
-            $lines = [];
-            $range = join('-', [ $addresses['from'][$i], $addresses['until'][$i] ]);
+            if (!is_null($filterExhibition)) {
+                if (!array_key_exists('id_exhibition', $addresses)
+                    || !array_key_exists($i, $addresses['id_exhibition'])
+                    || !is_array($addresses['id_exhibition'][$i])
+                    || !in_array($filterExhibition, $addresses['id_exhibition'][$i]))
+                {
+                    continue;
+                }
+            }
 
-            if ('-' != $range) {
-                $lines[] = $range;
+            $lines = [];
+
+            if ($showCountry) {
+                $range = join('-', [ $addresses['from'][$i], $addresses['until'][$i] ]);
+
+                if ('-' != $range) {
+                    $lines[] = $range;
+                }
             }
 
             foreach ([ [ 'address', 'place' ],
