@@ -145,11 +145,13 @@
 
                 {% if count > 0 %}
                     <div id="{{ divId }}" class="collapse">
+                    <ul class="list-group">
                     {% for catalogueEntry in catalogueEntries[exhibition.id] %}
-                        <p>
-                            {{ catalogueEntry.titleFull }}
-                        </p>
+                        <li class="list-group-item">
+                            {{ helper.itemexhibition_detail(catalogueEntry) }}
+                        </li>
                     {% endfor %}
+                    </ul>
                     </div>
                 {% endif %}
             </li>

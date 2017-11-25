@@ -219,29 +219,7 @@
             <ul class="list-group">
                 {% endif %}
             <li class="list-group-item">
-                {% if catalogueEntry.displaylocation is not null %}
-                <div style="float: right">
-                    <span class="small" title="Gallery/Room" style="color:#333">{{ catalogueEntry.displaylocation }}</span>
-                </div>
-                {% endif %}
-                {{ catalogueEntry.titleFull }}
-                <span class="small">
-                    {% if catalogueEntry.displayDate is not empty %}{{ catalogueEntry.displayDate }}{% endif %}
-                    {% if catalogueEntry.isForsale %}<sup><i class="glyphicon glyphicon-asterisk" title="For Sale"></i></sup>{% endif %}
-                    {% if catalogueEntry.price is not empty %}<span title="Price as in Catalogue">{{ catalogueEntry.price }}</span>{% endif %}
-                </span>
-                <div class="small">
-                {% if catalogueEntry.previewImg is not null %}<i class="glyphicon glyphicon-picture" title="Catalogue Illustration available"></i> {% endif %}
-                {{ catalogueEntry.typeParts }}
-                {% if catalogueEntry.ownerFull is not empty %}
-                    <i style="color: #ccc" class="glyphicon glyphicon-user" title="Owner as in Catalogue"></i>
-                    {{ catalogueEntry.ownerFull }}
-                {% endif %}
-                {% if catalogueEntry.description is not empty %}
-                    <i style="color: #ccc" class="glyphicon glyphicon-info-sign"></i>
-                    {{ catalogueEntry.description|nl2br }}
-                {% endif %}
-                </div>
+                {{ helper.itemexhibition_detail(catalogueEntry) }}
             </li>
             {% endfor %}
             </ul>
