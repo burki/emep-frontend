@@ -442,7 +442,15 @@ implements \JsonSerializable, JsonLdSerializable
      */
     public function getExhibitions()
     {
-        return $this->exhibitions;
+        if (is_null($this->exhibitions)) {
+            return null;
+        }
+
+        return $this->exhibitions->filter(
+            function($entity) {
+               return -1 != $entity->getStatus();
+            }
+        );
     }
 
     /**
