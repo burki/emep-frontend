@@ -14,6 +14,7 @@
             Sort by:
             {{ knp_pagination_sortable(pagination, 'Name', 'nameSort') }}
             {{ knp_pagination_sortable(pagination, 'Birth', 'P.birthDate') }}
+            {{ knp_pagination_sortable(pagination, 'Death', 'P.deathDate') }}
             {{ knp_pagination_sortable(pagination, '# Exhibitions', 'numExhibitionSort') }}
             {{ knp_pagination_sortable(pagination, '# Cat. Entries', 'numCatEntrySort') }}
         </div>
@@ -23,6 +24,8 @@
             {% set person = row[0] %}
             {% if 'P.birthDate' == sortField %}
                 {% set initial = person.birthDate|datedecade %}
+            {% elseif 'P.deathDate' == sortField %}
+                {% set initial = person.deathDate|datedecade %}
             {% elseif 'numExhibitionSort' == sortField %}
                 {% set initial = row['numExhibitionSort'] %}
             {% elseif 'numCatEntrySort' == sortField %}
