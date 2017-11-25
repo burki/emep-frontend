@@ -207,25 +207,34 @@ extends CrudController
         $routeName = 'person';
         $routeParams = [];
 
+        $criteria = new \Doctrine\Common\Collections\Criteria();
         $personRepo = $this->getDoctrine()
                 ->getRepository('AppBundle:Person');
 
         if (!empty($id)) {
             $routeParams = [ 'id' => $id ];
-            $person = $personRepo->findOneById($id);
+            $criteria->where($criteria->expr()->eq('id', $id));
         }
         else if (!empty($ulan)) {
-            $routeName = 'person-by-ulan'; $routeParams = [ 'ulan' => $ulan ];
-            $person = $personRepo->findOneByUlan($ulan);
+            $routeName = 'person-by-ulan';
+            $routeParams = [ 'ulan' => $ulan ];
+            $criteria->where($criteria->expr()->eq('ulan', $ulan));
         }
         else if (!empty($gnd)) {
-            $routeName = 'person-by-gnd'; $routeParams = [ 'gnd' => $gnd ];
-            $person = $personRepo->findOneByGnd($gnd);
+            $routeName = 'person-by-gnd';
+            $routeParams = [ 'gnd' => $gnd ];
+            $criteria->where($criteria->expr()->eq('gnd', $gnd));
         }
 
-        if (!isset($person) || $person->getStatus() == -1) {
+        $criteria->andWhere($criteria->expr()->neq('status', -1));
+
+        $persons = $personRepo->matching($criteria);
+
+        if (0 == count($persons)) {
             return $this->redirectToRoute('person-index');
         }
+
+        $person = $persons[0];
 
         $locale = $request->getLocale();
         if (in_array($request->get('_route'), [ 'person-jsonld', 'person-by-ulan-json', 'person-by-gnd-jsonld' ])) {
