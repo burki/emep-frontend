@@ -49,6 +49,7 @@
         "doctrine/orm": "@stable",
         "beberlei/DoctrineExtensions": "@stable",
 
+        "semsol/arc2": "@stable",
         "easyrdf/easyrdf": "@stable",
         "seboettg/citeproc-php": "dev-name-as-sort-order-fix#bf446dc",
         "fale/isbn": "3.*",
