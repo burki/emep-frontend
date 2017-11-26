@@ -61,14 +61,14 @@ implements \JsonSerializable, JsonLdSerializable
     /**
      * @var string The date that this organization was dissolved.
      *
-     * #ORM\Column(type="string", nullable=true)
+     * @ORM\Column(name="dissolutiondate", type="string", nullable=true)
      */
     protected $dissolutionDate;
 
     /**
      * @var string The date that this organization was founded.
      *
-     * #ORM\Column(type="string", nullable=true)
+     * @ORM\Column(name="foundingdate", type="string", nullable=true)
      */
     protected $foundingDate;
 
@@ -154,6 +154,11 @@ implements \JsonSerializable, JsonLdSerializable
      * #ORM\Column(nullable=true)
      */
     protected $slug;
+
+    /**
+    * @ORM\Column(type="json_array", nullable=true)
+    */
+    protected $additional;
 
     /**
      * @ORM\OneToMany(targetEntity="Exhibition", mappedBy="location",cascade={"all"}, fetch="EAGER")
@@ -512,6 +517,10 @@ implements \JsonSerializable, JsonLdSerializable
             'id' => $this->id,
             'name' => $this->name,
             'gnd' => $this->gnd,
+            'url' => $this->url,
+            'foundingDate' => $this->foundingDate,
+            'dissolutionDate' => $this->dissolutionDate,
+
         ];
     }
 

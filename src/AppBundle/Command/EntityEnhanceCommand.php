@@ -17,7 +17,7 @@ class EntityEnhanceCommand extends ContainerAwareCommand
     {
         $this
             ->setName('entity:enhance')
-            ->setDescription('Enhance Person/Place/Organization/Bibitem Entities')
+            ->setDescription('Enhance Person/Place/Location/Bibitem Entities')
             ->addArgument(
                 'type',
                 InputArgument::REQUIRED,
@@ -38,7 +38,7 @@ class EntityEnhanceCommand extends ContainerAwareCommand
                 break;
 
             case 'location':
-                return $this->enhanceOrganization();
+                return $this->enhanceLocation();
                 break;
 
             case 'country':
@@ -147,6 +147,10 @@ class EntityEnhanceCommand extends ContainerAwareCommand
         return $gndBeacon;
     }
 
+    /*
+     * TODO: Better wikidata queries in
+     * site/tool/missing_personwikidata.php
+     */
     protected function enhancePerson()
     {
         $locales = [ 'en' ]; // different labels, e.g of birthPlace for different locales
@@ -203,64 +207,51 @@ class EntityEnhanceCommand extends ContainerAwareCommand
                 continue;
             }
             var_dump('Query for ' . $person->getFullname());
-            /*
-            if (!empty($gnd) && array_key_exists($gnd, $gndBeacon)) {
-                $additional = $person->getAdditional();
-                $additional['beacon'] = $gndBeacon[$gnd];
-                $person->setAdditional($additional);
-                $persist = true;
-            }
-            $additional = $person->getAdditional();
-            if (is_null($additional) || !array_key_exists('wikidata', $additional)) {
-            */
-                foreach ($locales as $locale) {
-                    $wikidata = [];
-                    if (!empty($gnd)) {
-                        $wikidata = \AppBundle\Utils\BiographicalWikidata::fetchByGnd($gnd, $locale);
+            foreach ($locales as $locale) {
+                $wikidata = [];
+                if (!empty($gnd)) {
+                    $wikidata = \AppBundle\Utils\BiographicalWikidata::fetchByGnd($gnd, $locale);
+                }
+                if (empty($wikidata->identifier) && !empty($ulan)) {
+                    $wikidata = \AppBundle\Utils\BiographicalWikidata::fetchByUlan($ulan, $locale);
+                }
+                if (!empty($wikidata->identifier)) {
+                    /*
+                    if (is_null($additional)) {
+                        $additional = [];
                     }
-                    if (empty($wikidata->identifier) && !empty($ulan)) {
-                        $wikidata = \AppBundle\Utils\BiographicalWikidata::fetchByUlan($ulan, $locale);
+                    if (!array_key_exists('wikidata', $additional)) {
+                        $additional['wikidata'] = [];
                     }
-                    if (!empty($wikidata->identifier)) {
-                        /*
-                        if (is_null($additional)) {
-                            $additional = [];
-                        }
-                        if (!array_key_exists('wikidata', $additional)) {
-                            $additional['wikidata'] = [];
-                        }
-                        $additional['wikidata'][$locale] = (array)$wikidata;
-                        $person->setAdditional($additional);
-                        $persist = true;
-                        */
-                        // compile record of previously empty and now filled
-                        // TODO: maybe handle changes as well
-                        $updateProperties = [];
-                        foreach ($UPDATE_PROPERTIES as $property => $method)
-                        {
-                            if (!empty($wikidata->{$property})) {
-                                $getMethod = 'get' . ucfirst($method);
-                                $value = $person->$getMethod();
-                                if (empty($value)) {
-                                    $updateProperties[$method] = $wikidata->{$property};
-                                }
+                    $additional['wikidata'][$locale] = (array)$wikidata;
+                    $person->setAdditional($additional);
+                    $persist = true;
+                    */
+                    // compile record of previously empty and now filled
+                    // TODO: maybe handle changes as well
+                    $updateProperties = [];
+                    foreach ($UPDATE_PROPERTIES as $property => $method)
+                    {
+                        if (!empty($wikidata->{$property})) {
+                            $getMethod = 'get' . ucfirst($method);
+                            $value = $person->$getMethod();
+                            if (empty($value)) {
+                                $updateProperties[$method] = $wikidata->{$property};
                             }
                         }
-                        if (!empty($updateProperties)) {
-                            $item = $updateProperties;
-                            $item['name'] = $person->getFullname();
-                            $item['identifier'] = $wikidata->identifier;
-                            $items[$person->getId()] = $item;
-                        }
+                    }
+                    if (!empty($updateProperties)) {
+                        $item = $updateProperties;
+                        $item['name'] = $person->getFullname();
+                        $item['identifier'] = $wikidata->identifier;
+                        $items[$person->getId()] = $item;
                     }
                 }
-            /*
             }
-            */
 
             $gnd = $person->getGnd();
             if (false && !empty($gnd)) {
-                foreach ([ /* 'de', */ 'en' ] as $locale) {
+                foreach ([ 'en' ] as $locale) {
                     $entityfacts = $person->getEntityfacts($locale, true);
                     if (is_null($entityfacts)) {
                         $url = sprintf('http://hub.culturegraph.org/entityfacts/%s', $gnd);
@@ -333,63 +324,6 @@ class EntityEnhanceCommand extends ContainerAwareCommand
                                     }
                                 }
                             }
-
-                            /*
-                            $method = 'get' . ucfirst($property) . 'PlaceInfo';
-                            $placeInfo = $person->$method($locale);
-                            if (is_null($placeInfo) || !empty($placeInfo['tgn'])) {
-                                continue;
-                            }
-                            $place = null;
-                            if ($placeInfo['name'] == 'Altona') {
-                                $places = $em->getRepository('AppBundle:Place')->findByTgn('7012310');
-                            }
-                            else if (!empty($placeInfo['gnd'])) {
-                                $places = $em->getRepository('AppBundle:Place')->findByGnd($placeInfo['gnd']);
-                                if (empty($places)) {
-                                    // try to lookup by name
-                                    $places = $em->getRepository('AppBundle:Place')->findByName($placeInfo['name']);
-                                    if (count($places) > 1) {
-                                        $places[] = []; // skip if there are multiple matches
-                                    }
-                                }
-                            }
-                            else {
-                                continue;
-                            }
-
-                            if (!empty($places)) {
-                                $place = $places[0];
-                            }
-                            else {
-                                $geo = \AppBundle\Utils\GeographicalData::fetchByIdentifier('gnd' . ':' . $placeInfo['gnd']);
-                                if (!empty($geo) && !empty($geo->sameAs)) {
-                                    foreach ($geo->sameAs as $uri) {
-                                        if (preg_match('/^'
-                                                       . preg_quote('http://sws.geonames.org/', '/')
-                                                       . '(\d+)$/', $uri, $matches))
-                                        {
-                                            $geonamesId = $matches[1];
-                                            $places = $em->getRepository('AppBundle:Place')->findByGeonames($geonamesId);
-                                            if (!empty($places)) {
-                                                $place = $places[0];
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            if (!is_null($place)) {
-                                $method = 'set' . ucfirst($property) . 'Place';
-                                $person->$method($place);
-                                $persist = true;
-                            }
-                            else {
-                                echo sprintf("Lookup TGN: %s\thttp://d-nb.info/gnd/%s",
-                                             $placeInfo['name'], $placeInfo['gnd'])
-                                  . "\n";
-                            }
-                            */
                         }
                     }
                 }
@@ -401,7 +335,7 @@ class EntityEnhanceCommand extends ContainerAwareCommand
         }
 
         if (!empty($items)) {
-            // write to excel
+            // write to csv
             $headers = array_merge(['id', 'name', 'identifier'], array_values($UPDATE_PROPERTIES));
 
             $fname = $this->getContainer()->get('kernel')->getProjectDir()
@@ -567,59 +501,50 @@ class EntityEnhanceCommand extends ContainerAwareCommand
     }
     */
 
-    protected function enhanceOrganization()
+    protected function enhanceLocation()
     {
-        /*
-        // currently beacon
-        $gndBeacon = $this->loadGndBeacon([ 'dasjuedischehamburg' => 'BEACON-GND-ORG-dasjuedischehamburg.txt' ]);
-
-        $em = $this->getContainer()->get('doctrine')->getManager();
-        $organizationRepository = $em->getRepository('AppBundle:Organization');
-
-        $organizations = $organizationRepository->findBy([ 'status' => [0, 1] ]);
-        foreach ($organizations as $organization) {
-            $persist = false;
-            $gnd = $organization->getGnd();
-            if (empty($gnd)) {
-                continue;
-            }
-            if (array_key_exists($gnd, $gndBeacon)) {
-                $additional = $organization->getAdditional();
-                $additional['beacon'] = $gndBeacon[$gnd];
-                $organization->setAdditional($additional);
-                $persist = true;
-            }
-            if ($persist) {
-                $em->persist($organization);
-                $em->flush();
-            }
-        }
-        */
-
         // currently only homepages
-        /*
         $em = $this->getContainer()->get('doctrine')->getManager();
-        $organizationRepository = $em->getRepository('AppBundle:Organization');
-        $organizations = $organizationRepository->findBy([ 'url' => null ]);
+        $organizationRepository = $em->getRepository('AppBundle:Location');
+
+        $criteria = new \Doctrine\Common\Collections\Criteria();
+        $criteria->where($criteria->expr()->orX(
+            $criteria->expr()->isNull('url'),
+            $criteria->expr()->isNull('foundingDate'),
+            $criteria->expr()->isNull('dissolutionDate')
+        ))
+        ->andWhere($criteria->expr()->neq('status', -1));
+
+        $organizations = $organizationRepository->matching($criteria);
         foreach ($organizations as $organization) {
             $persist = false;
             $gnd = $organization->getGnd();
             if (empty($gnd)) {
                 continue;
             }
+
             $corporateBody = \AppBundle\Utils\CorporateBodyData::fetchByGnd($gnd);
             if (is_null($corporateBody) || !$corporateBody->isDifferentiated) {
                 continue;
             }
 
-            // the following were missing in the beginning
+            // properties we currently want to fetch
             foreach ([
-                      'dateOfTermination',
-                      'homepage',
-                      ] as $src)
+                    'dateOfEstablishment',
+                    'dateOfTermination',
+                    'homepage',
+                ] as $src)
             {
                 if (!empty($corporateBody->{$src})) {
                     switch ($src) {
+                        case 'dateOfEstablishment':
+                            $val = $organization->getFoundingDate();
+                            if (empty($val)) {
+                                $organization->setFoundingDate($corporateBody->{$src});
+                                $persist = true;
+                            }
+                            break;
+
                         case 'dateOfTermination':
                             $val = $organization->getDissolutionDate();
                             if (empty($val)) {
@@ -627,6 +552,7 @@ class EntityEnhanceCommand extends ContainerAwareCommand
                                 $persist = true;
                             }
                             break;
+
                         case 'homepage':
                             $val = $organization->getUrl();
                             if (empty($val)) {
@@ -637,14 +563,18 @@ class EntityEnhanceCommand extends ContainerAwareCommand
                     }
                 }
             }
+
             if ($persist) {
+                var_dump(json_encode($organization));
                 $em->persist($organization);
                 $em->flush();
             }
         }
-        */
     }
 
+    /*
+     * TODO: add additional fields to Country-table
+     */
     protected function enhanceCountry()
     {
         // currently info from http://api.geonames.org/countryInfo?username=burckhardtd';
@@ -704,6 +634,7 @@ class EntityEnhanceCommand extends ContainerAwareCommand
 
                     $country->setAdditional($additional);
                 }
+
                 if ($persist) {
                     $em->persist($country);
                     $em->flush();
