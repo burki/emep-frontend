@@ -105,7 +105,9 @@ EOT;
         $criteria->where($criteria->expr()->neq(
             'wikidata', null
         ))
-        ->andWhere($criteria->expr()->neq('status', -1));
+        ->andWhere($criteria->expr()->neq('status', -1))
+        // ->andWhere($criteria->expr()->eq('ulan', '500004793'))
+        ;
 
         // $criteria->setMaxResults(5); // testing
 
@@ -133,7 +135,7 @@ EOT;
         }
     }
 
-    protected function fetchWikistats($update = false)
+    protected function fetchWikistats($update = true)
     {
         $sparqlClient = new \EasyRdf_Sparql_Client('https://query.wikidata.org/sparql');
 
@@ -144,7 +146,9 @@ EOT;
         $criteria->where($criteria->expr()->neq(
             'wikidata', null
         ))
-        ->andWhere($criteria->expr()->neq('status', -1));
+        ->andWhere($criteria->expr()->neq('status', -1))
+        // ->andWhere($criteria->expr()->eq('ulan', '500004793'))
+        ;
 
         // $criteria->setMaxResults(5); // testing
 
@@ -169,12 +173,13 @@ EOT;
                 // https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia.org/all-access/user/Bernard_Adeney/monthly/2016010100/2016123100
                 $year = date('Y') - 1;
                 $url = sprintf('https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/%s.wikipedia.org/all-access/user/%s/monthly/%d010100/%d123100',
-                               $lang, urlencode($article), $year, $year);
+                               $lang, $article, $year, $year);
+                var_dump($url);
                 try {
                     $stats = json_decode(file_get_contents($url), true);
                 }
                 catch (\Exception $e) {
-                    $status = false;
+                    $stats = false;
                 }
 
                 if (false !== $stats && isset($stats['items'])) {
@@ -191,6 +196,9 @@ EOT;
                     $person->setAdditional($additional);
                     echo $article . "\t" . $lang . "\t" . $latest_sum . "\n";
                     $persist = true;
+                }
+                else if (array_key_exists('wikistats', $additional)) {
+                    unset($additional['wikistats'][$lang]);
                 }
             }
 
