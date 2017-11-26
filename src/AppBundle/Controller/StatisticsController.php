@@ -442,6 +442,63 @@ EOT;
     }
 
     /**
+     * @Route("/person/popularity", name="person-popularity")
+     */
+    public function personsWikipediaAction(\Symfony\Component\HttpFoundation\Request $request)
+    {
+        $em = $this->getDoctrine()->getEntityManager();
+
+        $lang = in_array($request->get('lang'), ['en', 'de', 'fr']) ? $request->get('lang') : 'en';
+
+        $qb = $this->getDoctrine()
+                ->getManager()
+                ->createQueryBuilder();
+
+        $qb->select([
+                'P',
+                'COUNT(DISTINCT E.id) AS numExhibitionSort',
+            ])
+            ->from('AppBundle:Person', 'P')
+            ->leftJoin('P.exhibitions', 'E')
+            ->leftJoin('P.catalogueEntries', 'IE')
+            ->where('P.status <> -1 AND P.wikidata IS NOT NULL')
+            ->groupBy('P.id') // for Count
+            ;
+
+
+        // Create the query
+        $results = $qb->getQuery()->getResult();
+        $data = [];
+        foreach ($results as $result) {
+            $person = $result[0];
+            $how_many = $result['numExhibitionSort'];
+            $additional = $person->getAdditional();
+            if (array_key_exists('wikistats', $additional)
+                && array_key_exists($lang, $additional['wikistats']))
+            {
+                $single_data = array(
+                    'name' => $person->getFullname(), // person
+                    'num' => (int)$how_many,
+                    'id' => $person->getId(),
+                    'x' => (int)$how_many + 0.3 * rand(-1, 1), // num-reports
+                    'y' => (int)$additional['wikistats'][$lang], // num hits
+                );
+                $data[] = $single_data;
+            }
+        }
+
+        usort($data, function($a, $b) {
+            return $a['y'] == $b['y'] ? 0 : ($a['y'] > $b['y'] ? -1 : 1);
+        });
+
+        return $this->render('Statistics/person-wikipedia.html.twig', [
+            'lang' => $lang,
+            'data' => json_encode($data),
+            'persons' => $data,
+        ]);
+    }
+
+    /**
      * TODO: rename since we added cities as well
      *
      * @Route("/work/by-person", name="item-by-person")

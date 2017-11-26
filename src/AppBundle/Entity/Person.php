@@ -160,22 +160,26 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
      * @ORM\Column(name="title", nullable=true)
      */
     protected $honoricPrefix;
+
     /**
      * TODO: rename to honorificSuffice
      * @var string
      *
      */
     protected $honoricSuffix;
+
     /**
      * @var string
      * @ORM\Column(type="string", nullable=true)
      */
     protected $ulan;
+
     /**
      * @var string
      * @ORM\Column(name="pnd",type="string", nullable=true)
      */
     protected $gnd;
+
     /**
      * @var string
      * @ORM\Column(type="string", nullable=true)
@@ -183,11 +187,20 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
     protected $viaf;
 
     /**
-    */
+     * @var string
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $wikidata;
+
+    /**
+     */
     protected $entityfacts;
 
     /**
-    */
+     * @var
+     *
+     * @ORM\Column(type="json_array", nullable=true)
+     */
     protected $additional;
 
     /**
@@ -849,6 +862,30 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
     public function getViaf()
     {
         return $this->viaf;
+    }
+
+    /**
+     * Sets wikidata.
+     *
+     * @param string $wikidata
+     *
+     * @return $this
+     */
+    public function setWikidata($wikidata)
+    {
+        $this->wikidata = $wikidata;
+
+        return $this;
+    }
+
+    /**
+     * Gets wikidata.
+     *
+     * @return string
+     */
+    public function getWikidata()
+    {
+        return $this->wikidata;
     }
 
     /**
