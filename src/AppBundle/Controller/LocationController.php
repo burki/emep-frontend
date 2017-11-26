@@ -58,13 +58,14 @@ extends CrudController
 
         $qb->select([
                 'L',
-                "CONCAT(P.countryCode, COALESCE(P.alternateName,P.name),L.name) HIDDEN countryPlaceNameSort",
+                "CONCAT(COALESCE(C.name, P.countryCode), COALESCE(P.alternateName,P.name),L.name) HIDDEN countryPlaceNameSort",
                 "L.name HIDDEN nameSort",
                 'COUNT(DISTINCT E.id) AS numExhibitionSort',
                 'COUNT(DISTINCT IE.id) AS numCatEntrySort',
             ])
             ->from('AppBundle:Location', 'L')
             ->leftJoin('L.place', 'P')
+            ->leftJoin('P.country', 'C')
             ->leftJoin('AppBundle:Exhibition', 'E',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'E.location = L AND E.status <> -1')

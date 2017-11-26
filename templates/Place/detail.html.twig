@@ -53,7 +53,7 @@
                     <p>
                         {{ helper.exhibition_period(exhibition) }}
                         <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
-                           <b>{{ exhibition.title }}</b>
+                           {{ exhibition.title }}
                            {{ exhibition.titleAppend }}
                         </a>
                     </p>

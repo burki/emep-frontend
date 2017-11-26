@@ -63,9 +63,26 @@
                     <a href="{{ location.url }}" target="_blank">{{ location.url|prettifyurl }}</a>
                 </dd>
             {% endif %}
+            {% if location.foundingDate is not empty %}
+                <dt>{{ 'Founding Date'|trans }}:</dt>
+                <dd>
+                    {{ location.foundingDate|dateincomplete }}
+                </dd>
+            {% endif %}
+            {% if location.dissolutionDate is not empty %}
+                <dt>{{ 'Dissolution Date'|trans }}:</dt>
+                <dd>
+                    {{ location.dissolutionDate|dateincomplete }}
+                </dd>
+            {% endif %}
+            {% if location.description is not empty %}
+                <dt>{{ 'PUblic Note'|trans }}:</dt>
+                <dd>
+                    {{ location.description|nl2br }}
+                </dd>
+            {% endif %}
             </dl>
 
-            <p>{#{ location.description|nl2br  }#}</p>
             {% if location.exhibitions is not empty %}
             <h3>Exhibitions</h3>
             <ul class="list-group">

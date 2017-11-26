@@ -53,7 +53,7 @@ extends CrudController
         $qb->select([
                 'P',
                 "COALESCE(P.alternateName,P.name) HIDDEN nameSort",
-                "CONCAT(C.name, COALESCE(P.alternateName,P.name)) HIDDEN countrySort",
+                "CONCAT(COALESCE(C.name, P.countryCode), COALESCE(P.alternateName,P.name)) HIDDEN countrySort",
             ])
             ->from('AppBundle:Place', 'P')
             ->leftJoin('P.country', 'C')
@@ -88,7 +88,7 @@ extends CrudController
      * @Route("/place/{id}", requirements={"id" = "\d+"}, name="place")
      * @Route("/place/tgn/{tgn}", requirements={"tgn" = "\d+"}, name="place-by-tgn")
      */
-    public function detailAction($id = null, $tgn = null)
+    public function detailAction(Request $request, $id = null, $tgn = null)
     {
         $placeRepo = $this->getDoctrine()
                 ->getRepository('AppBundle:Place');
@@ -104,7 +104,6 @@ extends CrudController
             return $this->redirectToRoute('place-index');
         }
 
-        $request = $this->get('request_stack')->getCurrentRequest();
         $locale = $request->getLocale();
 
         if (in_array($request->get('_route'), [ 'place-jsonld', 'place-by-tgn-jsonld' ])) {

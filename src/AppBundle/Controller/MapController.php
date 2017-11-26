@@ -91,8 +91,9 @@ class MapController extends Controller
         $disableClusteringAtZoom = 5;
 
         if ('location-by-place' == $route) {
+            $disableClusteringAtZoom = 10;
             $maxDisplay = 15;
-            $querystr = "SELECT Location.id AS location_id, Location.name AS location_name, COALESCE(Geoname.name_variant, Geoname.name) AS place, Geoname.tgn, Geoname.latitude, Geoname.longitude"
+            $querystr = "SELECT Location.id AS location_id, Location.name AS location_name, Location.place_geo AS location_geo, COALESCE(Geoname.name_variant, Geoname.name) AS place, Geoname.tgn, Geoname.latitude, Geoname.longitude"
                       . " FROM Location"
                       . " INNER JOIN Geoname ON Geoname.tgn=Location.place_tgn"
                       . " WHERE"
@@ -108,7 +109,6 @@ class MapController extends Controller
                       . " WHERE"
                       . " Geoname.type IN ('inhabited places')"
                       ;
-
         }
         else {
             $querystr = "SELECT DISTINCT Exhibition.id AS exhibition_id, Exhibition.title, startdate, enddate, Exhibition.displaydate AS displaydate, Location.id AS location_id, Location.name AS location_name, COALESCE(Geoname.name_variant, Geoname.name) AS place, Geoname.tgn, Geoname.latitude, Geoname.longitude"
@@ -154,15 +154,23 @@ class MapController extends Controller
         $values_country = [];
         $displayhelper = new ExhibitionDisplayHelper();
         while ($row = $stmt->fetch()) {
-            if ($row['longitude'] == 0 && $row['latitude'] == 0) {
+            if (empty($row['location_geo']) && $row['longitude'] == 0 && $row['latitude'] == 0) {
                 continue;
             }
             $key = $row['latitude'] . ':' . $row['longitude'];
+            if (!empty($row['location_geo'])) {
+                list($latitude, $longitude) = preg_split('/\s*,\s*/', $row['location_geo'], 2);
+                $key = $latitude . ':' . $longitude;
+            }
+            else {
+                $latitude = $row['latitude'];
+                $longitude = $row['longitude'];
+            }
 
             if (!array_key_exists($key, $values)) {
                 $values[$key]  = [
-                    'latitude' => (double)$row['latitude'],
-                    'longitude' => (double)$row['longitude'],
+                    'latitude' => (double)$latitude,
+                    'longitude' => (double)$longitude,
                     'place' => sprintf('<a href="%s">%s</a>',
                                        htmlspecialchars($this->generateUrl('place-by-tgn', [
                                             'tgn' => $row['tgn'],

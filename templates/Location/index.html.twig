@@ -19,6 +19,8 @@
         </div>
 
         {% set last_initial = '' %}
+        {% set last_countryCode = '' %}
+
         {% for row in pagination %}
             {% set location = row[0] %}
             {% set place = location.place %}
@@ -38,6 +40,10 @@
             {% if initial != last_initial %}
                 {% if last_initial != null %}
                 </ul>
+                {% endif %}
+                {% if 'countryPlaceNameSort' == sortField and last_countryCode != place.countryCode %}
+                    <h3>{{ countryName(place.countryCode) }}</h3>
+                    {% set last_countryCode = place.countryCode %}
                 {% endif %}
                 <h4>
                     {% if 'countryPlaceNameSort' == sortField %}
