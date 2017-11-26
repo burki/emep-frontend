@@ -94,7 +94,7 @@ EOT;
         }
     }
 
-    protected function fetchWikilinks()
+    protected function fetchWikilinks($update = false)
     {
         $sparqlClient = new \EasyRdf_Sparql_Client('https://query.wikidata.org/sparql');
 
@@ -118,11 +118,13 @@ EOT;
                 $additional = [];
             }
 
-            if (!array_key_exists('wikilinks', $additional)) {
-                $additional['wikilinks'] = $this->findWikilinks($sparqlClient, $person->getWikidata());
-                $person->setAdditional($additional);
-                $persist = true;
+            if (array_key_exists('wikilinks', $additional) && !$update) {
+                continue;
             }
+
+            $additional['wikilinks'] = $this->findWikilinks($sparqlClient, $person->getWikidata());
+            $person->setAdditional($additional);
+            $persist = true;
 
             if ($persist) {
                 $em->persist($person);
@@ -131,7 +133,7 @@ EOT;
         }
     }
 
-    protected function fetchWikistats($update = true)
+    protected function fetchWikistats($update = false)
     {
         $sparqlClient = new \EasyRdf_Sparql_Client('https://query.wikidata.org/sparql');
 
@@ -168,7 +170,13 @@ EOT;
                 $year = date('Y') - 1;
                 $url = sprintf('https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/%s.wikipedia.org/all-access/user/%s/monthly/%d010100/%d123100',
                                $lang, urlencode($article), $year, $year);
-                $stats = json_decode(file_get_contents($url), true);
+                try {
+                    $stats = json_decode(file_get_contents($url), true);
+                }
+                catch (\Exception $e) {
+                    $status = false;
+                }
+
                 if (false !== $stats && isset($stats['items'])) {
                     $latest_sum = 0;
                     foreach ($stats['items'] as $info) {
