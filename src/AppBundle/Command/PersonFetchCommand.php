@@ -135,7 +135,7 @@ EOT;
         }
     }
 
-    protected function fetchWikistats($update = true)
+    protected function fetchWikistats($update = false)
     {
         $sparqlClient = new \EasyRdf_Sparql_Client('https://query.wikidata.org/sparql');
 
@@ -174,7 +174,6 @@ EOT;
                 $year = date('Y') - 1;
                 $url = sprintf('https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/%s.wikipedia.org/all-access/user/%s/monthly/%d010100/%d123100',
                                $lang, $article, $year, $year);
-                var_dump($url);
                 try {
                     $stats = json_decode(file_get_contents($url), true);
                 }
