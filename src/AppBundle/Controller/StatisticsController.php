@@ -2,7 +2,9 @@
 
 namespace AppBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use \Symfony\Component\HttpFoundation\Request;
+use \Symfony\Bundle\FrameworkBundle\Controller\Controller;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 /**
@@ -13,7 +15,7 @@ class StatisticsController extends Controller
     /**
      * @Route("/exhibition/by-month", name="exhibition-by-month")
      */
-    public function exhibitionByMonth()
+    public function exhibitionByMonthAction()
     {
         $em = $this->getDoctrine()->getEntityManager();
 
@@ -82,7 +84,7 @@ class StatisticsController extends Controller
     /**
      * @Route("/person/by-year", name="person-by-year")
      */
-    public function personByYearAction()
+    public function personByYearActionAction()
     {
         // display the artists by birth-year, the catalog-entries by exhibition-year
         $em = $this->getDoctrine()->getEntityManager();
@@ -237,7 +239,7 @@ EOT;
     /**
      * @Route("/person/birth-death", name="person-birth-death")
      */
-    public function d3jsPlaceAction(\Symfony\Component\HttpFoundation\Request $request)
+    public function d3jsPlaceAction(Request $request)
     {
         $em = $this->getDoctrine()->getEntityManager();
 
@@ -316,7 +318,7 @@ EOT;
     /**
      * @Route("/exhibition/distribution", name="exhibition-distribution")
      */
-    public function itemPersonPerExhibition(\Symfony\Component\HttpFoundation\Request $request)
+    public function itemPersonPerExhibitionAction(Request $request)
     {
         $em = $this->getDoctrine()->getEntityManager();
 
@@ -380,7 +382,7 @@ EOT;
     /**
      * @Route("/person/distribution", name="person-distribution")
      */
-    public function exhibitionPerPerson(\Symfony\Component\HttpFoundation\Request $request)
+    public function exhibitionPerPerson(Request $request)
     {
         $em = $this->getDoctrine()->getEntityManager();
 
@@ -444,7 +446,7 @@ EOT;
     /**
      * @Route("/person/popularity", name="person-popularity")
      */
-    public function personsWikipediaAction(\Symfony\Component\HttpFoundation\Request $request)
+    public function personsWikipediaAction(Request $request)
     {
         $em = $this->getDoctrine()->getEntityManager();
 
@@ -503,7 +505,7 @@ EOT;
      *
      * @Route("/work/by-person", name="item-by-person")
      */
-    public function itemByPerson()
+    public function itemByPersonAction()
     {
         // display the number of works / exhibited works by artist
         $em = $this->getDoctrine()->getEntityManager();
@@ -738,6 +740,161 @@ EOT;
 
             'persons_by_place_persons' => $categories,
             'persons_by_place' => $persons_by_place,
+        ]);
+    }
+
+    /**
+     * TODO: rename since we added cities as well
+     *
+     * @Route("/exhibition/nationality", name="exhibition-nationality")
+     */
+    function exhibitionNationalityAction(Request $request)
+    {
+        $qb = $this->getDoctrine()
+                ->getManager()
+                ->createQueryBuilder();
+
+        $qb->select([
+                'P.id',
+                'P.nationality',
+                'Pl.countryCode',
+                'COUNT(DISTINCT IE.id) AS numEntries',
+                'C.name'
+            ])
+            ->from('AppBundle:Location', 'L')
+            ->leftJoin('L.place', 'Pl')
+            ->leftJoin('Pl.country', 'C')
+            ->leftJoin('AppBundle:Exhibition', 'E',
+                       \Doctrine\ORM\Query\Expr\Join::WITH,
+                       'E.location = L AND E.status <> -1')
+            ->leftJoin('AppBundle:ItemExhibition', 'IE',
+                       \Doctrine\ORM\Query\Expr\Join::WITH,
+                       'IE.exhibition = E AND IE.title IS NOT NULL')
+            ->innerJoin('IE.person', 'P')
+            ->where('L.status <> -1')
+            // ->andWhere("Pl.countryCode IN('CH', 'NL')") // test
+            ->groupBy('P.id')
+            ->orderBy('C.name', 'DESC')
+            ;
+
+        $lastCountry = '';
+        $result = $qb->getQuery()->getResult();
+
+        $statsByCountry = [];
+        $statsByNationality = [];
+        foreach ($result as $row) {
+            if (!array_key_exists($cc = $row['countryCode'], $statsByCountry)) {
+                $statsByCountry[$cc] = [
+                    'name' => $row['name'],
+                    'countByNationality' => [],
+                    'totalArtists' => 0,
+                    'totalItemExhibition' => 0,
+                ];
+            }
+
+            $nationality = empty($row['nationality']) ? 'XX' : $row['nationality'];
+            if (!array_key_exists($nationality, $statsByNationality)) {
+                $statsByNationality[$nationality] = [
+                    // 'name' => $row['name'],
+                    'countArtists' => 0,
+                    'countItemExhibition' => 0,
+                ];
+            }
+            if (!array_key_exists($nationality, $statsByCountry[$cc]['countByNationality'])) {
+                $statsByCountry[$cc]['countByNationality'][$nationality] = [
+                    'countArtists' => 0,
+                    'countItemExhibition' => 0,
+                ];
+            }
+            ++$statsByCountry[$cc]['countByNationality'][$nationality]['countArtists'];
+            ++$statsByCountry[$cc]['totalArtists'];
+            ++$statsByNationality[$nationality]['countArtists'];
+
+            $statsByCountry[$cc]['countByNationality'][$nationality]['countItemExhibition'] += $row['numEntries'];
+            $statsByCountry[$cc]['totalItemExhibition'] += $row['numEntries'];
+            $statsByNationality[$nationality]['countItemExhibition'] += $row['numEntries'];
+        }
+
+        $key = 'countItemExhibition'; // alternative: 'countArtists'
+
+        $nationalities = [];
+        foreach ($statsByNationality as $nationality => $stats) {
+            $nationalities[$nationality] = $stats[$key];
+        }
+
+        $countries = array_keys($statsByCountry);
+
+        uksort($nationalities, function ($idxA, $idxB) use ($countries, $nationalities) {
+            if ('XX' == $idxA) {
+                $a = 0;
+            }
+            else {
+                $countryIdx = array_search($idxA, $countries);
+                $a = false !== $countryIdx ? $countryIdx + 100000 : $nationalities[$idxA];
+            }
+
+            if ('XX' == $idxB) {
+                $b = 0;
+            }
+            else {
+                $countryIdx = array_search($idxB, $countries);
+                $b = false !== $countryIdx ? $countryIdx  + 100000 : $nationalities[$idxB];
+            }
+
+            if ($a == $b) {
+                return 0;
+            }
+
+            return ($a < $b) ? 1 : -1;
+        });
+
+        $maxNationality = 16;
+        $xCategories = array_keys($nationalities);
+        if (count($xCategories) > $maxNationality) {
+            $xCategories = array_merge(array_slice($xCategories, 0, $maxNationality - 1 ),
+                                       [ 'unknown', 'other' ]);
+        }
+        // exit;
+
+        $valuesFinal = [];
+        $y = 0;
+        foreach ($statsByCountry as $cc => $stats) {
+            $values = [];
+            foreach ($stats['countByNationality'] as $nationality => $counts) {
+                $x = array_search('XX' === $nationality ? 'unknown' : $nationality, $xCategories);
+                if (false === $x) {
+                    $x = array_search('other', $xCategories);
+                }
+                if (false !== $x) {
+                    $percentage = 100.0 * $counts[$key] / $stats['totalItemExhibition'];
+                    $valuesFinal[] = [
+                        'x' => $x,
+                        'y' => $y,
+                        'value' => $percentage,
+                        'total' => $counts[$key],
+                    ];
+                }
+                // $values[$nationality] = $counts[$key];
+            }
+            /*
+            arsort($values);
+
+            $valuesFinal[$cc] = array_map(function ($idx) use ($values) {
+                                        return [
+                                            'name' => $idx,
+                                            'y' => $values[$idx],
+                                        ];
+                                     },
+                                     array_keys($values));
+            */
+            $y++;
+        }
+        // var_dump($valuesFinal);
+
+        return $this->render('Statistics/exhibition-nationality.html.twig', [
+            'countries' => $countries,
+            'nationalities' => $xCategories,
+            'data' => $valuesFinal,
         ]);
     }
 }

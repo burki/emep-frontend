@@ -71,6 +71,9 @@ class Builder
         $menu['Exhibitions']->addChild('Chart: By Month', [
             'route' => 'exhibition-by-month',
         ]);
+        $menu['Exhibitions']->addChild("Chart: Artists' Nationality", [
+            'route' => 'exhibition-nationality',
+        ]);
 
         $menu->addChild('Venues', ['route' => 'location']);
         $menu['Venues']->addChild('List', [
