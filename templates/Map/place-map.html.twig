@@ -3,6 +3,31 @@
 {% block head %}
     {{ map.head() }}
     {{ map.head_markercluster() }}
+    {{ map.head_heatmap() }}
+
+    <style>
+.my-tooltip {
+    border: none;
+    padding: 2px;
+    padding-left: 6px;
+    padding-right: 6px;
+    background-color:rgba(30, 30, 30, 0.5);
+    box-shadow: none;
+    color: white;
+}
+
+.my-tooltip a {
+    color: white;
+    font-weight: bold;
+}
+
+.leaflet-tooltip-left.my-tooltip::before {
+  border-left-color: white;
+}
+.leaflet-tooltip-right.my-tooltip::before {
+  border-right-color: white;
+}
+    </style>
 {% endblock %}
 
 {% block body %}
@@ -26,9 +51,22 @@
         {{ map.showMap(bounds, markers) }}
         showMap();
 
+        // heat map
+        var heatCfg = {
+            // radius should be small ONLY if scaleRadius is true (or small radius is intended)
+            // if scaleRadius is false it will be the constant radius used in pixels
+            "radius": 25,
+            "scaleRadius": true,
+            "maxZoom": 6,
+            "max": {{ maxCount }}
+        };
+
+        var heatData = {{ data|raw }}.map(function (p) { return [p[0], p[1], p[4]]; });
+        var heat = L.heatLayer(heatData, heatCfg).addTo(map);
+
+        // place markers
         var markers = L.markerClusterGroup({
             iconCreateFunction: function (cluster) {
-                // var childCount = cluster.getChildCount();
                 var markers = cluster.getAllChildMarkers();
                 var n = 0;
                 for (var i = 0; i < markers.length; i++) {
@@ -44,10 +82,15 @@
                     c += 'large';
                 }
 
-                return new L.DivIcon({ html: '<div><span>' + childCount + '</span></div>', className: 'marker-cluster' + c, iconSize: new L.Point(40, 40) });
+                return new L.DivIcon({
+                    html: '<div><span>' + childCount + '</span></div>',
+                    className: 'marker-cluster' + c,
+                    iconSize: new L.Point(40, 40),
+                });
             },
             spiderfyOnMaxZoom: false,
-            // showCoverageOnHover: false, zoomToBoundsOnClick: false,
+            // showCoverageOnHover: false,
+            // zoomToBoundsOnClick: false,
             disableClusteringAtZoom: {% if disableClusteringAtZoom is not empty %}{{ disableClusteringAtZoom }}{% else %}5{% endif %}
         });
 
@@ -55,9 +98,33 @@
         for (var i = 0; i < addressPoints.length; i++) {
             var a = addressPoints[i];
             var title = a[2];
-            var marker = L.marker(L.latLng(a[0], a[1]),
-                                  { title: title });
-            marker.number = a[4];
+            var count = a[4];
+
+            if (false) {
+                var marker = L.marker(L.latLng(a[0], a[1]),
+                                      { title: title });
+            }
+            else {
+                var radius = 6;
+                if (count > 0) {
+                    radius += Math.round(1.5 * Math.log2(count > 256 ? 256 : count));
+                }
+                var markerProperties = {
+                    radius: radius,
+                    fillColor: 'rgb(0, 99, 166)',
+                    color: 'rgb(0, 99, 166)',
+                    weight: 1,
+                    opacity: 1,
+                    fillOpacity: 0.7
+                };
+
+                var marker = L.circleMarker(L.latLng(a[0], a[1]), markerProperties)
+                    .bindTooltip(title + ' (' + count + ')', {className: 'my-tooltip'})
+                    ;
+
+            }
+
+            marker.number = count;
             marker.bindPopup('<strong>' + title + '</strong><br />' + a[3]);
 
             markers.addLayer(marker);

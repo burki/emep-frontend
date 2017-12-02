@@ -14,6 +14,11 @@
     </script>
 {% endmacro %}
 
+{% macro head_heatmap() %}
+    <script src="{{ app.request.basepath }}/vendor/leaflet-heat/leaflet-heat.js"></script>
+    <script src="http://leaflet.github.io/Leaflet.markercluster/example/realworld.10000.js"></script>
+{% endmacro %}
+
 {% macro addTileLayer(maxZoom) %}
     if (true) {
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiaGF1c3ZlcnN0YW5kIiwiYSI6ImNpemU2OWJvaTAwNHIyd252b2ptaDV2NjkifQ.FGA8-opghZHquZJKlHSFdg', {

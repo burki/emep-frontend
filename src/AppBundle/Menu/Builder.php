@@ -84,7 +84,7 @@ class Builder
         $menu['Artists']->addChild('List', [
             'route' => 'person',
         ]);
-        $menu['Artists']->addChild('Map by Birth Place', [
+        $menu['Artists']->addChild('Map: Birth/Death Place', [
             'route' => 'person-by-place',
         ]);
         $menu['Artists']->addChild('Chart: Birth/Death', [

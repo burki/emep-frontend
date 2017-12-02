@@ -15,23 +15,39 @@ class MapController extends Controller
     /**
      * @Route("/person/by-place", name="person-by-place")
      */
-    public function birthDeathPlaces()
+    public function birthDeathPlaces(Request $request)
     {
+        $maxDisplay = 15;
+
+        $route = $request->get('_route');
+
         $em = $this->getDoctrine()->getEntityManager();
         $dbconn = $em->getConnection();
-        $querystr = "SELECT Person.id AS person_id, Person.lastname, Person.firstname, birthdate, deathdate, COALESCE(Geoname.name_variant, Geoname.name) AS place, Geoname.tgn, latitude, longitude"
+
+        $queryTemplate = "SELECT '%s' AS type, Person.id AS person_id, lastname, firstname, birthdate, deathdate, COALESCE(Geoname.name_variant, Geoname.name) AS place, Geoname.tgn AS tgn, latitude, longitude"
                   . " FROM Person"
-                  . " INNER JOIN Geoname ON Person.birthplace_tgn=Geoname.tgn"
-                  . " WHERE"
-                  . " Person.status <> -1"
-                  . " ORDER BY tgn, Person.lastname, Person.firstname"
+                  . " INNER JOIN Geoname ON Person.%splace_tgn=Geoname.tgn"
+                  . " WHERE Person.status <> -1";
+
+        $unionParts = [];
+
+        foreach ([ 'birth', 'death' ] as $key) {
+            $unionParts[] = sprintf($queryTemplate,
+                                    $key, $key);
+
+        }
+        $querystr = join(' UNION ', $unionParts)
+                  . " ORDER BY lastname, firstname, person_id"
                   ;
+
         $stmt = $dbconn->query($querystr);
         $values = [];
         while ($row = $stmt->fetch()) {
             if ($row['longitude'] == 0 && $row['latitude'] == 0) {
                 continue;
             }
+
+
             $key = $row['latitude'] . ':' . $row['longitude'];
 
             if (!array_key_exists($key, $values)) {
@@ -44,29 +60,53 @@ class MapController extends Controller
                                        ])),
                                        htmlspecialchars($row['place'])),
                     'persons' => [],
+                    'person_ids' => [ 'birth' => [], 'death' => [] ],
                 ];
             }
-            $values[$key]['persons'][] = sprintf('<a href="%s">%s</a>',
-                                                 htmlspecialchars($this->generateUrl('person', [
-                                                    'id' => $row['person_id'],
-                                                ])),
-                                                $row['lastname'] . ', ' . $row['firstname']);
+
+            if (!in_array($row['person_id'], $values[$key]['person_ids']['birth'])
+                && !in_array($row['person_id'], $values[$key]['person_ids']['death']))
+            {
+                $values[$key]['persons'][] = sprintf('<a href="%s">%s</a>',
+                                                     htmlspecialchars($this->generateUrl('person', [
+                                                        'id' => $row['person_id'],
+                                                    ])),
+                                                    $row['lastname'] . ', ' . $row['firstname']);
+            }
+
+            $values[$key]['person_ids'][$row['type']][] = $row['person_id'];
         }
+
         $values_final = [];
+        $max_count = 0;
         foreach ($values as $key => $value) {
+            $count_entries = count($value['persons']);
+            if ($count_entries <= $maxDisplay) {
+                $entry_list = implode('<br />', $value['persons']);
+            }
+            else {
+                $entry_list = implode('<br />', array_slice($value['persons'], 0, $maxDisplay - 1))
+                            . sprintf('<br />... (%d more)', $count_entries - $maxDisplay);
+            }
+
             $values_final[] = [
                 $value['latitude'], $value['longitude'],
                 $value['place'],
-                implode('<br />', $value['persons']),
-                count($value['persons']),
+                $entry_list,
+                $count = count($value['person_ids']['birth']) + count($value['person_ids']['death']),
             ];
+
+            if ($count > $max_count) {
+                $max_count = $count;
+            }
         }
 
         // display
         return $this->render('Map/place-map.html.twig', [
-            'pageTitle' => 'Artists by Birth Place',
+            'pageTitle' => 'Birth and Death Places',
             'data' => json_encode($values_final),
             'disableClusteringAtZoom' => 7,
+            'maxCount' => $max_count,
             'bounds' => [
                 [ 60, -120 ],
                 [ -15, 120 ],
