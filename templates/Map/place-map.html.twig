@@ -51,6 +51,7 @@
         {{ map.showMap(bounds, markers) }}
         showMap();
 
+    {% if showHeatMap %}
         // heat map
         var heatCfg = {
             // radius should be small ONLY if scaleRadius is true (or small radius is intended)
@@ -63,8 +64,11 @@
 
         var heatData = {{ data|raw }}.map(function (p) { return [p[0], p[1], p[4]]; });
         var heat = L.heatLayer(heatData, heatCfg).addTo(map);
+    {% endif %}
 
         // place markers
+        var markerStyle = {% if markerStyle is defined %}{{ markerStyle|json_encode|raw }}{% else %}'regular'{% endif %};
+
         var markers = L.markerClusterGroup({
             iconCreateFunction: function (cluster) {
                 var markers = cluster.getAllChildMarkers();
@@ -100,7 +104,7 @@
             var title = a[2];
             var count = a[4];
 
-            if (false) {
+            if ('circle' !== markerStyle) {
                 var marker = L.marker(L.latLng(a[0], a[1]),
                                       { title: title });
             }

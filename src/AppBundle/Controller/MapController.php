@@ -107,6 +107,8 @@ class MapController extends Controller
             'data' => json_encode($values_final),
             'disableClusteringAtZoom' => 7,
             'maxCount' => $max_count,
+            'showHeatMap' => true,
+            'markerStyle' => 'circle',
             'bounds' => [
                 [ 60, -120 ],
                 [ -15, 120 ],
