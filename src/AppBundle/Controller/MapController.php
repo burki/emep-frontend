@@ -273,6 +273,7 @@ class MapController extends Controller
                 [ 60, -120 ],
                 [ -15, 120 ],
             ],
+            'markerStyle' => 'exhibition-by-place' == $route ? 'circle' : 'default',
             'persons' => $persons,
         ]);
     }

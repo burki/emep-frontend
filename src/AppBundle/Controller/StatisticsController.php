@@ -750,6 +750,8 @@ EOT;
      */
     function exhibitionNationalityAction(Request $request)
     {
+        $countryMap = [ 'UA' => 'RU' ]; //
+
         $qb = $this->getDoctrine()
                 ->getManager()
                 ->createQueryBuilder();
@@ -783,7 +785,12 @@ EOT;
         $statsByCountry = [];
         $statsByNationality = [];
         foreach ($result as $row) {
-            if (!array_key_exists($cc = $row['countryCode'], $statsByCountry)) {
+            $cc = $row['countryCode'];
+            if (array_key_exists($cc, $countryMap)) {
+                $cc = $countryMap[$cc];
+            }
+
+            if (!array_key_exists($cc, $statsByCountry)) {
                 $statsByCountry[$cc] = [
                     'name' => $row['name'],
                     'countByNationality' => [],
@@ -792,7 +799,12 @@ EOT;
                 ];
             }
 
-            $nationality = empty($row['nationality']) ? 'XX' : $row['nationality'];
+            $nationality = empty($row['nationality'])
+                ? 'XX' : $row['nationality'];
+            if (array_key_exists($nationality, $countryMap)) {
+                $nationality = $countryMap[$nationality];
+            }
+
             if (!array_key_exists($nationality, $statsByNationality)) {
                 $statsByNationality[$nationality] = [
                     // 'name' => $row['name'],
