@@ -99,6 +99,9 @@ class Builder
         $menu['Artists']->addChild('Chart: Number of Exhibitions', [
             'route' => 'person-distribution',
         ]);
+        $menu['Artists']->addChild("Chart: Popularity according to Wikipedia", [
+            'route' => 'person-popularity',
+        ]);
 
         if ($showWorks) {
             $menu->addChild('Works', ['route' => 'item']);

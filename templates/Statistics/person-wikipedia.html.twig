@@ -7,10 +7,8 @@
     <script src="{{ app.request.basepath }}/vendor/highcharts/themes/sand-signika.js"></script>
     -->
     <script type="text/javascript">
-    var chart;
-
     $(document).ready(function() {
-        chart = new Highcharts.Chart({
+        new Highcharts.Chart({
             chart: {
                 type: 'scatter',
                 renderTo: 'container',
@@ -69,21 +67,28 @@
             series: [{
                 dataLabels: {
                     enabled: false,
-                    style: {color: "black" }
+                    style: {
+                        color: 'black',
+                    }
                 },
                 turboThreshold: 5000,
                 data: {{ data|raw }},
                 color: 'rgba(128, 133, 233, .7)'
             }]
-
         });
-
     });
     </script>
 {% endblock %}
 
 {% block body %}
     <h1>Wikipedia-Statistics</h1>
+    <form action="{{ path('person-popularity') }}" method="GET">
+        <select name="lang" onchange="this.form.submit()">
+            <option value="en"{% if lang == 'en' %} selected{% endif %}>English</option>
+            <option value="fr"{% if lang == 'fr' %} selected{% endif %}>French</option>
+            <option value="de"{% if lang == 'de' %} selected{% endif %}>German</option>
+        </select>
+    </form>
     <div id="container" style="min-width: 800px; height: 400px; margin: 0 auto;"></div>
     <h2>Persons</h2>
     {% for person in persons %}
