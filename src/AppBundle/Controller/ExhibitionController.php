@@ -216,7 +216,7 @@ extends CrudController
     /**
      * @Route("/exhibition/{id}", requirements={"id" = "\d+"}, name="exhibition")
      */
-    public function detailAction(Request $request, $id = null, $ulan = null, $gnd = null)
+    public function detailAction(Request $request, $id = null)
     {
         $routeName = $request->get('_route'); $routeParams = [];
 
@@ -258,6 +258,55 @@ extends CrudController
                 'twitter' => $this->buildTwitter($exhibition, $routeName, $routeParams),
                 */
             ],
+        ]);
+    }
+
+    /**
+     * @Route("/exhibition/{id}/stats.embed", requirements={"id" = "\d+"}, name="exhibition-stats-partial")
+     * @Route("/exhibition/{id}/stats", requirements={"id" = "\d+"}, name="exhibition-stats")
+     */
+    public function statsAction(Request $request, $id = null)
+    {
+        $repo = $this->getDoctrine()
+                ->getRepository('AppBundle:Exhibition');
+
+        if (!empty($id)) {
+            $routeParams = [ 'id' => $id ];
+            $exhibition = $repo->findOneById($id);
+        }
+
+        if (!isset($exhibition) || $exhibition->getStatus() == -1) {
+            return $this->redirectToRoute('exhibition-index');
+        }
+
+        // display the artists by birth-year, the catalog-entries by exhibition-year
+        $stats = StatisticsController::exhibitionAgeDistribution($em = $this->getDoctrine()->getEntityManager(), $exhibition->getId());
+        $ageCount = & $stats['age_count'];
+
+        $categories = $total = [];
+        for ($age = $stats['min_age']; $age <= $stats['max_age'] && $age < 120; $age++) {
+            $categories[] = $age; // 0 == $age % 5 ? $year : '';
+
+            foreach ([ 'living', 'deceased' ] as $cat) {
+                $total['age_' . $cat][$age] = [
+                    'name' => $age,
+                    'y' => isset($ageCount[$age]) && isset($ageCount[$age][$cat])
+                        ? intval($ageCount[$age][$cat]) : 0,
+                ];
+            }
+        }
+
+        $template = $this->get('twig')->loadTemplate('Statistics/person-exhibition-age.html.twig');
+        $chart = $template->renderBlock('chart', [
+            'container' => 'container-age',
+            'categories' => json_encode($categories),
+            'age_at_exhibition_living' => json_encode(array_values($total['age_living'])),
+            'age_at_exhibition_deceased' => json_encode(array_values($total['age_deceased'])),
+        ]);
+
+        // display the static content
+        return $this->render('Exhibition/stats.html.twig', [
+            'chart' => $chart
         ]);
     }
 }

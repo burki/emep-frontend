@@ -186,25 +186,27 @@ class StatisticsController extends Controller
         ]);
     }
 
-    /**
-     * @Route("/person/exhibition-age", name="person-exhibition-age")
-     */
-    public function personExhibitionAgeAction()
+    public static function exhibitionAgeDistribution($em, $exhibitionId = null)
     {
-        // display the artists by birth-year, the catalog-entries by exhibition-year
-        $em = $this->getDoctrine()->getEntityManager();
-
         $dbconn = $em->getConnection();
+
+        $where = !is_null($exhibitionId)
+            ? sprintf('WHERE Exhibition.id=%d', intval($exhibitionId))
+            : '';
+
         $querystr = <<<EOT
-SELECT COUNT(*) AS how_many, YEAR(EB.startdate) - YEAR(EB.birthdate) AS age
+SELECT COUNT(*) AS how_many,
+YEAR(EB.startdate) - YEAR(EB.birthdate) AS age,
+IF (EB.deathdate IS NOT NULL AND YEAR(EB.deathdate) < YEAR(EB.startdate), 'deceased', 'living') AS state
 FROM
-(SELECT DISTINCT Exhibition.startdate AS startdate, Person.birthdate AS birthdate
+(SELECT DISTINCT Exhibition.startdate AS startdate, Exhibition.id AS id_exhibition, Person.id AS id_person, Person.birthdate AS birthdate, Person.deathdate AS deathdate
 FROM Exhibition
 INNER JOIN ItemExhibition ON ItemExhibition.id_exhibition=Exhibition.id
 INNER JOIN Person ON ItemExhibition.id_person=Person.id AND Person.birthdate IS NOT NULL
+$where
 GROUP BY Exhibition.id, Person.id) AS EB
-GROUP BY age
-ORDER BY age, how_many
+GROUP BY age, state
+ORDER BY age, state, how_many
 EOT;
 
         $min_age = $max_age = 0;
@@ -213,26 +215,55 @@ EOT;
         $ageCount = [];
         while ($row = $stmt->fetch()) {
             if (0 == $min_age) {
-                $min_age = $row['age'];
+                $min_age = (int)$row['age'];
             }
-            $ageCount[$max_age = $row['age']] = $row['how_many'];
+            $max_age = $age = (int)$row['age'];
+            if (!array_key_exists($age, $ageCount)) {
+                $ageCount[$age] = [];
+            }
+            $ageCount[$age][$row['state']] = $row['how_many'];
         }
+
+        return [
+            'min_age' => $min_age,
+            'max_age' => $max_age,
+            'age_count' => $ageCount,
+        ];
+    }
+
+    /**
+     * @Route("/person/exhibition-age", name="person-exhibition-age")
+     */
+    public function personExhibitionAgeAction()
+    {
+        // display the artists by birth-year, the catalog-entries by exhibition-year
+        $stats = self::exhibitionAgeDistribution($em = $this->getDoctrine()->getEntityManager());
+        $ageCount = & $stats['age_count'];
 
         $categories = $total = [];
-        for ($age = $min_age; $age <= $max_age && $age < 150; $age++) {
+        for ($age = $stats['min_age']; $age <= $stats['max_age'] && $age < 120; $age++) {
             $categories[] = $age; // 0 == $age % 5 ? $year : '';
 
-            $total['age'][$age] = [
-                'name' => $age,
-                'y' => isset($ageCount[$age])
-                    ? intval($ageCount[$age]) : 0,
-            ];
+            foreach ([ 'living', 'deceased' ] as $cat) {
+                $total['age_' . $cat][$age] = [
+                    'name' => $age,
+                    'y' => isset($ageCount[$age]) && isset($ageCount[$age][$cat])
+                        ? intval($ageCount[$age][$cat]) : 0,
+                ];
+            }
         }
+
+        $template = $this->get('twig')->loadTemplate('Statistics/person-exhibition-age.html.twig');
+        $chart = $template->renderBlock('chart', [
+            'container' => 'container',
+            'categories' => json_encode($categories),
+            'age_at_exhibition_living' => json_encode(array_values($total['age_living'])),
+            'age_at_exhibition_deceased' => json_encode(array_values($total['age_deceased'])),
+        ]);
 
         // display the static content
         return $this->render('Statistics/person-exhibition-age.html.twig', [
-            'categories' => json_encode($categories),
-            'age_at_exhibition' => json_encode(array_values($total['age'])),
+            'chart' => $chart
         ]);
     }
 

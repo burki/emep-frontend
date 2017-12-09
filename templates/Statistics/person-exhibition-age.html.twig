@@ -6,12 +6,17 @@
     <script src="{{ app.request.basepath }}/vendor/highcharts/themes/sand-signika.js"></script>
     -->
     <script type="text/javascript">
-        var chart;
-
         $(document).ready(function() {
-            chart = new Highcharts.Chart({
+            {{ chart|raw }}
+        });
+    </script>
+{% endblock %}
+
+{# chart seperated so we can reuse it in per exhibition stats #}
+{% block chart %}
+            new Highcharts.Chart({
                 chart: {
-                    renderTo: 'container',
+                    renderTo: '{{ container|raw }}',
                     defaultSeriesType: 'column'
                     /*, margin: [ 50, 50, 100, 80] */
                 },
@@ -39,6 +44,8 @@
                             text: 'Count'
                         },
                         min: 0,
+                        tickInterval: 1,
+                        endOnTick: false,
                         // max: 600
                         // opposite: true
                     },
@@ -48,6 +55,7 @@
                         // console.log(this);
                         return '<b>'
                             + Highcharts.numberFormat(this.y, 0)
+                            + ('Age (Deceased Artist)' == this.series.name ? ' deceased' : ' living')
                             + ' persons exhibiting at age '
                             + this.point.name
                             + '</b>';
@@ -64,15 +72,18 @@
                 series: [
                     {
                         yAxis: 0,
-                        name: 'Age',
-                        data: {{ age_at_exhibition|raw }},
+                        name: 'Age (Living Artist)',
+                        data: {{ age_at_exhibition_living|raw }},
                         stack: 'age'
                     },
+                    {
+                        yAxis: 0,
+                        name: 'Age (Deceased Artist)',
+                        data: {{ age_at_exhibition_deceased|raw }},
+                        stack: 'age'
+                    }
                 ]
-        });
-    });
-
-    </script>
+            });
 {% endblock %}
 
 {% block body %}

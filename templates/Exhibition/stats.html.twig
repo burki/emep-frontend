@@ -1,0 +1,19 @@
+{% extends app.request.attributes.get('_route') == 'exhibition-stats-partial'
+    ? 'Base/partial.html.twig'
+    : 'Base/base.html.twig'
+%}
+
+{% block head %}
+{% endblock %}
+
+{% block body %}
+    <div id="container-age" style="width: 100%; height: auto; margin: 0 auto"></div>
+    <script src="{{ app.request.basepath }}/vendor/highcharts/highcharts.js"></script>
+    <script src="{{ app.request.basepath }}/vendor/highcharts/modules/exporting.js"></script>
+    <!--
+    <script src="{{ app.request.basepath }}/vendor/highcharts/themes/sand-signika.js"></script>
+    -->
+    <script type="text/javascript">
+    {{ chart|raw }}
+    </script>
+{% endblock %}
