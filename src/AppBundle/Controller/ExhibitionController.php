@@ -368,16 +368,40 @@ extends CrudController
         }
 
         $template = $this->get('twig')->loadTemplate('Statistics/person-exhibition-age.html.twig');
-        $chart = $template->renderBlock('chart', [
-            'container' => 'container-age',
-            'categories' => json_encode($categories),
-            'age_at_exhibition_living' => json_encode(array_values($total['age_living'])),
-            'age_at_exhibition_deceased' => json_encode(array_values($total['age_deceased'])),
+        $charts = [
+            $template->renderBlock('chart', [
+                'container' => 'container-age',
+                'categories' => json_encode($categories),
+                'age_at_exhibition_living' => json_encode(array_values($total['age_living'])),
+                'age_at_exhibition_deceased' => json_encode(array_values($total['age_deceased'])),
+            ]),
+        ];
+
+        // type of work
+        $stats = StatisticsController::itemExhibitionTypeDistribution($em, $exhibition->getId());
+        $data = [];
+        foreach ($stats['types'] as $type => $count) {
+            $percentage = 100.0 * $count / $stats['total'];
+            $dataEntry = [
+                'name' => $type,
+                'y' => (int)$count,
+            ];
+            if ($percentage < 5) {
+                $dataEntry['dataLabels'] = [ 'enabled' => false ];
+            }
+            $data[] = $dataEntry;
+        }
+
+        $template = $this->get('twig')->loadTemplate('Statistics/itemexhibition-type.html.twig');
+        $charts[] = $template->renderBlock('chart', [
+            'container' => 'container-type',
+            'total' => $stats['total'],
+            'data' => json_encode($data),
         ]);
 
         // display the static content
         return $this->render('Exhibition/stats.html.twig', [
-            'chart' => $chart
+            'chart' => implode("\n", $charts),
         ]);
     }
 }

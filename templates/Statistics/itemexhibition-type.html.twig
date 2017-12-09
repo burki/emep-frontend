@@ -1,0 +1,61 @@
+{% extends 'Base/base.html.twig' %}
+{% block head %}
+    <script src="{{ app.request.basepath }}/vendor/highcharts/highcharts.js"></script>
+    <script src="{{ app.request.basepath }}/vendor/highcharts/modules/exporting.js"></script>
+    <!--
+    <script src="{{ app.request.basepath }}/vendor/highcharts/themes/sand-signika.js"></script>
+    -->
+    <script type="text/javascript">
+        $(document).ready(function() {
+            {{ chart|raw }}
+        });
+    </script>
+{% endblock %}
+
+{# chart seperated so we can reuse it in per exhibition stats #}
+{% block chart %}
+    Highcharts.chart('{{ container|raw }}', {
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: 0,
+            plotShadow: false
+        },
+        title: {
+            text: 'Types of Work as in Catalogue',
+        },
+        subtitle: {
+            text: '{{ total }} catalogue entries'
+        },
+        tooltip: {
+            pointFormat: '<b>{point.percentage:.1f}%</b> ({point.y} cat. entries)'
+        },
+        plotOptions: {
+            pie: {
+                dataLabels: {
+                    enabled: true,
+                    distance: -50,
+                    style: {
+                        fontWeight: 'bold',
+                        color: 'white'
+                    }
+                },
+                /*
+                startAngle: -90,
+                endAngle: 90,
+                center: ['50%', '50%']
+                */
+            }
+        },
+        series: [{
+            name: 'Type of Work',
+            type: 'pie',
+            innerSize: '50%',
+            data: {{ data|raw }}
+        }]
+    });
+{% endblock %}
+
+{% block body %}
+    <!--<h1>Artists' Age at Exhibition</h1>-->
+    <div id="container" style="min-width: 800px; height: 400px; margin: 0 auto"></div>
+{% endblock %}

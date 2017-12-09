@@ -186,6 +186,41 @@ class StatisticsController extends Controller
         ]);
     }
 
+    public static function itemExhibitionTypeDistribution($em, $exhibitionId = null)
+    {
+        $dbconn = $em->getConnection();
+
+        $where = !is_null($exhibitionId)
+            ? sprintf('WHERE ItemExhibition.id_exhibition=%d', intval($exhibitionId))
+            : '';
+
+        $querystr = <<<EOT
+SELECT TypeTerm.id, TypeTerm.name, TypeTerm.aat, COUNT(*) AS how_many
+FROM ItemExhibition
+LEFT OUTER JOIN Term TypeTerm ON ItemExhibition.type=TypeTerm.id
+{$where}
+GROUP BY TypeTerm.id, TypeTerm.name
+ORDER BY TypeTerm.name
+EOT;
+
+        $stmt = $dbconn->query($querystr);
+        $total = 0;
+        $stats = [];
+        while ($row = $stmt->fetch()) {
+            $label = preg_match('/unknown/', $row['name'])
+                ? 'unknown'
+                : $row['name'];
+            $stats[$label] = $row['how_many'];
+            $total += $row['how_many'];
+        }
+
+        return [
+            'total' => $total,
+            'types' => $stats,
+        ];
+    }
+
+
     public static function exhibitionAgeDistribution($em, $exhibitionId = null)
     {
         $dbconn = $em->getConnection();
