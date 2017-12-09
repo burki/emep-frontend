@@ -12,6 +12,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
  */
 class StatisticsController extends Controller
 {
+    static $countryMap = [ 'UA' => 'RU' ]; // don't count Ukrania seperately
+
     /**
      * @Route("/exhibition/by-month", name="exhibition-by-month")
      */
@@ -220,7 +222,6 @@ EOT;
         ];
     }
 
-
     public static function exhibitionAgeDistribution($em, $exhibitionId = null)
     {
         $dbconn = $em->getConnection();
@@ -263,6 +264,61 @@ EOT;
             'min_age' => $min_age,
             'max_age' => $max_age,
             'age_count' => $ageCount,
+        ];
+    }
+
+    public static function itemExhibitionNationalityDistribution($em, $exhibitionId = null)
+    {
+        $qb = $em->createQueryBuilder();
+
+        $qb->select([
+                'P.id',
+                'P.nationality',
+                'COUNT(DISTINCT IE.id) AS numEntries'
+            ])
+            ->from('AppBundle:ItemExhibition', 'IE')
+            ->innerJoin('IE.person', 'P')
+            ->where('IE.title IS NOT NULL')
+            ->groupBy('P.id')
+            ->orderBy('P.nationality')
+            ;
+
+        if (!is_null($exhibitionId)) {
+            $qb->innerJoin('AppBundle:Exhibition', 'E',
+                       \Doctrine\ORM\Query\Expr\Join::WITH,
+                       'IE.exhibition = E AND E.id = :exhibitionId')
+                ->setParameter('exhibitionId', $exhibitionId);
+        }
+
+        $statsByNationality = [];
+        $totalArtists = 0;
+        $totalItemExhibition = 0;
+        $result = $qb->getQuery()->getResult();
+        foreach ($result as $row) {
+            $nationality = empty($row['nationality'])
+                ? 'XX' : $row['nationality'];
+            if (array_key_exists($nationality, self::$countryMap)) {
+                $nationality = self::$countryMap[$nationality];
+            }
+
+            if (!array_key_exists($nationality, $statsByNationality)) {
+                $statsByNationality[$nationality] = [
+                    'countArtists' => 0,
+                    'countItemExhibition' => 0,
+                ];
+            }
+
+            ++$totalArtists;
+            ++$statsByNationality[$nationality]['countArtists'];
+            $statsByNationality[$nationality]['countItemExhibition'] += $row['numEntries'];
+            $totalItemExhibition += $row['numEntries'];
+
+        }
+
+        return [
+            'totalArtists' => $totalArtists,
+            'totalItemExhibition' => $totalItemExhibition,
+            'nationalities' => $statsByNationality,
         ];
     }
 
@@ -516,7 +572,8 @@ EOT;
     {
         $em = $this->getDoctrine()->getEntityManager();
 
-        $lang = in_array($request->get('lang'), ['en', 'de', 'fr']) ? $request->get('lang') : 'en';
+        $lang = in_array($request->get('lang'), ['en', 'de', 'fr'])
+            ? $request->get('lang') : 'en';
 
         $qb = $this->getDoctrine()
                 ->getManager()
@@ -810,14 +867,10 @@ EOT;
     }
 
     /**
-     * TODO: rename since we added cities as well
-     *
      * @Route("/exhibition/nationality", name="exhibition-nationality")
      */
     function exhibitionNationalityAction(Request $request)
     {
-        $countryMap = [ 'UA' => 'RU' ]; //
-
         $qb = $this->getDoctrine()
                 ->getManager()
                 ->createQueryBuilder();
@@ -852,8 +905,8 @@ EOT;
         $statsByNationality = [];
         foreach ($result as $row) {
             $cc = $row['countryCode'];
-            if (array_key_exists($cc, $countryMap)) {
-                $cc = $countryMap[$cc];
+            if (array_key_exists($cc, self::$countryMap)) {
+                $cc = self::$countryMap[$cc];
             }
 
             if (!array_key_exists($cc, $statsByCountry)) {
@@ -867,8 +920,8 @@ EOT;
 
             $nationality = empty($row['nationality'])
                 ? 'XX' : $row['nationality'];
-            if (array_key_exists($nationality, $countryMap)) {
-                $nationality = $countryMap[$nationality];
+            if (array_key_exists($nationality, self::$countryMap)) {
+                $nationality = self::$countryMap[$nationality];
             }
 
             if (!array_key_exists($nationality, $statsByNationality)) {

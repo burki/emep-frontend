@@ -350,7 +350,7 @@ extends CrudController
             return $this->redirectToRoute('exhibition-index');
         }
 
-        // display the artists by birth-year, the catalog-entries by exhibition-year
+        // display the artists by birth-year
         $stats = StatisticsController::exhibitionAgeDistribution($em = $this->getDoctrine()->getEntityManager(), $exhibition->getId());
         $ageCount = & $stats['age_count'];
 
@@ -376,6 +376,32 @@ extends CrudController
                 'age_at_exhibition_deceased' => json_encode(array_values($total['age_deceased'])),
             ]),
         ];
+
+        // nationalities of participating artists
+        $stats = StatisticsController::itemExhibitionNationalityDistribution($em, $exhibition->getId());
+        $data = [];
+        $key = 'ItemExhibition'; // alternative is 'Artists'
+        foreach ($stats['nationalities'] as $nationality => $counts) {
+            $count = $counts['count' . $key];
+            $percentage = 100.0 * $count / $stats['total' . $key];
+            $dataEntry = [
+                'name' => $nationality,
+                'y' => (int)$count,
+                'artists' => $counts['countArtists'],
+                'itemExhibition' => $counts['countItemExhibition'],
+            ];
+            if ($percentage < 5) {
+                $dataEntry['dataLabels'] = [ 'enabled' => false ];
+            }
+            $data[] = $dataEntry;
+        }
+        $template = $this->get('twig')->loadTemplate('Statistics/itemexhibition-nationality.html.twig');
+        $charts[] = $template->renderBlock('chart', [
+            'container' => 'container-nationality',
+            'totalArtists' => $stats['totalArtists'],
+            'totalItemExhibition' => $stats['totalItemExhibition'],
+            'data' => json_encode($data),
+        ]);
 
         // type of work
         $stats = StatisticsController::itemExhibitionTypeDistribution($em, $exhibition->getId());
