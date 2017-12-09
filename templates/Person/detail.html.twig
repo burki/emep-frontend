@@ -169,7 +169,10 @@
            <h3>Frequent co-appearances</h3>
            <ul class="listing">
                    {% endif %}
-               <li><a href="{{ path('person', { 'id': person_id }) }}">{{  similar[person_id]['name'] }}</a> ({{ similar[person_id]['count'] }} exhibitions)</li>
+               <li>
+                    <a href="{{ path('person', { 'id': person_id }) }}">{{  similar[person_id]['name'] }}</a>
+                    (<a href="{{ path('exhibition-shared-partial', { 'persons': [ person.id, person_id ]|join(',') }) }}" data-remote="false" data-toggle="modal" data-target="#detailModal">{{ similar[person_id]['count'] }} exhibitions</a>)
+               </li>
                {% endif %}
            {% endfor %}
            {% if similar_found %}
@@ -263,4 +266,34 @@
             {% endif %}
         </div>
     </div><!-- .row -->
+
+    <!-- Modal for shared Exhibitions -->
+    <div id="detailModal" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <p>Loading....</p>
+          </div>
+          <!--
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+          -->
+        </div>
+      </div>
+    </div>
+
+    <script>
+    // Fill modal with content from link href
+    $('#detailModal').on('show.bs.modal', function(e) {
+        var link = $(e.relatedTarget);
+        $(this).find('.modal-body').html('Loading...');
+        $(this).find('.modal-body').load(link.attr('href'));
+    });
+    </script>
 {% endblock %}
