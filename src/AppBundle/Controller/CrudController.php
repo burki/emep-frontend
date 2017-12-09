@@ -16,10 +16,15 @@ extends Controller
     {
         $paginator = $this->get('knp_paginator');
 
+        $limit = $this->pageSize;
+        if (array_key_exists('pageSize', $options)) {
+            $limit = $options['pageSize'];
+        }
+
         return $paginator->paginate(
             $query, // query, NOT result
             $request->query->getInt('page', 1), // page number
-            $this->pageSize, // limit per page
+            $limit, // limit per page
             $options
         );
     }

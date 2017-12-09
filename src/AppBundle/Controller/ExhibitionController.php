@@ -160,6 +160,7 @@ extends CrudController
 
         $pagination = $this->buildPagination($request, $qb->getQuery(), [
             'defaultSortFieldName' => 'dateSort', 'defaultSortDirection' => 'asc',
+            'pageSize' => 1000,
         ]);
 
         return $this->render('Exhibition/shared.html.twig', [

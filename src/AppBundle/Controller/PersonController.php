@@ -92,6 +92,75 @@ extends CrudController
         ]);
     }
 
+    /**
+     * @Route("/person/shared.embed/{exhibitions}", name="person-shared-partial")
+     * @Route("/person/shared/{exhibitions}", name="person-shared")
+     */
+    public function sharedAction(Request $request, $exhibitions = null)
+    {
+        if (!is_null($exhibitions)) {
+            $exhibitions = explode(',', $exhibitions);
+        }
+        if (is_null($exhibitions) || count($exhibitions) < 2) {
+            throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException("Invalid argument");
+        }
+
+        $names = [];
+        $exhibitionRepo = $this->getDoctrine()
+                ->getRepository('AppBundle:Exhibition');
+        for ($i = 0; $i < 2; $i++) {
+            $criteria = new \Doctrine\Common\Collections\Criteria();
+
+            $criteria->where($criteria->expr()->eq('id', $exhibitions[$i]));
+
+            $criteria->andWhere($criteria->expr()->neq('status', -1));
+
+            $matching = $exhibitionRepo->matching($criteria);
+            if (0 == count($matching)) {
+                throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException("Invalid argument");
+            }
+            $names[] = $matching[0]->getTitle();
+        }
+
+        $qb = $this->getDoctrine()
+                ->getManager()
+                ->createQueryBuilder();
+
+        $qb->select([
+                'P',
+                "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort"
+            ])
+            ->from('AppBundle:Person', 'P')
+            ->innerJoin('AppBundle:ItemExhibition', 'IE1',
+                       \Doctrine\ORM\Query\Expr\Join::WITH,
+                       'IE1.person = P')
+            ->innerJoin('AppBundle:Exhibition', 'E1',
+                       \Doctrine\ORM\Query\Expr\Join::WITH,
+                       'IE1.exhibition = E1 AND E1.id=:exhibition1')
+            ->innerJoin('AppBundle:ItemExhibition', 'IE2',
+                       \Doctrine\ORM\Query\Expr\Join::WITH,
+                       'IE2.person = P')
+            ->innerJoin('AppBundle:Exhibition', 'E2',
+                       \Doctrine\ORM\Query\Expr\Join::WITH,
+                       'IE2.exhibition = E2 AND E2.id=:exhibition2')
+            ->setParameters([ 'exhibition1' => $exhibitions[0], 'exhibition2' => $exhibitions[1] ])
+            ->where('P.status <> -1')
+            ->groupBy('P.id')
+            ->orderBy('nameSort')
+            ;
+
+        $pagination = $this->buildPagination($request, $qb->getQuery(), [
+            'defaultSortFieldName' => 'nameSort', 'defaultSortDirection' => 'asc',
+            'pageSize' => 1000,
+        ]);
+
+        return $this->render('Person/shared.html.twig', [
+            'pageTitle' => $this->get('translator')->trans('Common Artists of')
+                . ' ' . implode(' and ', $names),
+            'pagination' => $pagination,
+        ]);
+    }
+
     /* TODO: try to merge with inverse method in ExhibitionController */
     protected function findSimilar($entity)
     {

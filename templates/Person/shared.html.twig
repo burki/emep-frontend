@@ -1,0 +1,43 @@
+{% extends app.request.attributes.get('_route') == 'person-shared-partial'
+    ? 'Base/partial.html.twig'
+    : 'Base/base.html.twig'
+%}
+
+{% import 'Shared/helper.html.twig' as helper %}
+
+{% block body %}
+    <h3>{{ pageTitle }}</h3>
+    <div class="row">
+        <div class="col-sm-12">
+        {% set sortField = app.request.get('sort') %}
+        {% set last_initial = '' %}
+        {% for row in pagination %}
+            {% set person = row %}
+            {% if 'P.birthDate' == sortField %}
+                {% set initial = person.birthDate|datedecade %}
+            {% elseif 'P.deathDate' == sortField %}
+                {% set initial = person.deathDate|datedecade %}
+            {% elseif 'numExhibitionSort' == sortField %}
+                {% set initial = row['numExhibitionSort'] %}
+            {% elseif 'numCatEntrySort' == sortField %}
+                {% set initial = row['numCatEntrySort'] %}
+            {% else %}
+                {% set initial = slugify.slugify(person.fullname|first)|upper %}
+            {% endif %}
+            {% if initial != last_initial %}
+                {% if last_initial != '' %}
+            </ul>
+                {% endif %}
+            <h2>{{ initial }}</h2>
+            {% set last_initial = initial %}
+            <ul class="list-group">
+            {% endif %}
+            <li class="list-group-item">
+                {{ helper.person_list_item(person) }}{% if row['numExhibitionSort'] > 0 %}, {{ row['numExhibitionSort'] }} exh., {{ row['numCatEntrySort'] }} entr.{% endif %}
+            </li>
+        {% else %}
+            No persons found
+        {% endfor %}
+        </div>
+    </div><!-- .row -->
+{% endblock %}
