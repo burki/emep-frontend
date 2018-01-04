@@ -14,12 +14,19 @@
             Sort by:
             {{ knp_pagination_sortable(pagination, 'Name', 'nameSort') }}
             {{ knp_pagination_sortable(pagination, 'Country', 'countrySort') }}
+            {{ knp_pagination_sortable(pagination, '# Exhibitions', 'numExhibitionSort', {}, {'direction': 'desc'}) }}
+            {{ knp_pagination_sortable(pagination, '# Cat. Entries', 'numCatEntrySort', {}, {'direction': 'desc'}) }}
         </div>
 
         {% set last_initial = '' %}
-        {% for place in pagination %}
+        {% for row in pagination %}
+            {% set place = row[0] %}
             {% if 'countrySort' == sortField %}
                 {% set initial = countryName(place.countryCode) %}
+            {% elseif 'numExhibitionSort' == sortField %}
+                {% set initial = row['numExhibitionSort'] %}
+            {% elseif 'numCatEntrySort' == sortField %}
+                {% set initial = row['numCatEntrySort'] %}
             {% else %}
                 {% set initial = slugify.slugify(place.nameLocalized(app.request.locale)|first)|upper %}
             {% endif %}
@@ -32,7 +39,7 @@
             <ul class="list-group">
             {% endif %}
             <li class="list-group-item">
-                {{ helper.place_linked(place) }}
+                {{ helper.place_linked(place) }}{% if row['numExhibitionSort'] > 0 %}, {{ row['numExhibitionSort'] }} exh., {{ row['numCatEntrySort'] }} entr.{% endif %}
                 {#% if place.children|length > 0 %}
                     <ul>
                         {% for child in place.children %}

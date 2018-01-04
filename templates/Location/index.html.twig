@@ -14,8 +14,8 @@
             Sort by:
             {{ knp_pagination_sortable(pagination, 'Place', 'countryPlaceNameSort') }}
             {{ knp_pagination_sortable(pagination, 'Name', 'nameSort') }}
-            {{ knp_pagination_sortable(pagination, '# Exhibitions', 'numExhibitionSort') }}
-            {{ knp_pagination_sortable(pagination, '# Cat. Entries', 'numCatEntrySort') }}
+            {{ knp_pagination_sortable(pagination, '# Exhibitions', 'numExhibitionSort', {}, {'direction': 'desc'}) }}
+            {{ knp_pagination_sortable(pagination, '# Cat. Entries', 'numCatEntrySort', {}, {'direction': 'desc'}) }}
         </div>
 
         {% set last_initial = '' %}

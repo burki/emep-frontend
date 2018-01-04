@@ -13,7 +13,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 class PlaceController
 extends CrudController
 {
-    protected $pageSize = 3000; // all on one page
+    protected $pageSize = 200; // 3000 if we want all on one page
 
     protected function buildCountries()
     {
@@ -52,12 +52,24 @@ extends CrudController
 
         $qb->select([
                 'P',
+                'COUNT(DISTINCT E.id) AS numExhibitionSort',
+                'COUNT(DISTINCT IE.id) AS numCatEntrySort',
                 "COALESCE(P.alternateName,P.name) HIDDEN nameSort",
                 "CONCAT(COALESCE(C.name, P.countryCode), COALESCE(P.alternateName,P.name)) HIDDEN countrySort",
             ])
             ->from('AppBundle:Place', 'P')
             ->leftJoin('P.country', 'C')
+            ->leftJoin('AppBundle:Location', 'L',
+                       \Doctrine\ORM\Query\Expr\Join::WITH,
+                       'L.place = P')
+            ->leftJoin('AppBundle:Exhibition', 'E',
+                       \Doctrine\ORM\Query\Expr\Join::WITH,
+                       'E.location = L AND E.status <> -1')
+            ->leftJoin('AppBundle:ItemExhibition', 'IE',
+                       \Doctrine\ORM\Query\Expr\Join::WITH,
+                       'IE.exhibition = E AND IE.title IS NOT NULL')
             ->where("P.type IN ('inhabited places')")
+            ->groupBy('P.id')
             ->orderBy('nameSort')
             ;
 
