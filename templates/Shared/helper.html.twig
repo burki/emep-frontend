@@ -16,6 +16,18 @@
     </div>
 {% endmacro %}
 
+{% macro pagination_sortable(pagination, title, key, defaultDirection = 'asc') %}
+    {% set sortDirection = defaultDirection %}
+    {% if app.request.get('sort') == key and app.request.get('direction') == defaultDirection %}
+        {% if defaultDirection == 'desc' %}
+            {% set sortDirection = 'asc' %}
+        {% else %}
+            {% set sortDirection = 'desc' %}
+        {% endif %}
+    {% endif %}
+    {{ knp_pagination_sortable(pagination, title, key, {}, { 'direction': sortDirection }) }}
+{% endmacro %}
+
 {% macro itemexhibition_detail (catalogueEntry) %}
     {% if catalogueEntry.displaylocation is not null %}
     <div style="float: right">

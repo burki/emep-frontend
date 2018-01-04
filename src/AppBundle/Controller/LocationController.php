@@ -90,7 +90,9 @@ extends CrudController
         }
 
         $pagination = $this->buildPagination($request, $qb->getQuery(), [
-            'defaultSortFieldName' => 'countryPlaceNameSort', 'defaultSortDirection' => 'asc',
+            // the following leads to wrong display in combination with our
+            // helper.pagination_sortable()
+            // 'defaultSortFieldName' => 'countryPlaceNameSort', 'defaultSortDirection' => 'asc',
         ]);
 
         $locations = $qb->getQuery()->getResult();

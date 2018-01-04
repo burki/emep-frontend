@@ -12,11 +12,11 @@
         <div class="sort-control">
             {% set sortField = app.request.get('sort') %}
             Sort by:
-            {{ knp_pagination_sortable(pagination, 'Name', 'nameSort') }}
-            {{ knp_pagination_sortable(pagination, 'Birth', 'P.birthDate') }}
-            {{ knp_pagination_sortable(pagination, 'Death', 'P.deathDate') }}
-            {{ knp_pagination_sortable(pagination, '# Exhibitions', 'numExhibitionSort', {}, {'direction': 'desc'}) }}
-            {{ knp_pagination_sortable(pagination, '# Cat. Entries', 'numCatEntrySort', {}, {'direction': 'desc'}) }}
+            {{ helper.pagination_sortable(pagination, 'Name', 'nameSort') }}
+            {{ helper.pagination_sortable(pagination, 'Birth', 'P.birthDate') }}
+            {{ helper.pagination_sortable(pagination, 'Death', 'P.deathDate') }}
+            {{ helper.pagination_sortable(pagination, '# Exhibitions', 'numExhibitionSort', 'desc') }}
+            {{ helper.pagination_sortable(pagination, '# Cat. Entries', 'numCatEntrySort', 'desc') }}
         </div>
 
         {% set last_initial = '' %}

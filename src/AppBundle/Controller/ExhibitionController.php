@@ -88,7 +88,9 @@ extends CrudController
         }
 
         $pagination = $this->buildPagination($request, $qb->getQuery(), [
-            'defaultSortFieldName' => 'dateSort', 'defaultSortDirection' => 'asc',
+            // the following leads to wrong display in combination with our
+            // helper.pagination_sortable()
+            // 'defaultSortFieldName' => 'dateSort', 'defaultSortDirection' => 'asc',
         ]);
 
         return $this->render('Exhibition/index.html.twig', [
