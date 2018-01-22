@@ -169,6 +169,11 @@ class ItemExhibition
     }
 
     /* custom accessor */
+    public function getId()
+    {
+        return $this->id;
+    }
+
     public function getExhibition()
     {
         return $this->exhibition;

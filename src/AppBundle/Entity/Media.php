@@ -144,6 +144,22 @@ abstract class Media
         return $this->status;
     }
 
+    public function getCaption()
+    {
+        $parts = [];
+
+        if (!empty($this->caption)) {
+            $parts[] = $this->caption;
+        }
+        if (!empty($this->copyright)) {
+            $parts[] = html_entity_decode('&#169;', ENT_NOQUOTES,'UTF-8') . ' ' . $this->copyright;
+        }
+
+        if (!empty($parts)) {
+            return implode(', ', $parts);
+        }
+    }
+
     public function getPath()
     {
         $id = $this->getReferencedId();
