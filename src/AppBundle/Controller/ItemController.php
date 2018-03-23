@@ -151,4 +151,16 @@ class ItemController extends Controller
             ],
         ]);
     }
+
+    /**
+     * @Route("/work/assign-style", name="item-assign-style")
+     */
+    public function assignStyleAction(Request $request)
+    {
+        $this->denyAccessUnlessGranted('ROLE_EXPERT', null, 'Unable to access this page!');
+
+        return $this->render('Item/assign-style.html.twig', [
+            'pageTitle' => 'Assign Style',
+        ]);
+    }
 }
