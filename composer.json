@@ -1,7 +1,7 @@
 {
     "config": {
         "platform": {
-            "php": "5.6.23"
+            "php": "7.0.25"
         }
     },
 
@@ -26,12 +26,15 @@
         "symfony/translation": "^3.4",
         "symfony/twig-bundle": "^3.4",
 
+        "symfony/security-bundle": "^3.4",
+
         "symfony/web-profiler-bundle": "^3.4",
         "symfony/debug-bundle": "^3.4",
 
         "symfony/validator": "^3.4",
         "symfony/form": "^3.4",
 
+        "symfony/monolog-bundle": "2.*",
         "symfony/swiftmailer-bundle": "@stable",
         "sensio/framework-extra-bundle": "@stable",
         "knplabs/knp-menu-bundle": "@stable",
@@ -42,6 +45,7 @@
         "knplabs/knp-paginator-bundle": "@stable",
 
         "cocur/slugify": "@stable",
+        "twig/twig": "1.*",
         "twig/extensions": "@stable",
         "liip/url-auto-converter-bundle": "dev-master",
 

@@ -1,2 +1,17 @@
 imports:
     - { resource: config.yaml }
+    
+monolog:
+    handlers:
+        filter_for_errors:
+            type: fingers_crossed
+            # if *one* log is error or higher, pass *all* to file_log
+            action_level: error
+            handler: file_log
+            excluded_404s:
+                - ^/
+
+        file_log:
+            type: stream
+            # log to var/logs/(dev|prod).log
+            path: "%kernel.logs_dir%/%kernel.environment%.log"

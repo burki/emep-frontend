@@ -50,7 +50,10 @@ class MicroKernel extends Kernel
             new \Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
             // new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
 
-            // new Symfony\Bundle\MonologBundle\MonologBundle(), // required by JMS\TranslationBundle\JMSTranslationBundle
+            new Symfony\Bundle\MonologBundle\MonologBundle(), // required by JMS\TranslationBundle\JMSTranslationBundle
+
+            // login
+            new \Symfony\Bundle\SecurityBundle\SecurityBundle(),
 
             // asset management
             // see http://symfony.com/doc/current/cookbook/assetic/asset_management.html

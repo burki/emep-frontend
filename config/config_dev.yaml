@@ -10,10 +10,14 @@ framework:
 #    toolbar: false
 #    intercept_redirects: false
 
-#monolog:
-#    handlers:
+monolog:
+    handlers:
 #        console:
 #            type:   console
 #            verbosity_levels:
 #                VERBOSITY_NORMAL: NOTICE # DEBUG
-
+#        stream:
+#            type: stream
+#            # log to var/logs/(dev|prod).log
+#            path: "%kernel.logs_dir%/%kernel.environment%.log"
+#            level: error
