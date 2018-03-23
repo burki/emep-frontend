@@ -7,7 +7,8 @@ use Knp\Menu\Matcher\Voter\VoterInterface;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class RequestVoter implements VoterInterface
+class RequestVoter
+implements VoterInterface
 {
     protected $requestStack;
 
@@ -26,6 +27,7 @@ class RequestVoter implements VoterInterface
         	// URL isn't just "/" and the first part of the URL match
 	    	return true;
     	}
+
         return null;
     }
 }

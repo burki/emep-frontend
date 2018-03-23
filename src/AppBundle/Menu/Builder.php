@@ -1,6 +1,7 @@
 <?php
 // src/AppBundle/Menu/Builder.php
 
+// registered in services.yml to pass $securityContext and $requestStack
 // see http://symfony.com/doc/current/bundles/KnpMenuBundle/index.html
 namespace AppBundle\Menu;
 
@@ -9,10 +10,12 @@ use Knp\Menu\FactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\PhpBridgeSessionStorage;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class Builder
 {
     private $factory;
+    private $authorizationChecker;
     private $requestStack;
 
     /**
@@ -21,9 +24,12 @@ class Builder
      *
      * Add any other dependency you need
      */
-    public function __construct(FactoryInterface $factory, RequestStack $requestStack)
+    public function __construct(FactoryInterface $factory,
+                                AuthorizationCheckerInterface $authorizationChecker,
+                                RequestStack $requestStack)
     {
         $this->factory = $factory;
+        $this->authorizationChecker = $authorizationChecker;
         $this->requestStack = $requestStack;
     }
 
@@ -47,12 +53,14 @@ class Builder
     public function createFooterMainMenu(array $options)
     {
         $options['position'] = 'footer';
+
         return $this->createMainMenu($options);
     }
 
     public function createMainMenu(array $options)
     {
-        $showWorks = !empty($_SESSION['user']);
+        $loggedIn = $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY');
+        $showWorks = $loggedIn || !empty($_SESSION['user']);
 
         // for translation, see http://symfony.com/doc/master/bundles/KnpMenuBundle/i18n.html
         $menu = $this->factory->createItem('home', [
@@ -110,6 +118,9 @@ class Builder
             ]);
             $menu['Works']->addChild('List by Exhibition', [
                 'route' => 'item-by-exhibition',
+            ]);
+            $menu['Works']->addChild('List by Style', [
+                'route' => 'item-by-style',
             ]);
             $menu['Works']->addChild('List by Style', [
                 'route' => 'item-by-style',
@@ -212,10 +223,12 @@ class Builder
                     var_dump($currentRoute);
                 }
         }
+
         if (isset($item)) {
             $item->setCurrent(true);
             return $item;
         }
+
         return $menu;
     }
 }
