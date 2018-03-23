@@ -59,7 +59,14 @@ class Builder
 
     public function createMainMenu(array $options)
     {
-        $loggedIn = $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY');
+        try {
+            $loggedIn = $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY');
+        }
+        catch (\Exception $e) {
+            // can happen on error pages
+            $loggedIn = false;
+        }
+
         $showWorks = $loggedIn || !empty($_SESSION['user']);
 
         // for translation, see http://symfony.com/doc/master/bundles/KnpMenuBundle/i18n.html

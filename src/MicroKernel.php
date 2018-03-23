@@ -120,14 +120,20 @@ class MicroKernel extends Kernel
                 '/_profiler',
                 $routes->import('@WebProfilerBundle/Resources/config/routing/profiler.xml')
             );
+
+            // Preview error pages through /_error/{statusCode}
+            //   see http://symfony.com/doc/current/cookbook/controller/error_pages.html
+            // Note: not sure why this is mapped to /_error/_error/{code}.{_format} as can be seen by
+            //   bin/console debug:router | grep twig
+            // ->_twig_error_test            ANY      ANY      ANY    /_error/_error/{code}.{_format}
+
+            $routes->mount(
+                '/_error',
+                $routes->import('@TwigBundle/Resources/config/routing/errors.xml')
+            );
         }
 
-        // See http://symfony.com/doc/current/cookbook/controller/error_pages.html
-        $routes->mount(
-            '/_error',
-            $routes->import('@TwigBundle/Resources/config/routing/errors.xml')
-        );
-
+        // our controllers
         $routes->mount('/', $routes->import('@AppBundle/Controller', 'annotation'));
     }
 }
