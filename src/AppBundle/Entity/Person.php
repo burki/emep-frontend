@@ -999,9 +999,17 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
             : implode(', ', $parts);
     }
 
-    public function getItems()
+    public function getItems($minStatus = 0)
     {
-        return $this->items;
+        if (is_null($this->items)) {
+            return $this->items;
+        }
+
+        return $this->items->filter(
+            function($entity) use ($minStatus) {
+               return $entity->getStatus() >= $minStatus;
+            }
+        );
     }
 
     public function getExhibitions()
