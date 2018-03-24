@@ -152,7 +152,7 @@ abstract class Media
             $parts[] = $this->caption;
         }
         if (!empty($this->copyright)) {
-            $parts[] = html_entity_decode('&#169;', ENT_NOQUOTES,'UTF-8') . ' ' . $this->copyright;
+            $parts[] = html_entity_decode('&#169;', ENT_NOQUOTES, 'UTF-8') . ' ' . $this->copyright;
         }
 
         if (!empty($parts)) {
