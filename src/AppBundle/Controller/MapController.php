@@ -139,7 +139,7 @@ class MapController extends Controller
                       . " FROM Location"
                       . " INNER JOIN Geoname ON Geoname.tgn=Location.place_tgn"
                       . " WHERE"
-                      . " Location.status <> -1"
+                      . " Location.status <> -1 AND 0 = (Location.flags & 256)"
                       . " ORDER BY tgn, location_name"
                       ;
         }
