@@ -178,7 +178,7 @@ implements \JsonSerializable, JsonLdSerializable
     protected $geonames;
 
     /**
-     * @ORM\OneToMany(targetEntity="Location", mappedBy="place",cascade={"all"}, fetch="EAGER")
+     * @ORM\OneToMany(targetEntity="Location", mappedBy="place",cascade={"all"}, fetch="EXTRA_LAZY")
      * @ORM\OrderBy({"name" = "ASC"})
      */
     protected $locations;
