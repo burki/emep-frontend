@@ -59,7 +59,7 @@ extends CrudController
                 'P',
                 'COUNT(DISTINCT E.id) AS numExhibitionSort',
                 'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-                "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort"
+                "P.sortName HIDDEN nameSort"
             ])
             ->from('AppBundle:Person', 'P')
             ->leftJoin('P.exhibitions', 'E')

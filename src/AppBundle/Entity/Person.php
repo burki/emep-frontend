@@ -87,6 +87,12 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
      */
     protected $familyName;
     /**
+     * @var string Generated Column for fast sorting.
+     *
+     * @ORM\Column(name="sortname",nullable=true)
+     */
+    protected $sortName;
+    /**
      * @var string Gender of the person.
      *
      * @ORM\Column(name="sex",nullable=true)
