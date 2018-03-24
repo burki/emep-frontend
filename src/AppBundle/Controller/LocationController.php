@@ -30,7 +30,7 @@ extends CrudController
             ->distinct()
             ->from('AppBundle:Location', 'L')
             ->leftJoin('L.place', 'P')
-            ->where('L.status <> -1 AND P.countryCode IS NOT NULL')
+            ->where('L.status <> -1 AND 0 = BIT_AND(L.flags, 256) AND P.countryCode IS NOT NULL')
             ;
 
         $countriesActive = [];
@@ -72,7 +72,7 @@ extends CrudController
             ->leftJoin('AppBundle:ItemExhibition', 'IE',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'IE.exhibition = E AND IE.title IS NOT NULL')
-            ->where('L.status <> -1')
+            ->where('L.status <> -1 AND 0 = BIT_AND(L.flags, 256)')
             ->groupBy('L.id')
             ->orderBy('countryPlaceNameSort')
             ;

@@ -52,6 +52,13 @@ implements \JsonSerializable, JsonLdSerializable
     protected $status = 0;
 
     /**
+     * @var integer
+     *
+     * @ORM\Column(type="integer", nullable=false)
+     */
+    protected $flags = 0;
+
+    /**
      * @var string A short description of the item.
      *
      * @ORM\Column(type="json_array", nullable=true)
