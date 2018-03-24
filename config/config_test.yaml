@@ -3,12 +3,8 @@ imports:
 
 framework:
     profiler:
-        enabled: true # true by default
+        enabled: false # true by default
         only_exceptions: false
-
-web_profiler:
-    toolbar: true
-    intercept_redirects: false
 
 monolog:
     handlers:
