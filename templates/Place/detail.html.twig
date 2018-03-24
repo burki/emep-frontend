@@ -52,10 +52,7 @@
                 {% for exhibition in location.exhibitions %}
                     <p>
                         {{ helper.exhibition_period(exhibition) }}
-                        <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
-                           {{ exhibition.title }}
-                           {{ exhibition.titleAppend }}
-                        </a>
+                        <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}"><b>{{ exhibition.title }}</b>{{ exhibition.titleAppend }}</a>{% if exhibitionStats[ exhibition.id ] is defined and exhibitionStats[exhibition.id].numCatEntrySort > 0 -%}, {{ exhibitionStats[exhibition.id].numCatEntrySort }} entr. by {{ exhibitionStats[exhibition.id].numPersonSort }} art.{% endif %}
                     </p>
                 {% endfor %}
                 </div>

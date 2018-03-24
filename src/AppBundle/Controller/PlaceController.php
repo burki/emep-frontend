@@ -51,7 +51,7 @@ extends CrudController
                 ->createQueryBuilder();
 
         $qb->select([
-                'P',
+                'P', 'C',
                 'COUNT(DISTINCT E.id) AS numExhibitionSort',
                 'COUNT(DISTINCT IE.id) AS numCatEntrySort',
                 "COALESCE(P.alternateName,P.name) HIDDEN nameSort",
@@ -145,11 +145,35 @@ extends CrudController
             ->setParameter('place', $place)
             ->getResult();
 
+        // stats
+        $qb = $this->getDoctrine()
+                ->getManager()
+                ->createQueryBuilder();
+        $qb->select([
+                'E.id AS id',
+                'COUNT(DISTINCT IE.id) AS numCatEntrySort',
+                'COUNT(DISTINCT P.id) AS numPersonSort',
+            ])
+            ->from('AppBundle:Exhibition', 'E')
+            ->leftJoin('E.location', 'L')
+            ->leftJoin('AppBundle:ItemExhibition', 'IE',
+                       \Doctrine\ORM\Query\Expr\Join::WITH,
+                       'IE.exhibition = E AND IE.title IS NOT NULL')
+            ->leftJoin('IE.person', 'P')
+            ->where('L.place = :place AND E.status <> -1')
+            ->setParameter('place', $place)
+            ->groupBy('E.id')
+            ;
+        $exhibitionStats = [];
+        foreach ($qb->getQuery()->getResult() as $row) {
+           $exhibitionStats[$row['id']] = $row;
+        }
 
         return $this->render('Place/detail.html.twig', [
             'pageTitle' => $place->getNameLocalized($locale),
             'place' => $place,
             'persons' => $persons,
+            'exhibitionStats' => $exhibitionStats,
             'em' => $this->getDoctrine()->getManager(),
             'pageMeta' => [
                 'jsonLd' => $place->jsonLdSerialize($locale),
