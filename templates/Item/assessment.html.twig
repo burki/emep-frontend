@@ -1,0 +1,46 @@
+{% extends 'Base/base.html.twig' %}
+{% import 'Shared/helper.html.twig' as helper %}
+
+{% block head %}
+    <!-- justifiedGallery, http://miromannino.github.io/Justified-Gallery/ -->
+    <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/justified-gallery/justifiedGallery.min.css">
+    <script src="{{ app.request.basepath }}/vendor/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    <script>
+        $( document ).ready(function() {
+            $('.gallery').justifiedGallery();
+        })
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div class="row" id="content">
+        <div class="col-sm-8">
+            {% if item is null %}
+                <p>No matching item found</p>
+            {% else %}
+                {% set preview = item.previewImg %}
+                {% if preview is not null %}
+                    {% set imgUrl = 'https://exhibitions05-15.kugb.univie.ac.at/uploads/' ~  preview.imgUrl %}
+                    <img style="max-height: 80vh; max-width: 100%;" src="{{ imgUrl }}" />
+                {% endif %}
+            {% endif %}
+        </div>
+        <div class="col-sm-4">
+            <h3>Assess Style</h1>
+
+            <p>Assessor: {{ app.user.username }}</p>
+            {% form_theme form 'bootstrap_3_horizontal_layout.html.twig' %}
+            {# renders all fields *and* the form start and end tags #}
+            {% if item is not null %}
+                {{ form(form) }}
+            <p><a href="{{ path('item-assessment', { 'id': item.id }) }}">Skip</a></p>
+            {% else %}
+                {{ form_start(form) }}
+                    {{ form_row(form.show) }}
+                    {{ form_row(form.submit) }}
+                    <!-- {{ form_rest(form) }} -->
+                {{ form_end(form) }}
+            {% endif %}
+        </div>
+    </div><!-- .row -->
+{% endblock %}

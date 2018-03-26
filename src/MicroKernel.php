@@ -50,7 +50,7 @@ extends Kernel
 
             new \Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
             new \Doctrine\Bundle\DoctrineCacheBundle\DoctrineCacheBundle(),
-            // new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
+            new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
 
             new Symfony\Bundle\MonologBundle\MonologBundle(), // required by JMS\TranslationBundle\JMSTranslationBundle
 
@@ -71,6 +71,9 @@ extends Kernel
 
             // converturls filter
             new Liip\UrlAutoConverterBundle\LiipUrlAutoConverterBundle(),
+
+            // form
+            new Shapecode\Bundle\HiddenEntityTypeBundle\ShapecodeHiddenEntityTypeBundle(),
 
             // contact
             new Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle(),

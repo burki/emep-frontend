@@ -33,6 +33,7 @@
 
         "symfony/validator": "^3.4",
         "symfony/form": "^3.4",
+        "shapecode/hidden-entity-type-bundle": "@stable",
 
         "symfony/monolog-bundle": "2.*",
         "symfony/swiftmailer-bundle": "@stable",
@@ -51,6 +52,7 @@
 
         "doctrine/doctrine-bundle": "@stable",
         "doctrine/orm": "@stable",
+        "stof/doctrine-extensions-bundle": "~1.2",
         "beberlei/DoctrineExtensions": "@stable",
 
         "semsol/arc2": "@stable",

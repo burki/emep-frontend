@@ -11,7 +11,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 /**
  *
  */
-class ItemController extends Controller
+class ItemController
+extends Controller
 {
     use SharingBuilderTrait;
 
@@ -152,15 +153,158 @@ class ItemController extends Controller
         ]);
     }
 
+    protected function fetchAssessment(\AppBundle\Entity\User $user,
+                                       \AppBundle\Entity\Item $item)
+    {
+        $qb = $this->getDoctrine()
+                ->getManager()
+                ->createQueryBuilder();
+
+        $qb->select([
+            'UI'
+        ])
+        ->from('AppBundle:UserItem', 'UI')
+        ->where('UI.user = :user AND UI.item = :item')
+        ->setParameters([
+            'user' => $user,
+            'item' => $item,
+        ]);
+
+        return $qb->getQuery()->getOneOrNullResult();
+    }
+
+    protected function buildStyleChoices()
+    {
+        $labels = [ 'Figurative', 'Abstracted', 'Abstract' ];
+        $termRepo = $this->getDoctrine()
+                ->getRepository('AppBundle:Term');
+
+        $options = [];
+        foreach ($labels as $label) {
+            $option = $termRepo->findOneByName($label);
+            if (!is_null($option)) {
+                $options[] = $option;
+            }
+        }
+
+        return $options;
+    }
+
     /**
-     * @Route("/work/assign-style", name="item-assign-style")
+     * @Route("/work/assessment", name="item-assessment")
      */
-    public function assignStyleAction(Request $request)
+    public function assignStyleAction(Request $request,
+                                      \Symfony\Component\HttpFoundation\Session\SessionInterface $session)
     {
         $this->denyAccessUnlessGranted('ROLE_EXPERT', null, 'Unable to access this page!');
 
-        return $this->render('Item/assign-style.html.twig', [
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+        $assessment = new \AppBundle\Entity\UserItem();
+        $assessment->setUser($user);
+
+        $item = null;
+        if ($request->getMethod() == 'POST' && array_key_exists('show', $_POST['assessment'])) {
+            $session->set('assessment_show', $_POST['assessment']['show']);
+        }
+
+        $formOptions = [
+            'show_default' => $session->has('assessment_show')
+                ? $session->get('assessment_show') : 'not assessed yet',
+            'style_choices' => $this->buildStyleChoices(),
+        ];
+
+        $form = $this->get('form.factory')->create(\AppBundle\Form\Type\AssessmentType::class,
+                                                   $assessment, $formOptions);
+        if ($request->getMethod() == 'POST' && array_key_exists('submit', $_POST['assessment'])) {
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                $item = $assessment->getItem();
+                $assessmentExisting = $this->fetchAssessment($user, $item);
+                if (!is_null($assessmentExisting)) {
+                    $assessmentExisting->setStyle($assessment->getStyle());
+                    $assessment = $assessmentExisting;
+                }
+
+                $em = $this->getDoctrine()
+                    ->getManager();
+
+                $em->persist($assessment);
+                $em->flush();
+                $item = null;
+
+                $assessment = new \AppBundle\Entity\UserItem();
+                $assessment->setUser($user);
+            }
+        }
+
+        $qb = $this->getDoctrine()
+                ->getManager()
+                ->createQueryBuilder();
+
+        $fields = [
+            'I',
+            'UI.id',
+            "P.familyName HIDDEN nameSort",
+            "COALESCE(I.earliestdate, I.creatordate) HIDDEN dateSort",
+            "I.catalogueId HIDDEN catSort",
+            "RAND() as HIDDEN randSort"
+        ];
+        $orders = [];
+
+        if (array_key_exists('id', $_GET) && intval($_GET['id']) > 0) {
+            $fields[] = sprintf("IF(I.id = %d, 1, 0) AS HIDDEN idSort",
+                                intval($_GET['id']));
+            $orders[] = 'idSort';
+        }
+        $orders[] = 'randSort';
+
+        if (is_null($item)) {
+            $qb->select($fields)
+                ->from('AppBundle:Item', 'I')
+                ->innerJoin('I.media', 'M')
+                ->leftJoin('I.creators', 'P')
+                ->leftJoin('AppBundle:UserItem', 'UI', 'WITH', 'UI.item=I AND UI.user=:user')
+                ->where('I.status <> -1 AND P.status <> -1 AND I.id BETWEEN 37 AND 40')
+                ->orderBy(implode(', ', $orders))
+                ->setMaxResults(1)
+                ->setParameter('user', $user)
+            ;
+
+            switch ($formOptions['show_default']) {
+                case 'not assessed yet':
+                    $qb->having('UI.id IS NULL');
+                    break;
+
+                case 'assessed':
+                    $qb->having('UI.id IS NOT NULL');
+                    break;
+
+                default:
+                    // var_dump($formOptions['show_default']);
+            }
+
+            $items = $qb->getQuery()->getResult();
+            $item = count($items) > 0 ? $items[0][0] : null;
+        }
+
+        if (!is_null($item)) {
+            $assessmentExisting = $this->fetchAssessment($user, $item);
+            if (!is_null($assessmentExisting)) {
+                $assessment = $assessmentExisting;
+            }
+            else {
+                $assessment->setItem($item);
+            }
+        }
+
+        $form = $this->get('form.factory')->create(\AppBundle\Form\Type\AssessmentType::class,
+                                                   $assessment, $formOptions);
+
+        return $this->render('Item/assessment.html.twig', [
             'pageTitle' => 'Assign Style',
+            'item' => $item,
+            'assessment' => $assessment,
+            'form' => $form->createView(),
         ]);
     }
 }

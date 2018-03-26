@@ -76,15 +76,17 @@ doctrine:
             string_functions:
                 REPLACE: DoctrineExtensions\Query\Mysql\Replace
                 REGEXP: DoctrineExtensions\Query\Mysql\Regexp
+                IF: DoctrineExtensions\Query\Mysql\IfElse
             numeric_functions:
                 MATCH: DoctrineExtensions\Query\Mysql\MatchAgainst
-        metadata_cache_driver: apcu
+                RAND: DoctrineExtensions\Query\Mysql\Rand
+        #metadata_cache_driver: apcu
         #    type: service
         #    id: doctrine_cache.providers.vendor_filesystem_metadata_cache
-        result_cache_driver: apcu
+        #result_cache_driver: apcu
         #    type: service
         #    id: doctrine_cache.providers.vendor_filesystem_result_cache
-        query_cache_driver: apcu
+        #query_cache_driver: apcu
         #    type: service
         #    id: doctrine_cache.providers.vendor_filesystem_query_cache
         second_level_cache:
@@ -104,7 +106,12 @@ doctrine_cache:
             file_system:
                 extension: cache
                 directory: %kernel.root_dir%/cache/doctrine
-                
+            
+stof_doctrine_extensions:
+    orm:
+        default:
+            timestampable: true
+   
 assetic:
     debug:          '%kernel.debug%'
     use_controller: '%kernel.debug%'
