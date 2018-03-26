@@ -202,6 +202,11 @@ extends Controller
         $assessment = new \AppBundle\Entity\UserItem();
         $assessment->setUser($user);
 
+        $id_ignore = null;
+        if (array_key_exists('id', $_GET) && intval($_GET['id']) > 0) {
+            $id_ignore = intval($_GET['id']);
+        }
+
         $item = null;
         if ($request->getMethod() == 'POST' && array_key_exists('show', $_POST['assessment'])) {
             $session->set('assessment_show', $_POST['assessment']['show']);
@@ -230,6 +235,7 @@ extends Controller
 
                 $em->persist($assessment);
                 $em->flush();
+                $id_ignore = $item->getId();
                 $item = null;
 
                 $assessment = new \AppBundle\Entity\UserItem();
@@ -251,9 +257,9 @@ extends Controller
         ];
         $orders = [];
 
-        if (array_key_exists('id', $_GET) && intval($_GET['id']) > 0) {
+        if (!is_null($id_ignore)) {
             $fields[] = sprintf("IF(I.id = %d, 1, 0) AS HIDDEN idSort",
-                                intval($_GET['id']));
+                                $id_ignore);
             $orders[] = 'idSort';
         }
         $orders[] = 'randSort';
@@ -264,7 +270,7 @@ extends Controller
                 ->innerJoin('I.media', 'M')
                 ->leftJoin('I.creators', 'P')
                 ->leftJoin('AppBundle:UserItem', 'UI', 'WITH', 'UI.item=I AND UI.user=:user')
-                ->where('I.status <> -1 AND P.status <> -1 AND I.id BETWEEN 37 AND 40')
+                ->where('I.status <> -1 AND P.status <> -1')
                 ->orderBy(implode(', ', $orders))
                 ->setMaxResults(1)
                 ->setParameter('user', $user)
