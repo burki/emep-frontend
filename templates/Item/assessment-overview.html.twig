@@ -1,0 +1,59 @@
+{% extends 'Base/base.html.twig' %}
+
+{% block head %}
+    <!-- justifiedGallery, http://miromannino.github.io/Justified-Gallery/ -->
+    <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/justified-gallery/justifiedGallery.min.css">
+    <script src="{{ app.request.basepath }}/vendor/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    <script>
+        $( document ).ready(function() {
+            $('.gallery').justifiedGallery();
+        })
+    </script>
+{% endblock %}
+
+{% block body %}
+    <h1>{{ pageTitle }}</h1>
+    <div class="row">
+        <div class="col-sm-8">
+        {% if results is not empty %}
+        {% set last_style = null %}
+        {% for row in results %}
+            {% set item = row[0] %}
+            {% set style = row['style'] %}
+            {% if style != last_style %}
+                {% if last_style != null %}
+            </div><!-- .gallery -->
+                {% endif %}
+            <h4>{{ style }}</h4>
+            {% set last_style = style %}
+            <div class="gallery">
+            {% endif %}
+            <a href="{{ path('item-assessment', { 'id' : item.id }) }}">
+                {% set preview = item.previewImg %}
+                {% if preview is not null %}
+                    {% set imgUrl = 'https://exhibitions05-15.kugb.univie.ac.at/uploads/' ~  preview.imgUrl('preview') %}
+                {% else %}
+                    {% set imgUrl = app.request.basepath ~ '/img/placeholder-image.jpg' %}
+                {% endif %}
+                <img src="{{ imgUrl }}" />
+                <div class="caption">
+                {% if item.creators is not empty %}
+                    {% for creator in item.creators %}{{ creator.fullname }}{% endfor %}
+                {% endif %}
+                {{ item.title }}
+
+                {% if item.displaydate is not empty %}
+                    {{ item.displaydate }}
+                {% else %}
+                    ({{ item.earliestdate|dateincomplete }}{# - {{  item.latestdate|dateincomplete  }}#})
+                {% endif %}
+                </div>
+            </a>
+        {% endfor %}
+            </div>
+        {% else %}
+            No Works found
+        {% endif %}
+        </div>
+    </div><!-- .row -->
+{% endblock %}

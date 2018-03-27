@@ -26,14 +26,14 @@
             {% endif %}
         </div>
         <div class="col-sm-4">
-            <h3>Assess Style</h1>
+            <h3><a href="{{ path('item-assessment-overview') }}">Assess Style</a></h3>
 
             <p>Assessor: {{ app.user.username }}</p>
             {% form_theme form 'bootstrap_3_horizontal_layout.html.twig' %}
             {# renders all fields *and* the form start and end tags #}
             {% if item is not null %}
                 {{ form(form) }}
-            <p><a href="{{ path('item-assessment', { 'id': item.id }) }}">Skip</a></p>
+            <p><a href="{{ path('item-assessment', { 'ignore': item.id }) }}">Skip</a></p>
             {% else %}
                 {{ form_start(form) }}
                     {{ form_row(form.show) }}

@@ -175,7 +175,13 @@ extends Controller
 
     protected function buildStyleChoices()
     {
-        $labels = [ 'Figurative', 'Abstracted', 'Abstract' ];
+        $labels = [
+            'Naturalistic',
+            'Stylized / form OR colour', 'Stylized / form AND colour',
+            'Non-representational',
+            'Anti-illusionistic',
+        ];
+
         $termRepo = $this->getDoctrine()
                 ->getRepository('AppBundle:Term');
 
@@ -202,12 +208,19 @@ extends Controller
         $assessment = new \AppBundle\Entity\UserItem();
         $assessment->setUser($user);
 
-        $id_ignore = null;
-        if (array_key_exists('id', $_GET) && intval($_GET['id']) > 0) {
-            $id_ignore = intval($_GET['id']);
+        $item = null;
+        $idIgnore = null;
+        if (array_key_exists('ignore', $_GET) && intval($_GET['ignore']) > 0) {
+            $idIgnore = intval($_GET['ignore']);
+        }
+        else if (array_key_exists('id', $_GET) && intval($_GET['id']) > 0) {
+            $repo = $this->getDoctrine()
+                    ->getRepository('AppBundle:Item');
+
+            $item = $repo->findOneById(intval($_GET['id']));
+            $session->set('assessment_show', 'assessed');
         }
 
-        $item = null;
         if ($request->getMethod() == 'POST' && array_key_exists('show', $_POST['assessment'])) {
             $session->set('assessment_show', $_POST['assessment']['show']);
         }
@@ -235,7 +248,7 @@ extends Controller
 
                 $em->persist($assessment);
                 $em->flush();
-                $id_ignore = $item->getId();
+                $idIgnore = $item->getId();
                 $item = null;
 
                 $assessment = new \AppBundle\Entity\UserItem();
@@ -257,9 +270,9 @@ extends Controller
         ];
         $orders = [];
 
-        if (!is_null($id_ignore)) {
+        if (!is_null($idIgnore)) {
             $fields[] = sprintf("IF(I.id = %d, 1, 0) AS HIDDEN idSort",
-                                $id_ignore);
+                                $idIgnore);
             $orders[] = 'idSort';
         }
         $orders[] = 'randSort';
@@ -311,6 +324,46 @@ extends Controller
             'item' => $item,
             'assessment' => $assessment,
             'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/work/assessment/overview", name="item-assessment-overview")
+     */
+    public function assessmentOverviewAction(Request $request)
+    {
+        $this->denyAccessUnlessGranted('ROLE_EXPERT', null, 'Unable to access this page!');
+
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+
+        $qb = $this->getDoctrine()
+                ->getManager()
+                ->createQueryBuilder();
+
+        $qb->select([
+                'I',
+                'T.name AS style',
+                'T.name HIDDEN styleSort',
+                "COALESCE(I.earliestdate, I.creatordate) HIDDEN dateSort",
+                "P.familyName HIDDEN nameSort",
+                "I.catalogueId HIDDEN catSort",
+            ])
+            ->from('AppBundle:Item', 'I')
+            ->innerJoin('AppBundle:UserItem', 'UI', 'WITH', 'UI.item=I AND UI.user=:user')
+            ->innerJoin('UI.style', 'T')
+            ->leftJoin('I.creators', 'P')
+            ->where('I.status <> -1 AND P.status <> -1')
+            ->orderBy('styleSort DESC, dateSort, nameSort, catSort')
+            ->setParameter('user', $user)
+            ;
+
+        $results = $qb->getQuery()
+            // ->setMaxResults(10) // for testing
+            ->getResult();
+
+        return $this->render('Item/assessment-overview.html.twig', [
+            'pageTitle' => $this->get('translator')->trans('Assessed Works'),
+            'results' => $results,
         ]);
     }
 }
