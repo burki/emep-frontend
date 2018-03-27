@@ -229,6 +229,7 @@ extends Controller
             'show_default' => $session->has('assessment_show')
                 ? $session->get('assessment_show') : 'not assessed yet',
             'style_choices' => $this->buildStyleChoices(),
+            'action' => $this->generateUrl('item-assessment'), // so ?id= isn't passed on
         ];
 
         $form = $this->get('form.factory')->create(\AppBundle\Form\Type\AssessmentType::class,
