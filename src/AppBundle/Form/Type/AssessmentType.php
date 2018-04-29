@@ -33,6 +33,7 @@ extends AbstractType
                 'choices' => [
                     'not assessed yet' => 'not assessed yet',
                     'assessed' => 'assessed',
+                    'no consensus' => 'no consensus',
                     'all' => '',
                 ],
                 'data' => $options['show_default'],

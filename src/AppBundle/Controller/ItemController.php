@@ -299,6 +299,10 @@ extends Controller
                     $qb->having('UI.id IS NOT NULL');
                     break;
 
+                case 'no consensus':
+                    $qb->andWhere('UI.id IS NULL AND I.style IS NULL');
+                    break;
+
                 default:
                     // var_dump($formOptions['show_default']);
             }
