@@ -9,7 +9,7 @@ parameters:
     # knp_menu.voter.router.class: Knp\Menu\Matcher\Voter\RegexVoter
     
 framework:
-    secret: %kernel.secret%
+    secret: '%kernel.secret%'
     # JMS\TranslationBundle\JMSTranslationBundle needs validation
     # validation: ~
     templating:
@@ -21,6 +21,7 @@ framework:
     session:
         storage_id: session.storage.php_bridge
         handler_id: ~
+
 twig:
     globals:
         siteName: "Exhibitions of Modern European Painting 1905-1915"
@@ -64,7 +65,7 @@ doctrine:
                 options:
                         1002: "SET NAMES '%database.charset%' COLLATE '%database.charset%_unicode_ci'"
                 default_table_options:
-                    charset: %database.charset%
+                    charset: '%database.charset%'
                     collate: '%database.charset%_unicode_ci'
                     engine:  MyISAM     # InnoDB
     orm:
@@ -97,15 +98,15 @@ doctrine_cache:
         vendor_filesystem_metadata_cache:
             file_system:
                 extension: cache
-                directory: %kernel.root_dir%/cache/doctrine
+                directory: '%kernel.cache_dir%/doctrine'
         vendor_filesystem_result_cache:
             file_system:
                 extension: cache
-                directory: %kernel.root_dir%/cache/doctrine
+                directory: '%kernel.cache_dir%/doctrine'
         vendor_filesystem_query_cache:
             file_system:
                 extension: cache
-                directory: %kernel.root_dir%/cache/doctrine
+                directory: '%kernel.cache_dir%/doctrine'
             
 stof_doctrine_extensions:
     orm:
