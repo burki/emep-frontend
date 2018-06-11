@@ -293,6 +293,19 @@ implements \JsonSerializable, JsonLdSerializable
         );
     }
 
+    public function getVenues()
+    {
+        if (is_null($this->locations)) {
+            return null;
+        }
+
+        return $this->locations->filter(
+            function($entity) {
+               return $entity->isVenue() && -1 != $entity->getStatus();
+            }
+        );
+    }
+
     public function showCenterMarker($em)
     {
         $hasPlaceParent = false;

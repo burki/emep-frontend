@@ -36,10 +36,11 @@
             {% endfor %}
         {% endif %}
 
-        {% if place.locations is not empty %}
+        {% set venues = place.venues %}
+        {% if venues is not empty %}
         <h3>Venues</h3>
         <ul class="list-group">
-        {% for location in place.locations %}
+        {% for location in venues %}
             <li class="list-group-item">
                 <a href="{{ path('location', { 'id' : location.id }) }}">
                     <b>{{ location.name }}</b>

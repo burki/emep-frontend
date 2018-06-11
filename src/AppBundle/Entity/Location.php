@@ -20,6 +20,8 @@ implements \JsonSerializable, JsonLdSerializable
 {
     use AddressesTrait;
 
+    const FLAGS_NOT_VENUE = 0x100;
+
     static function formatDateIncomplete($dateStr)
     {
         if (preg_match('/^\d{4}$/', $dateStr)) {
@@ -219,6 +221,26 @@ implements \JsonSerializable, JsonLdSerializable
     public function getStatus()
     {
         return $this->status;
+    }
+
+    /**
+     * Gets flags.
+     *
+     * @return int
+     */
+    public function getFlags()
+    {
+        return $this->flags;
+    }
+
+    /**
+     * Returns false if self::FLAGS_NOT_VENUE is set.
+     *
+     * @return bool
+     */
+    public function isVenue()
+    {
+        return 0 == ($this->flags & self::FLAGS_NOT_VENUE);
     }
 
     /**
