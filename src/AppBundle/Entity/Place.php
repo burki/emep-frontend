@@ -33,6 +33,7 @@ implements \JsonSerializable, JsonLdSerializable
         if ('inhabited place' == $type) {
             return 'place';
         }
+
         return $type;
     }
 
@@ -281,7 +282,15 @@ implements \JsonSerializable, JsonLdSerializable
 
     public function getLocations()
     {
-        return $this->locations;
+        if (is_null($this->locations)) {
+            return null;
+        }
+
+        return $this->locations->filter(
+            function($entity) {
+               return -1 != $entity->getStatus();
+            }
+        );
     }
 
     public function showCenterMarker($em)
