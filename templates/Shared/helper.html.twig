@@ -102,6 +102,10 @@
     <a href="{% if person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : person.ulan }) }}{% elseif person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : person.gnd }) }}{% else %}{{ path('person', { 'id' : person.id }) }}{% endif %}">{{ person.fullname }}</a>
 {%- endmacro %}
 
+{% macro person_linked_anchor(person) -%}
+    <a href="#person-{{ person.id }}">{{ person.fullname }}</a>
+{%- endmacro %}
+
 {% macro render_info(entries) -%}
     {% for entry in entries %}
         {{ entry.note }}

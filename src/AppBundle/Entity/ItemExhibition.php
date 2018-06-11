@@ -51,6 +51,13 @@ class ItemExhibition
     private $displaycreator;
 
     /**
+     * @var integer
+     *
+     * @ORM\Column(name="catalogue_section", type="integer")
+     */
+    private $catalogueSection;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="catalogueId", type="string", length=50, nullable=true)
@@ -69,6 +76,12 @@ class ItemExhibition
      * @ORM\JoinColumn(name="type", referencedColumnName="id")
      */
     private $type;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Term", cascade={"all"}, fetch="EAGER")
+     * @ORM\JoinColumn(name="style", referencedColumnName="id")
+     */
+    private $style;
 
     /**
      * @var string

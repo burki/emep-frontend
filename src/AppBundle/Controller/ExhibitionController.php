@@ -3,7 +3,6 @@
 namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Intl\Intl;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -33,16 +32,7 @@ extends CrudController
             ->where('E.status <> -1 AND P.countryCode IS NOT NULL')
             ;
 
-        $countriesActive = [];
-
-        foreach ($qb->getQuery()->getResult() as $result) {
-            $countryCode = $result['countryCode'];
-            $countriesActive[$countryCode] = Intl::getRegionBundle()->getCountryName($countryCode);
-        }
-
-        asort($countriesActive);
-
-        return $countriesActive;
+        return $this->buildActiveCountries($qb);
     }
 
     /**
@@ -266,8 +256,8 @@ extends CrudController
         $sortPersonFirst = 0 <> ($exhibition->flags & 0x20);
 
         usort($results, function ($a, $b) use ($sortPersonFirst) {
-            $sortPartsA = [ $a->catalogueId, $a->getPerson()->getFullname() ];
-            $sortPartsB = [ $b->catalogueId, $b->getPerson()->getFullname() ];
+            $sortPartsA = [ $a->catalogueSection . ' ' . $a->catalogueId, $a->getPerson()->getFullname() ];
+            $sortPartsB = [ $b->catalogueSection . ' ' . $b->catalogueId, $b->getPerson()->getFullname() ];
             if ($sortPersonFirst) {
                 $sortPartsA = array_reverse($sortPartsA);
                 $sortPartsB = array_reverse($sortPartsB);

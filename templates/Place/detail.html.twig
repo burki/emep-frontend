@@ -47,7 +47,14 @@
             {% set count = location.exhibitions|length %}
             {% if count > 0 %}
                 {% set divId = 'exhibitions' ~ location. id %}
-                <a class="badge" style="color: white" href="#{{ divId }}" data-toggle="collapse">{{ count }}</a>
+                {% set numEntries = 0 %}
+                {% for exhibition in location.exhibitions %}
+                    {% if exhibitionStats[ exhibition.id ] is defined and exhibitionStats[exhibition.id].numCatEntrySort > 0 %}
+                        {% set numEntries = numEntries + exhibitionStats[exhibition.id].numCatEntrySort %}
+                    {% endif %}
+                {% endfor %}
+
+                <a class="badge" style="color: white" href="#{{ divId }}" data-toggle="collapse">{{ count }} - {{ numEntries }}</a>
                 <div id="{{ divId }}" class="collapse">
                 {% for exhibition in location.exhibitions %}
                     <p>

@@ -3,7 +3,6 @@
 namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Intl\Intl;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -33,16 +32,7 @@ extends CrudController
             ->where('L.status <> -1 AND 0 = BIT_AND(L.flags, 256) AND P.countryCode IS NOT NULL')
             ;
 
-        $countriesActive = [];
-
-        foreach ($qb->getQuery()->getResult() as $result) {
-            $countryCode = $result['countryCode'];
-            $countriesActive[$countryCode] = Intl::getRegionBundle()->getCountryName($countryCode);
-        }
-
-        asort($countriesActive);
-
-        return $countriesActive;
+        return $this->buildActiveCountries($qb);
     }
 
     /**

@@ -33,8 +33,9 @@
         };
         service.views = {
             'seealso-ul' : new SeeAlsoUL({
-                                linkTarget: '_blank',
-                                maxItems: 100 })
+                linkTarget: '_blank',
+                maxItems: 100
+            })
         };
         service.replaceTagsOnLoad();
     </script>
@@ -125,72 +126,82 @@
         {% endif %}
 
         {% if person.exhibitions|length > 0 %}
-            <h3>Exhibitions</h3>
-            <ul class="list-group">
-            {% for exhibition in person.exhibitions %}
-            <li class="list-group-item">
-                {{ helper.exhibition_period(exhibition) }}
-                <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
-                    <b>{{ exhibition.title }}</b> {{ exhibition.titleAppend }}</a>
-                {% if catalogueEntries[exhibition.id] is defined %}
-                    {% set count = catalogueEntries[exhibition.id]|length %}
-                    {% if count > 0 %}
-                        {% set divId = 'entries' ~ exhibition.id %}
-                        <a class="badge" style="color: white" href="#{{ divId }}" data-toggle="collapse">{{ count }}</a>
-                    {% endif %}
-                {% else %}
-                    {% set count = 0 %}
-                {% endif %}
-
-                {% if exhibition.location is not null %}
-                    {% set location = exhibition.location %}
-                    <div>
-                    {% if location.place is not null %}
-                        {{ helper.place_linked(location.place) }}:
-                    {% endif %}
-                    <a href="{{ path('location', { 'id' : location.id }) }}">
-                        {{ location.name }}
-                    </a>
-                    </div>
-                {% endif %}
-
-                {% if count > 0 %}
-                    <div id="{{ divId }}" class="collapse">
-                    <ul class="list-group">
-                    {% for catalogueEntry in catalogueEntries[exhibition.id] %}
-                        <li class="list-group-item">
-                            {{ helper.itemexhibition_detail(catalogueEntry) }}
-                        </li>
-                    {% endfor %}
-                    </ul>
-                    </div>
-                {% endif %}
-            </li>
-            {% endfor %}
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 1em">
+                <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">{{ 'Exhibitions'|trans }}</a></li>
+                {% if similar|length > 0 %}<li role="presentation"><a href="#similar" aria-controls="similar" role="tab" data-toggle="tab">{{ 'Similar'|trans }}</a></li>{% endif %}
             </ul>
-        {% endif %}
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="home">
+                <h3>{{ 'Exhibitions'|trans }}</h3>
+                <ul class="list-group">
+                {% for exhibition in person.exhibitions %}
+                <li class="list-group-item">
+                    {{ helper.exhibition_period(exhibition) }}
+                    <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
+                        <b>{{ exhibition.title }}</b> {{ exhibition.titleAppend }}</a>
+                    {% if catalogueEntries[exhibition.id] is defined %}
+                        {% set count = catalogueEntries[exhibition.id]|length %}
+                        {% if count > 0 %}
+                            {% set divId = 'entries' ~ exhibition.id %}
+                            <a class="badge" style="color: white" href="#{{ divId }}" data-toggle="collapse">{{ count }}</a>
+                        {% endif %}
+                    {% else %}
+                        {% set count = 0 %}
+                    {% endif %}
 
-        {% if similar|length > 0 %}
-           {% set similar_keys = similar|keys %}
-           {% set similar_found = false %}
-           {% for person_id in similar_keys %}
-               {% if similar[person_id]['count'] > 1 %}
-                   {% if not similar_found %}
-                       {% set similar_found = true %}
-           <h3>Frequent co-appearances</h3>
-           <ul class="listing">
+                    {% if exhibition.location is not null %}
+                        {% set location = exhibition.location %}
+                        <div>
+                        {% if location.place is not null %}
+                            {{ helper.place_linked(location.place) }}:
+                        {% endif %}
+                        <a href="{{ path('location', { 'id' : location.id }) }}">
+                            {{ location.name }}
+                        </a>
+                        </div>
+                    {% endif %}
+
+                    {% if count > 0 %}
+                        <div id="{{ divId }}" class="collapse">
+                        <ul class="list-group">
+                        {% for catalogueEntry in catalogueEntries[exhibition.id] %}
+                            <li class="list-group-item">
+                                {{ helper.itemexhibition_detail(catalogueEntry) }}
+                            </li>
+                        {% endfor %}
+                        </ul>
+                        </div>
+                    {% endif %}
+                </li>
+                {% endfor %}
+                </ul>
+                </div><!-- .tab-pane -->
+
+                {% if similar|length > 0 %}
+                <div role="tabpanel" class="tab-pane" id="similar">
+                   {% set similar_keys = similar|keys %}
+                   {% set similar_found = false %}
+                   {% for person_id in similar_keys %}
+                       {% if similar[person_id]['count'] > 1 %}
+                           {% if not similar_found %}
+                               {% set similar_found = true %}
+                   <h3>Frequent co-appearances</h3>
+                   <ul class="listing">
+                           {% endif %}
+                       <li>
+                            <a href="{{ path('person', { 'id': person_id }) }}">{{  similar[person_id]['name'] }}</a>
+                            (<a href="{{ path('exhibition-shared-partial', { 'persons': [ person.id, person_id ]|join(',') }) }}" data-remote="false" data-toggle="modal" data-target="#detailModal">{{ similar[person_id]['count'] }} exhibitions</a>)
+                       </li>
+                       {% endif %}
+                   {% endfor %}
+                   {% if similar_found %}
+                   </ul>
                    {% endif %}
-               <li>
-                    <a href="{{ path('person', { 'id': person_id }) }}">{{  similar[person_id]['name'] }}</a>
-                    (<a href="{{ path('exhibition-shared-partial', { 'persons': [ person.id, person_id ]|join(',') }) }}" data-remote="false" data-toggle="modal" data-target="#detailModal">{{ similar[person_id]['count'] }} exhibitions</a>)
-               </li>
+                </div><!-- .tab-pane -->
                {% endif %}
-           {% endfor %}
-           {% if similar_found %}
-           </ul>
-           {% endif %}
-       {% endif %}
-
+            </div><!-- .tab-content -->
+        {% endif %}
         </div>
 
         <div class="col-sm-4 sidebar">

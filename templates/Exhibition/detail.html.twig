@@ -246,7 +246,7 @@
                     {% set last_initial = initial %}
 
                     <h4>
-                        <a href="{% if catalogueEntry.person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : catalogueEntry.person.ulan }) }}{% elseif catalogueEntry.person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : catalogueEntry.person.gnd }) }}{% else %}{{ path('person', { 'id' : catalogueEntry.person.id }) }}{% endif %}">
+                        <a id="person-{{ catalogueEntry.person.id }}" href="{% if catalogueEntry.person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : catalogueEntry.person.ulan }) }}{% elseif catalogueEntry.person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : catalogueEntry.person.gnd }) }}{% else %}{{ path('person', { 'id' : catalogueEntry.person.id }) }}{% endif %}">
                             {{ catalogueEntry.person.fullname(true) }}</a>
                         {% set addresses = catalogueEntry.person.addressesSeparated(exhibition.id) %}
                         {% if addresses is not empty %}
@@ -301,7 +301,7 @@
                 <h3>Artists</h3>
                 <ul class="list-unstyled">
                 {% for person in exhibition.artists %}
-                    <li><b>{{ helper.person_linked(person) }}</b></li>
+                    <li><b>{{ helper.person_linked_anchor(person) }}</b></li>
                 {% endfor %}
                 </ul>
             {% endif %}
