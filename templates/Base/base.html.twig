@@ -55,12 +55,27 @@
         <script src="{{ app.request.basepath }}/vendor/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
 
         {% include 'AppBundle:Shared:stylesheets.html.twig' %}
-        <style>
-        </style>
+
+        <script>
+        $(document).ready(function(){
+            $(window).scroll(function(){
+                if ($(this).scrollTop() > 100) {
+                    $('#scroll').fadeIn();
+                } else {
+                    $('#scroll').fadeOut();
+                }
+            });
+            $('#scroll').click(function(){
+                $('html, body').animate({ scrollTop: 0 }, 600);
+                return false;
+            });
+        });
+        </script>
         {% block head %}{% endblock %}
     </head>
 
     <body role="document" class="route-{{ app.request.get('_route') | replace({'_' : '-'}) }}">
+        <a href="#" id="scroll" style="display: none;"><span></span></a>
         <nav class="navbar navbar-inverse navbar-static-top">
             <div class="container">
                 <div class="row">

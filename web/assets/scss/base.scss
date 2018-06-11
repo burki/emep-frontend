@@ -1,12 +1,6 @@
-$color-color-dark: #070E44;
-$color-color-medium: #99A0B4;
+$color-color-medium: rgb(0, 99, 166);
+$color-color-dark: $color-color-medium * 0.7;
 
-$color-color-topic: #970376;
-$color-color-map: #f29000;
-$color-color-chronology: #3da2da;
-$color-color-lookup: #9B9B9B;
-
-/* $color-gray-dark: #9B9B9B; */
 $color-gray-dark: #8E8E8E;
 $color-gray-medium: #C0C0C0;
 $color-gray-light: #E0DFE0;
@@ -41,6 +35,41 @@ footer {
     height: 1px;
 }
 
+/* back to top */
+#scroll {
+    position: fixed;
+    right: 10px;
+    bottom: 10px;
+    cursor: pointer;
+    width: 50px;
+    height: 50px;
+    background-color: $color-gray-dark;
+    text-indent: -9999px;
+    display: none;
+    -webkit-border-radius: 60px;
+    -moz-border-radius: 60px;
+    border-radius: 60px;
+
+    &:hover {
+        background-color: $color-color-medium;
+        opacity: 1; filter: "alpha(opacity=100)";
+        -ms-filter: "alpha(opacity=100)";
+    }
+
+    span {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-left: -8px;
+        margin-top: -12px;
+        height: 0;
+        width: 0;
+        border: 8px solid transparent;
+        border-bottom-color: #ffffff;
+    }
+}
+
+
 /* general styles */
 
 body {
@@ -52,7 +81,7 @@ body {
 /********************************************************/
 nav {
     &.navbar-inverse {
-        background-color: rgb(0, 99, 166);
+        background-color: $color-color-medium;
         border-bottom: none;
     }
 
@@ -127,7 +156,7 @@ nav {
                 color: white;
             }
             &:hover, &.active {
-                background-color: rgb(0, 99, 166) * 0.7;
+                background-color: $color-color-dark;
             }
         }
 
