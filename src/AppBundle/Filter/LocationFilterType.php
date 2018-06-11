@@ -19,7 +19,7 @@ extends CrudFilterType
         ]);
 
         $builder->add('country', Filters\ChoiceFilterType::class, [
-            'choices' => [ '- all - ' => '' ] + $options['data']['choices'],
+            'choices' => [ '- all - ' => '' ] + $options['data']['country_choices'],
             'apply_filter' => function (QueryInterface $filterQuery, $field, $values) {
                 if (empty($values['value'])) {
                     return null;
@@ -28,7 +28,26 @@ extends CrudFilterType
                 $paramName = sprintf('p_%s', str_replace('.', '_', $field));
 
                 // expression that represent the condition
-                $expression = $filterQuery->getExpr()->eq(/* $field */ 'P.countryCode', ':'.$paramName);
+                $expression = $filterQuery->getExpr()->eq('P.countryCode', ':'.$paramName);
+
+                // expression parameters
+                $parameters = [ $paramName => $values['value'] ];
+
+                return $filterQuery->createCondition($expression, $parameters);
+            },
+        ]);
+
+        $builder->add('type', Filters\ChoiceFilterType::class, [
+            'choices' => [ '- all - ' => '' ] + $options['data']['type_choices'],
+            'apply_filter' => function (QueryInterface $filterQuery, $field, $values) {
+                if (empty($values['value'])) {
+                    return null;
+                }
+
+                $paramName = sprintf('l_%s', str_replace('.', '_', $field));
+
+                // expression that represent the condition
+                $expression = $filterQuery->getExpr()->eq('L.type', ':'.$paramName);
 
                 // expression parameters
                 $parameters = [ $paramName => $values['value'] ];

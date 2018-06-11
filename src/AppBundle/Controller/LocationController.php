@@ -35,6 +35,19 @@ extends CrudController
         return $this->buildActiveCountries($qb);
     }
 
+    protected function buildTypes()
+    {
+        $em = $this->getDoctrine()
+                ->getManager();
+
+        $result = $em->createQuery("SELECT DISTINCT L.type FROM AppBundle:Location L"
+                                   . " WHERE L.status <> -1 AND 0 = BIT_AND(L.flags, 256) AND L.type IS NOT NULL"
+                                   . " ORDER BY L.type")
+                ->getScalarResult();
+
+        return array_column($result, 'type');
+    }
+
     /**
      * @Route("/location", name="location-index")
      */
@@ -67,8 +80,10 @@ extends CrudController
             ->orderBy('countryPlaceNameSort')
             ;
 
+        $types = $this->buildTypes();
         $form = $this->get('form.factory')->create(\AppBundle\Filter\LocationFilterType::class, [
-            'choices' => array_flip($this->buildCountries()),
+            'country_choices' => array_flip($this->buildCountries()),
+            'type_choices' => array_combine($types, $types),
         ]);
 
         if ($request->query->has($form->getName())) {
