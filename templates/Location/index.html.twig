@@ -2,6 +2,16 @@
 
 {% import 'Shared/helper.html.twig' as helper %}
 
+{% block head %}
+    <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/select2-4.0.3/css/select2.min.css" />
+    <script src="{{ app.request.basepath }}/vendor/select2-4.0.3/js/select2.full.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#exhibition_filter_type').select2();
+        });
+    </script>
+{% endblock %}
+
 {% block body %}
     <h1>{{ pageTitle }}</h1>
     <div class="row">

@@ -38,7 +38,11 @@ extends CrudFilterType
         ]);
 
         $builder->add('type', Filters\ChoiceFilterType::class, [
-            'choices' => [ '- all - ' => '' ] + $options['data']['type_choices'],
+            'multiple' => true,
+            'choices' => /* [ '- all - ' => '' ] + */ $options['data']['type_choices'],
+            'attr' => [
+                'data-placeholder' => '- all - ',
+            ],
             'apply_filter' => function (QueryInterface $filterQuery, $field, $values) {
                 if (empty($values['value'])) {
                     return null;
@@ -47,10 +51,12 @@ extends CrudFilterType
                 $paramName = sprintf('l_%s', str_replace('.', '_', $field));
 
                 // expression that represent the condition
-                $expression = $filterQuery->getExpr()->eq('L.type', ':'.$paramName);
+                $expression = $filterQuery->getExpr()->in('L.type', ':'.$paramName);
 
                 // expression parameters
-                $parameters = [ $paramName => $values['value'] ];
+                $parameters = [
+                    $paramName => [ $values['value'], \Doctrine\DBAL\Connection::PARAM_STR_ARRAY ],
+                ];
 
                 return $filterQuery->createCondition($expression, $parameters);
             },

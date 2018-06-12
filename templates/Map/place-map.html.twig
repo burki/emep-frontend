@@ -44,15 +44,15 @@
     form.filter div {
         display: inline-block;
     }
-
-
     </style>
 
     <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/select2-4.0.3/css/select2.min.css" />
     <script src="{{ app.request.basepath }}/vendor/select2-4.0.3/js/select2.full.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('#map_filter_location-type').select2();
+            $('#map_filter_location-type').select2({
+                placeholder: 'all'
+            });
         });
     </script>
 {% endblock %}
