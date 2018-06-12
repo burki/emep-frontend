@@ -65,10 +65,10 @@ extends CrudController
             ->orderBy('dateSort')
             ;
 
-        $types = $this->buildVenueTypes();
+        $organizerTypes = $this->buildOrganizerTypes();
         $form = $this->get('form.factory')->create(\AppBundle\Filter\ExhibitionFilterType::class, [
             'country_choices' => array_flip($this->buildCountries()),
-            'location_type_choices' => array_combine($types, $types),
+            'organizer_type_choices' => array_combine($organizerTypes, $organizerTypes),
         ]);
 
         if ($request->query->has($form->getName())) {

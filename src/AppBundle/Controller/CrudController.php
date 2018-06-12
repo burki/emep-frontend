@@ -41,6 +41,19 @@ extends Controller
         return array_column($result, 'type');
     }
 
+    protected function buildOrganizerTypes()
+    {
+        $em = $this->getDoctrine()
+                ->getManager();
+
+        $result = $em->createQuery("SELECT DISTINCT E.organizerType AS type FROM AppBundle:Exhibition E"
+                                   . " WHERE E.status <> -1 AND E.organizerType <> ''"
+                                   . " ORDER BY type")
+                ->getScalarResult();
+
+        return array_column($result, 'type');
+    }
+
     protected function buildPagination($request, $query, $options = [])
     {
         $paginator = $this->get('knp_paginator');

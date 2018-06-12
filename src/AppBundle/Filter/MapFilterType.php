@@ -12,9 +12,9 @@ extends \Symfony\Component\Form\AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('location-type', Filters\ChoiceFilterType::class, [
-            'label' => 'Type of Venue',
+            'label' => $options['data']['type_label'],
             'multiple' => true,
-            'choices' => /* [ '- all - ' => '' ] + */ $options['data']['type_choices'],
+            'choices' => $options['data']['type_choices'],
         ]);
     }
 

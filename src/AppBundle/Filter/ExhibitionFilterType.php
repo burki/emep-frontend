@@ -38,10 +38,10 @@ extends CrudFilterType
             },
         ]);
 
-        $builder->add('location_type', Filters\ChoiceFilterType::class, [
-            'label' => 'Type of Venue',
+        $builder->add('organizer_type', Filters\ChoiceFilterType::class, [
+            'label' => 'Type of Organizing Body',
             'multiple' => true,
-            'choices' => $options['data']['location_type_choices'],
+            'choices' => $options['data']['organizer_type_choices'],
             'attr' => [
                 'data-placeholder' => '- all - ',
             ],
@@ -50,10 +50,10 @@ extends CrudFilterType
                     return null;
                 }
 
-                $paramName = sprintf('l_%s', str_replace('.', '_', $field));
+                $paramName = sprintf('e_%s', str_replace('.', '_', $field));
 
                 // expression that represent the condition
-                $expression = $filterQuery->getExpr()->in('L.type', ':'.$paramName);
+                $expression = $filterQuery->getExpr()->in('E.organizerType', ':'.$paramName);
 
                 // expression parameters
                 $parameters = [

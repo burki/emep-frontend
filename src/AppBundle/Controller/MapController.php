@@ -3,7 +3,6 @@
 namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
@@ -11,7 +10,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
  *
  */
 class MapController
-extends Controller
+extends CrudController
 {
     /**
      * @Route("/person/by-place", name="person-by-place")
@@ -118,22 +117,6 @@ extends Controller
     }
 
     /**
-     * TODO: share with LocationController
-     */
-    protected function buildTypes()
-    {
-        $em = $this->getDoctrine()
-                ->getManager();
-
-        $result = $em->createQuery("SELECT DISTINCT L.type FROM AppBundle:Location L"
-                                   . " WHERE L.status <> -1 AND 0 = BIT_AND(L.flags, 256) AND L.type IS NOT NULL"
-                                   . " ORDER BY L.type")
-                ->getScalarResult();
-
-        return array_column($result, 'type');
-    }
-
-    /**
      * @Route("/exhibition/by-place", name="exhibition-by-place")
      * @Route("/location/by-place", name="location-by-place")
      * @Route("/work/by-place", name="item-by-place")
@@ -154,9 +137,13 @@ extends Controller
         $parametersTypes = [];
 
         if (in_array($route, [ 'location-by-place', 'exhibition-by-place' ])) {
-            $types = $this->buildTypes();
+            $types = 'exhibition-by-place' == $route
+                ? $this->buildOrganizerTypes()
+                : $this->buildVenueTypes();
             $form = $this->get('form.factory')->create(\AppBundle\Filter\MapFilterType::class, [
                 'type_choices' => array_combine($types, $types),
+                'type_label' => 'exhibition-by-place' == $route
+                    ? 'Type of Organizing Body' : 'Type of Venue',
             ]);
 
             if ($request->getMethod() == 'POST') {
@@ -230,7 +217,7 @@ extends Controller
 
             $andWhere = '';
             if (array_key_exists('location-type', $filterData) && !empty($filterData['location-type'])) {
-                $andWhere .= ' AND Location.type IN(?)';
+                $andWhere .= ' AND Exhibition.organizer_type IN(?)';
                 $parameters[] = $filterData['location-type'];
                 $parametersTypes[] = \Doctrine\DBAL\Connection::PARAM_STR_ARRAY;
             }
