@@ -37,9 +37,10 @@ extends CrudFilterType
             },
         ]);
 
-        $builder->add('type', Filters\ChoiceFilterType::class, [
+        $builder->add('location_type', Filters\ChoiceFilterType::class, [
+            'label' => 'Type',
             'multiple' => true,
-            'choices' => /* [ '- all - ' => '' ] + */ $options['data']['type_choices'],
+            'choices' => $options['data']['location_type_choices'],
             'attr' => [
                 'data-placeholder' => '- all - ',
             ],
@@ -65,6 +66,6 @@ extends CrudFilterType
 
     public function getBlockPrefix()
     {
-        return 'exhibition_filter';
+        return 'location_filter';
     }
 }

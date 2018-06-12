@@ -20,7 +20,7 @@ extends CrudFilterType
         ]);
 
         $builder->add('country', Filters\ChoiceFilterType::class, [
-            'choices' => [ '- all - ' => '' ] + $options['data']['choices'],
+            'choices' => [ '- all - ' => '' ] + $options['data']['country_choices'],
             'apply_filter' => function (QueryInterface $filterQuery, $field, $values) {
                 if (empty($values['value'])) {
                     return null;
@@ -33,6 +33,32 @@ extends CrudFilterType
 
                 // expression parameters
                 $parameters = [ $paramName => $values['value'] ];
+
+                return $filterQuery->createCondition($expression, $parameters);
+            },
+        ]);
+
+        $builder->add('location_type', Filters\ChoiceFilterType::class, [
+            'label' => 'Type of Venue',
+            'multiple' => true,
+            'choices' => $options['data']['location_type_choices'],
+            'attr' => [
+                'data-placeholder' => '- all - ',
+            ],
+            'apply_filter' => function (QueryInterface $filterQuery, $field, $values) {
+                if (empty($values['value'])) {
+                    return null;
+                }
+
+                $paramName = sprintf('l_%s', str_replace('.', '_', $field));
+
+                // expression that represent the condition
+                $expression = $filterQuery->getExpr()->in('L.type', ':'.$paramName);
+
+                // expression parameters
+                $parameters = [
+                    $paramName => [ $values['value'], \Doctrine\DBAL\Connection::PARAM_STR_ARRAY ],
+                ];
 
                 return $filterQuery->createCondition($expression, $parameters);
             },

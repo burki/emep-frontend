@@ -28,6 +28,19 @@ extends Controller
         return $countriesActive;
     }
 
+    protected function buildVenueTypes()
+    {
+        $em = $this->getDoctrine()
+                ->getManager();
+
+        $result = $em->createQuery("SELECT DISTINCT L.type FROM AppBundle:Location L"
+                                   . " WHERE L.status <> -1 AND 0 = BIT_AND(L.flags, 256) AND L.type IS NOT NULL"
+                                   . " ORDER BY L.type")
+                ->getScalarResult();
+
+        return array_column($result, 'type');
+    }
+
     protected function buildPagination($request, $query, $options = [])
     {
         $paginator = $this->get('knp_paginator');
