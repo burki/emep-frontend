@@ -10,7 +10,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 /**
  *
  */
-class MapController extends Controller
+class MapController
+extends Controller
 {
     /**
      * @Route("/person/by-place", name="person-by-place")
@@ -117,6 +118,22 @@ class MapController extends Controller
     }
 
     /**
+     * TODO: share with LocationController
+     */
+    protected function buildTypes()
+    {
+        $em = $this->getDoctrine()
+                ->getManager();
+
+        $result = $em->createQuery("SELECT DISTINCT L.type FROM AppBundle:Location L"
+                                   . " WHERE L.status <> -1 AND 0 = BIT_AND(L.flags, 256) AND L.type IS NOT NULL"
+                                   . " ORDER BY L.type")
+                ->getScalarResult();
+
+        return array_column($result, 'type');
+    }
+
+    /**
      * @Route("/exhibition/by-place", name="exhibition-by-place")
      * @Route("/location/by-place", name="location-by-place")
      * @Route("/work/by-place", name="item-by-place")
@@ -131,15 +148,42 @@ class MapController extends Controller
         $persons = null;
         $maxDisplay = 10;
         $disableClusteringAtZoom = 5;
+        $form = null;
+        $filterData = [];
+        $parameters = [];
+        $parametersTypes = [];
+
+        if (in_array($route, [ 'location-by-place', 'exhibition-by-place' ])) {
+            $types = $this->buildTypes();
+            $form = $this->get('form.factory')->create(\AppBundle\Filter\MapFilterType::class, [
+                'type_choices' => array_combine($types, $types),
+            ]);
+
+            if ($request->getMethod() == 'POST') {
+                $form->handleRequest($request);
+                if ($form->isSubmitted() && $form->isValid()) {
+                    $filterData = $form->getData();
+                }
+            }
+        }
 
         if ('location-by-place' == $route) {
             $disableClusteringAtZoom = 10;
             $maxDisplay = 15;
+
+            $andWhere = '';
+            if (array_key_exists('location-type', $filterData) && !empty($filterData['location-type'])) {
+                $andWhere .= ' AND Location.type IN(?)';
+                $parameters[] = $filterData['location-type'];
+                $parametersTypes[] = \Doctrine\DBAL\Connection::PARAM_STR_ARRAY;
+            }
+
             $querystr = "SELECT Location.id AS location_id, Location.name AS location_name, Location.place_geo AS location_geo, COALESCE(Geoname.name_variant, Geoname.name) AS place, Geoname.tgn, Geoname.latitude, Geoname.longitude"
                       . " FROM Location"
                       . " INNER JOIN Geoname ON Geoname.tgn=Location.place_tgn"
                       . " WHERE"
                       . " Location.status <> -1 AND 0 = (Location.flags & 256)"
+                      . $andWhere
                       . " ORDER BY tgn, location_name"
                       ;
         }
@@ -184,14 +228,23 @@ class MapController extends Controller
                 $persons = $qbPerson->getQuery()->getResult();
             }
 
+            $andWhere = '';
+            if (array_key_exists('location-type', $filterData) && !empty($filterData['location-type'])) {
+                $andWhere .= ' AND Location.type IN(?)';
+                $parameters[] = $filterData['location-type'];
+                $parametersTypes[] = \Doctrine\DBAL\Connection::PARAM_STR_ARRAY;
+            }
+
             $querystr
                      .= " WHERE"
                       . " Exhibition.status <> -1"
+                      . $andWhere
                       . " ORDER BY tgn, Exhibition.startdate, location_name, Exhibition.title"
                       ;
         }
 
-        $stmt = $dbconn->query($querystr);
+
+        $stmt = $dbconn->executeQuery($querystr, $parameters, $parametersTypes);
         $values = [];
         $values_country = [];
         $displayhelper = new ExhibitionDisplayHelper();
@@ -268,6 +321,7 @@ class MapController extends Controller
         // display
         return $this->render('Map/place-map.html.twig', [
             'data' => json_encode($values_final),
+            'filter' => is_null($form) ? null : $form->createView(),
             'disableClusteringAtZoom' => $disableClusteringAtZoom,
             'bounds' => [
                 [ 60, -120 ],

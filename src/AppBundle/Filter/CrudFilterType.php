@@ -1,5 +1,5 @@
 <?php
-// PersonFilterType.php
+// CrudFilterType.php
 namespace AppBundle\Filter;
 
 use Symfony\Component\Form\AbstractType;

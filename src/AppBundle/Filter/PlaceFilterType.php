@@ -1,5 +1,5 @@
 <?php
-// PersonFilterType.php
+// PlaceFilterType.php
 namespace AppBundle\Filter;
 
 use Symfony\Component\Form\FormBuilderInterface;

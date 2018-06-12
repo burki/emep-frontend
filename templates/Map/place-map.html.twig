@@ -1,33 +1,60 @@
 {% extends 'Base/base.html.twig' %}
 {% import 'Shared/map-leaflet.html.twig' as map %}
+
 {% block head %}
     {{ map.head() }}
     {{ map.head_markercluster() }}
     {{ map.head_heatmap() }}
 
     <style>
-.my-tooltip {
-    border: none;
-    padding: 2px;
-    padding-left: 6px;
-    padding-right: 6px;
-    background-color:rgba(30, 30, 30, 0.5);
-    box-shadow: none;
-    color: white;
-}
+    .my-tooltip {
+        border: none;
+        padding: 2px;
+        padding-left: 6px;
+        padding-right: 6px;
+        background-color:rgba(30, 30, 30, 0.5);
+        box-shadow: none;
+        color: white;
+    }
 
-.my-tooltip a {
-    color: white;
-    font-weight: bold;
-}
+    .my-tooltip a {
+        color: white;
+        font-weight: bold;
+    }
 
-.leaflet-tooltip-left.my-tooltip::before {
-  border-left-color: white;
-}
-.leaflet-tooltip-right.my-tooltip::before {
-  border-right-color: white;
-}
+    .leaflet-tooltip-left.my-tooltip::before {
+        border-left-color: white;
+    }
+
+    .leaflet-tooltip-right.my-tooltip::before {
+        border-right-color: white;
+    }
+
+    .leaflet-marker-pane,
+    .leaflet-shadow-pane,
+    .leaflet-overlay-pane {
+        /* hack to work around https://github.com/CloudMade/Leaflet/issues/335 */
+        -webkit-transform: translateZ(0px);
+    }
+
+    #map_filter_location-type {
+        min-width: 15em;
+    }
+
+    form.filter div {
+        display: inline-block;
+    }
+
+
     </style>
+
+    <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/select2-4.0.3/css/select2.min.css" />
+    <script src="{{ app.request.basepath }}/vendor/select2-4.0.3/js/select2.full.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#map_filter_location-type').select2();
+        });
+    </script>
 {% endblock %}
 
 {% block body %}
@@ -142,4 +169,11 @@
 
         map.addLayer(markers);
     </script>
+
+    {% if filter is not null %}
+    <form class="filter" method="post" action="{{ path(app.request.attributes.get('_route')) }}">
+        {{ form_rest(filter) }}
+        <input type="submit" name="submit-filter" value="filter" />
+    </form>
+    {% endif %}
 {% endblock %}
