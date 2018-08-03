@@ -1,0 +1,15 @@
+parameters:
+    kernel.secret: 4963ca924932c8b95ad9e5d4e4eac0ba78534daa
+    database.host:     127.0.0.1
+    database.port:     ~
+    database.name:     emep
+    database.user:     root
+    database.password: ~
+    database.charset:   utf8mb4
+
+    mailer.transport: 'sendmail'
+    # mailer.transport: 'smtp'
+    mailer.host: ~
+    mailer.port: ~
+    mailer.username: ~
+    mailer.password: ~

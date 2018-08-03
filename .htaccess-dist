@@ -1,0 +1,15 @@
+# APP_ENVIRONMENT is assumed to be 'dev' if not set
+SetEnv APP_ENVIRONMENT test
+SetEnv APP_DEBUG true
+
+<IfModule mod_rewrite.c>
+    Options -MultiViews
+
+    RewriteEngine On
+    # adjust the following to match
+    # Alias /data /path/to/web
+    RewriteBase /data
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ app.php [QSA,L]
+</IfModule>
