@@ -53,7 +53,7 @@ extends Controller
                 ->innerJoin('E.items', 'I')
                 ->leftJoin('I.creators', 'P')
                 ->leftJoin('I.media', 'M')
-                ->where('I.status <> -1')
+                ->where('E.status <> -1 AND I.status <> -1')
                 ->orderBy('E.startdate, E.id')
                 // , nameSort, dateSort, catSort')
                 ;
