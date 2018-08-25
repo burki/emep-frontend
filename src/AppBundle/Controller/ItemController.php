@@ -72,7 +72,7 @@ extends Controller
                 ])
                 ->from('AppBundle:Item', 'I')
                 ->leftJoin('I.creators', 'P')
-                ->innerJoin('I.style', 'T')
+                ->leftJoin('I.style', 'T')
                 ->where('I.status <> -1 AND P.status <> -1')
                 ->orderBy('styleSort DESC, dateSort, nameSort, catSort')
                 ;
