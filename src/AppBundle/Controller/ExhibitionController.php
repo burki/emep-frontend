@@ -234,7 +234,7 @@ extends CrudController
         return $jaccardIndex;
     }
 
-    protected function findCatalogueEntries($exhibition)
+    protected function findCatalogueEntries($exhibition, $sort = '')
     {
         // get the catalogue entries by exhibition
         $qb = $this->getDoctrine()
@@ -255,7 +255,7 @@ extends CrudController
             ->getResult();
 
         // sort, either catalogueId or person first
-        $sortPersonFirst = 0 <> ($exhibition->flags & 0x20);
+        $sortPersonFirst = 'person' == $sort || $exhibition->isSortedByPerson();
 
         usort($results, function ($a, $b) use ($sortPersonFirst) {
             $sortPartsA = [ $a->catalogueSection . ' ' . $a->catalogueId, $a->getPerson()->getFullname() ];
@@ -314,7 +314,7 @@ extends CrudController
             'exhibition' => $exhibition,
             'catalogue' => $exhibition->findBibitem($this->getDoctrine()->getManager(), 1),
             'citeProc' => $citeProc,
-            'catalogueEntries' => $this->findCatalogueEntries($exhibition),
+            'catalogueEntries' => $this->findCatalogueEntries($exhibition, $request->get('sort')),
             'showWorks' => !empty($_SESSION['user']),
             'similar' => $this->findSimilar($exhibition),
             'pageMeta' => [

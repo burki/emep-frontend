@@ -6,6 +6,17 @@
     {% endif %}
 {% endmacro %}
 
+{% macro exhibition_itemexhibition_sort_control(exhibition) %}
+    {% if not exhibition.isSortedByPerson %}
+        {% set active = app.request.get('sort') %}
+        <div class="sort-control">
+        Sort by:
+        <a href="{{ path('exhibition', { 'id': exhibition.id}) }}"{% if active != 'person' %} class="active"{% endif %}>Catalogue Order</a>
+        <a href="{{ path('exhibition', { 'id': exhibition.id, 'sort': 'person' }) }}"{% if active == 'person' %} class="active"{% endif %}>Artist</a>
+        </div>
+    {% endif %}
+{% endmacro %}
+
 {% macro pagination_count(pagination) %}
     {# total items count #}
     <div class="count">

@@ -198,6 +198,10 @@ nav {
     a.desc::after {
         content: "\e156";
     }
+
+    a.active {
+        font-weight: bold;
+    }
 }
 
 form.filter {

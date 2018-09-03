@@ -237,6 +237,8 @@
                 <div role="tabpanel" class="tab-pane active" id="home">
                 {% set last_initial = '' %}
                 <h3>Catalogue Entries</h3>
+                {{ helper.exhibition_itemexhibition_sort_control(exhibition) }}
+
                 {% for catalogueEntry in catalogueEntries %}
                     {% set initial = catalogueEntry.person.fullname %}
                     {% if initial != last_initial %}
