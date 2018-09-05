@@ -80,7 +80,7 @@ class ExportGdfCommand extends ContainerAwareCommand
             ->from('AppBundle:Person', 'P')
             ->leftJoin('P.exhibitions', 'E')
             // ->leftJoin('P.catalogueEntries', 'IE')
-            ->where('P.status <> -1')
+            ->where('P.status <> -1 AND E.status <> -1')
             ->groupBy('P.id') // for Count
             ->having('numExhibitionSort >= 2')
             ->orderBy('numExhibitionSort', 'DESC')
@@ -96,9 +96,20 @@ class ExportGdfCommand extends ContainerAwareCommand
         }
 
         echo 'nodedef>name VARCHAR,label VARCHAR' . "\n";
+        $data = [];
         foreach ($nodes as $nodeId => $nodeLabel) {
-            echo implode(',', [ $nodeId, $nodeLabel ]), "\n";
+            // echo implode(',', [ $nodeId, $nodeLabel ]), "\n";
+            $data[] = [ $nodeId, $nodeLabel ];
         }
+
+        $fp = fopen('php://temp', 'w+');
+        foreach ($data as $fields) {
+            // Add row to CSV buffer
+            fputcsv($fp, $fields);
+        }
+        rewind($fp); // Set the pointer back to the start
+        echo stream_get_contents($fp); // Fetch the contents of our CSV
+        fclose($fp); // Close our pointer and free up memory and /tmp space
 
         $qb = $em->createQueryBuilder();
         $qb->select('E.id as exhibitionId', 'P.id as personId')
