@@ -3,6 +3,8 @@
     : 'Base/base.html.twig'
 %}
 
+{% import 'Shared/helper.html.twig' as helper %}
+
 {% block head %}
 {% endblock %}
 
@@ -13,10 +15,12 @@
 
     <script src="{{ app.request.basepath }}/vendor/highcharts/highcharts.js"></script>
     <script src="{{ app.request.basepath }}/vendor/highcharts/modules/exporting.js"></script>
-    <!--
-    <script src="{{ app.request.basepath }}/vendor/highcharts/themes/sand-signika.js"></script>
-    -->
+
     <script type="text/javascript">
     {{ chart|raw }}
     </script>
+
+    {% if app.request.attributes.get('_route') != 'exhibition-stats-partial' %}
+    {{ helper.show_detailmodal() }}
+    {% endif %}
 {% endblock %}

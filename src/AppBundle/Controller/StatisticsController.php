@@ -10,7 +10,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 /**
  *
  */
-class StatisticsController extends Controller
+class StatisticsController
+extends Controller
 {
     static $countryMap = [ 'UA' => 'RU' ]; // don't count Ukrania seperately
 
@@ -110,7 +111,7 @@ class StatisticsController extends Controller
 
         $data = [];
         $max_year = $min_year = 0;
-        foreach (['birth', 'death'] as $key) {
+        foreach ([ 'birth', 'death' ] as $key) {
             $date_field = $key . 'date';
             $querystr = 'SELECT YEAR(' . $date_field . ') AS year'
                       // . ', sex'
@@ -222,6 +223,42 @@ EOT;
         ];
     }
 
+    public static function exhibitionAgePersonIds($em, $age, $exhibitionId = null)
+    {
+        $dbconn = $em->getConnection();
+
+        $where = !is_null($exhibitionId) && intval($exhibitionId) > 0
+            ? sprintf('WHERE Exhibition.id=%d', intval($exhibitionId))
+            : '';
+
+        $querystr = <<<EOT
+SELECT id,
+IF (EB.deathdate IS NOT NULL AND YEAR(EB.deathdate) < YEAR(EB.startdate), 'deceased', 'living') AS state
+FROM
+(SELECT DISTINCT Person.id AS id, Exhibition.startdate AS startdate, Exhibition.id AS id_exhibition, Person.id AS id_person, Person.birthdate AS birthdate, Person.deathdate AS deathdate
+FROM Exhibition
+INNER JOIN ItemExhibition ON ItemExhibition.id_exhibition=Exhibition.id
+INNER JOIN Person ON ItemExhibition.id_person=Person.id AND Person.birthdate IS NOT NULL
+$where
+GROUP BY Exhibition.id, Person.id) AS EB
+WHERE YEAR(EB.startdate) - YEAR(EB.birthdate) = :age
+EOT;
+
+        $stmt = $stmt = $em->getConnection()->prepare($querystr);
+        $stmt->bindValue(':age', $age, \PDO::PARAM_INT);
+        $stmt->execute();
+        $ids = [];
+        while ($row = $stmt->fetch()) {
+            if (!array_key_exists($row['state'], $ids)) {
+                $ids[$row['state']] = [];
+            }
+
+            $ids[$row['state']][] = $row['id'];
+        }
+
+        return $ids;
+    }
+
     public static function exhibitionAgeDistribution($em, $exhibitionId = null)
     {
         $dbconn = $em->getConnection();
@@ -312,7 +349,6 @@ EOT;
             ++$statsByNationality[$nationality]['countArtists'];
             $statsByNationality[$nationality]['countItemExhibition'] += $row['numEntries'];
             $totalItemExhibition += $row['numEntries'];
-
         }
 
         return [
@@ -346,7 +382,7 @@ EOT;
 
         $template = $this->get('twig')->loadTemplate('Statistics/person-exhibition-age.html.twig');
         $chart = $template->renderBlock('chart', [
-            'container' => 'container',
+            'container' => 'container-age',
             'categories' => json_encode($categories),
             'age_at_exhibition_living' => json_encode(array_values($total['age_living'])),
             'age_at_exhibition_deceased' => json_encode(array_values($total['age_deceased'])),
@@ -354,6 +390,7 @@ EOT;
 
         // display the static content
         return $this->render('Statistics/person-exhibition-age.html.twig', [
+            'container' => 'container-age',
             'chart' => $chart
         ]);
     }

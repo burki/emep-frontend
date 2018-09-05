@@ -101,6 +101,7 @@ extends CrudController
         if (!is_null($persons)) {
             $persons = explode(',', $persons);
         }
+
         if (is_null($persons) || count($persons) < 2) {
             throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException("Invalid argument");
         }
@@ -119,6 +120,7 @@ extends CrudController
             if (0 == count($matching)) {
                 throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException("Invalid argument");
             }
+
             $names[] = $matching[0]->getFullname(true);
         }
 
@@ -328,6 +330,30 @@ extends CrudController
     }
 
     /**
+     * @Route("/exhibition/{id}/stats/info", requirements={"id" = "\d*"}, name="exhibition-stats-info")
+     */
+    public function statsInfoAction(Request $request, $id)
+    {
+        $chart = $request->get('chart');
+        switch ($chart) {
+            case 'container-age':
+                $personIds = StatisticsController::exhibitionAgePersonIds($em = $this->getDoctrine()->getEntityManager(), $request->get('point'), $id);
+                foreach ($personIds as $type => $ids) {
+                    $personIds[$type] = $this->hydratePersons($ids);
+                }
+
+                return $this->render('Exhibition/stats-info-age.html.twig', [
+                    'age' => $request->get('point'),
+                    'personsByType' => $personIds,
+                ]);
+                break;
+
+            default:
+                die('Currently not handling chart: ' . $chart);
+        }
+    }
+
+    /**
      * @Route("/exhibition/{id}/stats.embed", requirements={"id" = "\d+"}, name="exhibition-stats-partial")
      * @Route("/exhibition/{id}/stats", requirements={"id" = "\d+"}, name="exhibition-stats")
      */
@@ -369,6 +395,7 @@ extends CrudController
                 'categories' => json_encode($categories),
                 'age_at_exhibition_living' => json_encode(array_values($total['age_living'])),
                 'age_at_exhibition_deceased' => json_encode(array_values($total['age_deceased'])),
+                'exhibition_id' => $id,
             ]),
         ];
 

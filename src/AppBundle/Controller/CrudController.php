@@ -70,4 +70,23 @@ extends Controller
             $options
         );
     }
+
+    protected function hydratePersons($ids, $preserveOrder = false)
+    {
+        // hydrate with doctrine entity
+        $qb = $this->getDoctrine()
+                ->getManager()
+                ->createQueryBuilder();
+
+        $hydrationQuery = $qb->select([ 'P', 'field(P.id, :ids) as HIDDEN field', 'P.sortName HIDDEN nameSort' ])
+            ->from('AppBundle:Person', 'P')
+            ->where('P.id IN (:ids)')
+            ->orderBy($preserveOrder ? 'field' : 'nameSort')
+            ->getQuery();
+            ;
+
+        $hydrationQuery->setParameter('ids', $ids);
+
+        return $hydrationQuery->getResult();
+    }
 }
