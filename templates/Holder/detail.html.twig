@@ -1,0 +1,134 @@
+{% extends 'Base/base.html.twig' %}
+
+{% import 'Shared/helper.html.twig' as helper %}
+{% import 'Shared/map-leaflet.html.twig' as map %}
+
+{% block head %}
+    {{ map.head() }}
+    <script src="{{ app.request.basepath }}/js/seealso.js"></script>
+    <script>
+        var service = new SeeAlsoCollection();
+        service.services = {
+            'gndaks' : new SeeAlsoService('https://beacon.findbuch.de/seemore/gnd-aks/-dewp@wd')
+        };
+        service.views = {
+            'seealso-ul' : new SeeAlsoUL({
+                linkTarget: '_blank',
+                maxItems: 100
+            })
+        };
+        service.replaceTagsOnLoad();
+    </script>
+{% endblock %}
+
+{% block body %}
+    <h1>
+        {{ holder.name }}
+    </h1>
+    {{ holder.nameAppend }}
+
+    <div class="row">
+        <div class="col-sm-8">
+            <dl class="dl-horizontal">
+            {% if holder.placeLabel is not null %}
+                <dt>{{ 'Place'|trans }}:</dt>
+                <dd>
+                    {{ holder.placeLabel }}
+                </dd>
+            {% endif %}
+            {% if holder.url is not empty %}
+                <dt>{{ 'Homepage'|trans }}:</dt>
+                <dd>
+                    <a href="{{ holder.url }}" target="_blank">{{ holder.url|prettifyurl }}</a>
+                </dd>
+            {% endif %}
+            {#% if holder.foundingDate is not empty %}
+                <dt>{{ 'Founding Date'|trans }}:</dt>
+                <dd>
+                    {{ holder.foundingDate|dateincomplete }}
+                </dd>
+            {% endif %}
+            {% if holder.dissolutionDate is not empty %}
+                <dt>{{ 'Dissolution Date'|trans }}:</dt>
+                <dd>
+                    {{ holder.dissolutionDate|dateincomplete }}
+                </dd>
+            {% endif %#}
+            {% if holder.description is not empty %}
+                <dt>{{ 'Note'|trans }}:</dt>
+                <dd>
+                    {{ holder.description|nl2br }}
+                </dd>
+            {% endif %}
+            </dl>
+
+            {% if bibitems is not empty %}
+            <h3>Catalogues</h3>
+            <ul class="list-group">
+            {% for row in bibitems %}
+                {% set bibitem = row[0] %}
+                <li class="list-group-item">
+                    {{ bibitem.renderCitationAsHtml(citeProc, false)|raw }}
+                    {% if row.signature is not empty or row.url is not empty %}
+                        <div style="margin-top: 1em">
+                        {% if row.signature is not empty %}
+                            {{ row.signature}}
+                        {% endif %}
+                        {% if row.url is not empty %}
+                            <a href="{{ row.url }}" target="_blank">{{ row.url|prettifyurl }}</a>
+                        {% endif %}
+                        </div>
+                    {% endif %}
+                </li>
+            {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+
+        <div class="col-sm-4 sidebar">
+            {% if holder.geo is not empty %}
+            <div id="map" class="col-sm-12" style="width: 100%; min-height: 360px; border-bottom: 20px solid white;"></div>
+
+            <script>
+            function adjustMapSize() {
+                /*
+                $('#map').height(function(index, height) {
+                    return window.innerHeight - $(this).offset().top;
+                });
+                */
+            }
+
+            $( window ).resize(adjustMapSize);
+            adjustMapSize();
+
+            var map = L.map('map');
+
+            map.setView([{{ holder.geo }}], 10);
+            L.marker([ {{ holder.geo }} ]).addTo(map);
+
+            {{ map.addTileLayer() }}
+            </script>
+        {% endif %}
+
+            {% if holder.gnd is not empty %}
+            <div class="container-fluid box">
+                <div class="row box-color-title">
+                    <div class="col-sm-12">
+                        <h4>
+                            {% if holder.gnd is not empty %}
+                            {{ 'Integrated Authority File'|trans }}
+                            <br /><a href="http://d-nb.info/gnd/{{ holder.gnd }}" target="_blank">{{ holder.gnd }}</a>
+                            {% else %}
+                            {{ 'Additional Information'|trans }}
+                            {% endif %}
+                        </h4>
+                    </div>
+                    <div class="col-sm-12">
+                        <div title="{{ holder.gnd }}" class="gndaks seealso-ul"></div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div><!-- .row -->
+{% endblock %}

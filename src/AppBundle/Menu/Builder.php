@@ -76,7 +76,7 @@ class Builder
         ]);
         $menu->setChildrenAttributes([ 'id' => 'menu-main', 'class' => 'nav navbar-nav' ]);
 
-        $menu->addChild('Exhibitions', ['route' => 'exhibition']);
+        $menu->addChild('Exhibitions', [ 'route' => 'exhibition' ]);
         $menu['Exhibitions']->addChild('List', [
             'route' => 'exhibition',
         ]);
@@ -90,7 +90,7 @@ class Builder
             'route' => 'exhibition-nationality',
         ]);
 
-        $menu->addChild('Venues', ['route' => 'location']);
+        $menu->addChild('Venues', [ 'route' => 'location' ]);
         $menu['Venues']->addChild('List', [
             'route' => 'location',
         ]);
@@ -98,7 +98,7 @@ class Builder
             'route' => 'location-by-place',
         ]);
 
-        $menu->addChild('Artists', ['route' => 'person']);
+        $menu->addChild('Artists', [ 'route' => 'person' ]);
         $menu['Artists']->addChild('List', [
             'route' => 'person',
         ]);
@@ -118,8 +118,10 @@ class Builder
             'route' => 'person-popularity',
         ]);
 
+        $menu->addChild('Holding Institutions', [ 'route' => 'holder' ]);
+
         if ($showWorks) {
-            $menu->addChild('Works', ['route' => 'item']);
+            $menu->addChild('Works', [ 'route' => 'item' ]);
             $menu['Works']->addChild('List by Artist', [
                 'route' => 'item',
             ]);
@@ -140,7 +142,7 @@ class Builder
             ]);
         }
 
-        $menu->addChild('Places', ['route' => 'place']);
+        $menu->addChild('Places', [ 'route' => 'place' ]);
         $menu['Places']->addChild('List', [
             'route' => 'place',
         ]);

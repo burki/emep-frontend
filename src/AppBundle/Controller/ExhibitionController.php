@@ -273,14 +273,6 @@ extends CrudController
         return $results;
     }
 
-    private function instantiateCiteProc($locale)
-    {
-        $kernel = $this->get('kernel');
-        $path = $kernel->locateResource('@AppBundle/Resources/csl/infoclio-de.csl.xml');
-
-        return new \AcademicPuma\CiteProc\CiteProc(file_get_contents($path), $locale);
-    }
-
     /**
      * @Route("/exhibition/{id}", requirements={"id" = "\d+"}, name="exhibition")
      */
