@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/ekko-lightbox/ekko-lightbox.css">
     <script src="{{ app.request.basepath }}/vendor/ekko-lightbox/ekko-lightbox.min.js"></script>
     <script>
-        $( document ).ready(function() {
+        $(document).ready(function() {
             $('.gallery').justifiedGallery();
 
             // ekko-lightbox
@@ -64,6 +64,7 @@
                     {% endif %}
                 </dd>
             {% endif %}
+
             {% set deathPlace = person.deathPlaceInfo(app.request.locale) %}
             {% if deathPlace is not empty or person.deathDate is not empty %}
                 <dt>{{ 'Died'|trans }}:</dt>
@@ -90,6 +91,7 @@
                     {% endfor %}
                 </dd>
             {% endif %}
+
             {% if person.url is not empty %}
                 <dt>{{ 'Homepage'|trans }}:</dt>
                 <dd>
@@ -99,6 +101,7 @@
             </dl>
 
             <p>{{ person.description|nl2br  }}</p>
+
             {% if showWorks and person.items is not empty %}
             <h3>Works</h3>
             <div class="gallery">
@@ -228,7 +231,7 @@
                 */
             }
 
-            $( window ).resize(adjustMapSize);
+            $(window).resize(adjustMapSize);
             adjustMapSize();
 
             var map = L.map('map');

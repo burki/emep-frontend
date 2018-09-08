@@ -1,0 +1,14 @@
+{% extends 'Base/partial.html.twig' %}
+
+{% import 'Shared/helper.html.twig' as helper %}
+
+{% block body %}
+    {% for type,persons in personsByType %}
+        <h2>{{ type|capitalize }} Persons exhibiting at Age {{ age }}</h2>
+        <ul class="list-group">
+        {% for person in persons %}
+            <li class="list-group-item">{{ helper.person_list_item(person) }}</li>
+        {% endfor %}
+        </ul>
+    {% endfor %}
+{% endblock %}

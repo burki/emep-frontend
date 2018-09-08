@@ -1,4 +1,7 @@
 {% extends 'Base/base.html.twig' %}
+
+{% import 'Shared/helper.html.twig' as helper %}
+
 {% block head %}
     <script src="{{ app.request.basepath }}/vendor/highcharts/highcharts.js"></script>
     <script src="{{ app.request.basepath }}/vendor/highcharts/modules/exporting.js"></script>
@@ -66,8 +69,18 @@
                         stacking: 'normal',
                         borderWidth: 1,
                         groupPadding: 0,
-                        pointPadding: 0
-                    }
+                        pointPadding: 0,
+                        events: {
+                            click: function (event) {
+                                var url = '{{ path('exhibition-stats-info', { 'id': exhibition_id }) }}?chart={{ container|raw }}';
+                                url += '&series=' + encodeURIComponent(this.name);
+                                url += '&point=' + encodeURIComponent(event.point.name);
+
+                                $('#detailModal').modal('show');
+                                $('#detailModal').find(".modal-body").load(url);
+                            }
+                        }
+                    },
                 },
                 series: [
                     {
@@ -88,5 +101,7 @@
 
 {% block body %}
     <!--<h1>Artists' Age at Exhibition</h1>-->
-    <div id="container" style="min-width: 800px; height: 400px; margin: 0 auto"></div>
+    <div id="{{ container|raw }}" style="min-width: 800px; height: 400px; margin: 0 auto"></div>
+
+    {{ helper.show_detailmodal() }}
 {% endblock %}

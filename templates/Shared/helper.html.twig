@@ -6,6 +6,17 @@
     {% endif %}
 {% endmacro %}
 
+{% macro exhibition_itemexhibition_sort_control(exhibition) %}
+    {% if not exhibition.isSortedByPerson %}
+        {% set active = app.request.get('sort') %}
+        <div class="sort-control">
+        Sort by:
+        <a href="{{ path('exhibition', { 'id': exhibition.id}) }}"{% if active != 'person' %} class="active"{% endif %}>Catalogue Order</a>
+        <a href="{{ path('exhibition', { 'id': exhibition.id, 'sort': 'person' }) }}"{% if active == 'person' %} class="active"{% endif %}>Artist</a>
+        </div>
+    {% endif %}
+{% endmacro %}
+
 {% macro pagination_count(pagination) %}
     {# total items count #}
     <div class="count">
@@ -113,4 +124,26 @@
         {% if entry.url is not empty %}{{ entry.url|converturls }}{% endif %}
         {% if not loop.last %}<br />{% endif %}
     {% endfor %}
+{% endmacro %}
+
+{% macro show_detailmodal() %}
+    {# modal for detailed info about clicked data #}
+    <div id="detailModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>Loading....</p>
+                </div>
+                <!--
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+                -->
+            </div>
+        </div>
+    </div>
 {% endmacro %}

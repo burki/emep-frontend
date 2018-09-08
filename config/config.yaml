@@ -75,9 +75,10 @@ doctrine:
         auto_mapping: true 
         dql:
             string_functions:
+                FIELD: DoctrineExtensions\Query\Mysql\Field
+                IF: DoctrineExtensions\Query\Mysql\IfElse
                 REPLACE: DoctrineExtensions\Query\Mysql\Replace
                 REGEXP: DoctrineExtensions\Query\Mysql\Regexp
-                IF: DoctrineExtensions\Query\Mysql\IfElse
             numeric_functions:
                 MATCH: DoctrineExtensions\Query\Mysql\MatchAgainst
                 RAND: DoctrineExtensions\Query\Mysql\Rand

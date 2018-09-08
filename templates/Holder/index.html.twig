@@ -1,0 +1,101 @@
+{% extends 'Base/base.html.twig' %}
+
+{% import 'Shared/helper.html.twig' as helper %}
+
+{% block body %}
+    <h1>{{ pageTitle }}</h1>
+    <div class="row">
+        <div class="col-sm-8">
+        {% if pagination.getTotalItemCount > 0 %}
+        {{ helper.pagination_count(pagination) }}
+
+        {#
+        <div class="sort-control">
+            {% set sortField = app.request.get('sort') %}
+            Sort by:
+            {{ helper.pagination_sortable(pagination, 'Place', 'countryPlaceNameSort') }}
+            {{ helper.pagination_sortable(pagination, 'Name', 'nameSort') }}
+            {{ helper.pagination_sortable(pagination, '# Publication', 'numCatEntrySort', 'desc') }}
+        </div>
+        #}
+
+        {% set last_initial = '' %}
+        {% set last_countryCode = '' %}
+
+        {% for row in pagination %}
+            {% set holder = row[0] %}
+            {% set place = holder.place %}
+            <ul class="list-unstyled">
+            {% if 'nameSort' == sortField %}
+                {# ignore #}
+            {% elseif 'numExhibitionSort' == sortField %}
+                {% set initial = row['numExhibitionSort'] %}
+            {% elseif 'numCatEntrySort' == sortField %}
+                {% set initial = row['numCatEntrySort'] %}
+            {% else %}
+                {% set sortField = 'countryPlaceNameSort' %}
+                {% if holder.placeLabel is not empty %}
+                    {% set initial = holder.placeLabel %}
+                {% endif %}
+            {% endif %}
+            {% if initial != last_initial %}
+                {% if last_initial != null %}
+                </ul>
+                {% endif %}
+                {% if 'countryPlaceNameSort' == sortField and last_countryCode != place.countryCode %}
+                    <h3>{{ countryName(place.countryCode) }}</h3>
+                    {% set last_countryCode = place.countryCode %}
+                {% endif %}
+                <h4>
+                    {% if 'countryPlaceNameSort' == sortField %}
+                        {% if place is not null %}
+                            {{ helper.place_linked(place) }}
+                        {% endif %}
+                    {% else %}
+                        {{ initial }}
+                    {% endif %}
+                </h4>
+                {% set last_initial = initial %}
+                <ul class="list-group">
+            {% endif %}
+            <li class="list-group-item">
+                <a href="{{ path('holder', { 'id' : holder.id }) }}">
+                    <b>{{ holder.name }}</b>
+                </a>
+
+                ({{ row.numBibitemSort }} cat.)
+                {#% set count = location.exhibitions|length %}
+                {% if count > 0 %}
+                    {% set divId = 'exhibitions' ~ location.id %}
+                    <a class="badge" style="color: white" href="#{{ divId }}" data-toggle="collapse">{{ count }} - {{ row['numCatEntrySort'] }}</a>
+                    <div id="{{ divId }}" class="collapse">
+                    {% for exhibition in location.exhibitions %}
+                        <p>
+                            {{ helper.exhibition_period(exhibition) }}
+                            <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
+                                <b>{{ exhibition.title }}</b>
+                                {{ exhibition.titleAppend }}
+                            </a>
+                        </p>
+                    {% endfor %}
+                    </div>
+                {% endif %#}
+            </li>
+        {% endfor %}
+            </ul>
+            {# display navigation #}
+            <div class="navigation">
+                {{ knp_pagination_render(pagination) }}
+            </div>
+        {% else %}
+            No Holding Institutions found
+        {% endif %}
+        </div>
+        <div class="col-sm-4">
+            <form class="filter" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
+                {{ form_rest(form) }}
+                <input type="submit" name="submit-filter" value="filter" />
+            </form>
+        </div>
+    </div><!-- .row -->
+{% endblock %}

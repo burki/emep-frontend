@@ -13,6 +13,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Exhibition
 {
+    const FLAGS_CATIDBYARTIST = 0x20;
+
     /**
      * @var integer
      *
@@ -465,6 +467,11 @@ class Exhibition
             ->getResult();
 
         return $results;
+    }
+
+    public function isSortedByPerson()
+    {
+        return 0 <> ($this->flags & self::FLAGS_CATIDBYARTIST);
     }
 
     /* make private properties public through a generic __get / __set */

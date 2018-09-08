@@ -30,7 +30,11 @@
         {% endif %}
         {% set last_style = null %}
         {% for item in results %}
-            {% set style = item.style.name %}
+            {% if item.style is null %}
+                {% set style = 'no consensus' %}
+            {% else %}
+                {% set style = item.style.name %}
+            {% endif %}
             {% if style != last_style %}
                 {% if last_style != null %}
             </div><!-- .gallery -->
