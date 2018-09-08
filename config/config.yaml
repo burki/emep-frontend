@@ -169,3 +169,6 @@ liip_url_auto_converter:
     linkclass:
     target: _blank
     debugmode: false
+
+debug:
+  dump_destination: "tcp://%env(VAR_DUMPER_SERVER)%"
