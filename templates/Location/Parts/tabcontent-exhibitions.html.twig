@@ -1,0 +1,77 @@
+{% block exhibitions %}
+    <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.css">
+    <script src="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.js"></script>
+    <script>
+        $( document ).ready(function() {
+            $('#exhibitions').DataTable({
+                paging: true,
+                searching: false,
+                info: false,
+                "columns": [
+                    null,
+                    { "orderSequence": [ "desc", "asc" ] },
+                    { "orderSequence": [ "desc", "asc" ] },
+                    { "orderSequence": [ "desc", "asc" ] },
+                    { "orderSequence": [ "desc", "asc" ] },
+                    { "orderSequence": [ "desc", "asc" ] }
+                ]
+            });
+        })
+    </script>
+
+
+
+
+
+    <div role="tabpanel" class="tab-pane active" id="home">
+
+        <table id="exhibitions" class="table table-striped table-bordered dataTable listviewcontainer">
+            <thead>
+            <tr class="listviewheading">
+                <th>Date</th>
+                <th>Title</th>
+                <th>City</th>
+                <th>Venue</th>
+                <th>Number of Cat. Entries</th>
+                <th>type</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            {% for exhibition in location.exhibitions %}
+
+                {% set exhPlace = exhibition.location.place %}
+
+                <tr class="listviewrow">
+                    <td class="date"><b>{{ helper.exhibition_period(exhibition) }}</b></td>
+                    <td class="title"><a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
+                            <b>{{ exhibition.title }}</b> {{ exhibition.titleAppend }}</a></td>
+                    <td class="normal">
+                        <a href="{% if exhPlace.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : exhPlace.tgn }) }}{% else %}{{ path('place', { 'id' : exhPlace.id }) }}{% endif %}">
+                            {{ exhibition.location.placeLabel }}
+                        </a>
+                    </td>
+                    <td class="normal">
+                        <a href="{{ path('location', { 'id' : exhibition.location.id }) }}">
+                            {{ exhibition.location.name }}
+                        </a>
+                    </td>
+                    <td>{% if catalogueEntries[exhibition.id] is defined %}
+                            {% set count = catalogueEntries[exhibition.id]|length %}
+                            {% if count > 0 %}
+                                {% set divId = 'entries' ~ exhibition.id %}
+                                <a class="badge" style="color: white" href="#{{ divId }}" data-toggle="collapse">{{ count }}</a>
+                            {% endif %}
+                        {% else %}
+                            {% set count = 0 %}
+                        {% endif %}
+                    </td>
+                    <td>{{ exhibition.organizerType }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+
+    </div><!-- .tab-pane -->
+{% endblock %}

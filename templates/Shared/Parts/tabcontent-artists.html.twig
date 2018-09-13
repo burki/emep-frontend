@@ -1,0 +1,38 @@
+{% if artists|length > 0 %}
+    <script>
+        $( document ).ready(function() {
+            $('#artists-table').DataTable({
+                paging: true,
+                searching: false,
+                info: false,
+                "columns": [
+                    null,
+                    { "orderSequence": [ "desc", "asc" ] },
+                    { "orderSequence": [ "desc", "asc" ] }
+                ]
+            });
+        })
+    </script>
+
+    <div role="tabpanel" class="tab-pane" id="artists">
+        <table id="artists-table" class="table table-striped table-bordered dataTable">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Number of Exhibitions</th>
+                <th>Number of Cat. Entries</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for row in artistsArray %}
+                {% set person = row[0] %}
+                <tr>
+                    <td><b>{{ helper.person_linked(person) }}</b></td>
+                    <td>{{ row['numExhibitionSort'] }}</td>
+                    <td>{{ row['numCatEntrySort'] }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div><!-- .tab-pane -->
+{% endif %}

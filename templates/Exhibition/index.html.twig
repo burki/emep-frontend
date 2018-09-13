@@ -14,40 +14,31 @@
 
 {% block body %}
 
-    <div class="w-container">
-        <h1 class="heading">{{ pageTitle }}</h1>
-        <div class="searchbarcontainer">
-            <div class="searchbarinputcontainer"></div>
-            <div class="searchbuttoncontainer">
-                <div class="div-block">
-                    <div class="text-block-2">Search</div>
-                </div>
-                <div class="div-block-2"><img src="images/noun_Arrow-Down_1594877_ffffff.svg" width="75" class="image"></div>
-            </div>
-        </div>
-    </div>
+
 
 <div class="w-container">
-    <div class="searchbarcontainer">
+
+    <h1 class="heading">{{ pageTitle }}</h1>
+
+
+    <div class="searchbarcontainer w-form">
+
         <form class="filter" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
             <div class="searchbarinputcontainer">
                 {{ form_rest(form) }}
             </div>
-            <div class="searchbuttoncontainer">
-                <div class="div-block">
-                    <input type="submit" name="submit-filter" value="search" />
-                </div>
-                <div class="div-block-2"><img src="images/noun_Arrow-Down_1594877_ffffff.svg" width="75" class="image"></div>
+            <div class="searchbuttoncontainer"><input type="submit" name="submit-filter" value="Search" class="submit-button w-button">
+                <div class="div-block-2"><img src="{{ app.request.basepath }}/img/noun_Arrow-Down_1594877_ffffff.svg" width="75" class="image"></div>
             </div>
-
         </form>
     </div>
 </div>
 
-    <div class="row">
-        <div class="col-sm-8">
+
+    <div class="contentcontainer w-container">
+
         {% if pagination.getTotalItemCount > 0 %}
-        {{ helper.pagination_count(pagination) }}
+        {# helper.pagination_count(pagination) #}
 
         <div class="sort-control">
             {% set sortField = app.request.get('sort') %}
@@ -57,8 +48,27 @@
             {{ helper.pagination_sortable(pagination, '# Cat. Entries', 'numCatEntrySort', 'desc') }}
         </div>
 
+
+            <table id="exhibitions" class="table table-striped table-bordered dataTable listviewcontainer">
+                <thead>
+                <tr class="listviewheading">
+                    <th>Date</th>
+                    <th>Title</th>
+                    <th>City</th>
+                    <th>Venue</th>
+                    <th>Number of Cat. Entries</th>
+                    <th>type</th>
+
+                </tr>
+                </thead>
+                <tbody>
+
+
         {% set last_initial = '' %}
         {% for row in pagination %}
+
+
+
             {% set exhibition = row[0] %}
             {% if 'placeSort' == sortField %}
                 {% if exhibition.location is not null and exhibition.location.place is not null %}
@@ -71,34 +81,48 @@
             {% else %}
                 {% set initial = slugify.slugify(person.fullname|first)|upper %}
             {% endif %}
+
+
             {% if initial != last_initial %}
                 {% if last_initial != '' %}
-            </ul>
+                    {# </ul>  #}
                 {% endif %}
-            <h2>{{ initial }} </h2>
+
+            <h2>{{ initial }}</h2>
             {% set last_initial = initial %}
-            <ul class="list-group">
+                {# <ul class="list-group"> #}
             {% endif %}
-            <li class="list-group-item">
-                {{ helper.exhibition_period(exhibition) }}
-
-                <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
-                    <b>{{ exhibition.title }}</b> {{ exhibition.titleAppend }}</a>
-                {% if 'numCatEntrySort' != sortField %}{{ row['numCatEntrySort'] }} entr.{% endif %}
-
-                {% if exhibition.location is not null %}
-                    {% set location = exhibition.location %}
-                    <div>
-                    {% if location.place is not null %}
-                        {{ helper.place_linked(location.place) }}:
+            <tr class="listviewrow">
+                <td class="date"><b>{{ helper.exhibition_period(exhibition) }}</b></td>
+                <td class="title"><a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
+                        <b>{{ exhibition.title }}</b> {{ exhibition.titleAppend }}</a></td>
+                <td class="normal">
+                    <a href="{% if exhPlace.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : exhPlace.tgn }) }}{% else %}{{ path('place', { 'id' : exhPlace.id }) }}{% endif %}">
+                        {{ exhibition.location.placeLabel }}
+                    </a>
+                </td>
+                <td class="normal">
+                    <a href="{{ path('location', { 'id' : exhibition.location.id }) }}">
+                        {{ exhibition.location.name }}
+                    </a>
+                </td>
+                <td>{% if catalogueEntries[exhibition.id] is defined %}
+                        {% set count = catalogueEntries[exhibition.id]|length %}
+                        {% if count > 0 %}
+                            {% set divId = 'entries' ~ exhibition.id %}
+                            <a class="badge" style="color: white" href="#{{ divId }}" data-toggle="collapse">{{ count }}</a>
+                        {% endif %}
+                    {% else %}
+                        {% set count = 0 %}
                     {% endif %}
-                    <a href="{{ path('location', { 'id' : location.id }) }}">
-                        {{ location.name }}</a>
-                    </div>
-                {% endif %}
-            </li>
+                </td>
+                <td>{{ exhibition.organizerType }}</td>
+            </tr>
+
+
         {% endfor %}
-            </ul>
+                </tbody>
+            </table>
             {# display navigation #}
             <div class="navigation">
                 {{ knp_pagination_render(pagination) }}
@@ -107,11 +131,17 @@
             No Exhibitions found
         {% endif %}
         </div>
-        <div class="col-sm-4">
+        <!--<div class="col-sm-4">
             <form class="filter" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
                 {{ form_rest(form) }}
                 <input type="submit" name="submit-filter" value="filter" />
             </form>
-        </div>
+        </div>-->
     </div><!-- .row -->
+
+
+
+
 {% endblock %}
+
+

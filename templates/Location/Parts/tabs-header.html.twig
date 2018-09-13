@@ -1,0 +1,22 @@
+{% block tabsHeader %}
+    <!-- Nav tabs -->
+    <div>
+        <div class="tabsymbols">
+            <div class="icontab"><img src="images/setttings_icon_blue.svg" class="iconimage"></div>
+            <div class="icontab"><img src="images/download_icon_blue.svg" class="iconimage"></div>
+        </div>
+        <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 1em">
+            <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">{{ 'Exhibitions'|trans }}</a></li>
+            {# co-appearnces #}
+            {% if artists|length > 0 %}
+                <li role="presentation"><a href="#artists" aria-controls="similar" role="tab" data-toggle="tab">{{ 'Artists'|trans }}</a></li>
+            {% endif %}
+            {# authority files #}
+            {% if location.gnd is not empty or location.ulan is not empty %}
+                <li role="presentation"><a href="#authority" aria-controls="authority" role="tab" data-toggle="tab">{{ 'Integrated Authority File'|trans }}</a></li>
+            {% endif %}
+        </ul>
+
+    </div>
+
+{% endblock %}

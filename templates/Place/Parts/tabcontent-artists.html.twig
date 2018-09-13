@@ -1,0 +1,44 @@
+
+{% if artistsArray|length > 0 %}
+
+    <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.css">
+    <script src="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.js"></script>
+
+    <script>
+        $( document ).ready(function() {
+            $('#artists-table').DataTable({
+                paging: true,
+                searching: false,
+                info: false,
+                "columns": [
+                    { "orderSequence": [ "desc", "asc" ] },
+                    { "orderSequence": [ "desc", "asc" ] },
+                    { "orderSequence": [ "desc", "asc" ] }
+                ]
+            });
+        })
+    </script>
+
+
+    <div role="tabpanel" class="tab-pane active" id="artists">
+        <table id="artists-table" class="table table-striped table-bordered dataTable">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Year of Birth</th>
+                <th>Year of Birth</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for person in artistsArray %}
+                {% set birthPlace = person.birthPlace %}
+                <tr>
+                    <td><b>{{ helper.person_linked(person) }}</b></td>
+                    <td>{{ person.birthDate|dateincomplete -}} </td>
+                    <td>{{ person.deathDate|dateincomplete -}} </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div><!-- .tab-pane -->
+{% endif %}

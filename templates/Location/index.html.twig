@@ -13,11 +13,30 @@
 {% endblock %}
 
 {% block body %}
-    <h1>{{ pageTitle }}</h1>
-    <div class="row">
-        <div class="col-sm-8">
+
+    <div class="w-container">
+
+        <h1 class="heading">{{ pageTitle }}</h1>
+
+
+        <div class="searchbarcontainer w-form">
+
+            <form class="filter" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
+                <div class="searchbarinputcontainer">
+                    {{ form_rest(form) }}
+                </div>
+                <div class="searchbuttoncontainer"><input type="submit" name="submit-filter" value="Search" class="submit-button w-button">
+                    <div class="div-block-2"><img src="{{ app.request.basepath }}/img/noun_Arrow-Down_1594877_ffffff.svg" width="75" class="image"></div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+<div class="contentcontainer w-container">
+        <div class="col-sm-12">
         {% if pagination.getTotalItemCount > 0 %}
-        {{ helper.pagination_count(pagination) }}
+        {# helper.pagination_count(pagination) #}
 
         <div class="sort-control">
             {% set sortField = app.request.get('sort') %}
@@ -52,9 +71,16 @@
                 </ul>
                 {% endif %}
                 {% if 'countryPlaceNameSort' == sortField and last_countryCode != place.countryCode %}
-                    <h3>{{ countryName(place.countryCode) }}</h3>
+                    <h3>
+                        {%  if place.countryCode == '' %}
+                            No Country
+                        {% else %}
+                            {{ countryName(place.countryCode) }}
+                        {% endif %}
+                    </h3>
                     {% set last_countryCode = place.countryCode %}
                 {% endif %}
+
                 <h4>
                     {% if 'countryPlaceNameSort' == sortField %}
                         {% if place is not null %}
@@ -77,7 +103,7 @@
 
                 {% set count = location.exhibitions|length %}
                 {% if count > 0 %}
-                    {% set divId = 'exhibitions' ~ location.id %}
+                    <span class="groupHeader">{% set divId = 'exhibitions' ~ location.id %}</span>
                     <a class="badge" style="color: white" href="#{{ divId }}" data-toggle="collapse">{{ count }} - {{ row['numCatEntrySort'] }}</a>
                     <div id="{{ divId }}" class="collapse">
                     {% for exhibition in location.exhibitions %}
@@ -102,11 +128,6 @@
             No Venues found
         {% endif %}
         </div>
-        <div class="col-sm-4">
-            <form class="filter" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
-                {{ form_rest(form) }}
-                <input type="submit" name="submit-filter" value="filter" />
-            </form>
-        </div>
+
     </div><!-- .row -->
 {% endblock %}

@@ -1,0 +1,58 @@
+{# birthplace #}
+{% set birthPlace = person.birthPlaceInfo(app.request.locale) %}
+{% if birthPlace is not empty or person.birthDate is not empty %}
+    <div class="artist-information-container">
+        <div class="artist-information-label">{{ 'Born'|trans }}</div>
+        <div class="artist-information-text">{{ person.birthDate|dateincomplete -}}
+            {% if birthPlace is not empty %}{% if person.birthDate is not empty %}{{- ',' }}{% endif %}
+                {% if birthPlace.id is not empty %}
+                    <a href="{% if birthPlace.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : birthPlace.tgn }) }}{% else %}{{ path('place', { 'id' : birthPlace.id }) }}{% endif %}">
+                        {{ birthPlace['name'] }}
+                    </a>
+                {% else %}
+                    {{ birthPlace['name'] }}
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+{% endif %}
+
+{# deathplace #}
+{% set deathPlace = person.deathPlaceInfo(app.request.locale) %}
+{% if deathPlace is not empty or person.deathDate is not empty %}
+    <div class="artist-information-container">
+        <div class="artist-information-label">{{ 'Died'|trans }}</div>
+        <div class="artist-information-text">{{ person.deathDate|dateincomplete -}}
+            {% if deathPlace is not empty %}{% if person.deathDate is not empty %}{{- ',' }}{% endif %}
+                {% if deathPlace.id is not empty %}
+                    <a href="{% if deathPlace.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : deathPlace.tgn }) }}{% else %}{{ path('place', { 'id' : deathPlace.id }) }}{% endif %}">
+                        {{ deathPlace['name'] }}
+                    </a>
+                {% else %}
+                    {{ deathPlace['name'] }}
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+{% endif %}
+
+{# adress #}
+{% set addresses = person.addressesSeparated %}
+{% if addresses is not empty %}
+    <div class="artist-information-container">
+        <div class="artist-information-label">{{ 'Places of Activity'|trans }}</div>
+        <div class="artist-information-text">{% for address in addresses %}
+                {{ address['info']|replace({ "\n" : ", " }) }}<br />
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+{# url #}
+{% if person.url is not empty %}
+    <div class="artist-information-container">
+        <div class="artist-information-label">{{ 'Homepage'|trans }}</div>
+        <div class="artist-information-text"><a href="{{ person.url }}" target="_blank">{{ person.url|prettifyurl }}</a></div>
+    </div>
+{% endif %}

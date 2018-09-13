@@ -97,104 +97,65 @@
 {% endblock %}
 
 {% block body %}
-    <h1>
-        {{ exhibition.title }}
-    </h1>
-    {% if exhibition.titleAppend is not empty %}
-    <h2 style="margin-top: -0.8rem"><span class="small">{{ exhibition.titleAppend }}</span></h2>
-    {% endif %}
-    {{ exhibition.subtitle }}
+
+    <div class="contentcontainer nopadding w-container">
+        <div class="lefthalf">
+            <div class="subheader">exhibition</div>
+            <h1 class="heading">{{ exhibition.title }}</h1>
+            {% if exhibition.titleAppend is not empty %}
+                <h2 style="margin-top: -0.8rem"><span class="small">{{ exhibition.titleAppend }}</span></h2>
+            {% endif %}
+
+            <div class="artist-information-text" style="width: 100%; margin-bottom: 2rem;">{{ exhibition.subtitle }}</div>
+            <div class="artist_information">
+                {# load helper part#}
+                {% embed "Exhibition/Parts/location-base-information.html.twig" %}
+                {% endembed %}
+            </div>
+        </div>
+        <div class="maphalf">
+            {% embed "Exhibition/Parts/exhibitionMap.html.twig" %}
+            {% endembed %}
+        </div>
+    </div>
+
+
+    <div class="contentcontainer w-container">
+
+
+        <div class="listviewrow">
+
+            {# tabs headers #}
+            {% embed "Exhibition/Parts/tabs-header.html.twig" %}
+            {% endembed %}
+
+            <div class="tab-content">
+                {% set exhibitionArray = location.exhibitions %}
+
+                {% embed "Exhibition/Parts/tabcontent-catalogue-entries.html.twig" %}
+                {% endembed %}
+
+                {% set artistsArray = artists %}
+
+                {% embed "Exhibition/Parts/tabcontent-similiar.html.twig" %}
+                {% endembed %}
+
+
+                {% embed "Location/Parts/tabcontent-authority.html.twig" %}
+                {% endembed %}
+
+
+
+            </div><!-- .tab-content -->
+        </div>
+    </div>
+
+
+
 
     <div class="row">
         <div class="col-sm-8">
-            <p>
-            {{ helper.exhibition_period(exhibition) }}
 
-            {% if exhibition.location is not null %}
-                {% set location = exhibition.location %}
-                {% if location.place is not null %}
-                    {{ helper.place_linked(location.place) }}:
-                {% endif %}
-                <a href="{{ path('location', { 'id' : location.id }) }}">{{ location.name }}</a>
-            {% endif %}
-            </p>
-
-            <dl class="dl-horizontal">
-            {% if exhibition.organizer is not empty %}
-                <dt>Organized by:</dt>
-                <dd>
-                {{ exhibition.organizer|replace({"\n" : ' / ' }) }}
-                {% if exhibition.organizerType is not empty %}
-                    [{{ exhibition.organizerType }}]
-                {% endif %}
-                </dd>
-            {% endif %}
-
-            {% if exhibition.organizingCommittee is not empty %}
-                <dt>Organizing Committee:</dt>
-                <dd>
-                    <span class="more">
-                    {{ exhibition.organizingCommittee|nl2br }}
-                    </span>
-                </dd>
-            {% endif %}
-
-            {% if exhibition.hours is not empty %}
-                <dt>Opening Hours:</dt>
-                <dd>{{ exhibition.hours }}</dd>
-            {% endif %}
-
-            {% if exhibition.price is not empty %}
-                <dt>Ticket Price:</dt>
-                <dd>{{ exhibition.price }}</dd>
-            {% endif %}
-            </dl>
-
-            <dl class="dl-horizontal">
-            {% if catalogue is not empty %}
-                <dt>Catalogue:</dt>
-                <dd>
-                    {% for bibitem in catalogue %}
-                        {{ bibitem.renderCitationAsHtml(citeProc, false)|raw }}
-                    {% endfor %}
-                </dd>
-            {% endif %}
-            {% if exhibition.cataloguePrice is not empty %}
-                <dt>Catalogue Price:</dt>
-                <dd>{{ exhibition.cataloguePrice }}</dd>
-            {% endif %}
-            {% if exhibition.preface is not empty %}
-                <dt>Preface:</dt>
-                <dd>
-                    <span class="more">
-                    {{ exhibition.preface|nl2br }}
-                    </span>
-                </dd>
-            {% endif %}
-            {% if exhibition.catalogueStructure is not empty %}
-                <dt>Catalogue Structure:</dt>
-                <dd>
-                    {{ exhibition.catalogueStructure|nl2br }}
-                </dd>
-            {% endif %}
-            </dl>
-
-            {% if exhibition.note is not empty or exhibition.hasInfo %}
-            <dl class="dl-horizontal">
-                {% if exhibition.note is not empty %}
-                <dt>Note:</dt>
-                <dd>
-                    {{ exhibition.note|nl2br }}
-                </dd>
-                {% endif %}
-                {% if exhibition.hasInfo %}
-                <dt>Additional Notes:</dt>
-                <dd>
-                    {{ helper.render_info(exhibition.infoExpanded) }}
-                </dd>
-                {% endif %}
-            </dl>
-            {% endif %}
 
             {% if showWorks and exhibition.items is not empty %}
             <h3>Works</h3>
@@ -225,88 +186,7 @@
             </div><!-- .gallery -->
             {% endif %}
 
-            {% if catalogueEntries is not empty %}
-            <!-- Nav tabs -->
-            <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 1em">
-                {% if catalogueEntries is not empty %}<li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">{{ 'Catalogue Entries'|trans }}</a></li>{% endif %}
-                {% if similar|length > 0 %}<li role="presentation"><a href="#similar" aria-controls="similar" role="tab" data-toggle="tab">{{ 'Similar'|trans }}</a></li>{% endif %}
-                <li role="presentation"><a href="#stats" data-url="{{ path('exhibition-stats-partial', { id: exhibition.id }) }}" aria-controls="chronology" role="tab" data-toggle="tab">{{ 'Statistics'|trans }}</a></li>
-            </ul>
 
-            <div class="tab-content">
-                <div role="tabpanel" class="tab-pane active" id="home">
-                {% set last_initial = '' %}
-                <h3>Catalogue Entries</h3>
-                {{ helper.exhibition_itemexhibition_sort_control(exhibition) }}
-
-                {% for catalogueEntry in catalogueEntries %}
-                    {% set initial = catalogueEntry.person.fullname %}
-                    {% if initial != last_initial %}
-                        {% if last_initial != '' %}
-                </ul>
-                        {% endif %}
-                    {% set last_initial = initial %}
-
-                    <h4>
-                        <a id="person-{{ catalogueEntry.person.id }}" href="{% if catalogueEntry.person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : catalogueEntry.person.ulan }) }}{% elseif catalogueEntry.person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : catalogueEntry.person.gnd }) }}{% else %}{{ path('person', { 'id' : catalogueEntry.person.id }) }}{% endif %}">
-                            {{ catalogueEntry.person.fullname(true) }}</a>
-                        {% set addresses = catalogueEntry.person.addressesSeparated(exhibition.id) %}
-                        {% if addresses is not empty %}
-                            <span class="small">
-                        {% for address in addresses %}
-                            {{ address['info']|replace({ "\n" : ", " }) }}{% if not loop.last %}; {% endif %}
-                        {% endfor %}
-                            </span>
-                        {% endif %}
-                    </h4>
-
-                <ul class="list-group">
-                    {% endif %}
-                <li class="list-group-item">
-                    {{ helper.itemexhibition_detail(catalogueEntry) }}
-                </li>
-                {% endfor %}
-                </ul>
-                </div><!-- .tab-pane -->
-
-            {% if similar|length > 0 %}
-                <div role="tabpanel" class="tab-pane" id="similar">
-                {% set similar_keys = similar|keys %}
-                {% set found = false %}
-                {% set numArtists = exhibition.artists|length %}
-                {% for exhibition_id in similar_keys %}
-                    {% if similar[exhibition_id]['count'] > 1 or numArtists == 1 %}
-                        {% if not found %}
-                            {% set found = true %}
-                            <h3>Other Exhibitions with multiple matching Artists</h2>
-                            <ul class="listing">
-                        {% endif %}
-                    <li><a href="{{ path('exhibition', { 'id': exhibition_id }) }}">{{  similar[exhibition_id]['title'] }}</a>
-                        (<a href="{{ path('person-shared-partial', { 'exhibitions': [ exhibition.id, exhibition_id ]|join(',') }) }}" data-remote="false" data-toggle="modal" data-target="#detailModal">{{ similar[exhibition_id]['count'] }} artists</a>)</li>
-                    {% endif %}
-                {% endfor %}
-                {% if found %}
-                </ul>
-                {% endif %}
-                </div><!-- .tab-pane -->
-            {% endif %}
-
-                <div role="tabpanel" class="tab-pane" id="stats">
-                    {{ 'Loading...' | trans }}
-                </div>
-            </div><!-- .tab-content -->
-            {% endif %}
-        </div>
-
-        <div class="col-sm-4 sidebar">
-            {% if exhibition.artists|length > 0 %}
-                <h3>Artists</h3>
-                <ul class="list-unstyled">
-                {% for person in exhibition.artists %}
-                    <li><b>{{ helper.person_linked_anchor(person) }}</b></li>
-                {% endfor %}
-                </ul>
-            {% endif %}
         </div>
     </div><!-- .row -->
 

@@ -3,11 +3,33 @@
 {% import 'Shared/helper.html.twig' as helper %}
 
 {% block body %}
-    <h1>{{ 'Places' | trans }}</h1>
-    <div class="row">
-        <div class="col-sm-8">
+
+
+    <div class="w-container">
+
+        <h1 class="heading">{{ 'Places' | trans }}</h1>
+
+
+        <div class="searchbarcontainer w-form">
+
+            <form class="filter places-filter" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
+                <div class="searchbarinputcontainer">
+                    {{ form_rest(form) }}
+                </div>
+                <div class="searchbuttoncontainer"><input type="submit" name="submit-filter" value="Search" class="submit-button w-button">
+                    <div class="div-block-2"><img src="{{ app.request.basepath }}/img/noun_Arrow-Down_1594877_ffffff.svg" width="75" class="image"></div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
+
+    <div class="contentcontainer w-container">
+        <div class="col-sm-12">
         {% if pagination.getTotalItemCount > 0 %}
-        {{ helper.pagination_count(pagination) }}
+        {# helper.pagination_count(pagination) #}
 
         <div class="sort-control">
             {% set sortField = app.request.get('sort') %}
@@ -34,7 +56,7 @@
                 {% if last_initial != '' %}
             </ul>
                 {% endif %}
-            <h2>{{ initial }} </h2>
+            <h2 class="artist-first-letter">{{ initial }} </h2>
             {% set last_initial = initial %}
             <ul class="list-group">
             {% endif %}
@@ -58,11 +80,6 @@
             No places found
         {% endif %}
         </div>
-        <div class="col-sm-4">
-            <form class="filter" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
-                {{ form_rest(form) }}
-                <input type="submit" name="submit-filter" value="filter" />
-            </form>
-        </div>
+
     </div><!-- .row -->
 {% endblock %}

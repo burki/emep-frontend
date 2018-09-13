@@ -74,7 +74,7 @@ class Builder
             'label' => 'Home',
             'route' => 'home',
         ]);
-        $menu->setChildrenAttributes([ 'id' => 'menu-main', 'class' => 'nav navbar-nav' ]);
+        $menu->setChildrenAttributes([ 'id' => 'menu-main', 'class' => 'nav-menu w-nav-menu', 'role' => 'navigation' ]);
 
         $menu->addChild('Exhibitions', [ 'route' => 'exhibition' ]);
         $menu['Exhibitions']->addChild('List', [

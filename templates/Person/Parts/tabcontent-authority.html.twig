@@ -1,0 +1,44 @@
+{% block authority %}
+    {% if person.gnd is not empty or person.ulan is not empty %}
+        <div role="tabpanel" class="tab-pane" id="authority">
+            <div class="container-fluid box">
+                <div class="row box-color-title">
+                    <div class="col-sm-12">
+                        <h4>
+                            {% if person.gnd is not empty %}
+                                <!--{{ 'Integrated Authority File'|trans }}
+                                <br />--><a href="http://d-nb.info/gnd/{{ person.gnd }}" target="_blank">{{ person.gnd }}</a>
+                            {% else %}
+                                {{ 'Additional Information'|trans }}
+                            {% endif %}
+                        </h4>
+                    </div>
+                </div>
+                <div class="row box-color-content-inverse">
+                    {% if person.ulan is not empty or person.additional.beacon is not empty %}
+                        <div class="col-sm-12 beacon-ul">
+                            <ul>
+                                {% if person.ulan is not empty %}
+                                    <li>
+                                        <a href="http://vocab.getty.edu/page/ulan/{{ person.ulan }}" target="_blank">Getty ULAN</a>
+                                    </li>
+                                {% endif %}
+                                {% if person.additional.beacon is not empty %}
+                                    {% for info in person.additional.beacon %}
+                                        <li><a href="{{ info.url }}" target="_blank">{{ info.description }}</a></li>
+                                    {% endfor %}
+                                {% endif %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    {% if person.gnd is not empty %}
+                        <div class="col-sm-12">
+                            <div title="{{ person.gnd }}" class="pndaks seealso-ul"></div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}

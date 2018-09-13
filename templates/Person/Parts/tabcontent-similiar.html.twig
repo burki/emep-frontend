@@ -1,0 +1,58 @@
+{% block similars %}
+    {% if similar|length > 0 %}
+
+        <script>
+            $( document ).ready(function() {
+                $('#similars').DataTable({
+                    paging: true,
+                    searching: false,
+                    info: false,
+                    "columns": [
+                        { "orderSequence": [ "desc", "asc" ] },
+                        { "orderSequence": [ "desc", "asc" ] }
+                    ]
+                });
+            })
+        </script>
+
+        <div role="tabpanel" class="tab-pane" id="similar">
+            <table id="similars" class="table table-striped table-bordered dataTable listviewcontainer">
+                <thead>
+                <tr class="listviewheading">
+                    <th>co-appearance</th>
+                    <th>number of exhibitions</th>
+                </tr>
+                </thead>
+
+
+            {% set similar_keys = similar|keys %}
+            {% set similar_found = false %}
+
+            {% for person_id in similar_keys %}
+                {% if similar[person_id]['count'] > 1 %}
+                    {% if not similar_found %}
+                        {% set similar_found = true %}
+
+                        <tbody>
+                    {% endif %}
+
+                    <tr class="listviewrow">
+                        <td class="normal">
+                            <a href="{{ path('person', { 'id': person_id }) }}">{{  similar[person_id]['name'] }}</a>
+                        </td>
+                        <td class="normal">
+                            <a href="{{ path('exhibition-shared-partial', { 'persons': [ person.id, person_id ]|join(',') }) }}" data-remote="false" data-toggle="modal" data-target="#detailModal">{{ similar[person_id]['count'] }}</a>
+                        </td>
+                    </tr>
+                {% endif %}
+
+            {% endfor %}
+            {% if similar_found %}
+                </tbody>
+                {% endif %}
+            </table>
+        </div><!-- .tab-pane -->
+    {% endif %}
+{% endblock %}
+
+

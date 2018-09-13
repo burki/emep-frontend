@@ -1,0 +1,70 @@
+{% block similars %}
+    {% if similar|length > 0 %}
+
+        <script>
+            $( document ).ready(function() {
+                $('#similartable').DataTable({
+                    paging: true,
+                    searching: false,
+                    info: false,
+                    "columns": [
+                        { "orderSequence": [ "desc", "asc" ] },
+                        { "orderSequence": [ "desc", "asc" ] }
+                    ]
+                });
+            })
+        </script>
+
+        <div role="tabpanel" class="tab-pane" id="similars">
+            <table id="similartable" class="table table-striped table-bordered dataTable listviewcontainer">
+                <thead>
+                <tr class="listviewheading">
+                    <th>exhibition</th>
+                    <th>number of artists</th>
+                </tr>
+                </thead>
+
+
+                {% set similar_keys = similar|keys %}
+                {% set found = false %}
+                {% set numArtists = exhibition.artists|length %}
+
+            {% set similar_keys = similar|keys %}
+            {% set similar_found = false %}
+
+
+                {% set similar_keys = similar|keys %}
+                {% set found = false %}
+                {% set numArtists = exhibition.artists|length %}
+
+
+            {% for exhibition_id in similar_keys %}
+
+               {% if similar[exhibition_id]['count'] > 1 or numArtists == 1 %}
+                    {% if not similar_found %}
+                        {% set similar_found = true %}
+
+                        <tbody>
+                    {% endif %}
+
+                    <tr class="listviewrow">
+                        <td class="normal">
+                            <a href="{{ path('exhibition', { 'id': exhibition_id }) }}">{{  similar[exhibition_id]['title'] }}</a>
+                        </td>
+                        <td class="normal">
+                            <a href="{{ path('person-shared-partial', { 'exhibitions': [ exhibition.id, exhibition_id ]|join(',') }) }}" data-remote="false" data-toggle="modal" data-target="#detailModal">{{ similar[exhibition_id]['count'] }} artists</a>
+                            <a href="{{ path('exhibition-shared-partial', { 'persons': [ person.id, person_id ]|join(',') }) }}" data-remote="false" data-toggle="modal" data-target="#detailModal">{{ similar[person_id]['count'] }}</a>
+                        </td>
+                    </tr>
+                {% endif %}
+
+            {% endfor %}
+            {% if similar_found %}
+                </tbody>
+                {% endif %}
+            </table>
+        </div><!-- .tab-pane -->
+    {% endif %}
+{% endblock %}
+
+

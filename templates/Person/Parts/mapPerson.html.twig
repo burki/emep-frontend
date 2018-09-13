@@ -1,0 +1,38 @@
+{% block map %}
+    {% set deathPlace = person.deathPlaceInfo(app.request.locale) %}
+    {% set birthPlace = person.birthPlaceInfo(app.request.locale) %}
+    {% if birthPlace.geo is not empty and deathPlace.geo is not empty and birthPlace.geo != deathPlace.geo %}
+        <div id="map" class="col-sm-12" style="width: 100%; min-height: 320px;"></div>
+
+        <script>
+            function adjustMapSize() {
+                /*
+                $('#map').height(function(index, height) {
+                    return window.innerHeight - $(this).offset().top;
+                });
+                */
+            }
+
+            $(window).resize(adjustMapSize);
+            adjustMapSize();
+
+            var map = L.map('map');
+
+            {% if birthPlace.geo is not empty and deathPlace.geo is not empty and birthPlace.geo != deathPlace.geo %}
+            map.fitBounds([ [ {{ birthPlace.geo }} ],
+                [ {{ deathPlace.geo }} ] ]);
+            L.marker([ {{ birthPlace.geo }} ]).addTo(map);
+            L.marker([ {{ deathPlace.geo }} ]).addTo(map);
+            {% else %}
+            map.setView([{% if birthPlace.geo is not empty %}{{ birthPlace.geo }}{% else %}{{ deathPlace.geo }}{% endif %}], 10);
+            L.marker([ {% if birthPlace.geo is not empty %}{{ birthPlace.geo }}{% else %}{{ deathPlace.geo }}{% endif %} ]).addTo(map)
+            {% endif %}
+
+            {{ map.addTileLayer() }}
+        </script>
+    {% else %}
+        <div class="no_data_block">
+            <div>no map data available</div>
+        </div>
+    {% endif %}
+{% endblock %}

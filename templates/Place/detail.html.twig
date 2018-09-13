@@ -1,9 +1,11 @@
 {% extends 'Base/base.html.twig' %}
 
+
 {% import 'Shared/map-leaflet.html.twig' as map %}
 {% import 'Shared/helper.html.twig' as helper %}
 
 {% block head %}
+
     {{ map.head() }}
 {% endblock %}
 
@@ -16,10 +18,52 @@
             {% if not loop.last %} &gt; {% endif %}
         {% endfor %}
     </div>
+
+
+    <div class="contentcontainer nopadding w-container">
+        <div class="lefthalf">
+            <div class="subheader">place</div>
+            <h1 class="heading">{{ place.nameLocalized(app.request.locale) }}</h1>
+
+        </div>
+        <div class="maphalf">
+            {% embed "Place/Parts/locationMap.html.twig" %}
+            {% endembed %}
+        </div>
+    </div>
+
+
     {% endif %}
-    <h1>
-        {{ place.nameLocalized(app.request.locale) }}
-    </h1>
+
+    <div class="contentcontainer w-container">
+
+
+        <div class="listviewrow">
+
+            {# tabs headers #}
+            {% embed "Place/Parts/tabs-header.html.twig" %}
+            {% endembed %}
+
+            <div class="tab-content">
+
+                {#
+                 {% embed "Shared/Parts/tabcontent-exhibitions.html.twig" %}
+                {% endembed %}
+#}
+
+                {% set artistsArray = persons %}
+                {% embed "Place/Parts/tabcontent-artists.html.twig" %}
+                {% endembed %}
+
+
+
+
+
+
+            </div><!-- .tab-content -->
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-sm-8">
         {% set childrenByType = place.getChildrenByType(em) %}
@@ -70,17 +114,8 @@
         </ul>
         {% endif %}
 
-        {% if persons is not empty %}
-        <h3>Artists</h3>
-        <ul class="list-group">
-        {% for person in persons %}
-            <li class="list-group-item">
-                {{ helper.person_list_item(person) }}
-            </li>
-        {% endfor %}
-        </ul>
-        {% endif %}
-        </div>
+
+        {#
         <div class="col-sm-4 sidebar">
             <div class="container-fluid box">
                 <div class="row box-color-title">
@@ -96,50 +131,9 @@
                     </div>
                 </div>
 
-            {#{ dump(place.additional )}#}
-            {% if place.geo is not empty or place.additional.boundary is not empty %}
-            <div id="map" class="col-sm-12" style="width: 100%; min-height: 360px"></div>
-            <script>
-            function adjustMapSize() {
-                /*
-                $('#map').height(function(index, height) {
-                    return window.innerHeight - $(this).offset().top;
-                });
-                */
-            }
 
-            $( window ).resize(adjustMapSize);
-            adjustMapSize();
-
-            var map = L.map('map');
-
-            var bounds = null;
-            {% if place.additional.bounds is not empty %}
-                bounds = {{ place.additional.bounds|json_encode|raw }};
-            {% elseif place.geo is not null %}
-                {% if place.showCenterMarker(em) %}
-                    L.marker([ {{ place.geo }} ]).addTo(map);
-                    map.setView([{{ place.geo }}], {{ place.defaultZoomlevel }});
-                {% else %}
-                    map.setView([{{ place.geo }}], 3);
-                {% endif %}
-            {% endif %}
-
-            {{ map.addTileLayer() }}
-
-            {% if place.additional.boundary is not empty %}
-                var boundary = {{ place.additional.boundary|json_encode|raw }};
-                var geojsonLayer = L.geoJSON(boundary).addTo(map);
-                if (bounds == null) {
-                    bounds = geojsonLayer.getBounds();
-                }
-            {% endif %}
-            if (bounds != null) {
-                map.fitBounds(bounds);
-            }
-            </script>
-            {% endif %}
         </div>
+        #}
         </div>
     </div><!-- .row -->
 {% endblock %}

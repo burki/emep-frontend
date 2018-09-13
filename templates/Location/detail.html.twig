@@ -22,28 +22,62 @@
 
     <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.css">
     <script src="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.js"></script>
-    <script>
-        $( document ).ready(function() {
-            $('#artists').DataTable({
-                paging: false,
-                searching: false,
-                info: false,
-                "columns": [
-                    null,
-                    { "orderSequence": [ "desc", "asc" ] },
-                    { "orderSequence": [ "desc", "asc" ] }
-                ]
-            });
-        })
-    </script>
+
 {% endblock %}
 
 {% block body %}
-    <h1>
-        {{ location.name }}
-    </h1>
-    {{ location.nameAppend }}
 
+    <div class="contentcontainer nopadding w-container">
+        <div class="lefthalf">
+            <div class="subheader">venue</div>
+            <h1 class="heading">{{ location.name }}</h1>
+            <div class="artist_information">
+                {# load helper part#}
+                {% embed "Location/Parts/location-base-information.html.twig" %}
+                {% endembed %}
+            </div>
+        </div>
+        <div class="maphalf">
+            {% embed "Location/Parts/locationMap.html.twig" %}
+            {% endembed %}
+        </div>
+    </div>
+
+
+    <div class="contentcontainer w-container">
+
+
+        <div class="listviewrow">
+
+                {# tabs headers #}
+                {% embed "Location/Parts/tabs-header.html.twig" %}
+                {% endembed %}
+
+                <div class="tab-content">
+                    {% set exhibitionArray = location.exhibitions %}
+
+                    {% embed "Shared/Parts/tabcontent-exhibitions.html.twig" %}
+                    {% endembed %}
+
+                    {% set artistsArray = artists %}
+
+                    {% embed "Shared/Parts/tabcontent-artists.html.twig" %}
+                    {% endembed %}
+
+
+                    {% embed "Location/Parts/tabcontent-authority.html.twig" %}
+                    {% endembed %}
+
+
+
+                </div><!-- .tab-content -->
+        </div>
+    </div>
+
+
+    {# location.nameAppend #}
+
+    {#
     <div class="row">
         <div class="col-sm-8">
             <dl class="dl-horizontal">
@@ -83,110 +117,9 @@
             {% endif %}
             </dl>
 
-            {% if location.exhibitions is not empty or artists|length > 0 %}
-            <!-- Nav tabs -->
-            <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 1em">
-                <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">{{ 'Exhibitions'|trans }}</a></li>
-                {% if artists|length > 0 %}<li role="presentation"><a href="#artists-pane" aria-controls="similar" role="tab" data-toggle="tab">{{ 'Artists'|trans }}</a></li>{% endif %}
-            </ul>
-            <div class="tab-content">
-                {% if location.exhibitions is not empty %}
-                <div role="tabpanel" class="tab-pane active" id="home">
-                <h3>Exhibitions</h3>
-                <ul class="list-group">
-                    {% for exhibition in location.exhibitions %}
-                    <li class="list-group-item">
-                        {{ helper.exhibition_period(exhibition) }}
-                        <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}"><b>{{ exhibition.title }}</b>{{ exhibition.titleAppend }}</a>{% if exhibitionStats[ exhibition.id ] is defined and exhibitionStats[exhibition.id].numCatEntrySort > 0 -%}, {{ exhibitionStats[exhibition.id].numCatEntrySort }} entr. by {{ exhibitionStats[exhibition.id].numPersonSort }} art.{% endif %}
-                    </li>
-                    {% endfor %}
-                </ul>
-                </div><!-- .tab-pane -->
-                {% endif %}
-
-                {% if artists|length > 0 %}
-                <div role="tabpanel" class="tab-pane active" id="artists-pane">
-                <h3>Artists showing at this Venue</h3>
-                <table id="artists" class="table table-striped table-bordered dataTable">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Number of Exhibitions</th>
-                            <th>Number of Cat. Entries</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                {% for row in artists %}
-                    {% set person = row[0] %}
-                        <tr>
-                            <td><b>{{ helper.person_linked(person) }}</b></td>
-                            <td>{{ row['numExhibitionSort'] }}</td>
-                            <td>{{ row['numCatEntrySort'] }}</td>
-                        </tr>
-                {% endfor %}
-                    </tbody>
-                </table>
-                </div><!-- .tab-pane -->
-                {% endif %}
-            </div><!-- .tab-content -->
-            {% endif %}
         </div>
+        #}
 
-        <div class="col-sm-4 sidebar">
-            {% if location.geo is not empty %}
-            <div id="map" class="col-sm-12" style="width: 100%; min-height: 360px; border-bottom: 20px solid white;"></div>
 
-            <script>
-            function adjustMapSize() {
-                /*
-                $('#map').height(function(index, height) {
-                    return window.innerHeight - $(this).offset().top;
-                });
-                */
-            }
-
-            $( window ).resize(adjustMapSize);
-            adjustMapSize();
-
-            var map = L.map('map');
-
-            map.setView([{{ location.geo }}], 10);
-            L.marker([ {{ location.geo }} ]).addTo(map);
-
-            {{ map.addTileLayer() }}
-            </script>
-            {% endif %}
-            {#% if artists|length > 0 %}
-                <h3>Artists</h3>
-                <ul class="list-unstyled">
-                {% for row in artists %}
-                    {% set person = row[0 ]%}
-                    <li><b>{{ helper.person_linked(person) }}</b>
-                        ({{ row['numExhibitionSort']}} exh., {{ row['numCatEntrySort'] }} entr.)
-                    </li>
-                {% endfor %}
-                </ul>
-            {% endif %#}
-
-            {% if location.gnd is not empty %}
-            <div class="container-fluid box">
-                <div class="row box-color-title">
-                    <div class="col-sm-12">
-                        <h4>
-                            {% if location.gnd is not empty %}
-                            {{ 'Integrated Authority File'|trans }}
-                            <br /><a href="http://d-nb.info/gnd/{{ location.gnd }}" target="_blank">{{ location.gnd }}</a>
-                            {% else %}
-                            {{ 'Additional Information'|trans }}
-                            {% endif %}
-                        </h4>
-                    </div>
-                    <div class="col-sm-12">
-                        <div title="{{ location.gnd }}" class="gndaks seealso-ul"></div>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-        </div>
     </div><!-- .row -->
 {% endblock %}

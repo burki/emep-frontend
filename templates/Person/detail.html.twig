@@ -10,6 +10,8 @@
     <!-- ekko-lightbox, http://ashleydw.github.io/lightbox/ -->
     <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/ekko-lightbox/ekko-lightbox.css">
     <script src="{{ app.request.basepath }}/vendor/ekko-lightbox/ekko-lightbox.min.js"></script>
+    <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.css">
+    <script src="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.js"></script>
     <script>
         $(document).ready(function() {
             $('.gallery').justifiedGallery();
@@ -42,65 +44,60 @@
 {% endblock %}
 
 {% block body %}
-    <h1>
-        {{ person.fullname(true) }}
-    </h1>
+
+    <div class="contentcontainer nopadding w-container">
+        <div class="lefthalf">
+            <div class="subheader">Artist</div>
+            <h1 class="heading">{{ person.fullname(true) }}</h1>
+            <div class="artist_information">
+                {# load helper part#}
+                {% embed "Person/Parts/artist-base-information.html.twig" %}
+                {% endembed %}
+            </div>
+
+            {%  if person.description is not empty %}
+                <p class="artist-text">{{ person.description|nl2br  }}</p>
+            {% endif %}
+        </div>
+        <div class="maphalf">
+            {% embed "Person/Parts/mapPerson.html.twig" %}
+            {% endembed %}
+        </div>
+    </div>
+
+
+
+
+    <div class="contentcontainer w-container">
+
+
+            <div class="listviewrow">
+                {% if person.exhibitions|length > 0 %}
+
+                    {# tabs headers #}
+                    {% embed "Person/Parts/tabs-header.html.twig" %}
+                    {% endembed %}
+
+                    <div class="tab-content">
+
+                        {% set exhibitionArray = person.exhibitions %}
+                        {% embed "Shared/Parts/tabcontent-exhibitions.html.twig" %}
+                        {% endembed %}
+
+                        {% embed "Person/Parts/tabcontent-similiar.html.twig" %}
+                        {% endembed %}
+
+                        {% embed "Person/Parts/tabcontent-authority.html.twig" %}
+                        {% endembed %}
+
+                    </div><!-- .tab-content -->
+                {% endif %}
+            </div>
+    </div>
+
+
     <div class="row">
-        <div class="col-sm-8">
-            <dl class="dl-horizontal">
-            {% set birthPlace = person.birthPlaceInfo(app.request.locale) %}
-            {% if birthPlace is not empty or person.birthDate is not empty %}
-                <dt>{{ 'Born'|trans }}:</dt>
-                <dd>
-                    {{ person.birthDate|dateincomplete -}}
-                    {% if birthPlace is not empty %}{% if person.birthDate is not empty %}{{- ',' }}{% endif %}
-                        {% if birthPlace.id is not empty %}
-                            <a href="{% if birthPlace.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : birthPlace.tgn }) }}{% else %}{{ path('place', { 'id' : birthPlace.id }) }}{% endif %}">
-                            {{ birthPlace['name'] }}
-                            </a>
-                        {% else %}
-                            {{ birthPlace['name'] }}
-                        {% endif %}
-                    {% endif %}
-                </dd>
-            {% endif %}
-
-            {% set deathPlace = person.deathPlaceInfo(app.request.locale) %}
-            {% if deathPlace is not empty or person.deathDate is not empty %}
-                <dt>{{ 'Died'|trans }}:</dt>
-                <dd>
-                    {{ person.deathDate|dateincomplete -}}
-                    {% if deathPlace is not empty %}{% if person.deathDate is not empty %}{{- ',' }}{% endif %}
-                        {% if deathPlace.id is not empty %}
-                            <a href="{% if deathPlace.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : deathPlace.tgn }) }}{% else %}{{ path('place', { 'id' : deathPlace.id }) }}{% endif %}">
-                            {{ deathPlace['name'] }}
-                            </a>
-                        {% else %}
-                            {{ deathPlace['name'] }}
-                        {% endif %}
-                    {% endif %}
-                </dd>
-            {% endif %}
-
-            {% set addresses = person.addressesSeparated %}
-            {% if addresses is not empty %}
-                <dt>{{ 'Places of Activity'|trans }}:</dt>
-                <dd>
-                    {% for address in addresses %}
-                        {{ address['info']|replace({ "\n" : ", " }) }}<br />
-                    {% endfor %}
-                </dd>
-            {% endif %}
-
-            {% if person.url is not empty %}
-                <dt>{{ 'Homepage'|trans }}:</dt>
-                <dd>
-                    <a href="{{ person.url }}" target="_blank">{{ person.url|prettifyurl }}</a>
-                </dd>
-            {% endif %}
-            </dl>
-
-            <p>{{ person.description|nl2br  }}</p>
+        <div class="col-sm-8 person-description">
 
             {% if showWorks and person.items is not empty %}
             <h3>Works</h3>
@@ -128,85 +125,10 @@
             </div>
         {% endif %}
 
-        {% if person.exhibitions|length > 0 %}
-            <!-- Nav tabs -->
-            <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 1em">
-                <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">{{ 'Exhibitions'|trans }}</a></li>
-                {% if similar|length > 0 %}<li role="presentation"><a href="#similar" aria-controls="similar" role="tab" data-toggle="tab">{{ 'Similar'|trans }}</a></li>{% endif %}
-            </ul>
-            <div class="tab-content">
-                <div role="tabpanel" class="tab-pane active" id="home">
-                <h3>{{ 'Exhibitions'|trans }}</h3>
-                <ul class="list-group">
-                {% for exhibition in person.exhibitions %}
-                <li class="list-group-item">
-                    {{ helper.exhibition_period(exhibition) }}
-                    <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
-                        <b>{{ exhibition.title }}</b> {{ exhibition.titleAppend }}</a>
-                    {% if catalogueEntries[exhibition.id] is defined %}
-                        {% set count = catalogueEntries[exhibition.id]|length %}
-                        {% if count > 0 %}
-                            {% set divId = 'entries' ~ exhibition.id %}
-                            <a class="badge" style="color: white" href="#{{ divId }}" data-toggle="collapse">{{ count }}</a>
-                        {% endif %}
-                    {% else %}
-                        {% set count = 0 %}
-                    {% endif %}
 
-                    {% if exhibition.location is not null %}
-                        {% set location = exhibition.location %}
-                        <div>
-                        {% if location.place is not null %}
-                            {{ helper.place_linked(location.place) }}:
-                        {% endif %}
-                        <a href="{{ path('location', { 'id' : location.id }) }}">
-                            {{ location.name }}
-                        </a>
-                        </div>
-                    {% endif %}
 
-                    {% if count > 0 %}
-                        <div id="{{ divId }}" class="collapse">
-                        <ul class="list-group">
-                        {% for catalogueEntry in catalogueEntries[exhibition.id] %}
-                            <li class="list-group-item">
-                                {{ helper.itemexhibition_detail(catalogueEntry) }}
-                            </li>
-                        {% endfor %}
-                        </ul>
-                        </div>
-                    {% endif %}
-                </li>
-                {% endfor %}
-                </ul>
-                </div><!-- .tab-pane -->
 
-                {% if similar|length > 0 %}
-                <div role="tabpanel" class="tab-pane" id="similar">
-                   {% set similar_keys = similar|keys %}
-                   {% set similar_found = false %}
-                   {% for person_id in similar_keys %}
-                       {% if similar[person_id]['count'] > 1 %}
-                           {% if not similar_found %}
-                               {% set similar_found = true %}
-                   <h3>Frequent co-appearances</h3>
-                   <ul class="listing">
-                           {% endif %}
-                       <li>
-                            <a href="{{ path('person', { 'id': person_id }) }}">{{  similar[person_id]['name'] }}</a>
-                            (<a href="{{ path('exhibition-shared-partial', { 'persons': [ person.id, person_id ]|join(',') }) }}" data-remote="false" data-toggle="modal" data-target="#detailModal">{{ similar[person_id]['count'] }} exhibitions</a>)
-                       </li>
-                       {% endif %}
-                   {% endfor %}
-                   {% if similar_found %}
-                   </ul>
-                   {% endif %}
-                </div><!-- .tab-pane -->
-               {% endif %}
-            </div><!-- .tab-content -->
-        {% endif %}
-        </div>
-
+        {# find a artist with all informations set correctly #}
         <div class="col-sm-4 sidebar">
             {% set entityfacts = person.entityfacts %}
             {% if entityfacts is not empty %}
@@ -219,76 +141,6 @@
                 {% endif %}
             {% endif %}
 
-            {% if false and (birthPlace.geo is not empty or deathPlace.geo is not empty) %}
-            <div id="map" class="col-sm-12" style="width: 100%; min-height: 360px; border-bottom: 20px solid white;"></div>
-
-            <script>
-            function adjustMapSize() {
-                /*
-                $('#map').height(function(index, height) {
-                    return window.innerHeight - $(this).offset().top;
-                });
-                */
-            }
-
-            $(window).resize(adjustMapSize);
-            adjustMapSize();
-
-            var map = L.map('map');
-
-            {% if birthPlace.geo is not empty and deathPlace.geo is not empty and birthPlace.geo != deathPlace.geo %}
-            map.fitBounds([ [ {{ birthPlace.geo }} ],
-                            [ {{ deathPlace.geo }} ] ]);
-            L.marker([ {{ birthPlace.geo }} ]).addTo(map);
-            L.marker([ {{ deathPlace.geo }} ]).addTo(map);
-            {% else %}
-            map.setView([{% if birthPlace.geo is not empty %}{{ birthPlace.geo }}{% else %}{{ deathPlace.geo }}{% endif %}], 10);
-            L.marker([ {% if birthPlace.geo is not empty %}{{ birthPlace.geo }}{% else %}{{ deathPlace.geo }}{% endif %} ]).addTo(map)
-            {% endif %}
-
-            {{ map.addTileLayer() }}
-            </script>
-            {% endif %}
-
-            {% if person.gnd is not empty or person.ulan is not empty %}
-            <div class="container-fluid box">
-                <div class="row box-color-title">
-                    <div class="col-sm-12">
-                        <h4>
-                            {% if person.gnd is not empty %}
-                            {{ 'Integrated Authority File'|trans }}
-                            <br /><a href="http://d-nb.info/gnd/{{ person.gnd }}" target="_blank">{{ person.gnd }}</a>
-                            {% else %}
-                            {{ 'Additional Information'|trans }}
-                            {% endif %}
-                        </h4>
-                    </div>
-                </div>
-                <div class="row box-color-content-inverse">
-                    {% if person.ulan is not empty or person.additional.beacon is not empty %}
-                    <div class="col-sm-12 beacon-ul">
-                        <ul>
-                            {% if person.ulan is not empty %}
-                            <li>
-                                <a href="http://vocab.getty.edu/page/ulan/{{ person.ulan }}" target="_blank">Getty ULAN</a>
-                            </li>
-                            {% endif %}
-                            {% if person.additional.beacon is not empty %}
-                                {% for info in person.additional.beacon %}
-                            <li><a href="{{ info.url }}" target="_blank">{{ info.description }}</a></li>
-                                {% endfor %}
-                            {% endif %}
-                        </ul>
-                    </div>
-                    {% endif %}
-                    {% if person.gnd is not empty %}
-                    <div class="col-sm-12">
-                        <div title="{{ person.gnd }}" class="pndaks seealso-ul"></div>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-            {% endif %}
         </div>
     </div><!-- .row -->
 

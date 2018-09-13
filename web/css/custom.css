@@ -1,0 +1,193 @@
+.top-level-container:hover .menu_level_1 {
+    display: block;
+}
+
+.menu_level_1 {
+    list-style: none;
+}
+
+a:hover {
+    text-decoration: none!important;
+}
+
+.w-container {
+    max-width: 1250px;
+}
+
+.searchbarcontainer.w-form form label {
+    display: none;
+}
+
+.searchbarcontainer.w-form form div input, .searchbarcontainer.w-form form div select, .select2-container, .select2-container--default.select2-container--focus .select2-selection--multiple, .select2-container--default .select2-selection--multiple, select2-search select2-search--inline{
+    height: 100%;
+}
+
+.searchbarinputcontainer div:nth-child(1) {
+    width: 35%!important;
+}
+
+.searchbarinputcontainer div:nth-child(2){
+    width: 25%;
+}
+
+.searchbarinputcontainer div:nth-child(3){
+    width: 40%!important;
+}
+
+
+#exhibition_filter_search, #place_filter_search, #place_filter_country, #person_filter_search, #person_filter_gender, #person_filter_nationality, #exhibition_filter_country, .select2-container--default.select2-container--focus .select2-selection--multiple, #location_filter_search, #location_filter_country {
+    width: 100%!important;
+}
+
+
+#exhibition_filter_country, #place_filter_search, #place_filter_country, #exhibition_filter_search, #location_filter_search, #location_filter_country, #person_filter_search, #person_filter_gender, #person_filter_nationality {
+    background-color: transparent;
+    border: none;
+    border-right: 1px solid rgba(112, 112, 112, 0.19);
+    border-radius: 0;
+    -webkit-appearance: none;
+    padding-left: 20px
+}
+
+/* CUSTOM DATATABLES STYLES */
+
+.table-striped>tbody>tr:nth-of-type(odd), .table-striped>tbody>tr:nth-of-type(even) {
+    background-color: transparent!important;
+}
+
+.table-bordered>tbody>tr>td, .table-bordered>thead>tr>th {
+    border: none!important;
+}
+
+.table-bordered>tbody>tr>td {
+    border-bottom: 1px solid #D1D8DC!important;
+}
+
+.table-bordered{
+    border: none!important;
+}
+
+td.title a {
+    color: #5B6974;
+}
+
+td.normal a {
+    color: #A4B1BA;
+}
+
+.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th{
+    vertical-align: middle!important;
+}
+
+.table>thead>tr>td, .table>thead>tr>th {
+    vertical-align: bottom;
+}
+
+tr {
+    height: 65px!important;
+    font-size: 10px!important;
+}
+
+
+.pagination>.active>a, .pagination>.active>a:focus, .pagination>.active>a:hover, .pagination>.active>span, .pagination>.active>span:focus, .pagination>.active>span:hover{
+    background-color: #1869a3;
+    border-color: #1869a3;
+}
+
+.pagination>li>a, .pagination>li>span{
+    color: #1869a3;
+}
+
+/* END CUSTOM DATABLES STYLES */
+
+div#footer-fwf {
+    margin-bottom: 30px;
+}
+
+.tabsymbols{
+    float: right;
+}
+
+.nav-tabs {
+    border-bottom: 1px solid #a4b1ba;
+}
+
+.nav-tabs>li {
+}
+
+.nav-tabs>li>a{
+    line-height: 3;
+    color: #5b6974;
+
+}
+
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+    background-color: transparent;
+    border: none;
+}
+
+.nav-tabs>li.active>a{
+    color: #1869a3;
+    border-bottom: solid 1px #1869a3;
+}
+
+
+.nav-tabs>li>a:hover, .nav-tabs>li>a:hover{
+    background-color: transparent;
+    border: 1px solid transparent;
+    color: #1869a3!important;
+}
+
+.groupHeader a, .groupHeader{
+    color: #5B6974;
+    font-size: 1.3rem;
+}
+
+.minus-collapse {
+    font-size: 1.6rem;
+    color: #1869A3;
+    font-weight: bold;
+}
+
+.list-group-item {
+    padding-left: 0px;
+    padding-right: 0px;
+    border: none;
+}
+
+
+.artist-first-letter {
+    color: #5B6974;
+    font-size: 21px;
+    line-height: 12px;
+    margin-top: 10px;
+}
+
+
+
+.places-filter div:nth-child(0) {
+    width: 100%!important;
+}
+
+.places-filter .searchbarinputcontainer div:nth-child(1){
+    width: 100%!important;
+}
+
+.places-filter .searchbarinputcontainer div:nth-child(2){
+    width: 35%!important;
+}
+
+
+
+.places-filter {
+    width: 100%!important;
+}
+
+.select2 {
+    width: 100%!important;
+}
+
+.select2-selection {
+    border: none!important;
+    padding-top: 14px!important;
+}
