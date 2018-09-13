@@ -2,8 +2,8 @@
     <!-- Nav tabs -->
     <div>
         <div class="tabsymbols">
-            <div class="icontab"><img src="images/setttings_icon_blue.svg" class="iconimage"></div>
-            <div class="icontab"><img src="images/download_icon_blue.svg" class="iconimage"></div>
+            <div class="icontab"><img src="{{ app.request.basepath }}/img/setttings_icon_blue.svg" class="iconimage"></div>
+            <div class="icontab"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage"></div>
         </div>
         <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 1em">
             {% if catalogueEntries is not empty %}
