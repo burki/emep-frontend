@@ -25,6 +25,10 @@
     </script>
 
     {{ map.head() }}
+    <script>
+        {{ map.defineColorIcons() }}
+    </script>
+
     <script src="{{ app.request.basepath }}/js/seealso.js"></script>
     <script>
         var service = new SeeAlsoCollection();
@@ -219,7 +223,7 @@
                 {% endif %}
             {% endif %}
 
-            {% if false and (birthPlace.geo is not empty or deathPlace.geo is not empty) %}
+            {% if (birthPlace.geo is not empty or deathPlace.geo is not empty) %}
             <div id="map" class="col-sm-12" style="width: 100%; min-height: 360px; border-bottom: 20px solid white;"></div>
 
             <script>
@@ -239,11 +243,17 @@
             {% if birthPlace.geo is not empty and deathPlace.geo is not empty and birthPlace.geo != deathPlace.geo %}
             map.fitBounds([ [ {{ birthPlace.geo }} ],
                             [ {{ deathPlace.geo }} ] ]);
-            L.marker([ {{ birthPlace.geo }} ]).addTo(map);
-            L.marker([ {{ deathPlace.geo }} ]).addTo(map);
+            L.marker([ {{ birthPlace.geo }} ], { icon: violetIcon })
+                .bindTooltip('{{ birthPlace['name'] }}', { className: 'my-tooltip'})
+                .addTo(map);
+            L.marker([ {{ deathPlace.geo }} ], { icon: blackIcon })
+                .bindTooltip('{{ deathPlace['name'] }}', { className: 'my-tooltip'})
+                .addTo(map);
             {% else %}
             map.setView([{% if birthPlace.geo is not empty %}{{ birthPlace.geo }}{% else %}{{ deathPlace.geo }}{% endif %}], 10);
-            L.marker([ {% if birthPlace.geo is not empty %}{{ birthPlace.geo }}{% else %}{{ deathPlace.geo }}{% endif %} ]).addTo(map)
+            L.marker([ {% if birthPlace.geo is not empty %}{{ birthPlace.geo }}{% else %}{{ deathPlace.geo }}{% endif %} ])
+                .bindTooltip('{% if birthPlace.geo is not empty %}{{ birthPlace['name'] }}{% else %}{{ deathPlace['name'] }}{% endif %}', { className: 'my-tooltip'})
+                .addTo(map);
             {% endif %}
 
             {{ map.addTileLayer() }}
