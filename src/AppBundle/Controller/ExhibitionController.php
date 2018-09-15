@@ -48,18 +48,18 @@ extends CrudController
 
         $qb->select([
                 'E',
-                // 'COUNT(DISTINCT A.id) AS numArtistSort',
                 'COUNT(DISTINCT IE.id) AS numCatEntrySort',
+                'COUNT(DISTINCT A.id) AS numPersonSort',
                 "E.startdate HIDDEN dateSort",
                 "CONCAT(COALESCE(P.alternateName, P.name), E.startdate) HIDDEN placeSort"
             ])
             ->from('AppBundle:Exhibition', 'E')
             ->leftJoin('E.location', 'L')
             ->leftJoin('L.place', 'P')
-            // ->leftJoin('E.artists', 'A')
             ->leftJoin('AppBundle:ItemExhibition', 'IE',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'IE.exhibition = E AND IE.title IS NOT NULL')
+            ->leftJoin('IE.person', 'A')
             ->where('E.status <> -1')
             ->groupBy('E.id')
             ->orderBy('dateSort')

@@ -54,7 +54,7 @@
 
                 <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
                     <b>{{ exhibition.title }}</b> {{ exhibition.titleAppend }}</a>
-                {% if 'numCatEntrySort' != sortField %}{{ row['numCatEntrySort'] }} entr.{% endif %}
+                    {% if row['numCatEntrySort'] > 0 %}{{ row['numCatEntrySort'] }} entr. by {{ row['numPersonSort'] }} art.{% endif %}
 
                 {% if exhibition.location is not null %}
                     {% set location = exhibition.location %}
