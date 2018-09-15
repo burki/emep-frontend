@@ -45,6 +45,7 @@
         display: inline-block;
     }
     </style>
+    <script src="{{ app.request.basepath }}/vendor/leaflet.minichart-0.2.5/leaflet.minichart.min.js"></script>
 
     <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/select2-4.0.3/css/select2.min.css" />
     <script src="{{ app.request.basepath }}/vendor/select2-4.0.3/js/select2.full.min.js"></script>
@@ -129,30 +130,45 @@
         for (var i = 0; i < addressPoints.length; i++) {
             var a = addressPoints[i];
             var title = a[2];
-            var count = a[4];
+            var count = a[4] + a[5];
 
-            if ('circle' !== markerStyle) {
-                var marker = L.marker(L.latLng(a[0], a[1]),
-                                      { title: title });
-            }
-            else {
+            if ('circle' === markerStyle || 'pie' == markerStyle) {
                 var radius = 6;
                 if (count > 0) {
                     radius += Math.round(1.5 * Math.log2(count > 256 ? 256 : count));
                 }
-                var markerProperties = {
-                    radius: radius,
-                    fillColor: 'rgb(0, 99, 166)',
-                    color: 'rgb(0, 99, 166)',
-                    weight: 1,
-                    opacity: 1,
-                    fillOpacity: 0.7
-                };
 
-                var marker = L.circleMarker(L.latLng(a[0], a[1]), markerProperties)
-                    .bindTooltip(title + ' (' + count + ')', {className: 'my-tooltip'})
-                    ;
+                var marker;
+                if ('circle' === markerStyle) {
+                    var markerProperties = {
+                        radius: radius,
+                        fillColor: 'rgb(0, 99, 166)',
+                        color: 'rgb(0, 99, 166)',
+                        weight: 1,
+                        opacity: 1,
+                        fillOpacity: 0.7
+                    };
+                    marker = L.circleMarker(L.latLng(a[0], a[1]), markerProperties);
 
+                }
+                else {
+                    // pie
+                    var markerProperties = {
+                        colors: [ '#b286ef', '#000' ],
+                        width: 2 * radius,
+                        height: 2 * radius,
+                        type: 'pie',
+                        data: [ a[4], a[5] ]
+                    };
+                    var marker = L.minichart(L.latLng(a[0], a[1]), markerProperties);
+                }
+
+                marker.bindTooltip(title + ' (' + a[4] + '/' + a[5] + ')',
+                                   { className: 'my-tooltip'});
+            }
+            else {
+                var marker = L.marker(L.latLng(a[0], a[1]),
+                                      { title: title });
             }
 
             marker.number = count;
@@ -160,12 +176,6 @@
 
             markers.addLayer(marker);
         }
-
-        /*
-        markers.on('clusterclick', function (a) {
-            a.layer.spiderfy();
-        });
-        */
 
         map.addLayer(markers);
     </script>
