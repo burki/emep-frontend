@@ -24,7 +24,7 @@
         $(document).ready(function() {
             var groupColumn = 1;
             var table = $('#entrytable').DataTable({
-                paging: false,
+                paging: true,
                 searching: false,
                 info: false,
                 "columnDefs": [
@@ -88,13 +88,13 @@
 
 
 
-    <div role="tabpanel" class="tab-pane active" id="entries">
+    <div role="tabpanel" class="tab-pane" id="entries">
         {#
           {{ helper.exhibition_itemexhibition_sort_control(exhibition) }}
         #}
 
 
-        <table id="entrytable" class="table table-striped table-bordered dataTable listviewcontainer">
+        <table id="entrytable" class="table table-striped table-bordered dataTable listviewcontainer" style="width:100%">
             <thead>
             <tr class="listviewheading">
                 <th>Artwork Name</th>

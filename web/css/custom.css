@@ -191,3 +191,9 @@ div#footer-fwf {
     border: none!important;
     padding-top: 14px!important;
 }
+
+.information-tab{
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    width: 100%;
+}

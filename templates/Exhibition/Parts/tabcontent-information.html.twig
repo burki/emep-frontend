@@ -1,0 +1,58 @@
+{% block information %}
+
+
+        <div role="tabpanel" class="tab-pane active" id="information">
+
+            {% if exhibition.organizingCommittee is empty and exhibition.hours is empty and catalogue is empty and exhibition.cataloguePrice is empty and exhibition.preface is empty and exhibition.catalogueStructure is empty and exhibition.catalogueStructure is empty and exhibition.note is empty and exhibition.hasInfo == false and exhibition.hasInfo == false %}
+                <div class="artist-information-text information-tab">no more information available</div>
+            {% endif %}
+            {% if exhibition.organizingCommittee is not empty %}
+                <div class="artist-information-label information-tab">Organizing Committee</div>
+                <div class="artist-information-text">{{ exhibition.organizingCommittee|nl2br }}</div>
+            {% endif %}
+
+            {% if exhibition.hours is not empty %}
+                <div class="artist-information-label information-tab">Opening Hours</div>
+                <div class="artist-information-text">{{ exhibition.hours }}</div>
+            {% endif %}
+
+            {% if catalogue is not empty %}
+                    <div class="artist-information-label information-tab">Catalogue</div>
+                    <div class="artist-information-text">
+                        {% for bibitem in catalogue %}
+                            {{ bibitem.renderCitationAsHtml(citeProc, false)|raw }}
+                        {% endfor %}
+                    </div>
+            {% endif %}
+
+            {% if exhibition.cataloguePrice is not empty %}
+                    <div class="artist-information-label information-tab">Catalogue Price</div>
+                    <div class="artist-information-text">{{ exhibition.cataloguePrice }}</div>
+            {% endif %}
+
+            {% if exhibition.preface is not empty %}
+                    <div class="artist-information-label information-tab">Preface</div>
+                    <div class="artist-information-text">{{ exhibition.preface|nl2br }}</div>
+            {% endif %}
+
+            {% if exhibition.catalogueStructure is not empty %}
+                    <div class="artist-information-label information-tab">Catalogue Structure</div>
+                    <div class="artist-information-text">{{ exhibition.catalogueStructure|nl2br }}</div>
+            {% endif %}
+
+            {% if exhibition.note is not empty or exhibition.hasInfo %}
+                {% if exhibition.note is not empty %}
+                        <div class="artist-information-label information-tab">Note</div>
+                        <div class="artist-information-text">{{ exhibition.note|nl2br }}</div>
+                {% endif %}
+                {% if exhibition.hasInfo %}
+                        <div class="artist-information-label information-tab">Additional Notes</div>
+                        <div class="artist-information-text">{{ helper.render_info(exhibition.infoExpanded) }}</div>
+                {% endif %}
+            {% endif %}
+
+
+        </div><!-- .tab-pane -->
+{% endblock %}
+
+

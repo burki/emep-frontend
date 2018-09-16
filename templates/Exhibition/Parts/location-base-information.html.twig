@@ -8,8 +8,7 @@
 {% if location.type is not null %}
     <div class="artist-information-container">
         <div class="artist-information-label">{{ 'type'|trans }}</div>
-        <div class="artist-information-text">{{ location.type }}
-        </div>
+        <div class="artist-information-text">{{ location.type }}</div>
     </div>
 
 {% endif %}
@@ -46,65 +45,3 @@
         </div>
     </div>
 {% endif %}
-
-{% if exhibition.organizingCommittee is not empty %}
-    <div class="artist-information-container">
-        <div class="artist-information-label">Organizing Committee</div>
-        <div class="artist-information-text">{{ exhibition.organizingCommittee|nl2br }}</div>
-    </div>
-{% endif %}
-
-{% if exhibition.hours is not empty %}
-    <div class="artist-information-container">
-        <div class="artist-information-label">Opening Hours</div>
-        <div class="artist-information-text">{{ exhibition.hours }}</div>
-    </div>
-{% endif %}
-
-{% if catalogue is not empty %}
-    <div class="artist-information-container">
-        <div class="artist-information-label">Catalogue</div>
-        <div class="artist-information-text">
-            {% for bibitem in catalogue %}
-                {{ bibitem.renderCitationAsHtml(citeProc, false)|raw }}
-            {% endfor %}
-        </div>
-    </div>
-{% endif %}
-
-{% if exhibition.cataloguePrice is not empty %}
-    <div class="artist-information-container">
-        <div class="artist-information-label">Catalogue Price</div>
-        <div class="artist-information-text">{{ exhibition.cataloguePrice }}</div>
-    </div>
-{% endif %}
-
-{% if exhibition.preface is not empty %}
-    <div class="artist-information-container">
-        <div class="artist-information-label">Preface</div>
-        <div class="artist-information-text">{{ exhibition.preface|nl2br }}</div>
-    </div>
-{% endif %}
-
-{% if exhibition.catalogueStructure is not empty %}
-    <div class="artist-information-container">
-        <div class="artist-information-label">Catalogue Structure</div>
-        <div class="artist-information-text">{{ exhibition.catalogueStructure|nl2br }}</div>
-    </div>
-{% endif %}
-
-{% if exhibition.note is not empty or exhibition.hasInfo %}
-    {% if exhibition.note is not empty %}
-        <div class="artist-information-container">
-            <div class="artist-information-label">Note</div>
-            <div class="artist-information-text">{{ exhibition.note|nl2br }}</div>
-        </div>
-    {% endif %}
-    {% if exhibition.hasInfo %}
-        <div class="artist-information-container">
-            <div class="artist-information-label">Additional Notes</div>
-            <div class="artist-information-text">{{ helper.render_info(exhibition.infoExpanded) }}</div>
-        </div>
-    {% endif %}
-{% endif %}
-

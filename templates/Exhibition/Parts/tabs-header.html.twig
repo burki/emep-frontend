@@ -6,15 +6,17 @@
             <div class="icontab"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage"></div>
         </div>
         <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 1em">
+            <li role="presentation" class="active"><a href="#information" aria-controls="entries" role="tab" data-toggle="tab">{{ 'Information'|trans }}</a></li>
+
             {% if catalogueEntries is not empty %}
-                <li role="presentation" class="active"><a href="#entries" aria-controls="entries" role="tab" data-toggle="tab">{{ 'Catalogue Entries'|trans }}</a></li>
+                <li role="presentation"><a href="#entries" aria-controls="entries" role="tab" data-toggle="tab">{{ 'Catalogue Entries'|trans }}</a></li>
             {% endif %}
             {# co-appearnces #}
             {% if similar|length > 0 %}
                 <li role="presentation"><a href="#similars" aria-controls="similars" role="tab" data-toggle="tab">{{ 'Similars'|trans }}</a></li>
             {% endif %}
             {# authority files #}
-                <li role="presentation"><a href="#statistics" aria-controls="statistics" role="tab" data-toggle="tab">{{ 'Statistics'|trans }}</a></li>
+            <li role="presentation"><a href="#stats" data-url="{{ path('exhibition-stats-partial', { id: exhibition.id }) }}" aria-controls="chronology" role="tab" data-toggle="tab">{{ 'Statistics'|trans }}</a></li>
         </ul>
 
     </div>

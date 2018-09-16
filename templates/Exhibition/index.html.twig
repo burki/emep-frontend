@@ -5,6 +5,8 @@
 {% block head %}
     <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/select2-4.0.3/css/select2.min.css" />
     <script src="{{ app.request.basepath }}/vendor/select2-4.0.3/js/select2.full.min.js"></script>
+    <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.css">
+    <script src="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.js"></script>
     <script>
         $(document).ready(function() {
             $('#exhibition_filter_organizer_type').select2();
@@ -13,6 +15,8 @@
 {% endblock %}
 
 {% block body %}
+
+
 
 
 
@@ -58,7 +62,6 @@
                     <th>Venue</th>
                     <th>Number of Cat. Entries</th>
                     <th>type</th>
-
                 </tr>
                 </thead>
                 <tbody>
@@ -88,33 +91,34 @@
                     {# </ul>  #}
                 {% endif %}
 
-            <h2>{{ initial }}</h2>
+
             {% set last_initial = initial %}
                 {# <ul class="list-group"> #}
             {% endif %}
             <tr class="listviewrow">
-                <td class="date"><b>{{ helper.exhibition_period(exhibition) }}</b></td>
+                <td class="date">
+                    <b>{{ helper.exhibition_period(exhibition) }}</b>
+                </td>
+
                 <td class="title"><a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
-                        <b>{{ exhibition.title }}</b> {{ exhibition.titleAppend }}</a></td>
+                        <b>{{ exhibition.title }}</b> {{ exhibition.titleAppend }}</a>
+                </td>
+
                 <td class="normal">
                     <a href="{% if exhPlace.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : exhPlace.tgn }) }}{% else %}{{ path('place', { 'id' : exhPlace.id }) }}{% endif %}">
                         {{ exhibition.location.placeLabel }}
                     </a>
                 </td>
+
                 <td class="normal">
                     <a href="{{ path('location', { 'id' : exhibition.location.id }) }}">
                         {{ exhibition.location.name }}
                     </a>
                 </td>
-                <td>{% if catalogueEntries[exhibition.id] is defined %}
-                        {% set count = catalogueEntries[exhibition.id]|length %}
-                        {% if count > 0 %}
-                            {% set divId = 'entries' ~ exhibition.id %}
-                            <a class="badge" style="color: white" href="#{{ divId }}" data-toggle="collapse">{{ count }}</a>
-                        {% endif %}
-                    {% else %}
-                        {% set count = 0 %}
-                    {% endif %}
+
+
+                <td>
+                    <a class="badge" style="color: white" href="#{{ divId }}" data-toggle="collapse">{{ row['numCatEntrySort'] }}</a>
                 </td>
                 <td>{{ exhibition.organizerType }}</td>
             </tr>
@@ -138,6 +142,71 @@
             </form>
         </div>-->
     </div><!-- .row -->
+
+    {% if 'placeSort' == sortField %}
+        <script>
+            $(document).ready(function() {
+                var groupColumn = 2;
+                var table = $('#exhibitions').DataTable({
+                    paging: false,
+                    searching: false,
+                    info: false,
+                    "columnDefs": [
+                        { "visible": false, "targets": groupColumn }
+                    ],
+                    "order": [[ groupColumn, 'asc' ]],
+                    "displayLength": 25,
+                    "drawCallback": function ( settings ) {
+                        var api = this.api();
+                        var rows = api.rows( {page:'current'} ).nodes();
+                        var last=null;
+
+                        api.column(groupColumn, {page:'current'} ).data().each( function ( group, i ) {
+                            if ( last !== group ) {
+
+                                $(rows).eq( i ).before(
+                                    '<tr class="group groupHeader" data-name="' + group + '" ><td colspan="5"><span class="minus-collapse">-</span> '+group+'</td></tr>'
+                                );
+
+                                last = group;
+                            }
+                        } );
+                    }
+                } );
+
+
+            } );
+        </script>
+    {% endif %}
+
+
+
+    <script>
+        $(document).ready(function() {
+
+
+            // Order by the grouping
+            $('#exhibitions tbody').on( 'click', 'tr.group', function () {
+                var currentOrder = table.order()[0];
+                /* if ( currentOrder[0] === groupColumn && currentOrder[1] === 'asc' ) {
+                    table.order( [ groupColumn, 'desc' ] ).draw();
+                }
+                else {
+                    table.order( [ groupColumn, 'asc' ] ).draw();
+                }*/
+
+
+                var splitGroup = $(this).data('name');
+
+                // console.log('.collapseRow[data-rowname="' + splitGroup + '"]');
+
+                $('.collapseRow[data-rowname="' + splitGroup + '"]').toggleClass('collapsed');
+
+
+                // console.log($(this).data('name'));
+                } );
+        });
+    </script>
 
 
 
