@@ -1,0 +1,46 @@
+{# refactor with other tabscontent to only have one view #}
+
+{% block authority %}
+    {% if holder.gnd is not empty %}
+        <div role="tabpanel" class="tab-pane" id="authority">
+            <div class="container-fluid box">
+                <div class="row box-color-title">
+                    <div class="col-sm-12">
+                        <h4>
+                            {% if holder.gnd is not empty %}
+                                <!--{{ 'Integrated Authority File'|trans }}
+                                <br />--><a href="http://d-nb.info/gnd/{{ holder.gnd }}" target="_blank">{{ holder.gnd }}</a>
+                            {% else %}
+                                {{ 'Additional Information'|trans }}
+                            {% endif %}
+                        </h4>
+                    </div>
+                </div>
+                <div class="row box-color-content-inverse">
+                    {% if holder.ulan is not empty or holder.additional.beacon is not empty %}
+                        <div class="col-sm-12 beacon-ul">
+                            <ul>
+                                {% if holder.ulan is not empty %}
+                                    <li>
+                                        <a href="http://vocab.getty.edu/page/ulan/{{ holder.ulan }}" target="_blank">Getty ULAN</a>
+                                    </li>
+                                {% endif %}
+                                {% if holder.additional.beacon is not empty %}
+                                    {% for info in holder.additional.beacon %}
+                                        <li><a href="{{ info.url }}" target="_blank">{{ info.description }}</a></li>
+                                    {% endfor %}
+                                {% endif %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    {% if holder.gnd is not empty %}
+                        <div class="col-sm-12">
+                            <div title="{{ holder.gnd }}" class="pndaks seealso-ul"></div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}

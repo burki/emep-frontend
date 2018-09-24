@@ -1,0 +1,115 @@
+{% block entries %}
+    <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.css">
+    <script src="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.js"></script>
+    <style>
+        .collapsed {
+            display: none;
+        }
+    </style>
+    <script>
+        /*
+        $( document ).ready(function() {
+            $('#entries').DataTable({
+                paging: false,
+                searching: false,
+                info: false,
+                "columns": [
+                    { "orderSequence": [ "desc", "asc" ] },
+                    { "orderSequence": [ "desc", "asc" ] }
+                ]
+            });
+        })
+        */
+
+        $(document).ready(function() {
+            var groupColumn = 1;
+            var table = $('#entrytable').DataTable({
+                paging: true,
+                searching: false,
+                info: false,
+                "columnDefs": [
+                    { "visible": false, "targets": groupColumn }
+                ],
+                "order": [[ groupColumn, 'asc' ]],
+                "displayLength": 25,
+                "drawCallback": function ( settings ) {
+                    var api = this.api();
+                    var rows = api.rows( {page:'current'} ).nodes();
+                    var last=null;
+
+                    api.column(groupColumn, {page:'current'} ).data().each( function ( group, i ) {
+                        if ( last !== group ) {
+                            var splitGroup = group.split('>');
+                            splitGroup  = splitGroup[1].split('</a');
+                            splitGroup = splitGroup[0];
+
+
+                            $(rows).eq( i ).before(
+                                '<tr class="group groupHeader" data-name="' + splitGroup + '" ><td colspan="5"><span class="minus-collapse">-</span> '+group+'</td></tr>'
+                            );
+
+                            last = group;
+                        }
+                    } );
+                }
+            } );
+
+
+
+
+            // Order by the grouping
+            $('#entrytable tbody').on( 'click', 'tr.group', function () {
+                var currentOrder = table.order()[0];
+                /* if ( currentOrder[0] === groupColumn && currentOrder[1] === 'asc' ) {
+                    table.order( [ groupColumn, 'desc' ] ).draw();
+                }
+                else {
+                    table.order( [ groupColumn, 'asc' ] ).draw();
+                }*/
+
+
+                var splitGroup = $(this).data('name');
+
+                // console.log('.collapseRow[data-rowname="' + splitGroup + '"]');
+
+                $('.collapseRow[data-rowname="' + splitGroup + '"]').toggleClass('collapsed');
+
+
+                // console.log($(this).data('name'));
+            } );
+        } );
+
+
+    </script>
+
+
+
+    <div role="tabpanel" class="tab-pane active" id="entries">
+
+        <table id="entrytable" class="table table-striped table-bordered dataTable listviewcontainer" style="width:100%">
+            <thead>
+            <tr class="listviewheading">
+                <th>catalogue</th>
+                <th>url</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for row in bibitems %}
+                {% set bibitem = row[0] %}
+                <tr class="listviewrow">
+                    <td class="title">{{ bibitem.renderCitationAsHtml(citeProc, false)|raw }}</td>
+                    <td class="normal">{% if row.signature is not empty %}
+                            {{ row.signature}}
+                        {% endif %}
+                        {% if row.url is not empty %}
+                            <a href="{{ row.url }}" target="_blank">{{ row.url|prettifyurl }}</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+
+    </div><!-- .tab-pane -->
+{% endblock %}

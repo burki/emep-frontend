@@ -1,0 +1,21 @@
+{% if holder.placeLabel is not null %}
+    <div class="artist-information-container">
+        <div class="artist-information-label">{{ 'Place'|trans }}</div>
+        <div class="artist-information-text">{{ holder.placeLabel }}</div>
+    </div>
+{% endif %}
+
+
+{% if holder.url is not empty %}
+    <div class="artist-information-container">
+        <div class="artist-information-label">{{ 'Homepage'|trans }}</div>
+        <div class="artist-information-text"><a href="{{ holder.url }}" target="_blank">{{ holder.url|prettifyurl }}</a></div>
+    </div>
+{% endif %}
+
+{% if holder.placeLabel is not null %}
+    <div class="artist-information-container">
+        <div class="artist-information-label">{{ 'Note'|trans }}</div>
+        <div class="artist-information-text">{{ holder.description|nl2br }}</div>
+    </div>
+{% endif %}

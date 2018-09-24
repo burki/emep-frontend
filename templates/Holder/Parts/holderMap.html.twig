@@ -1,0 +1,52 @@
+{% block map %}
+    {% set place = holder.geo %}
+    {% if place.geo is not empty %}
+        <div id="map" class="col-sm-12" style="width: 100%; min-height: 320px;"></div>
+
+
+    {% else %}
+        <div class="no_data_block">
+            <div>no map data available</div>
+        </div>
+    {% endif %}
+
+    <script>
+        function adjustMapSize() {
+            /*
+            $('#map').height(function(index, height) {
+                return window.innerHeight - $(this).offset().top;
+            });
+            */
+        }
+
+        $( window ).resize(adjustMapSize);
+        adjustMapSize();
+
+        var map = L.map('map');
+
+        var bounds = null;
+        {% if place.additional.bounds is not empty %}
+        bounds = {{ place.additional.bounds|json_encode|raw }};
+        {% elseif place.geo is not null %}
+        {% if place.showCenterMarker(em) %}
+        L.marker([ {{ place.geo }} ]).addTo(map);
+        map.setView([{{ place.geo }}], {{ place.defaultZoomlevel }});
+        {% else %}
+        map.setView([{{ place.geo }}], 3);
+        {% endif %}
+        {% endif %}
+
+        {{ map.addTileLayer() }}
+
+        {% if place.additional.boundary is not empty %}
+        var boundary = {{ place.additional.boundary|json_encode|raw }};
+        var geojsonLayer = L.geoJSON(boundary).addTo(map);
+        if (bounds == null) {
+            bounds = geojsonLayer.getBounds();
+        }
+        {% endif %}
+        if (bounds != null) {
+            map.fitBounds(bounds);
+        }
+    </script>
+{% endblock %}
