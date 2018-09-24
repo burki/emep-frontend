@@ -2,13 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="83f6ca58-d621-4971-9ce4-caca212d12de" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/templates/Holder/Parts/holder-base-information.html.twig" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/Holder/Parts/holderMap.html.twig" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/Holder/Parts/tabcontent-authority.html.twig" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/Holder/Parts/tabcontent-catalogue-entries.html.twig" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/Holder/Parts/tabs-header.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/Holder/detail.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Holder/detail.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/Holder/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Holder/index.html.twig" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -22,43 +17,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="detail.html.twig" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/templates/Holder/detail.html.twig">
+      <file leaf-file-name="index.html.twig" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/templates/Holder/index.html.twig">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="816">
-              <caret line="68" column="4" selection-start-line="68" selection-start-column="4" selection-end-line="68" selection-end-column="4" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="tabcontent-catalogue-entries.html.twig" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/templates/Holder/Parts/tabcontent-catalogue-entries.html.twig">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="441">
-              <caret line="86" column="47" selection-start-line="86" selection-start-column="47" selection-end-line="86" selection-end-column="47" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="tabs-header.html.twig" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/templates/Holder/Parts/tabs-header.html.twig">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
-              <caret line="11" column="33" selection-start-line="11" selection-start-column="33" selection-end-line="11" selection-end-column="33" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="detail.html.twig" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/templates/Exhibition/detail.html.twig">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="728">
-              <caret line="156" column="10" selection-start-line="122" selection-start-column="4" selection-end-line="156" selection-end-column="10" />
-              <folding>
-                <element signature="e#27#33#1" expanded="true" />
-                <element signature="e#79#85#0" expanded="true" />
-                <element signature="e#85#91#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="163">
+              <caret line="42" column="72" selection-start-line="42" selection-start-column="72" selection-end-line="42" selection-end-column="72" />
             </state>
           </provider>
         </entry>
@@ -146,7 +109,6 @@
         <option value="$PROJECT_DIR$/templates/Statistics/itemexhibition-nationality.html.twig" />
         <option value="$PROJECT_DIR$/templates/Statistics/itemexhibition-type.html.twig" />
         <option value="$PROJECT_DIR$/templates/Statistics/person-exhibition-age.html.twig" />
-        <option value="$PROJECT_DIR$/templates/Holder/index.html.twig" />
         <option value="$PROJECT_DIR$/web/css/custom.css" />
         <option value="$PROJECT_DIR$/templates/Holder/Parts/holder-base-information.html.twig" />
         <option value="$PROJECT_DIR$/templates/Holder/Parts/holderMap.html.twig" />
@@ -154,6 +116,7 @@
         <option value="$PROJECT_DIR$/templates/Holder/Parts/tabs-header.html.twig" />
         <option value="$PROJECT_DIR$/templates/Holder/Parts/tabcontent-catalogue-entries.html.twig" />
         <option value="$PROJECT_DIR$/templates/Holder/detail.html.twig" />
+        <option value="$PROJECT_DIR$/templates/Holder/index.html.twig" />
       </list>
     </option>
   </component>
@@ -436,12 +399,12 @@
       <workItem from="1536527684778" duration="4670000" />
       <workItem from="1536837788493" duration="22651000" />
       <workItem from="1537454040705" duration="6699000" />
-      <workItem from="1537693644648" duration="8678000" />
+      <workItem from="1537693644648" duration="8946000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="58692000" />
+    <option name="totallyTimeSpent" value="58960000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
@@ -745,13 +708,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/templates/Holder/index.html.twig">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="346">
-          <caret line="42" column="28" selection-start-line="42" selection-start-column="28" selection-end-line="42" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/templates/Exhibition/index.html.twig">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="568">
@@ -787,6 +743,27 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/templates/Holder/detail.html.twig">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="816">
+          <caret line="68" column="4" selection-start-line="68" selection-start-column="4" selection-end-line="68" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/Holder/Parts/tabcontent-catalogue-entries.html.twig">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="441">
+          <caret line="86" column="47" selection-start-line="86" selection-start-column="47" selection-end-line="86" selection-end-column="47" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/Holder/Parts/tabs-header.html.twig">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="11" column="33" selection-start-line="11" selection-start-column="33" selection-end-line="11" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/templates/Exhibition/detail.html.twig">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="728">
@@ -799,24 +776,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/templates/Holder/Parts/tabs-header.html.twig">
+    <entry file="file://$PROJECT_DIR$/templates/Holder/index.html.twig">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" column="33" selection-start-line="11" selection-start-column="33" selection-end-line="11" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/Holder/Parts/tabcontent-catalogue-entries.html.twig">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="441">
-          <caret line="86" column="47" selection-start-line="86" selection-start-column="47" selection-end-line="86" selection-end-column="47" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/Holder/detail.html.twig">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="816">
-          <caret line="68" column="4" selection-start-line="68" selection-start-column="4" selection-end-line="68" selection-end-column="4" />
+        <state relative-caret-position="163">
+          <caret line="42" column="72" selection-start-line="42" selection-start-column="72" selection-end-line="42" selection-end-column="72" />
         </state>
       </provider>
     </entry>
