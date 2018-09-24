@@ -2,10 +2,50 @@
 
 {% import 'Shared/helper.html.twig' as helper %}
 
+{% block head %}
+    <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/select2-4.0.3/css/select2.min.css" />
+    <script src="{{ app.request.basepath }}/vendor/select2-4.0.3/js/select2.full.min.js"></script>
+    <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.css">
+    <script src="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.js"></script>
+
+{% endblock %}
+
 {% block body %}
-    <h1>{{ pageTitle }}</h1>
-    <div class="row">
-        <div class="col-sm-8">
+
+
+    <div class="w-container">
+
+        <h1 class="heading">{{ pageTitle }}</h1>
+
+
+        <div class="searchbarcontainer w-form">
+
+            <form class="filter" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
+                <div class="searchbarinputcontainer">
+                    {{ form_rest(form) }}
+                </div>
+                <div class="searchbuttoncontainer"><input type="submit" name="submit-filter" value="Search" class="submit-button w-button">
+                    <div class="div-block-2"><img src="{{ app.request.basepath }}/img/noun_Arrow-Down_1594877_ffffff.svg" width="75" class="image"></div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+<div class="contentcontainer w-container">
+
+    {# helper.pagination_count(pagination) #}
+    {% set sortField = app.request.get('sort') %}
+    <table id="exhibitions" class="table table-striped table-bordered dataTable listviewcontainer">
+        <thead>
+        <tr class="listviewheading">
+            <th>{{ helper.pagination_sortable(pagination, 'Name', 'nameSort') }}</th>
+            <th>Cat. Entries</th>
+        </tr>
+        </thead>
+        <tbody>
+
+
         {% if pagination.getTotalItemCount > 0 %}
         {{ helper.pagination_count(pagination) }}
 
@@ -25,7 +65,7 @@
         {% for row in pagination %}
             {% set holder = row[0] %}
             {% set place = holder.place %}
-            <ul class="list-unstyled">
+            {# <ul class="list-unstyled"> #}
             {% if 'nameSort' == sortField %}
                 {# ignore #}
             {% elseif 'numExhibitionSort' == sortField %}
@@ -40,62 +80,37 @@
             {% endif %}
             {% if initial != last_initial %}
                 {% if last_initial != null %}
-                </ul>
+                {# </ul> #}
                 {% endif %}
                 {% if 'countryPlaceNameSort' == sortField and last_countryCode != place.countryCode %}
-                    <h3>{{ countryName(place.countryCode) }}</h3>
+                   {# <h3>{{ countryName(place.countryCode) }}</h3> #}
                     {% set last_countryCode = place.countryCode %}
                 {% endif %}
-                <h4>
-                    {% if 'countryPlaceNameSort' == sortField %}
-                        {% if place is not null %}
-                            {{ helper.place_linked(place) }}
-                        {% endif %}
-                    {% else %}
-                        {{ initial }}
-                    {% endif %}
-                </h4>
-                {% set last_initial = initial %}
-                <ul class="list-group">
-            {% endif %}
-            <li class="list-group-item">
-                <a href="{{ path('holder', { 'id' : holder.id }) }}">
-                    <b>{{ holder.name }}</b>
-                </a>
 
-                ({{ row.numBibitemSort }} cat.)
-                {#% set count = location.exhibitions|length %}
-                {% if count > 0 %}
-                    {% set divId = 'exhibitions' ~ location.id %}
-                    <a class="badge" style="color: white" href="#{{ divId }}" data-toggle="collapse">{{ count }} - {{ row['numCatEntrySort'] }}</a>
-                    <div id="{{ divId }}" class="collapse">
-                    {% for exhibition in location.exhibitions %}
-                        <p>
-                            {{ helper.exhibition_period(exhibition) }}
-                            <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
-                                <b>{{ exhibition.title }}</b>
-                                {{ exhibition.titleAppend }}
-                            </a>
-                        </p>
-                    {% endfor %}
-                    </div>
-                {% endif %#}
-            </li>
+                {% set last_initial = initial %}
+                {# <ul class="list-group"> #}
+            {% endif %}
+            <tr class="listviewrow">
+
+                <td class="title"><a href="{{ path('holder', { 'id' : holder.id }) }}">
+                        <b>{{ holder.name }}</b></a>
+                </td>
+                <td>
+                    {{ row.numBibitemSort }}
+                </td>
+
+            </tr>
         {% endfor %}
-            </ul>
+            {# </ul> #}
             {# display navigation #}
+        </tbody>
+    </table>
             <div class="navigation">
                 {{ knp_pagination_render(pagination) }}
             </div>
         {% else %}
             No Holding Institutions found
         {% endif %}
-        </div>
-        <div class="col-sm-4">
-            <form class="filter" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
-                {{ form_rest(form) }}
-                <input type="submit" name="submit-filter" value="filter" />
-            </form>
-        </div>
+
     </div><!-- .row -->
 {% endblock %}

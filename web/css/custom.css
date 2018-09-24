@@ -35,12 +35,12 @@ a:hover {
 }
 
 
-#exhibition_filter_search, #place_filter_search, #place_filter_country, #person_filter_search, #person_filter_gender, #person_filter_nationality, #exhibition_filter_country, .select2-container--default.select2-container--focus .select2-selection--multiple, #location_filter_search, #location_filter_country {
+#exhibition_filter_search, #holder_filter_search, #holder_filter_country, #place_filter_search, #place_filter_country, #person_filter_search, #person_filter_gender, #person_filter_nationality, #exhibition_filter_country, .select2-container--default.select2-container--focus .select2-selection--multiple, #location_filter_search, #location_filter_country {
     width: 100%!important;
 }
 
 
-#exhibition_filter_country, #place_filter_search, #place_filter_country, #exhibition_filter_search, #location_filter_search, #location_filter_country, #person_filter_search, #person_filter_gender, #person_filter_nationality {
+#exhibition_filter_country, #holder_filter_country, #place_filter_search, #place_filter_country, #exhibition_filter_search, #location_filter_search, #location_filter_country, #person_filter_search, #person_filter_gender, #person_filter_nationality {
     background-color: transparent;
     border: none;
     border-right: 1px solid rgba(112, 112, 112, 0.19);
