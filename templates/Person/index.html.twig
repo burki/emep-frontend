@@ -28,6 +28,7 @@
         {% if pagination.getTotalItemCount > 0 %}
         {# helper.pagination_count(pagination) #}
 
+        <!--
         <div class="sort-control">
             {% set sortField = app.request.get('sort') %}
             Sort by:
@@ -37,6 +38,19 @@
             {{ helper.pagination_sortable(pagination, '# Exhibitions', 'numExhibitionSort', 'desc') }}
             {{ helper.pagination_sortable(pagination, '# Cat. Entries', 'numCatEntrySort', 'desc') }}
         </div>
+        -->
+
+        <table id="exhibitions" class="table table-striped table-bordered dataTable listviewcontainer">
+            <thead>
+            <tr class="listviewheading">
+                <th>{{ helper.pagination_sortable(pagination, 'Name', 'nameSort') }}</th>
+                <th>{{ helper.pagination_sortable(pagination, 'Birth Date', 'P.birthDate') }}</th>
+                <th>{{ helper.pagination_sortable(pagination, 'Death Date', 'P.deathDate') }}</th>
+                <th>{{ helper.pagination_sortable(pagination, 'Number of Exhibitions', 'numExhibitionSort', 'desc') }}</th>
+                <th>{{ helper.pagination_sortable(pagination, 'Number of Cat. Entries', 'numCatEntrySort', 'desc') }}</th>
+            </tr>
+            </thead>
+            <tbody>
 
         {% set last_initial = '' %}
         {% for row in pagination %}
@@ -54,17 +68,47 @@
             {% endif %}
             {% if initial != last_initial %}
                 {% if last_initial != '' %}
-            </ul>
+            {# </ul> #}
                 {% endif %}
-            <h2 class="artist-first-letter">{{ initial }}</h2>
+            {# <h2 class="artist-first-letter">{{ initial }}</h2> #}
             {% set last_initial = initial %}
-            <ul class="list-group">
+            {# <ul class="list-group"> #}
             {% endif %}
-            <li class="list-group-item">
+
+            <tr class="listviewrow">
+                <td class="title">
+                    <a href="{{ path('person', { 'id' : person.id }) }}">{{ person.fullname(true) }}</a>
+                </td>
+
+                <td class="date">
+                    {{ person.birthDate|dateincomplete -}}
+                </td>
+
+                <td class="date">
+                    {{ person.deathDate|dateincomplete -}}
+                </td>
+
+                {% set count = row['numExhibitionSort'] %}
+                <td class="normal">
+                    <span class="badge" style="color: white" >{{ count }}</span>
+                </td>
+
+                {% set countEntries = row['numCatEntrySort'] %}
+                <td class="normal">
+                    <span class="badge" style="color: white" >{{ countEntries }}</span>
+                </td>
+
+            </tr>
+
+
+
+            <!--<li class="list-group-item">
                 {{ helper.person_list_item(person) }}{% if row['numExhibitionSort'] > 0 %}, {{ row['numExhibitionSort'] }} exh., {{ row['numCatEntrySort'] }} entr.{% endif %}
-            </li>
+            </li> -->
         {% endfor %}
-            </ul>
+            </tbody>
+        </table>
+            {# </ul> #}
             {# display navigation #}
             <div class="navigation">
                 {{ knp_pagination_render(pagination) }}

@@ -197,3 +197,42 @@ div#footer-fwf {
     margin-bottom: 2rem;
     width: 100%;
 }
+
+
+/*    HIGHCHARTS  */
+path.highcharts-grid-line {
+    stroke-dasharray: 20 37;
+    stroke-width: 1.2px;
+}
+
+path.highcharts-axis-line {
+    display: none;
+}
+
+path.highcharts-tick {
+    display: none;
+}
+
+.chart-header{
+    color: #5B6974;
+    font-size: 1.7rem;
+}
+
+.chart-header:hover {
+    color: rgba(91, 105, 115, 0.6);
+}
+
+.chartsymbol{
+    color: #02A5BE;
+    margin-right: 1rem;
+    display: inline-block;
+    overflow: hidden;
+    width: 15px;
+    height: 23px;
+}
+
+.charttypeTitle{
+    color: #A4B1BA;
+    margin-left: 1rem;
+    font-size: 1rem;
+}

@@ -5,6 +5,7 @@
 {% block head %}
     <script src="{{ app.request.basepath }}/vendor/highcharts/highcharts.js"></script>
     <script src="{{ app.request.basepath }}/vendor/highcharts/modules/exporting.js"></script>
+
     <!--
     <script src="{{ app.request.basepath }}/vendor/highcharts/themes/sand-signika.js"></script>
     -->
@@ -24,7 +25,7 @@
                     /*, margin: [ 50, 50, 100, 80] */
                 },
                 title: {
-                    text: 'Artists\' Age at Exhibition Start'
+                    text: ' '
                 },
                 /*
                 subtitle: {
@@ -34,11 +35,8 @@
                 xAxis: {
                     categories: {{ categories|raw }},
                     labels: {
-                        rotation: -45,
-                        align: 'right',
-                        style: {
-                            font: 'normal 13px Verdana, sans-serif'
-                        }
+                        rotation: 0,
+                        align: 'right'
                     }
                 },
                 yAxis: [
@@ -87,7 +85,11 @@
                         yAxis: 0,
                         name: 'Age (Living Artist)',
                         data: {{ age_at_exhibition_living|raw }},
-                        stack: 'age'
+                        stack: 'age',
+                        borderColor: '#3683BA',
+                        borderWidth: 2,
+                        borderRadius: 3,
+                        color: '#3683BAbf'
                     },
                     {
                         yAxis: 0,
@@ -100,8 +102,6 @@
 {% endblock %}
 
 {% block body %}
-    <!--<h1>Artists' Age at Exhibition</h1>-->
     <div id="{{ container|raw }}" style="min-width: 800px; height: 400px; margin: 0 auto"></div>
-
     {{ helper.show_detailmodal() }}
 {% endblock %}
