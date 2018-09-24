@@ -39,3 +39,6 @@
 
 # Backup en
 */Entity/*~
+
+# Mac files
+.DS_Store
