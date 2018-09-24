@@ -745,7 +745,7 @@ EOT;
         $categories = array_keys($data);
         for ($i = 0; $i < count($categories); $i++) {
             $category = $categories[$i];
-            foreach (['works', 'works_exhibited','exhibitions']
+            foreach (['works', 'works_exhibited', 'exhibitions']
                      as $key) {
                 if ('works' == $key) {
                     foreach ($styles as $style) {
@@ -820,7 +820,7 @@ EOT;
         $place_categories = array_keys($place_data);
         for ($i = 0; $i < count($place_categories); $i++) {
             $category = $place_categories[$i];
-            foreach (['works', 'works_exhibited','exhibitions']
+            foreach (['works', 'works_exhibited', 'exhibitions']
                      as $key) {
                 $place_total[$key][$category] = [
                     'name' => $category,
@@ -859,10 +859,6 @@ EOT;
             if (!array_key_exists($fullname, $persons_by_place[$place_key])) {
                 // new person in this place
                 $persons_by_place[$place_key][$fullname] = $row;
-                $persons_by_place[$place_key][$fullname]['Figurative']
-                  = $persons_by_place[$place_key][$fullname]['Abstracted']
-                  = $persons_by_place[$place_key][$fullname]['Abstract']
-                  = 0;
                 $persons_by_place[$place_key][$fullname]['total_item']
                     = $persons_by_place[$place_key][$fullname]['total_exhibition']
                     = 0;
@@ -870,6 +866,7 @@ EOT;
                     = $persons_by_place[$place_key][$fullname]['item_ids']
                     = [];
             }
+
             if (!array_key_exists($row['style'], $persons_by_place[$place_key][$fullname])) {
                 $persons_by_place[$place_key][$fullname][$row['style']] = 0;
             }
@@ -882,6 +879,56 @@ EOT;
                 $persons_by_place[$place_key][$fullname]['item_ids'][] = $row['item_id'];
                 $persons_by_place[$place_key][$fullname]['total_item'] += 1;
                 $persons_by_place[$place_key][$fullname][$row['style']] += 1;
+            }
+        }
+
+        // for table
+        $querystr = "SELECT Exhibition.id AS exhibition_id, Item.id AS item_id, YEAR(Exhibition.startdate) AS year, Person.lastname, Person.firstname, IFNULL(Term.name, 'unknown') AS style"
+                    . " FROM Exhibition"
+                    . ' INNER JOIN ItemExhibition ON ItemExhibition.id_exhibition=Exhibition.id'
+                    . ' INNER JOIN Item ON Item.id=ItemExhibition.id_item AND Item.id <> -1'
+                    . ' LEFT OUTER JOIN Term ON Item.style=Term.id'
+                    . ' INNER JOIN ItemPerson ON Item.id=ItemPerson.id_item'
+                    . ' INNER JOIN Person ON ItemPerson.id_person=Person.id AND Person.status <> -1'
+                    . " WHERE Exhibition.status <> -1"
+                  . ' ORDER BY year, Person.id, exhibition_id'
+                  ;
+
+        $stmt = $dbconn->query($querystr);
+
+        $persons_by_year = [];
+        while ($row = $stmt->fetch()) {
+            $year_key = $row['year'];
+
+            if (!array_key_exists($year_key, $persons_by_year)) {
+                // new year
+                $persons_by_year[$year_key] = [];
+            }
+            $fullname = $row['lastname'] . ', ' . $row['firstname'];
+
+            if (!array_key_exists($fullname, $persons_by_year[$year_key])) {
+                // new person in this year
+                $persons_by_year[$year_key][$fullname] = $row;
+                $persons_by_year[$year_key][$fullname]['total_item']
+                    = $persons_by_year[$year_key][$fullname]['total_exhibition']
+                    = 0;
+                $persons_by_year[$year_key][$fullname]['exhibition_ids']
+                    = $persons_by_year[$year_key][$fullname]['item_ids']
+                    = [];
+            }
+
+            if (!array_key_exists($row['style'], $persons_by_year[$year_key][$fullname])) {
+                $persons_by_year[$year_key][$fullname][$row['style']] = 0;
+            }
+
+            if (!in_array($row['exhibition_id'], $persons_by_year[$year_key][$fullname]['exhibition_ids'])) {
+                $persons_by_year[$year_key][$fullname]['exhibition_ids'][] = $row['exhibition_id'];
+                $persons_by_year[$year_key][$fullname]['total_exhibition'] += 1;
+            }
+            if (!in_array($row['item_id'], $persons_by_year[$year_key][$fullname]['item_ids'])) {
+                $persons_by_year[$year_key][$fullname]['item_ids'][] = $row['item_id'];
+                $persons_by_year[$year_key][$fullname]['total_item'] += 1;
+                $persons_by_year[$year_key][$fullname][$row['style']] += 1;
             }
         }
 
@@ -900,6 +947,7 @@ EOT;
 
             'persons_by_place_persons' => $categories,
             'persons_by_place' => $persons_by_place,
+            'persons_by_year' => $persons_by_year,
         ]);
     }
 
