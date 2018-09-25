@@ -15,6 +15,87 @@ extends Controller
 {
     static $countryMap = [ 'UA' => 'RU' ]; // don't count Ukrania seperately
 
+    // . " INNER JOIN ExhibitionLocation ON ExhibitionLocation.id_exhibition=Exhibition.id_location"
+
+
+
+    public function exhibitionByMonthIndex($countriesQuery, $organizerTypeQuery){
+
+        $em = $this->getDoctrine()->getEntityManager();
+
+        $countryQueryString = $this->getCountryQueryString('Location', 'Exhibition', 'country', $countriesQuery);
+
+        $dbconn = $em->getConnection();
+        $querystr = "SELECT YEAR(startdate) AS start_year, MONTH(startdate) AS start_month"
+            . ", COUNT(*) AS how_many FROM Exhibition"
+            . " INNER JOIN ExhibitionLocation ON ExhibitionLocation.id_exhibition=Exhibition.id"
+            . " INNER JOIN Location ON Location.id=ExhibitionLocation.id_location"
+            . " WHERE Exhibition.status <> -1 AND MONTH(startdate) <> 0"
+            . " AND ${countryQueryString}" // FILTERING THE LOCATIONS
+            . " GROUP BY YEAR(startdate), MONTH(startdate)"
+            . " ORDER BY start_year, start_month"
+        ;
+
+        //->andWhere("Pl.countryCode IN(${countryQueryString})")
+
+
+
+        $stmt = $dbconn->query($querystr);
+        $frequency_count = [];
+        $min_year = -1;
+        while ($row = $stmt->fetch()) {
+            if ($min_year < 0) {
+                $min_year = (int)$row['start_year'];
+            }
+            $key = $row['start_year'] . sprintf('%02d', $row['start_month']);
+            $how_many = (int)$row['how_many'];
+            $frequency_count[$key] = $how_many;
+        }
+
+        $data = $scatter_data = $scatter_categories = [];
+
+        $keys = array_keys($frequency_count);
+        $i = $min = $keys[0];
+        $max = $keys[count($keys) - 1];
+        $sum = 0;
+        while ($i <= $max) {
+            $key = $i;
+            $categories[] = sprintf('%04d-%02d', $year = intval($i / 100), $month = $i % 100);
+            $count = array_key_exists($key, $frequency_count) ? $frequency_count[$key] : 0;
+            $sum += $count;
+            $data[] = $count;
+            if ($count > 0) {
+                if (!in_array($year, $scatter_categories)) {
+                    $scatter_categories[] = $year;
+                }
+                $scatter_data[] = [
+                    'y' => $year - $min_year,
+                    'x' => $month - 1,
+                    'count' => $count, 'year' => $year,
+                    'marker' => [ 'radius' => intval(2 * sqrt($count) + 0.5) ]
+                ];
+            }
+            // $sum += $count;
+            if ($i % 100 < 12) {
+                ++$i;
+            }
+            else {
+                $i = $i + (100 - $i % 100) + 1;
+            }
+        }
+        $data_avg = round(1.0 * $sum / count($data), 1);
+
+        // display the static content
+        return $this->render('Statistics/exhibition-by-month-index.html.twig', [
+            'data_avg' => $data_avg,
+            'categories' => json_encode($categories),
+            'data' => json_encode($data),
+            'scatter_data' => json_encode($scatter_data),
+            'scatter_categories' => json_encode($scatter_categories),
+        ]);
+    }
+
+
     /**
      * @Route("/exhibition/by-month", name="exhibition-by-month")
      */
@@ -25,7 +106,7 @@ extends Controller
         $dbconn = $em->getConnection();
         $querystr = "SELECT YEAR(startdate) AS start_year, MONTH(startdate) AS start_month"
                   . ", COUNT(*) AS how_many FROM Exhibition"
-                  . " WHERE status <> -1 AND MONTH(startdate) <> 0"
+                  . " WHERE Exhibition.status <> -1 AND MONTH(startdate) <> 0"
                   . " GROUP BY YEAR(startdate), MONTH(startdate)"
                   . " ORDER BY start_year, start_month"
                   ;
@@ -903,6 +984,209 @@ EOT;
         ]);
     }
 
+    function getCountryQueryString($countryModelString, $fallbackModel, $countryCode, $countriesQuery){
+        $countryQueryString = '';
+        $counterCountry = 0;
+
+        if ($countriesQuery.length > 1){
+            foreach($countriesQuery as $country){
+                if(counter > 0){
+                    $countryQueryString .= ", ";
+                }
+                $countryQueryString .= "'" . $country . "'";
+
+                $counterCountry++;
+            }
+        }else {
+            $countryQueryString = "'". $countriesQuery ."'";
+        }
+
+        if($countriesQuery === 'any'){
+            $countryQueryString = $fallbackModel. ".status <> -1";
+        }else{
+            $countryQueryString = $countryModelString . ".".$countryCode." IN(" . $countryQueryString . ")";
+        }
+
+        return $countryQueryString;
+    }
+
+    // controller is called by /exhibition route to load async the stats
+    function exhibitionNationalityIndex($countriesQuery, $organizerTypeQuery){
+
+
+        $countryQueryString = $this->getCountryQueryString('Pl', 'L', 'countryCode', $countriesQuery);
+
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+
+        // >where("u.created_date BETWEEN '${fromdateaccounts}'
+
+        $qb->select([
+            'P.id',
+            'P.nationality',
+            'Pl.countryCode',
+            'COUNT(DISTINCT IE.id) AS numEntries',
+            'C.name'
+        ])
+            ->from('AppBundle:Location', 'L')
+            ->leftJoin('L.place', 'Pl')
+            ->leftJoin('Pl.country', 'C')
+            ->leftJoin('AppBundle:Exhibition', 'E',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'E.location = L AND E.status <> -1')
+            ->leftJoin('AppBundle:ItemExhibition', 'IE',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE.exhibition = E AND IE.title IS NOT NULL')
+            ->innerJoin('IE.person', 'P')
+            ->where('L.status <> -1')
+            //->andWhere($countryQueryString)
+            //->andWhere("Pl.countryCode IN(${countryQueryString})")
+            ->andWhere("${countryQueryString}")
+            //->andWhere("Pl.countryCode IN('CH', 'NL')") // test
+            ->groupBy('P.id')
+            ->orderBy('C.name', 'DESC')
+        ;
+
+        $lastCountry = '';
+        $result = $qb->getQuery()->getResult();
+
+        $statsByCountry = [];
+        $statsByNationality = [];
+        foreach ($result as $row) {
+            $cc = $row['countryCode'];
+            if (array_key_exists($cc, self::$countryMap)) {
+                $cc = self::$countryMap[$cc];
+            }
+
+            if (!array_key_exists($cc, $statsByCountry)) {
+                $statsByCountry[$cc] = [
+                    'name' => $row['name'],
+                    'countByNationality' => [],
+                    'totalArtists' => 0,
+                    'totalItemExhibition' => 0,
+                ];
+            }
+
+            $nationality = empty($row['nationality'])
+                ? 'XX' : $row['nationality'];
+            if (array_key_exists($nationality, self::$countryMap)) {
+                $nationality = self::$countryMap[$nationality];
+            }
+
+            if (!array_key_exists($nationality, $statsByNationality)) {
+                $statsByNationality[$nationality] = [
+                    // 'name' => $row['name'],
+                    'countArtists' => 0,
+                    'countItemExhibition' => 0,
+                ];
+            }
+            if (!array_key_exists($nationality, $statsByCountry[$cc]['countByNationality'])) {
+                $statsByCountry[$cc]['countByNationality'][$nationality] = [
+                    'countArtists' => 0,
+                    'countItemExhibition' => 0,
+                ];
+            }
+            ++$statsByCountry[$cc]['countByNationality'][$nationality]['countArtists'];
+            ++$statsByCountry[$cc]['totalArtists'];
+            ++$statsByNationality[$nationality]['countArtists'];
+
+            $statsByCountry[$cc]['countByNationality'][$nationality]['countItemExhibition'] += $row['numEntries'];
+            $statsByCountry[$cc]['totalItemExhibition'] += $row['numEntries'];
+            $statsByNationality[$nationality]['countItemExhibition'] += $row['numEntries'];
+        }
+
+        $key = 'countItemExhibition'; // alternative: 'countArtists'
+
+        $nationalities = [];
+        foreach ($statsByNationality as $nationality => $stats) {
+            $nationalities[$nationality] = $stats[$key];
+        }
+
+        $countries = array_keys($statsByCountry);
+
+        uksort($nationalities, function ($idxA, $idxB) use ($countries, $nationalities) {
+            if ('XX' == $idxA) {
+                $a = 0;
+            }
+            else {
+                $countryIdx = array_search($idxA, $countries);
+                $a = false !== $countryIdx ? $countryIdx + 100000 : $nationalities[$idxA];
+            }
+
+            if ('XX' == $idxB) {
+                $b = 0;
+            }
+            else {
+                $countryIdx = array_search($idxB, $countries);
+                $b = false !== $countryIdx ? $countryIdx  + 100000 : $nationalities[$idxB];
+            }
+
+            if ($a == $b) {
+                return 0;
+            }
+
+            return ($a < $b) ? 1 : -1;
+        });
+
+        $maxNationality = 16;
+        $xCategories = array_keys($nationalities);
+        if (count($xCategories) > $maxNationality) {
+            $xCategories = array_merge(array_slice($xCategories, 0, $maxNationality - 1 ),
+                [ 'unknown', 'other' ]);
+        }
+        // exit;
+
+        $valuesFinal = [];
+        $y = 0;
+        foreach ($statsByCountry as $cc => $stats) {
+            $values = [];
+            foreach ($stats['countByNationality'] as $nationality => $counts) {
+                $x = array_search('XX' === $nationality ? 'unknown' : $nationality, $xCategories);
+                if (false === $x) {
+                    $x = array_search('other', $xCategories);
+                }
+                if (false !== $x) {
+                    $percentage = 100.0 * $counts[$key] / $stats['totalItemExhibition'];
+                    $valuesFinal[] = [
+                        'x' => $x,
+                        'y' => $y,
+                        'value' => $percentage,
+                        'total' => $counts[$key],
+                    ];
+                }
+                // $values[$nationality] = $counts[$key];
+            }
+            /*
+            arsort($values);
+
+            $valuesFinal[$cc] = array_map(function ($idx) use ($values) {
+                                        return [
+                                            'name' => $idx,
+                                            'y' => $values[$idx],
+                                        ];
+                                     },
+                                     array_keys($values));
+            */
+            $y++;
+        }
+        // var_dump($valuesFinal);
+
+
+        /*return $this->render('Statistics/test.html.twig', [
+            'countries' => $countries,
+            'nationalities' => $xCategories,
+            'data' => $valuesFinal,
+        ]);*/
+
+        return $this->render('Statistics/exhibition-nationality-index.html.twig', [
+            'countries' => $countries,
+            'nationalities' => $xCategories,
+            'data' => $valuesFinal,
+        ]);
+    }
+
     /**
      * @Route("/exhibition/nationality", name="exhibition-nationality")
      */
@@ -910,12 +1194,6 @@ EOT;
 
     function exhibitionNationalityAction(Request $request)
     {
-        if ($request->query->has('exhibition_filter')) {
-            echo 'has the form stats';
-        }
-
-
-
         $qb = $this->getDoctrine()
                 ->getManager()
                 ->createQueryBuilder();

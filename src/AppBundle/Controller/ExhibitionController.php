@@ -36,24 +36,6 @@ extends CrudController
     }
 
 
-    /**
-     * @Route("/rest/{country}/{types}/{string}", name="rest-index")
-     */
-
-    public function restTest(Request $request, $country, $types, $string){
-        $title = $request->attributes->get('title');
-
-        echo ('$country: ');
-        echo $country;
-
-        echo ('          ');
-        echo ('$types: ');
-        echo $types;
-
-        echo ('          ');
-        echo ('$string: ');
-        echo $string;
-    }
 
     /**
      * @Route("/exhibition", name="exhibition-index")
@@ -61,9 +43,6 @@ extends CrudController
     public function indexAction(Request $request)
     {
 
-        if ($request->query->has('exhibition_filter')) {
-            echo 'has the form exhibition';
-        }
 
 
         $route = $request->get('_route');
@@ -110,6 +89,9 @@ extends CrudController
         }
 
 
+        $countries = $form->get('country')->getData();
+        $organizerType = $form->get('organizer_type')->getData();
+
 
         // NEEDS TO BE HERE TO GET THE SAME FORM RESULT --> FORM NEEDS TO BE SUBMITTED
 
@@ -145,7 +127,9 @@ extends CrudController
             'markerStyle' => $mapdata['markerStyle'],
             'persons' => $mapdata['persons'],
             'realData' => $result,
-            'resultTest' => $mapdata['resultTest']
+            'resultTest' => $mapdata['resultTest'],
+            'countries' => $countries,
+            'organizerType' => $organizerType
         ]);
     }
 

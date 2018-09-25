@@ -1,0 +1,102 @@
+
+    <script src="{{ app.request.basepath }}/vendor/highcharts/highcharts.js"></script>
+    <script src="{{ app.request.basepath }}/vendor/highcharts/modules/exporting.js"></script>
+    <script src="{{ app.request.basepath }}/js/collapseChart.js"></script>
+
+    <!--
+    <script src="{{ app.request.basepath }}/vendor/highcharts/themes/sand-signika.js"></script>
+    -->
+    <script type="text/javascript">
+    var chart;
+
+    $(document).ready(function() {
+        $('#container-exhibtions-bar').highcharts({
+            chart: {
+                // renderTo: 'container',
+                zoomType: 'xy'
+            },
+            title: {
+                text: ''
+            },
+            subtitle: {
+                text: 'Average: {{ data_avg }} exhibitions per month'
+            },
+            xAxis: {
+                categories: {{ categories|raw }},
+                labels: {
+                    rotation: -45,
+                    step: 3, // this will show one label for every quarter
+                    align: 'right'
+                }
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: '\n',
+                }
+            },
+            legend: {
+                enabled: false
+            },
+            tooltip: {
+                // headerFormat: '{point.key}',
+                pointFormat: '{point.y} Exhibitions'
+            },
+
+            series: [
+                {
+                    type: 'column',
+                    data: {{ data|raw }}
+                }
+            ]
+        });
+
+
+        // see http://jsfiddle.net/KmPJE/1/
+        $('#container-exhibtions-bubble').highcharts({
+            chart: {
+                defaultSeriesType: 'scatter'
+            },
+
+            title: {
+                text: "\n"
+            },
+
+            xAxis: {
+                categories: ['Jan','Feb','Mar','Apr','May','Jun','Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            },
+
+            yAxis: {
+                categories: {{ scatter_categories|raw }},
+            },
+
+            tooltip: {
+                    formatter: function() {
+                        // console.log(this);
+                        return '<b>'
+                            + this.point.count
+                            + ' exhibitions '
+                            + ' in '
+                            + this.x + ' ' + this.point.year
+                            + '</b>';
+                    }
+                },
+
+            series: [{
+                name: 'Exhibitions',
+                data: {{ scatter_data|raw }}
+            }]
+        });
+
+    });
+    </script>
+
+    <h3 class="chart-header" data-collapse="container-exhibtions-bar"><span class="chartsymbol">+</span>Number of exhibitions by month<span class="charttypeTitle">(Bar Chart)</span></h3>
+    <div class="collapse" id="container-exhibtions-bar" style="min-width: 800px; height: 400px; margin: 0 auto;"></div>
+
+    <h3 class="chart-header" data-collapse="container-exhibtions-bubble"><span class="chartsymbol">+</span>Number of exhibitions by month<span class="charttypeTitle">(Bubble Chart)</span></h3>
+    <div class="collapse" id="container-exhibtions-bubble" style="min-width: 800px; height: 400px; margin: 0 auto;"></div>
+
+
+    <script src="{{ app.request.basepath }}/js/collapseChart.js"></script>
+
