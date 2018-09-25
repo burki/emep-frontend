@@ -13,7 +13,8 @@ framework:
     # JMS\TranslationBundle\JMSTranslationBundle needs validation
     # validation: ~
     templating:
-        engines: ['twig', 'php']
+        engines: ['twig']
+        hinclude_default_template: hinclude.html.twig
     # knp_paginator needs translate bundle
     translator: { fallbacks: ['%locale%'], logging: false }
     # needs form bundle
@@ -21,6 +22,7 @@ framework:
     session:
         storage_id: session.storage.php_bridge
         handler_id: ~
+    fragments: { path: /_fragment }
 
 twig:
     globals:

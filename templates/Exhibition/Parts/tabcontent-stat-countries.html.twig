@@ -3,7 +3,11 @@
     <script src="https://raw.github.com/mnot/hinclude/v0.9.1/hinclude.js"></script>
 
 
-    {{ render_hinclude(url('location'), {'default': 'Loading...'}) }}
+
+
+    {{ render_hinclude(controller('...'), {'default': 'Loading...'}) }}
+
+
 
     {{ render(controller(
             'AppBundle\\Controller\\StatisticsController::exhibitionNationalityAction'
