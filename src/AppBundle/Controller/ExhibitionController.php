@@ -35,11 +35,37 @@ extends CrudController
         return $this->buildActiveCountries($qb);
     }
 
+
+    /**
+     * @Route("/rest/{country}/{types}/{string}", name="rest-index")
+     */
+
+    public function restTest(Request $request, $country, $types, $string){
+        $title = $request->attributes->get('title');
+
+        echo ('$country: ');
+        echo $country;
+
+        echo ('          ');
+        echo ('$types: ');
+        echo $types;
+
+        echo ('          ');
+        echo ('$string: ');
+        echo $string;
+    }
+
     /**
      * @Route("/exhibition", name="exhibition-index")
      */
     public function indexAction(Request $request)
     {
+
+        if ($request->query->has('exhibition_filter')) {
+            echo 'has the form exhibition';
+        }
+
+
         $route = $request->get('_route');
 
         $qb = $this->getDoctrine()
@@ -65,11 +91,15 @@ extends CrudController
             ->orderBy('dateSort')
             ;
 
+
+
         $organizerTypes = $this->buildOrganizerTypes();
         $form = $this->get('form.factory')->create(\AppBundle\Filter\ExhibitionFilterType::class, [
             'country_choices' => array_flip($this->buildCountries()),
             'organizer_type_choices' => array_combine($organizerTypes, $organizerTypes),
         ]);
+
+
 
         if ($request->query->has($form->getName())) {
             // manually bind values from the request
@@ -79,16 +109,43 @@ extends CrudController
             $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($form, $qb);
         }
 
+
+
+        // NEEDS TO BE HERE TO GET THE SAME FORM RESULT --> FORM NEEDS TO BE SUBMITTED
+
+
+
+        // STARTING TO ADD MAP DATA HERE
+        // $mapdata = StatisticsController::exhibitionAgeDistribution($em = $this->getDoctrine()->getEntityManager(), $exhibition->getId());
+        $mapdata = MapController::exhibitionByPlaceIndex($request, $this, $form);
+        // echo $mapdata;
+
+
+        // END MAP DATA HERE
+
+
+
         $pagination = $this->buildPagination($request, $qb->getQuery(), [
             // the following leads to wrong display in combination with our
             // helper.pagination_sortable()
             // 'defaultSortFieldName' => 'dateSort', 'defaultSortDirection' => 'asc',
         ]);
 
+        // echo ($mapdata['bounds']);
+
+        $result = $qb->getQuery()->execute();
+
         return $this->render('Exhibition/index.html.twig', [
             'pageTitle' => $this->get('translator')->trans('Exhibitions'),
             'pagination' => $pagination,
             'form' => $form->createView(),
+            'data'=>$mapdata['data'],
+            'bounds'=>$mapdata['bounds'],
+            'disableClusteringAtZoom' => $mapdata['disableClusteringAtZoom'],
+            'markerStyle' => $mapdata['markerStyle'],
+            'persons' => $mapdata['persons'],
+            'realData' => $result,
+            'resultTest' => $mapdata['resultTest']
         ]);
     }
 

@@ -1,0 +1,189 @@
+{% import 'Shared/map-leaflet.html.twig' as map %}
+{% block head %}
+    {{ map.head() }}
+    {{ map.head_markercluster() }}
+    {{ map.head_heatmap() }}
+
+    <style>
+        .my-tooltip {
+            border: none;
+            padding: 2px;
+            padding-left: 6px;
+            padding-right: 6px;
+            background-color:rgba(30, 30, 30, 0.5);
+            box-shadow: none;
+            color: white;
+        }
+
+        .my-tooltip a {
+            color: white;
+            font-weight: bold;
+        }
+
+        .leaflet-tooltip-left.my-tooltip::before {
+            border-left-color: white;
+        }
+
+        .leaflet-tooltip-right.my-tooltip::before {
+            border-right-color: white;
+        }
+
+        .leaflet-marker-pane,
+        .leaflet-shadow-pane,
+        .leaflet-overlay-pane {
+            /* hack to work around https://github.com/CloudMade/Leaflet/issues/335 */
+            -webkit-transform: translateZ(0px);
+        }
+
+        #map_filter_location-type {
+            min-width: 15em;
+        }
+
+        form.filter div {
+            display: inline-block;
+        }
+    </style>
+
+    <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/select2-4.0.3/css/select2.min.css" />
+    <script src="{{ app.request.basepath }}/vendor/select2-4.0.3/js/select2.full.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#map_filter_location-type').select2({
+                placeholder: 'all'
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block body %}
+
+    <div role="tabpanel" class="tab-pane mappane" id="map">
+
+
+
+        <div id="map-container">
+            <div id="map" style="width: 100%; min-height: 480px"></div>
+        </div>
+        <script type="text/javascript">
+
+
+            {{ map.showMap(bounds, marker) }}
+            showMap();
+
+            {% if showHeatMap %}
+            // heat map
+            var heatCfg = {
+                // radius should be small ONLY if scaleRadius is true (or small radius is intended)
+                // if scaleRadius is false it will be the constant radius used in pixels
+                "radius": 25,
+                "scaleRadius": true,
+                "maxZoom": 6,
+                "max": {{ maxCount }}
+            };
+
+            var heatData = {{ data|raw }}.map(function (p) { return [p[0], p[1], p[4]]; });
+            var heat = L.heatLayer(heatData, heatCfg).addTo(map);
+            {% endif %}
+
+            // place markers
+            var markerStyle = {% if markerStyle is defined %}{{ markerStyle|json_encode|raw }}{% else %}'regular'{% endif %};
+
+            var markers = L.markerClusterGroup({
+                iconCreateFunction: function (cluster) {
+                    var markers = cluster.getAllChildMarkers();
+                    var n = 0;
+                    for (var i = 0; i < markers.length; i++) {
+                        n += markers[i].number;
+                    }
+                    var childCount = n;
+                    var c = ' marker-cluster-';
+                    if (childCount < 10) {
+                        c += 'small';
+                    } else if (childCount < 100) {
+                        c += 'medium';
+                    } else {
+                        c += 'large';
+                    }
+
+                    return new L.DivIcon({
+                        html: '<div><span>' + childCount + '</span></div>',
+                        className: 'marker-cluster' + c,
+                        iconSize: new L.Point(40, 40),
+                    });
+                },
+                spiderfyOnMaxZoom: false,
+                // showCoverageOnHover: false,
+                // zoomToBoundsOnClick: false,
+                disableClusteringAtZoom: {% if disableClusteringAtZoom is not empty %}{{ disableClusteringAtZoom }}{% else %}5{% endif %}
+            });
+
+            var addressPoints = {{ data|raw }};
+            for (var i = 0; i < addressPoints.length; i++) {
+                var a = addressPoints[i];
+                var title = a[2];
+                var count = a[4];
+
+                if ('circle' !== markerStyle) {
+                    var marker = L.marker(L.latLng(a[0], a[1]),
+                        { title: title });
+                }
+                else {
+                    var radius = 6;
+                    if (count > 0) {
+                        radius += Math.round(1.5 * Math.log2(count > 256 ? 256 : count));
+                    }
+                    var markerProperties = {
+                        radius: radius,
+                        fillColor: 'rgb(0, 99, 166)',
+                        color: 'rgb(0, 99, 166)',
+                        weight: 1,
+                        opacity: 1,
+                        fillOpacity: 0.7
+                    };
+
+                    var marker = L.circleMarker(L.latLng(a[0], a[1]), markerProperties)
+                        .bindTooltip(title + ' (' + count + ')', {className: 'my-tooltip'})
+                    ;
+
+                }
+
+                marker.number = count;
+                marker.bindPopup('<strong>' + title + '</strong><br />' + a[3]);
+
+                markers.addLayer(marker);
+            }
+
+            /*
+            markers.on('clusterclick', function (a) {
+                a.layer.spiderfy();
+            });
+            */
+
+            map.addLayer(markers);
+
+
+
+            // re-centers the map when the viewport size changes
+            map.on('resize', function () {
+                map.invalidateSize();
+            });
+
+
+            function clickMap(){
+                // we need a delay so the resizing happens when the map is in the viewport
+                setTimeout(function() {
+                    map.invalidateSize();
+                }, 200);
+            }
+
+        </script>
+
+        {% if filter is not null %}
+            <form class="filter" method="post" action="{{ path(app.request.attributes.get('_route')) }}">
+                {{ form_rest(filter) }}
+                <input type="submit" name="submit-filter" value="filter" />
+            </form>
+        {% endif %}
+
+    </div>
+{% endblock %}

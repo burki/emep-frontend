@@ -906,11 +906,20 @@ EOT;
     /**
      * @Route("/exhibition/nationality", name="exhibition-nationality")
      */
+
+
     function exhibitionNationalityAction(Request $request)
     {
+        if ($request->query->has('exhibition_filter')) {
+            echo 'has the form stats';
+        }
+
+
+
         $qb = $this->getDoctrine()
                 ->getManager()
                 ->createQueryBuilder();
+
 
         $qb->select([
                 'P.id',

@@ -124,6 +124,7 @@ extends CrudController
      */
     public function exhibitionByPlace(Request $request)
     {
+
         $em = $this->getDoctrine()->getEntityManager();
         $dbconn = $em->getConnection();
 
@@ -317,6 +318,182 @@ extends CrudController
             'markerStyle' => 'exhibition-by-place' == $route ? 'circle' : 'default',
             'persons' => $persons,
         ]);
+    }
+
+
+
+    // refactor this big time
+    public function exhibitionByPlaceIndex(Request $request, $thisOptional, $form)
+    {
+
+
+        $em = $thisOptional->getDoctrine()->getEntityManager();
+        $dbconn = $em->getConnection();
+
+        $route = $request->get('_route');
+        $persons = null;
+        $maxDisplay = 10;
+        $disableClusteringAtZoom = 5;
+        $filterData = [];
+        $parameters = [];
+        $parametersTypes = [];
+
+
+
+        $querystr = "SELECT DISTINCT Exhibition.id AS exhibition_id, Exhibition.title, startdate, enddate, Exhibition.displaydate AS displaydate, Location.id AS location_id, Location.name AS location_name, COALESCE(Geoname.name_variant, Geoname.name) AS place, Geoname.tgn, Geoname.latitude, Geoname.longitude"
+            . " FROM Exhibition"
+            . " INNER JOIN Location ON Location.id=Exhibition.id_location"
+            . " INNER JOIN Geoname ON Geoname.tgn=Location.place_tgn";
+
+
+
+        $andWhere = '';
+
+        $querystr
+            .= " WHERE"
+            . " Exhibition.status <> -1"
+            . $andWhere
+            . " ORDER BY tgn, Exhibition.startdate, location_name, Exhibition.title"
+        ;
+
+
+
+        // TEST OTHER VARIANT
+
+        $qb = $thisOptional->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb->select([
+            'E',
+            'L.id AS location_id',
+            'L.name AS location_name',
+            'COALESCE(G.name) AS place',
+            'G.tgn',
+            'G.latitude',
+            'G.longitude',
+            //'startdate',
+            //'enddate'
+        ])
+            ->from('AppBundle:Exhibition', 'E')
+            ->innerJoin('E.location', 'L')
+            ->innerJoin('L.place', 'G')
+            ->leftJoin('L.place', 'P')
+            ->where('E.status <> -1')
+            // ->where('ORDER BY tgn, E.startdate, location_name, E.title')
+            ->groupBy('E.id')
+            //->orderBy('dateSort')
+        ;
+
+
+
+        if ($request->query->has($form->getName())) {
+            // manually bind values from the request
+            // $form->submit($request->query->get('exhibition_filter'));
+
+            // build the query from the given form object
+            $thisOptional->get('lexik_form_filter.query_builder_updater')->addFilterConditions($form, $qb);
+        }
+
+        $result = $qb->getQuery()->execute();
+
+
+
+        $stmt = $dbconn->executeQuery($querystr, $parameters, $parametersTypes);
+        $values = [];
+        $values_country = [];
+
+        $displayhelper = new ExhibitionDisplayHelper();
+
+        //foreach ($values as $key => $value) {
+
+        //print_r($result[0]);
+
+        //$result = $stmt;
+
+        foreach ($result as $row) {
+            if (empty($row['location_geo']) && $row['longitude'] == 0 && $row['latitude'] == 0) {
+                continue;
+            }
+            $key = $row['latitude'] . ':' . $row['longitude'];
+            if (!empty($row['location_geo'])) {
+                list($latitude, $longitude) = preg_split('/\s*,\s*/', $row['location_geo'], 2);
+                $key = $latitude . ':' . $longitude;
+            }
+            else {
+                $latitude = $row['latitude'];
+                $longitude = $row['longitude'];
+            }
+
+            if (!array_key_exists($key, $values)) {
+                $values[$key]  = [
+                    'latitude' => (double)$latitude,
+                    'longitude' => (double)$longitude,
+                    'place' => sprintf('<a href="%s">%s</a>',
+                        htmlspecialchars($thisOptional->generateUrl('place-by-tgn', [
+                            'tgn' => $row['tgn'],
+                        ])),
+                        htmlspecialchars($row['place'])),
+                    'exhibitions' => [],
+                ];
+            }
+
+            if ('location-by-place' == $route) {
+                $values[$key]['exhibitions'][] =
+                    sprintf('<a href="%s">%s</a>',
+                        htmlspecialchars($thisOptional->generateUrl('location', [
+                            'id' => $row['location_id'],
+                        ])),
+                        htmlspecialchars($row['location_name'])
+                    );
+            }
+            else if ('place-map' != $route) {
+                $values[$key]['exhibitions'][] =
+                    sprintf('<a href="%s">%s</a> at <a href="%s">%s</a> (%s)',
+                        htmlspecialchars($thisOptional->generateUrl('exhibition', [
+                            'id' => $row['exhibition_id'],
+                        ])),
+                        htmlspecialchars($row['title']),
+                        htmlspecialchars($thisOptional->generateUrl('location', [
+                            'id' => $row['location_id'],
+                        ])),
+                        htmlspecialchars($row['location_name']),
+                        $displayhelper->buildDisplayDate($row)
+                    );
+            }
+        }
+
+        $values_final = [];
+        foreach ($values as $key => $value) {
+            $count_entries = count($value['exhibitions']);
+            if ($count_entries <= $maxDisplay) {
+                $entry_list = implode('<br />', $value['exhibitions']);
+            }
+            else {
+                $entry_list = implode('<br />', array_slice($value['exhibitions'], 0, $maxDisplay - 1))
+                    . sprintf('<br />... (%d more)', $count_entries - $maxDisplay);
+            }
+            $values_final[] = [
+                $value['latitude'], $value['longitude'],
+                $value['place'],
+                $entry_list,
+                'place-map' == $route ? 1 : count($value['exhibitions']),
+            ];
+        }
+
+        // display
+        return [
+            'data' => json_encode($values_final),
+            'filter' => is_null($form) ? null : $form->createView(),
+            'disableClusteringAtZoom' => $disableClusteringAtZoom,
+            'bounds' => [
+                [ 60, -120 ],
+                [ -15, 120 ],
+            ],
+            'markerStyle' => 'exhibition-by-place' == $route ? 'circle' : 'default',
+            'persons' => $persons,
+            'resultTest' => $result
+        ];
     }
 }
 

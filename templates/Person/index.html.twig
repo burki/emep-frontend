@@ -46,8 +46,8 @@
                 <th>{{ helper.pagination_sortable(pagination, 'Name', 'nameSort') }}</th>
                 <th>{{ helper.pagination_sortable(pagination, 'Birth Date', 'P.birthDate') }}</th>
                 <th>{{ helper.pagination_sortable(pagination, 'Death Date', 'P.deathDate') }}</th>
-                <th>{{ helper.pagination_sortable(pagination, 'Number of Exhibitions', 'numExhibitionSort', 'desc') }}</th>
-                <th>{{ helper.pagination_sortable(pagination, 'Number of Cat. Entries', 'numCatEntrySort', 'desc') }}</th>
+                <th class="number-center">{{ helper.pagination_sortable(pagination, 'Number of Exhibitions', 'numExhibitionSort', 'desc') }}</th>
+                <th class="number-right">{{ helper.pagination_sortable(pagination, 'Number of Cat. Entries', 'numCatEntrySort', 'desc') }}</th>
             </tr>
             </thead>
             <tbody>
@@ -89,13 +89,13 @@
                 </td>
 
                 {% set count = row['numExhibitionSort'] %}
-                <td class="normal">
-                    <span class="badge" style="color: white" >{{ count }}</span>
+                <td class="normal number-center">
+                    {{ count }}
                 </td>
 
                 {% set countEntries = row['numCatEntrySort'] %}
-                <td class="normal">
-                    <span class="badge" style="color: white" >{{ countEntries }}</span>
+                <td class="normal number-right">
+                    {{ countEntries }}
                 </td>
 
             </tr>
