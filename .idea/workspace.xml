@@ -2,20 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="83f6ca58-d621-4971-9ce4-caca212d12de" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/templates/Exhibition/Parts/tabcontent-exhibition-list.html.twig" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/Exhibition/Parts/tabcontent-map.html.twig" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/Exhibition/Parts/tabcontent-stat-countries.html.twig" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/Exhibition/Parts/tabs-header-index.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/AppBundle/Controller/ExhibitionController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/AppBundle/Controller/ExhibitionController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/AppBundle/Controller/MapController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/AppBundle/Controller/MapController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/AppBundle/Controller/StatisticsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/AppBundle/Controller/StatisticsController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/Exhibition/Parts/tabs-header.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Exhibition/Parts/tabs-header.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/Exhibition/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Exhibition/index.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/Holder/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Holder/index.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/Map/place-map.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Map/place-map.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/Person/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Person/index.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/css/custom.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/css/custom.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.yaml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -87,7 +74,7 @@
         <entry file="file://$PROJECT_DIR$/config/config.yaml">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="225">
-              <caret line="15" column="24" selection-start-line="15" selection-start-column="24" selection-end-line="15" selection-end-column="24" />
+              <caret line="15" column="31" selection-start-line="15" selection-start-column="31" selection-end-line="15" selection-end-column="31" />
             </state>
           </provider>
         </entry>
@@ -462,12 +449,12 @@
       <workItem from="1536527684778" duration="4670000" />
       <workItem from="1536837788493" duration="22651000" />
       <workItem from="1537454040705" duration="6699000" />
-      <workItem from="1537693644648" duration="22171000" />
+      <workItem from="1537693644648" duration="22221000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="72185000" />
+    <option name="totallyTimeSpent" value="72235000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
@@ -843,7 +830,7 @@
     <entry file="file://$PROJECT_DIR$/config/config.yaml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="225">
-          <caret line="15" column="24" selection-start-line="15" selection-start-column="24" selection-end-line="15" selection-end-column="24" />
+          <caret line="15" column="31" selection-start-line="15" selection-start-column="31" selection-end-line="15" selection-end-column="31" />
         </state>
       </provider>
     </entry>

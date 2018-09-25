@@ -13,7 +13,7 @@ framework:
     # JMS\TranslationBundle\JMSTranslationBundle needs validation
     # validation: ~
     templating:
-        engines: ['twig']
+        engines: ['twig', 'php']
     # knp_paginator needs translate bundle
     translator: { fallbacks: ['%locale%'], logging: false }
     # needs form bundle
