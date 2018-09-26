@@ -24,19 +24,23 @@ a:hover {
 
 .searchbarinputcontainer div:nth-child(1) {
     width: 35%!important;
+    height: 100%;
 }
 
 .searchbarinputcontainer div:nth-child(2){
     width: 25%;
+    height: 100%;
 }
 
 .searchbarinputcontainer div:nth-child(3){
     width: 40%!important;
+    height: 100%;
 }
 
 
 #exhibition_filter_search, #holder_filter_search, #holder_filter_country, #place_filter_search, #place_filter_country, #person_filter_search, #person_filter_gender, #person_filter_nationality, #exhibition_filter_country, .select2-container--default.select2-container--focus .select2-selection--multiple, #location_filter_search, #location_filter_country {
     width: 100%!important;
+    height: 100%;
 }
 
 

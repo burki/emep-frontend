@@ -485,4 +485,101 @@ extends CrudController
             'chart' => implode("\n", $charts),
         ]);
     }
+
+    public function statsActionDetail($id)
+    {
+        $repo = $this->getDoctrine()
+            ->getRepository('AppBundle:Exhibition');
+
+        if (!empty($id)) {
+            $routeParams = [ 'id' => $id ];
+            $exhibition = $repo->findOneById($id);
+        }
+
+        if (!isset($exhibition) || $exhibition->getStatus() == -1) {
+            return $this->redirectToRoute('exhibition-index');
+        }
+
+        // display the artists by birth-year
+        $stats = StatisticsController::exhibitionAgeDistribution($em = $this->getDoctrine()->getEntityManager(), $exhibition->getId());
+        $ageCount = & $stats['age_count'];
+
+        $categories = $total = [];
+        for ($age = $stats['min_age']; $age <= $stats['max_age'] && $age < 120; $age++) {
+            $categories[] = $age; // 0 == $age % 5 ? $year : '';
+
+            foreach ([ 'living', 'deceased' ] as $cat) {
+                $total['age_' . $cat][$age] = [
+                    'name' => $age,
+                    'y' => isset($ageCount[$age]) && isset($ageCount[$age][$cat])
+                        ? intval($ageCount[$age][$cat]) : 0,
+                ];
+            }
+        }
+
+        $template = $this->get('twig')->loadTemplate('Statistics/person-exhibition-age.html.twig');
+        $charts = [
+            $template->renderBlock('chart', [
+                'container' => 'container-age',
+                'categories' => json_encode($categories),
+                'age_at_exhibition_living' => json_encode(array_values($total['age_living'])),
+                'age_at_exhibition_deceased' => json_encode(array_values($total['age_deceased'])),
+                'exhibition_id' => $id,
+            ]),
+        ];
+
+        // nationalities of participating artists
+        $stats = StatisticsController::itemExhibitionNationalityDistribution($em, $exhibition->getId());
+        $data = [];
+        $key = 'ItemExhibition'; // alternative is 'Artists'
+        foreach ($stats['nationalities'] as $nationality => $counts) {
+            $count = $counts['count' . $key];
+            $percentage = 100.0 * $count / $stats['total' . $key];
+            $dataEntry = [
+                'name' => $nationality,
+                'y' => (int)$count,
+                'artists' => $counts['countArtists'],
+                'itemExhibition' => $counts['countItemExhibition'],
+            ];
+            if ($percentage < 5) {
+                $dataEntry['dataLabels'] = [ 'enabled' => false ];
+            }
+            $data[] = $dataEntry;
+        }
+        $template = $this->get('twig')->loadTemplate('Statistics/itemexhibition-nationality.html.twig');
+        $charts[] = $template->renderBlock('chart', [
+            'container' => 'container-nationality',
+            'totalArtists' => $stats['totalArtists'],
+            'totalItemExhibition' => $stats['totalItemExhibition'],
+            'data' => json_encode($data),
+        ]);
+
+        // type of work
+        $stats = StatisticsController::itemExhibitionTypeDistribution($em, $exhibition->getId());
+        $data = [];
+        foreach ($stats['types'] as $type => $count) {
+            $percentage = 100.0 * $count / $stats['total'];
+            $dataEntry = [
+                'name' => $type,
+                'y' => (int)$count,
+            ];
+            if ($percentage < 5) {
+                $dataEntry['dataLabels'] = [ 'enabled' => false ];
+            }
+            $data[] = $dataEntry;
+        }
+
+        $template = $this->get('twig')->loadTemplate('Statistics/itemexhibition-type.html.twig');
+        $charts[] = $template->renderBlock('chart', [
+            'container' => 'container-type',
+            'total' => $stats['total'],
+            'data' => json_encode($data),
+        ]);
+
+        // display the static content
+        return $this->render('Exhibition/stats-detail.html.twig', [
+            'chart' => implode("\n", $charts),
+        ]);
+
+    }
 }
