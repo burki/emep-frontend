@@ -60,6 +60,8 @@
         "stof/doctrine-extensions-bundle": "~1.2",
         "beberlei/DoctrineExtensions": "@stable",
 
+        "wikimedia/utfnormal": "^2.0",
+
         "semsol/arc2": "@stable",
         "easyrdf/easyrdf": "@stable",
         "seboettg/citeproc-php": "dev-name-as-sort-order-fix#bf446dc",
