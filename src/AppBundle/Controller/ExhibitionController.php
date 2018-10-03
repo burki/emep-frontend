@@ -42,9 +42,6 @@ extends CrudController
      */
     public function indexAction(Request $request)
     {
-
-
-
         $route = $request->get('_route');
 
         $qb = $this->getDoctrine()

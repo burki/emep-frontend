@@ -749,14 +749,10 @@ extends CrudController
     }
 
 
-
     // refactor this big time
     public function exhibitionByPlaceIndex(Request $request, $thisOptional, $form)
     {
-
-
         $em = $thisOptional->getDoctrine()->getEntityManager();
-        $dbconn = $em->getConnection();
 
         $route = $request->get('_route');
         $persons = null;
@@ -766,14 +762,12 @@ extends CrudController
         $parameters = [];
         $parametersTypes = [];
 
-
-
+        /*
+        $dbconn = $em->getConnection();
         $querystr = "SELECT DISTINCT Exhibition.id AS exhibition_id, Exhibition.title, startdate, enddate, Exhibition.displaydate AS displaydate, Location.id AS location_id, Location.name AS location_name, COALESCE(Geoname.name_variant, Geoname.name) AS place, Geoname.tgn, Geoname.latitude, Geoname.longitude"
             . " FROM Exhibition"
             . " INNER JOIN Location ON Location.id=Exhibition.id_location"
             . " INNER JOIN Geoname ON Geoname.tgn=Location.place_tgn";
-
-
 
         $andWhere = '';
 
@@ -783,26 +777,24 @@ extends CrudController
             . $andWhere
             . " ORDER BY tgn, Exhibition.startdate, location_name, Exhibition.title"
         ;
-
-
-
-        // TEST OTHER VARIANT
+        $stmt = $dbconn->executeQuery($querystr, $parameters, $parametersTypes);
+        */
 
         $qb = $thisOptional->getDoctrine()
             ->getManager()
             ->createQueryBuilder();
 
         $qb->select([
-            'E',
-            'L.id AS location_id',
-            'L.name AS location_name',
-            'COALESCE(G.name) AS place',
-            'G.tgn',
-            'G.latitude',
-            'G.longitude',
-            //'startdate',
-            //'enddate'
-        ])
+                'PARTIAL E.{id,title,startdate,enddate,displaydate}',
+                'L.id AS location_id',
+                'L.name AS location_name',
+                'COALESCE(G.name) AS place',
+                'G.tgn',
+                'G.latitude',
+                'G.longitude',
+                //'startdate',
+                //'enddate'
+            ])
             ->from('AppBundle:Exhibition', 'E')
             ->innerJoin('E.location', 'L')
             ->innerJoin('L.place', 'G')
@@ -812,8 +804,6 @@ extends CrudController
             ->groupBy('E.id')
             //->orderBy('dateSort')
         ;
-
-
 
         if ($request->query->has($form->getName())) {
             // manually bind values from the request
@@ -825,19 +815,10 @@ extends CrudController
 
         $result = $qb->getQuery()->execute();
 
-
-
-        $stmt = $dbconn->executeQuery($querystr, $parameters, $parametersTypes);
         $values = [];
         $values_country = [];
 
         $displayhelper = new ExhibitionDisplayHelper();
-
-        //foreach ($values as $key => $value) {
-
-        //print_r($result[0]);
-
-        //$result = $stmt;
 
         foreach ($result as $row) {
             if (empty($row['location_geo']) && $row['longitude'] == 0 && $row['latitude'] == 0) {
@@ -866,29 +847,23 @@ extends CrudController
                 ];
             }
 
-            if ('location-by-place' == $route) {
-                $values[$key]['exhibitions'][] =
-                    sprintf('<a href="%s">%s</a>',
-                        htmlspecialchars($thisOptional->generateUrl('location', [
-                            'id' => $row['location_id'],
-                        ])),
-                        htmlspecialchars($row['location_name'])
-                    );
-            }
-            else if ('place-map' != $route) {
-                $values[$key]['exhibitions'][] =
-                    sprintf('<a href="%s">%s</a> at <a href="%s">%s</a> (%s)',
-                        htmlspecialchars($thisOptional->generateUrl('exhibition', [
-                            'id' => $row['exhibition_id'],
-                        ])),
-                        htmlspecialchars($row['title']),
-                        htmlspecialchars($thisOptional->generateUrl('location', [
-                            'id' => $row['location_id'],
-                        ])),
-                        htmlspecialchars($row['location_name']),
-                        $displayhelper->buildDisplayDate($row)
-                    );
-            }
+            $exhibition = $row[0];
+            $values[$key]['exhibitions'][] =
+                sprintf('<a href="%s">%s</a> at <a href="%s">%s</a> (%s)',
+                    htmlspecialchars($thisOptional->generateUrl('exhibition', [
+                        'id' => $exhibition->getId(),
+                    ])),
+                    htmlspecialchars($exhibition->getTitle()),
+                    htmlspecialchars($thisOptional->generateUrl('location', [
+                        'id' => $row['location_id'],
+                    ])),
+                    htmlspecialchars($row['location_name']),
+                    $displayhelper->buildDisplayDate([
+                        'displaydate' => $exhibition->getDisplaydate(),
+                        'startdate' => $exhibition->getStartdate(),
+                        'enddate' => $exhibition->getEnddate(),
+                    ])
+                );
         }
 
         $values_final = [];
