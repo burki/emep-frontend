@@ -5,17 +5,17 @@
 
     <div class="w-container">
         <div class="home-menu-container">
-            <a href="/exhibition" class="link-block w-inline-block">
+            <a href="{{ path('exhibition-index') }}" class="link-block w-inline-block">
                 <img src="{{ app.request.basepath }}/img/noun_Ticket_1162076_5b6974.svg" class="home-menu-item-image">
                 <div class="home-menu-item-text">exhibitions</div>
             </a>
 
-            <a href="/location" class="link-block w-inline-block">
+            <a href="{{ path('location-index') }}" class="link-block w-inline-block">
                 <img src="{{ app.request.basepath }}/img/noun_Stamp_1932662_5b6974.svg" class="home-menu-item-image">
                 <div class="home-menu-item-text">venues</div>
             </a>
 
-            <a href="/person" class="link-block w-inline-block">
+            <a href="{{ path('person-index') }}" class="link-block w-inline-block">
                 <img src="{{ app.request.basepath }}/img/noun_artist_1277151_5b6974.svg" class="home-menu-item-image">
                 <div class="home-menu-item-text">artists</div>
             </a>
