@@ -11,7 +11,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
-class EntityEnhanceCommand extends ContainerAwareCommand
+class EntityEnhanceCommand
+extends ContainerAwareCommand
 {
     protected function configure()
     {
@@ -52,6 +53,7 @@ class EntityEnhanceCommand extends ContainerAwareCommand
             default:
                 $output->writeln(sprintf('<error>invalid type: %s</error>',
                                          $input->getArgument('type')));
+
                 return 1;
         }
     }
@@ -61,12 +63,14 @@ class EntityEnhanceCommand extends ContainerAwareCommand
         if (!class_exists('\Normalizer')) {
             return $value;
         }
+
         if (!\Normalizer::isNormalized($value)) {
             $normalized = \Normalizer::normalize($value);
             if (false !== $normalized) {
                 $value = $normalized;
             }
         }
+
         return $value;
     }
 
@@ -86,11 +90,13 @@ class EntityEnhanceCommand extends ContainerAwareCommand
         if (!isset($this->client)) {
             $this->client = new \EasyRdf_Http_Client();
         }
+
         $this->client->setUri($url);
         $this->client->resetParameters(true); // clear headers
         foreach ($headers as $name => $val) {
             $this->client->setHeaders($name, $val);
         }
+
         try {
             $response = $this->client->request();
             if ($response->getStatus() < 400) {
@@ -99,9 +105,11 @@ class EntityEnhanceCommand extends ContainerAwareCommand
         } catch (\Exception $e) {
             $content = null;
         }
+
         if (!isset($content)) {
             return false;
         }
+
         $json = json_decode(self::normalizeUnicode($content), true);
 
         // API error
@@ -127,18 +135,21 @@ class EntityEnhanceCommand extends ContainerAwareCommand
                 if (empty($line)) {
                     continue;
                 }
+
                 if (preg_match('/^\#/', $line)) {
                     if (preg_match('/^\#\s*(NAME|DESCRIPTION|PREFIX|TARGET)\s*\:\s*(.+)/', $line, $matches)) {
                         $info[strtolower($matches[1])] = trim($matches[2]);
                     }
                     continue;
                 }
+
                 $parts = explode('|', $line);
                 if (count($parts) >= 3) {
                     $gnd = trim($parts[0]);
                     if (!array_key_exists($gnd, $gndBeacon)) {
                         $gndBeacon[$gnd] = [];
                     }
+
                     $gndBeacon[$gnd][$key] = $info + [ 'url' => trim($parts[2]) ];
                 }
             }
@@ -147,23 +158,27 @@ class EntityEnhanceCommand extends ContainerAwareCommand
         return $gndBeacon;
     }
 
+    protected function fetchEntityFactsByGnd($gnd, $locale = 'en')
+    {
+        $url = sprintf('http://hub.culturegraph.org/entityfacts/%s', $gnd);
+        $result = $this->executeJsonQuery($url, [
+            'Accept' => 'application/json',
+            'Accept-Language' => $locale, // date-format!
+        ]);
+
+        return $result;
+    }
+
     /*
+     * Get additional properties, currently from entityfacts and wikidata
      * TODO: Better wikidata queries in
      * site/tool/missing_personwikidata.php
+     *
+     * Currently not used and tested
+     *
      */
-    protected function enhancePerson()
+    protected function enhancePersonProperties()
     {
-        $locales = [ 'en' ]; // different labels, e.g of birthPlace for different locales
-        /*
-        // just test the Service:
-        // $wikidata = \AppBundle\Utils\BiographicalWikidata::fetchByUlan(500007835, $locales[0]);
-        $wikidata = \AppBundle\Utils\BiographicalWikidata::fetchByGnd(123924464, $locales[0]);
-
-        var_dump($wikidata);
-        exit;
-        */
-
-        // currently entityfacts and wikidata
         $em = $this->getContainer()->get('doctrine')->getManager();
 
         // lookup people who have gnd or ulan who have birthDate/Place or deathDate/Place not set
@@ -206,27 +221,21 @@ class EntityEnhanceCommand extends ContainerAwareCommand
             if (empty($gnd) && empty($ulan)) {
                 continue;
             }
-            var_dump('Query for ' . $person->getFullname());
-            foreach ($locales as $locale) {
+
+            // var_dump('Query for ' . $person->getFullname());
+            /*
+            // we currently do wikidata in separate task
+            foreach (\AppBundle\Entity\Person::$entityfactsLocales as $locale) {
                 $wikidata = [];
                 if (!empty($gnd)) {
                     $wikidata = \AppBundle\Utils\BiographicalWikidata::fetchByGnd($gnd, $locale);
                 }
+
                 if (empty($wikidata->identifier) && !empty($ulan)) {
                     $wikidata = \AppBundle\Utils\BiographicalWikidata::fetchByUlan($ulan, $locale);
                 }
+
                 if (!empty($wikidata->identifier)) {
-                    /*
-                    if (is_null($additional)) {
-                        $additional = [];
-                    }
-                    if (!array_key_exists('wikidata', $additional)) {
-                        $additional['wikidata'] = [];
-                    }
-                    $additional['wikidata'][$locale] = (array)$wikidata;
-                    $person->setAdditional($additional);
-                    $persist = true;
-                    */
                     // compile record of previously empty and now filled
                     // TODO: maybe handle changes as well
                     $updateProperties = [];
@@ -240,6 +249,7 @@ class EntityEnhanceCommand extends ContainerAwareCommand
                             }
                         }
                     }
+
                     if (!empty($updateProperties)) {
                         $item = $updateProperties;
                         $item['name'] = $person->getFullname();
@@ -248,89 +258,67 @@ class EntityEnhanceCommand extends ContainerAwareCommand
                     }
                 }
             }
+            */
 
-            $gnd = $person->getGnd();
-            if (false && !empty($gnd)) {
-                foreach ([ 'en' ] as $locale) {
+            // entityfacts
+            if (!empty($gnd)) {
+                foreach (\AppBundle\Entity\Person::$entityfactsLocales as $locale) {
                     $entityfacts = $person->getEntityfacts($locale, true);
+
                     if (is_null($entityfacts)) {
-                        $url = sprintf('http://hub.culturegraph.org/entityfacts/%s', $gnd);
-                        $result = $this->executeJsonQuery($url, [
-                            'Accept' => 'application/json',
-                            'Accept-Language' => $locale, // date-format!
-                        ]);
-                        if (false !== $result) {
-                            $person->setEntityfacts($result, $locale);
-                            $entityfacts = $person->getEntityfacts($locale, true);
-
-                            if ('de' == $locale && !empty($result['biographicalOrHistoricalInformation'])) {
-                                $description = $person->getDescription();
-                                if (!array_key_exists($locale, $description)) {
-                                    $description[$locale] = $result['biographicalOrHistoricalInformation'];
-                                    $person->setDescription($description);
-                                }
-                            }
-                            $persist = true;
-                        }
+                        continue;
                     }
-                    if (!is_null($entityfacts)) {
-                        $fullname = $person->getFullname();
-                        if (empty($fullname)) {
-                            // set surname - e.g. http://hub.culturegraph.org/entityfacts/118676059
-                            foreach ([ 'surname' => 'givenName' ] as $src => $property) {
-                                if (!empty($entityfacts[$src])) {
-                                    $method = 'set' . ucfirst($property);
-                                    $person->$method($entityfacts[$src]);
-                                    $persist = true;
-                                }
-                            }
+
+                    // try to set birth/death place
+                    foreach ([ 'birth', 'death' ] as $property) {
+                        $key = 'placeOf' . ucfirst($property);
+                        $method = 'get' . ucfirst($property) . 'PlaceLabel';
+                        $currentValue = $person->$method();
+                        if (empty($currentValue) && !empty($entityfacts[$key])) {
+                            echo ($person->getId() . ': ' . $entityfacts['preferredName']) . "\n";
+                            var_dump($entityfacts[$key]);
                         }
 
-                        // try to set birth/death place
-                        foreach ([ 'birth', 'death' ] as $property) {
-                            if ('en' == $locale) {
-                                // we use english locale because of date format
+                        if ('en' == $locale) {
+                            // we use english locale because of date format
+                            $key = 'dateOf' . ucfirst($property);
 
-                                $key = 'dateOf' . ucfirst($property);
-                                if (!empty($entityfacts[$key])) {
-                                    $method = 'get' . ucfirst($property) . 'Date';
-                                    $date = $person->$method();
-                                    if (empty($date)) {
-                                        $value = $entityfacts[$key];
-                                        if (preg_match('/^\d{4}$/', $value)) {
-                                            $value .= '-00-00';
-                                        }
-                                        else {
-                                            $date = \DateTime::createFromFormat('F d, Y', $value);
-                                            unset($value);
-                                            if (isset($date)) {
-                                                $res = \DateTime::getLastErrors();
-                                                if (0 == $res['warning_count'] && 0 == $res['error_count']) {
-                                                    $date_str = $date->format('Y-m-d');
-                                                    if ('0000-00-00' !== $date_str) {
-                                                        $value = $date_str;
-                                                    }
+                            if (!empty($entityfacts[$key])) {
+                                $method = 'get' . ucfirst($property) . 'Date';
+                                $date = $person->$method();
+
+                                if (empty($date)) {
+                                    $value = $entityfacts[$key];
+                                    if (preg_match('/^\d{4}$/', $value)) {
+                                        $value .= '-00-00';
+                                    }
+                                    else {
+                                        $date = \DateTime::createFromFormat('F d, Y', $value);
+                                        unset($value);
+                                        if (isset($date)) {
+                                            $res = \DateTime::getLastErrors();
+                                            if (0 == $res['warning_count'] && 0 == $res['error_count']) {
+                                                $date_str = $date->format('Y-m-d');
+                                                if ('0000-00-00' !== $date_str) {
+                                                    $value = $date_str;
                                                 }
                                             }
                                         }
-                                        if (isset($value)) {
-                                            var_dump($entityfacts['preferredName']);
-                                            var_dump($property);
-                                            var_dump($value);
-                                            $method = 'set' . ucfirst($property) . 'Date';
-                                            $person->$method($value);
-                                            $persist = true;
-                                        }
+                                    }
+
+                                    if (isset($value)) {
+                                        echo ($person->getId() . ': ' . $entityfacts['preferredName']) . "\n";
+                                        var_dump($property);
+                                        var_dump($value);
+                                        $method = 'set' . ucfirst($property) . 'Date';
+                                        $person->$method($value);
+                                        $persist = true;
                                     }
                                 }
                             }
                         }
                     }
                 }
-            }
-            if ($persist) {
-                $em->persist($person);
-                $em->flush();
             }
         }
 
@@ -360,6 +348,74 @@ class EntityEnhanceCommand extends ContainerAwareCommand
             }
             $writer->finish();
         }
+    }
+
+    /*
+     * Fetch missing entityfact data
+     *
+     */
+    protected function fetchMissingEntityfacts()
+    {
+        $em = $this->getContainer()->get('doctrine')->getManager();
+
+        // lookup people who have gnd but entityfacts is null
+        $qb = $em->createQueryBuilder();
+
+        $qb->select([
+                'P',
+            ])
+            ->from('AppBundle:Person', 'P')
+            ->where('P.status <> -1')
+            ->andWhere('P.gnd IS NOT NULL')
+            ->andWhere('P.entityfacts IS NULL')
+            ->orderBy('P.id', 'DESC')
+            ;
+
+        $query = $qb->getQuery()
+            //->setMaxResults(25) // for testing
+            //->setFirstResult(10)
+            ;
+
+        $persistCount = 0;
+        foreach ($query->getResult() as $person) {
+            $persist = false;
+            $gnd = $person->getGnd();
+
+            foreach (\AppBundle\Entity\Person::$entityfactsLocales as $locale) {
+                $result = $this->fetchEntityFactsByGnd($gnd, $locale);
+
+                if (false !== $result) {
+                    $person->setEntityfacts($result, $locale);
+                    $entityfacts = $person->getEntityfacts($locale, true);
+
+                    $persist = true;
+                }
+            }
+
+            if ($persist) {
+                $em->persist($person);
+                ++$persistCount;
+            }
+
+            if ($persistCount > 20) {
+                $em->flush();
+                $persistCount = 0;
+            }
+        }
+
+        if ($persistCount > 0) {
+            $em->flush();
+        }
+    }
+
+    /**
+     * Fetch entitifacts and try to set additional properties
+     */
+    protected function enhancePerson()
+    {
+        $this->fetchMissingEntityfacts();
+
+        $this->enhancePersonProperties();
     }
 
     /*
