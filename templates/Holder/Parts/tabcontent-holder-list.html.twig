@@ -1,0 +1,80 @@
+<div role="tabpanel" class="tab-pane active" id="exhibitions">
+
+    {# helper.pagination_count(pagination) #}
+    {% set sortField = app.request.get('sort') %}
+    <table id="exhibitions" class="table table-striped table-bordered dataTable listviewcontainer">
+        <thead>
+        <tr class="listviewheading">
+            <th>{{ helper.pagination_sortable(pagination, 'Name', 'nameSort') }}</th>
+            <th>{{ helper.pagination_sortable(pagination, 'Cat. Entries', 'numBibitemSort', 'desc') }}</th>
+        </tr>
+        </thead>
+        <tbody>
+
+
+        {% if pagination.getTotalItemCount > 0 %}
+
+        {#
+        <div class="sort-control">
+            {% set sortField = app.request.get('sort') %}
+            Sort by:
+            {{ helper.pagination_sortable(pagination, 'Place', 'countryPlaceNameSort') }}
+            {{ helper.pagination_sortable(pagination, 'Name', 'nameSort') }}
+            {{ helper.pagination_sortable(pagination, '# Publication', 'numCatEntrySort', 'desc') }}
+        </div>
+        #}
+
+        {% set last_initial = '' %}
+        {% set last_countryCode = '' %}
+
+        {% for row in pagination %}
+            {% set holder = row[0] %}
+            {% set place = holder.place %}
+            {# <ul class="list-unstyled"> #}
+            {% if 'nameSort' == sortField %}
+                {# ignore #}
+            {% elseif 'numExhibitionSort' == sortField %}
+                {% set initial = row['numExhibitionSort'] %}
+            {% elseif 'numCatEntrySort' == sortField %}
+                {% set initial = row['numCatEntrySort'] %}
+            {% else %}
+                {% set sortField = 'countryPlaceNameSort' %}
+                {% if holder.placeLabel is not empty %}
+                    {% set initial = holder.placeLabel %}
+                {% endif %}
+            {% endif %}
+            {% if initial != last_initial %}
+                {% if last_initial != null %}
+                    {# </ul> #}
+                {% endif %}
+                {% if 'countryPlaceNameSort' == sortField and last_countryCode != place.countryCode %}
+                    {# <h3>{{ countryName(place.countryCode) }}</h3> #}
+                    {% set last_countryCode = place.countryCode %}
+                {% endif %}
+
+                {% set last_initial = initial %}
+                {# <ul class="list-group"> #}
+            {% endif %}
+            <tr class="listviewrow">
+
+                <td class="title"><a href="{{ path('holder', { 'id' : holder.id }) }}">
+                        <b>{{ holder.name }}</b></a>
+                </td>
+                <td>
+                    {{ row.numBibitemSort }}
+                </td>
+
+            </tr>
+        {% endfor %}
+        {# </ul> #}
+        {# display navigation #}
+        </tbody>
+    </table>
+    <div class="navigation">
+        {{ knp_pagination_render(pagination) }}
+    </div>
+{% else %}
+    No Holding Institutions found
+    {% endif %}
+
+</div>

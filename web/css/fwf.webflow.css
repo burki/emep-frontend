@@ -426,7 +426,7 @@ a {
   height: 100%;
 }
 
-.text-field-2 {
+.text-field-class {
   height: 100%;
 }
 
@@ -542,4 +542,139 @@ a {
 
 .container {
   margin-top: 50px;
+}
+
+@media (max-width: 991px) {
+  .container-4 {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 767px) {
+  .searchbarcontainer {
+    height: 100%;
+  }
+  .searchbarinputcontainer {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    border-style: none;
+    background-color: transparent;
+  }
+  .searchbuttoncontainer {
+    height: 45px;
+    margin-left: 0px;
+  }
+  .contentcontainer.nopadding {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: reverse;
+    -webkit-flex-direction: column-reverse;
+    -ms-flex-direction: column-reverse;
+    flex-direction: column-reverse;
+  }
+  .tabsymbols {
+    display: none;
+  }
+  .maphalf {
+    display: none;
+  }
+  .filter {
+    height: 200px;
+    padding-right: 0px;
+    padding-left: 0px;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+  }
+  .submit-button {
+    width: 90%;
+  }
+  .select-field {
+    height: 45px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+  .text-field {
+    width: 100%;
+    height: 45px;
+    margin-bottom: 5px;
+  }
+  .div-block-3 {
+    width: 100%;
+    height: 45px;
+  }
+  .text-field-class {
+    width: 100%;
+    margin-bottom: 5px;
+    border: 1px solid #c5c5c5;
+    border-radius: 5px;
+    background-color: #fff;
+  }
+  .no_data_block {
+    display: block;
+  }
+  .home-menu-container {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+  }
+  .link-block {
+    width: 200px;
+    margin-bottom: 10px;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .div-block-4 {
+    width: 100%;
+    height: 45px;
+  }
+  .container-2 {
+    padding: 11px 20px;
+  }
+  .container-3 {
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+}
+
+@media (max-width: 479px) {
+  .artist-information-container {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+  }
+  .container-2 {
+    padding-right: 20px;
+    padding-left: 20px;
+  }
 }

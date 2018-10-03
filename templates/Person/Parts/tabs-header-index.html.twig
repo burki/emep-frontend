@@ -8,17 +8,11 @@
         <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 1em">
             <li role="presentation" class="active"><a href="#exhibitions" aria-controls="entries" role="tab" data-toggle="tab">{{ 'Exhibitions'|trans }}</a></li>
 
-            <li role="presentation"><a href="#map" role="tab" onclick="clickMap()" data-toggle="tab">{{ 'Map'|trans }}</a></li>
+            <li role="presentation"><a href="#map" role="tab" data-toggle="tab" onclick="clickMap()">{{ 'Map'|trans }}</a></li>
             <li role="presentation"><a href="#stats" role="tab" data-toggle="tab" >{{ 'Stats'|trans }}</a></li>
 
         </ul>
 
     </div>
-
-    <script>
-        function clickMap(){
-            $(document).trigger("rerenderMap");
-        }
-    </script>
 
 {% endblock %}

@@ -17,7 +17,7 @@ extends CrudFilterType
         ]);
 
         $builder->add('country', Filters\ChoiceFilterType::class, [
-            'choices' => [ '- all - ' => '' ] + $options['data']['choices'],
+            'choices' => [ 'select country' => '' ] + $options['data']['choices'],
             'apply_filter' => function (QueryInterface $filterQuery, $field, $values) {
                 if (empty($values['value'])) {
                     return null;

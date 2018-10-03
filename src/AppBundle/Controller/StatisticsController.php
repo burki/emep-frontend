@@ -270,6 +270,125 @@ extends Controller
         ]);
     }
 
+    public function personByYearActionPart($countriesQuery, $genderQuery)
+    {
+        // display the artists by birth-year, the catalog-entries by exhibition-year
+        $em = $this->getDoctrine()->getEntityManager();
+
+        $andWhere = '';
+        $andWhere = $this->getPersonQueryString('Person', 'Person.status >= 0', 'country', $countriesQuery);
+
+
+        $dbconn = $em->getConnection();
+        $querystr = "SELECT 'active' AS type, COUNT(*) AS how_many FROM Person"
+            . " WHERE status >= 0 AND birthdate IS NOT NULL"
+            // . "  AND sex IS NOT NULL"
+        ;
+
+        // for the selected ones
+        $querystr .= " AND " . $andWhere;
+
+
+        $querystr .= " UNION SELECT 'total' AS type, COUNT(*) AS how_many"
+            . " FROM Person WHERE status >= 0";
+
+        // for the total number of personas
+        $querystr .= " AND " . $andWhere;
+
+
+        $stmt = $dbconn->query($querystr);
+        $subtitle_parts = [];
+        while ($row = $stmt->fetch()) {
+            if ('active' == $row['type']) {
+                $total_active = $row['how_many'];
+            }
+            $subtitle_parts[] = $row['how_many'];
+        }
+
+        $subtitle = implode(' out of ', $subtitle_parts) . ' artists';
+
+        $data = [];
+        $max_year = $min_year = 0;
+        foreach ([ 'birth', 'death' ] as $key) {
+            $date_field = $key . 'date';
+
+            $querystr = 'SELECT YEAR(' . $date_field . ') AS year'
+                // . ', sex'
+                . ', COUNT(*) AS how_many'
+                . ' FROM Person WHERE status >= 0 AND ' . $date_field . ' IS NOT NULL'
+                . ' AND ' . $andWhere // country code filter
+                // . ' AND sex IS NOT NULL'
+                . ' GROUP BY YEAR(' . $date_field. ')'
+                // . ', sex'
+                . ' ORDER BY YEAR(' . $date_field . ')'
+                //. ', sex'
+            ;
+            $stmt = $dbconn->query($querystr);
+
+            while ($row = $stmt->fetch()) {
+                if (0 == $min_year || $row['year'] < $min_year) {
+                    $min_year = $row['year'];
+                }
+                if ($row['year'] > $max_year) {
+                    $max_year = $row['year'];
+                }
+                if (!isset($data[$row['year']])) {
+                    $data[$row['year']] = [];
+                }
+                $data[$row['year']][$key] = $row['how_many'];
+            }
+        }
+
+        if ($min_year < 1820) {
+            $min_year = 1820;
+        }
+        if ($max_year > 2000) {
+            $max_year = 2000;
+        }
+
+        /*
+        $total_works = 0;
+
+        $querystr = 'SELECT PublicationPerson.publication_ord AS year, Publication.complete_works = 0 AS base, COUNT(DISTINCT Publication.id) AS how_many FROM Person LEFT OUTER JOIN PublicationPerson ON PublicationPerson.person_id=Person.id LEFT OUTER JOIN Publication ON Publication.id=PublicationPerson.publication_id AND Publication.status >= 0 WHERE Person.status >= 0 AND PublicationPerson.publication_ord IS NOT NULL'
+                  // . ' AND sex IS NOT NULL'
+                  . ' GROUP BY PublicationPerson.publication_ord, Publication.complete_works = 0'
+                  . ' ORDER BY PublicationPerson.publication_ord, Publication.complete_works = 0';
+        $stmt = $dbconn->query($querystr);
+        while ($row = $stmt->fetch()) {
+            $total_works += $row['how_many'];
+            $key = $row['base'] ? 'works_issued_base' : 'works_issued_extended';
+            $data[$row['year']][$key] = $row['how_many'];
+        }
+        */
+
+        $categories = [];
+        for ($year = $min_year; $year <= $max_year; $year++) {
+            $categories[] = 0 == $year % 5 ? $year : '';
+            foreach (['birth', 'death',
+                         // 'works',
+                         'works_issued_base', 'works_issued_extended']
+                     as $key)
+            {
+                $total[$key][$year] = [
+                    'name' => $year,
+                    'y' => isset($data[$year][$key])
+                        ? intval($data[$year][$key]) : 0,
+                ];
+            }
+        }
+
+        return $this->render('Statistics/person-by-year-index.html.twig', [
+            'subtitle' => json_encode($subtitle),
+            'categories' => json_encode($categories),
+            'person_birth' => json_encode(array_values($total['birth'])),
+            'person_death' => json_encode(array_values($total['death'])),
+            /*
+            'works_base' => json_encode(array_values($total['works_issued_base'])),
+            'works_extended' => json_encode(array_values($total['works_issued_extended'])),
+            */
+        ]);
+    }
+
     public static function itemExhibitionTypeDistribution($em, $exhibitionId = null)
     {
         $dbconn = $em->getConnection();
@@ -340,13 +459,31 @@ EOT;
         return $ids;
     }
 
-    public static function exhibitionAgeDistribution($em, $exhibitionId = null)
+    public static function exhibitionAgeDistribution($em, $gender = null, $countryQuery = null, $exhibitionId = null)
     {
         $dbconn = $em->getConnection();
 
-        $where = !is_null($exhibitionId)
-            ? sprintf('WHERE Exhibition.id=%d', intval($exhibitionId))
-            : '';
+        $conditionCounter = 0;
+
+        $where = '';
+
+        // build where query for exhibitionID
+        if(!is_null($exhibitionId)){
+            $where = sprintf('WHERE Exhibition.id=%d', intval($exhibitionId));
+            $conditionCounter++;
+        }
+
+        // build where query for nationality
+        if(!is_null($countryQuery) and $countryQuery !== 'any' ){
+            if($conditionCounter === 0){
+                $where = 'WHERE ';
+            }else {
+                $where .= ' AND ';
+            }
+
+            $where .= StatisticsController::getPersonQueryString('Person', 'Person.status >= 0', 'country', $countryQuery);
+        }
+
 
         $querystr = <<<EOT
 SELECT COUNT(*) AS how_many,
@@ -473,6 +610,42 @@ EOT;
         return $this->render('Statistics/person-exhibition-age.html.twig', [
             'container' => 'container-age',
             'chart' => $chart
+        ]);
+    }
+
+    public function personExhibitionAgeActionPart($countriesQuery, $genderQuery)
+    {
+        // display the artists by birth-year, the catalog-entries by exhibition-year
+        $stats = self::exhibitionAgeDistribution($em = $this->getDoctrine()->getEntityManager(), $genderQuery, $countriesQuery);
+        $ageCount = & $stats['age_count'];
+
+        $categories = $total = [];
+        for ($age = $stats['min_age']; $age <= $stats['max_age'] && $age < 120; $age++) {
+            $categories[] = $age; // 0 == $age % 5 ? $year : '';
+
+            foreach ([ 'living', 'deceased' ] as $cat) {
+                $total['age_' . $cat][$age] = [
+                    'name' => $age,
+                    'y' => isset($ageCount[$age]) && isset($ageCount[$age][$cat])
+                        ? intval($ageCount[$age][$cat]) : 0,
+                ];
+            }
+        }
+
+        /*$template = $this->get('twig')->loadTemplate('Statistics/person-exhibition-age-index.html.twig');
+        $chart = $template->renderBlock('chart', [
+            'container' => 'container-age',
+            'categories' => json_encode($categories),
+            'age_at_exhibition_living' => json_encode(array_values($total['age_living'])),
+            'age_at_exhibition_deceased' => json_encode(array_values($total['age_deceased'])),
+        ]);*/
+
+        // display the static content
+        return $this->render('Statistics/person-exhibition-age-index.html.twig', [
+            'container' => 'container-age',
+            'categories' => json_encode($categories),
+            'age_at_exhibition_living' => json_encode(array_values($total['age_living'])),
+            'age_at_exhibition_deceased' => json_encode(array_values($total['age_deceased'])),
         ]);
     }
 
@@ -683,6 +856,73 @@ EOT;
         ]);
     }
 
+    public function exhibitionPerPersonPart($countriesQuery, $genderQuery)
+    {
+        $em = $this->getDoctrine()->getEntityManager();
+
+        $dbconn = $em->getConnection();
+
+        $data = [ 'exhibition' => [], 'item' => [] ];
+        $data_median = [];
+
+
+        $where = ' AND '. StatisticsController::getPersonQueryString('Person', 'Exhibition.status <> -1', 'country', $countriesQuery);
+
+
+        foreach ([ 'exhibition', 'item' ] as $type) {
+            $what = 'item' == $type ? '*' : 'DISTINCT id_exhibition';
+
+            $querystr = "SELECT id_person, COUNT({$what}) AS how_many"
+                . " FROM ItemExhibition INNER JOIN Exhibition ON Exhibition.id=ItemExhibition.id_exhibition AND Exhibition.status <> -1 AND 0 = (Exhibition.flags & 0x100)"
+                . " INNER JOIN Person ON Person.id=ItemExhibition.id_person AND Person.status <> -1"
+                . " WHERE ItemExhibition.title IS NOT NULL"
+                . $where
+                . " GROUP BY id_person"
+                . " HAVING how_many >= 1"
+            ;
+            $stmt = $dbconn->query($querystr);
+            $frequency_count = [];
+            while ($row = $stmt->fetch()) {
+                $how_many = (int)$row['how_many'];
+                if (!array_key_exists($how_many, $frequency_count)) {
+                    $frequency_count[$how_many] = 0;
+                }
+                ++$frequency_count[$how_many];
+            }
+            ksort($frequency_count);
+            $keys = array_keys($frequency_count);
+            $min = $keys[0]; $max = $keys[count($keys) - 1];
+
+            $sum = 0;
+            for ($i = $min; $i <= $max; $i++) {
+                $count = array_key_exists($i, $frequency_count) ? $frequency_count[$i] : 0;
+                $data[$type][] = $count;
+                $sum += $count;
+            }
+
+            // find the index for which we reach half the sum
+            $sum_half = $sum / 2.0;
+            $sum = 0;
+            for ($i = $min; $i <= $max; $i++) {
+                $count = array_key_exists($i, $frequency_count) ? $frequency_count[$i] : 0;
+                if ($sum + $count >= $sum_half) {
+                    $delta_left = $sum_half - $sum;
+                    $delta_right = $sum + $count - $sum_half;
+                    $data_median[$type] = $delta_left < $delta_right ? $i - 1 : $i;
+                    break;
+                }
+
+                $sum += $count;
+            }
+        }
+
+        // display the static content
+        return $this->render('Statistics/person-distribution-index.html.twig', [
+            'data' => json_encode($data['exhibition']),
+            'data_median' => $data_median['exhibition'],
+        ]);
+    }
+
     /**
      * @Route("/person/popularity", name="person-popularity")
      */
@@ -739,6 +979,73 @@ EOT;
             'data' => json_encode($data),
             'persons' => $data,
         ]);
+    }
+
+
+    public function personsWikipediaPart($countriesQuery, $genderQuery)
+    {
+        $lang = 'en';
+
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+
+        $where = ' AND '. StatisticsController::getPersonQueryString('P', 'P.status <> -1', 'nationality', $countriesQuery);
+
+
+        $qb->select([
+            'P',
+            'COUNT(DISTINCT E.id) AS numExhibitionSort'
+        ])
+            ->from('AppBundle:Person', 'P')
+            ->leftJoin('P.exhibitions', 'E')
+            // ->leftJoin('P.catalogueEntries', 'IE')
+            ->where('P.status <> -1 AND P.wikidata IS NOT NULL '. $where)
+            ->groupBy('P.id') // for Count
+        ;
+
+
+
+        // Create the query
+        $results = $qb->getQuery()->getResult();
+
+        $data = [];
+        foreach ($results as $result) {
+            $person = $result[0];
+            $how_many = $result['numExhibitionSort'];
+            $additional = $person->getAdditional();
+            if (array_key_exists('wikistats', $additional)
+                && array_key_exists($lang, $additional['wikistats']))
+            {
+                $single_data = array(
+                    'name' => $person->getFullname(), // person
+                    //'num' => (int)$how_many,
+                    'id' => $person->getId(),
+                    'x' => (int)$how_many + 0.3 * rand(-1, 1), // num-reports
+                    'y' => (int)$additional['wikistats'][$lang], // num hits
+                );
+                $data[] = $single_data;
+            }
+        }
+
+
+
+
+        usort($data, function($a, $b) {
+            return $a['y'] == $b['y'] ? 0 : ($a['y'] > $b['y'] ? -1 : 1);
+        });
+
+
+        return $this->render('Statistics/person-wikipedia-index.html.twig', [
+            'lang' => $lang,
+            'data' => json_encode($data),
+            'persons' => $data,
+        ]);
+
+
+
+
     }
 
     /**
@@ -1008,6 +1315,63 @@ EOT;
         }
 
         return $countryQueryString;
+    }
+
+
+
+    function getArrayQueryString($modelString, $modelSubcode, $queryArray, $fallbackString ){
+        $modelQueryString = '';
+        $counterQueryArray = 0;
+
+        if ($queryArray === '' or $queryArray === 'any'){
+            $modelQueryString = $fallbackString;
+        } else {
+            if($queryArray.length > 1){
+                foreach ($queryArray as $queryElement){
+                    if($counterQueryArray > 0){
+                        $modelQueryString .= ", ";
+                    }
+                    $modelQueryString .= "'" . $queryElement . "''";
+                    $counterQueryArray++;
+                }
+            }else {
+                $modelQueryString = "'" . $queryArray . "'";
+            }
+
+            // form the right query with the params
+            $modelQueryString = $modelString . "." . $modelSubcode . " IN(" . $modelQueryString . ")";
+        }
+
+        return $modelQueryString;
+    }
+
+    // creates additonal query for filter actions
+    function getPersonQueryString($personModelString, $fallbackString, $nationalityCode , $nationalityArray){
+        $personQueryString = '';
+        $counterNationalityArray = 0;
+
+
+        if ( $nationalityArray === '' or $nationalityArray === 'any' ){
+            $personQueryString = $fallbackString;
+        } else {
+            // if nationality is set check if larger than one or only on value
+            if ($nationalityArray.length > 1) {
+                foreach ($nationalityArray as $nationality) {
+                    if ($counterNationalityArray > 0) {
+                        $personQueryString .= ", ";
+                    }
+                    $personQueryString .= "'" . $nationality . "''";
+                    $counterNationalityArray++;
+                }
+            } else {
+                $personQueryString = "'" . $nationalityArray . "'";
+            }
+
+            // form the right query with the params
+            $personQueryString = $personModelString . "." . $nationalityCode . " IN(" . $personQueryString . ")";
+        }
+
+        return $personQueryString;
     }
 
     // controller is called by /exhibition route to load async the stats

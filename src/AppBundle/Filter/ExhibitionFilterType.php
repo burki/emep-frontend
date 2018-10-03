@@ -20,7 +20,7 @@ extends CrudFilterType
         ]);
 
         $builder->add('country', Filters\ChoiceFilterType::class, [
-            'choices' => [ '- all - ' => '' ] + $options['data']['country_choices'],
+            'choices' => [ 'select country' => '' ] + $options['data']['country_choices'],
             'apply_filter' => function (QueryInterface $filterQuery, $field, $values) {
                 if (empty($values['value'])) {
                     return null;
@@ -43,7 +43,7 @@ extends CrudFilterType
             'multiple' => true,
             'choices' => $options['data']['organizer_type_choices'],
             'attr' => [
-                'data-placeholder' => '- all - ',
+                'data-placeholder' => 'select type of organizing body',
             ],
             'apply_filter' => function (QueryInterface $filterQuery, $field, $values) {
                 if (empty($values['value'])) {

@@ -12,7 +12,9 @@ class DefaultController extends Controller
 {
     /**
      * @Route("/", name="home")
+     * @Route("/data", name="data")
      */
+
     public function indexAction()
     {
         return $this->render('Default/index.html.twig');

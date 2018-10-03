@@ -1,0 +1,29 @@
+<div role="tabpanel" class="tab-pane" id="stats">
+
+
+    <script src="{{ app.request.basepath }}/vendor/highcharts/highcharts.js"></script>
+    <script src="{{ app.request.basepath }}/vendor/highcharts/modules/exporting.js"></script>
+    <script src="{{ app.request.basepath }}/vendor/highcharts/modules/heatmap.js"></script>
+    <script src="{{ app.request.basepath }}/js/highchart_custom_theme.js"></script>
+
+
+
+    {%  set countriesQuery = '' %}
+    {%  set genderQuery = 'any' %}
+
+
+    {% if nationalities|length %}
+        {% set countriesQuery = nationalities %}
+    {% endif %}
+
+    {% if gender|length %}
+        {% set genderQuery = gender %}
+    {% endif %}
+
+    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::personByYearActionPart', {countriesQuery: countriesQuery, genderQuery: genderQuery}), {'default': 'Loading... <br/>'}) }}
+    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::personExhibitionAgeActionPart', {countriesQuery: countriesQuery, genderQuery: genderQuery}), {'default': 'Loading... <br/>'}) }}
+    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::exhibitionPerPersonPart', {countriesQuery: countriesQuery, genderQuery: genderQuery}), {'default': 'Loading... <br/>'}) }}
+    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::personsWikipediaPart', {countriesQuery: countriesQuery, genderQuery: genderQuery}), {'default': 'Loading... <br/>'}) }}
+
+
+</div>

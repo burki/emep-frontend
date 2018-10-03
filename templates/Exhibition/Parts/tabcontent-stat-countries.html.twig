@@ -1,11 +1,11 @@
 <div role="tabpanel" class="tab-pane" id="stats">
 
+    <script src="{{ app.request.basepath }}/js/collapseChart.js"></script>
+
     <script src="{{ app.request.basepath }}/vendor/highcharts/highcharts.js"></script>
     <script src="{{ app.request.basepath }}/vendor/highcharts/modules/exporting.js"></script>
     <script src="{{ app.request.basepath }}/vendor/highcharts/modules/heatmap.js"></script>
-    <script src="{{ app.request.basepath }}/js/hinclude.js"></script>
     <script src="{{ app.request.basepath }}/js/highchart_custom_theme.js"></script>
-    <script src="{{ app.request.basepath }}/js/collapseChart.js"></script>
 
 
     {%  set countriesQuery = 'any' %}
@@ -20,8 +20,8 @@
         {% set organizerTypeQuery = organizerType %}
     {% endif %}
 
-    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::exhibitionNationalityIndex', {countriesQuery: countriesQuery, organizerTypeQuery: organizerTypeQuery}), {'default': 'Loading...'}) }}
-    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::exhibitionByMonthIndex', {countriesQuery: countriesQuery, organizerTypeQuery: organizerTypeQuery}), {'default': 'Loading...'}) }}
+    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::exhibitionNationalityIndex', {countriesQuery: countriesQuery, organizerTypeQuery: organizerTypeQuery}), {'default': 'Loading... <br/>'}) }}
+    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::exhibitionByMonthIndex', {countriesQuery: countriesQuery, organizerTypeQuery: organizerTypeQuery}), {'default': 'Loading... <br/>'}) }}
 
 
 </div>

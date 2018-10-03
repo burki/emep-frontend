@@ -1,12 +1,15 @@
 {% block exhibitions %}
     <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.css">
     <script src="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.js"></script>
+    <script src="{{ app.request.basepath }}/js/dataTables-mobile.min.js"></script>
+
     <script>
         $( document ).ready(function() {
             $('#exhibitions').DataTable({
                 paging: true,
                 searching: false,
                 info: false,
+                responsive: true,
                 "columns": [
                     null,
                     { "orderSequence": [ "desc", "asc" ] },
@@ -60,7 +63,7 @@
                             {% set count = catalogueEntries[exhibition.id]|length %}
                             {% if count > 0 %}
                                 {% set divId = 'entries' ~ exhibition.id %}
-                                <a class="badge" style="color: white" href="#{{ divId }}" data-toggle="collapse">{{ count }}</a>
+                                <a class="" href="#{{ divId }}" data-toggle="collapse">{{ count }}</a>
                             {% endif %}
                         {% else %}
                             {% set count = 0 %}

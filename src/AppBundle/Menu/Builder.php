@@ -57,7 +57,7 @@ class Builder
         return $this->createMainMenu($options);
     }
 
-    public function createMainMenu(array $options)
+    /* public function createMainMenu(array $options)
     {
         try {
             $loggedIn = $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY');
@@ -149,6 +149,93 @@ class Builder
         $menu['Places']->addChild('Map', [
             'route' => 'place-map',
         ]);
+
+        // find the matching parent
+        // TODO: maybe use a voter, see https://gist.github.com/nateevans/9958390
+        $uriCurrent = $this->requestStack->getCurrentRequest()->getRequestUri();
+
+        // create the iterator
+        $itemIterator = new \Knp\Menu\Iterator\RecursiveItemIterator($menu);
+
+        // iterate recursively on the iterator
+        $iterator = new \RecursiveIteratorIterator($itemIterator, \RecursiveIteratorIterator::SELF_FIRST);
+
+        foreach ($iterator as $item) {
+            $uri = $item->getUri();
+            if (substr($uriCurrent, 0, strlen($uri)) === $uri) {
+                $item->setCurrent(true);
+                break;
+            }
+        }
+
+        return $menu;
+    }*/
+
+    public function createMainMenu(array $options)
+    {
+        try {
+            $loggedIn = $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY');
+        }
+        catch (\Exception $e) {
+            // can happen on error pages
+            $loggedIn = false;
+        }
+
+        $showWorks = $loggedIn || !empty($_SESSION['user']);
+
+        // for translation, see http://symfony.com/doc/master/bundles/KnpMenuBundle/i18n.html
+        $menu = $this->factory->createItem('home', [
+            'label' => 'Home',
+            'route' => 'home',
+        ]);
+        $menu->setChildrenAttributes([ 'id' => 'menu-main', 'class' => 'nav-menu w-nav-menu', 'role' => 'navigation' ]);
+
+
+        $menu->addChild('Home', [ 'route' => 'home' ]); // maybe create a view for view data
+
+        $menu->addChild('View Data', [ 'route' => 'data' ]); // maybe create a view for view data
+        $menu['View Data']->addChild('Exhibitions', [
+            'route' => 'exhibition',
+        ]);
+
+        $menu['View Data']->addChild('Venues', [
+            'route' => 'location',
+        ]);
+
+        $menu['View Data']->addChild('Artists', [
+            'route' => 'person',
+        ]);
+
+        /* $menu['View Data']->addChild('Places', [
+            'route' => 'place',
+        ]); */
+
+
+
+        $menu->addChild('Holding Institutions', [ 'route' => 'holder' ]);
+
+        if ($showWorks) {
+            $menu->addChild('Works', [ 'route' => 'item' ]);
+            $menu['Works']->addChild('List by Artist', [
+                'route' => 'item',
+            ]);
+            $menu['Works']->addChild('List by Exhibition', [
+                'route' => 'item-by-exhibition',
+            ]);
+            $menu['Works']->addChild('List by Style', [
+                'route' => 'item-by-style',
+            ]);
+            $menu['Works']->addChild('List by Style', [
+                'route' => 'item-by-style',
+            ]);
+            $menu['Works']->addChild('Exhibition Map', [
+                'route' => 'item-by-place',
+            ]);
+            $menu['Works']->addChild('Stats by Artist', [
+                'route' => 'item-by-person',
+            ]);
+        }
+
 
         // find the matching parent
         // TODO: maybe use a voter, see https://gist.github.com/nateevans/9958390

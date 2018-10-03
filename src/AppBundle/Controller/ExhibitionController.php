@@ -93,19 +93,6 @@ extends CrudController
         $organizerType = $form->get('organizer_type')->getData();
 
 
-        // NEEDS TO BE HERE TO GET THE SAME FORM RESULT --> FORM NEEDS TO BE SUBMITTED
-
-
-
-        // STARTING TO ADD MAP DATA HERE
-        // $mapdata = StatisticsController::exhibitionAgeDistribution($em = $this->getDoctrine()->getEntityManager(), $exhibition->getId());
-        $mapdata = MapController::exhibitionByPlaceIndex($request, $this, $form);
-        // echo $mapdata;
-
-
-        // END MAP DATA HERE
-
-
 
         $pagination = $this->buildPagination($request, $qb->getQuery(), [
             // the following leads to wrong display in combination with our
@@ -121,13 +108,7 @@ extends CrudController
             'pageTitle' => $this->get('translator')->trans('Exhibitions'),
             'pagination' => $pagination,
             'form' => $form->createView(),
-            'data'=>$mapdata['data'],
-            'bounds'=>$mapdata['bounds'],
-            'disableClusteringAtZoom' => $mapdata['disableClusteringAtZoom'],
-            'markerStyle' => $mapdata['markerStyle'],
-            'persons' => $mapdata['persons'],
             'realData' => $result,
-            'resultTest' => $mapdata['resultTest'],
             'countries' => $countries,
             'organizerType' => $organizerType
         ]);

@@ -20,14 +20,14 @@ extends CrudFilterType
 
         $builder->add('gender', Filters\ChoiceFilterType::class, [
             'choices' => [
-                '- all - ' => '',
+                'select gender' => '',
                 'female' => 'F',
                 'male' => 'M',
             ],
         ]);
 
         $builder->add('nationality', Filters\ChoiceFilterType::class, [
-            'choices' => [ '- all - ' => '' ] + $options['data']['choices'],
+            'choices' => [ 'select nationality' => '' ] + $options['data']['choices'],
         ]);
     }
 

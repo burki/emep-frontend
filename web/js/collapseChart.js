@@ -1,6 +1,6 @@
 
 
-$('.chart-header').click(function() {
+$('.chart-header').on('click', function() {
     var collapseId = $(this).data('collapse');
 
     console.log('collapse id: ', collapseId);

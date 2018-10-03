@@ -15,6 +15,10 @@ extends AbstractType
     protected function addSearchFilter(FormBuilderInterface $builder, array $searchFields, $useFulltext = false)
     {
         $builder->add('search', Filters\TextFilterType::class, [
+            'label' => false,
+            'attr' => array(
+                'placeholder' => 'Search',
+            ),
             'apply_filter' => function (QueryInterface $filterQuery, $field, $values) use ($searchFields, $useFulltext)
             {
                 if (empty($values['value'])) {

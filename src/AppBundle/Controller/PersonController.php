@@ -81,6 +81,11 @@ extends CrudController
             $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($form, $qb);
         }
 
+        // getting the form data fields to send it back down and use it in hinclude requests async
+        $gender = $form->get('gender')->getData();
+        $nationalities = $form->get('nationality')->getData();
+
+
         $pagination = $this->buildPagination($request, $qb->getQuery(), [
             // the following leads to wrong display in combination with our
             // helper.pagination_sortable()
@@ -91,8 +96,11 @@ extends CrudController
             'pageTitle' => $this->get('translator')->trans('Artists'),
             'pagination' => $pagination,
             'form' => $form->createView(),
+            'nationalities' => $nationalities,
+            'gender' => $gender
         ]);
     }
+
 
     /**
      * @Route("/person/shared.embed/{exhibitions}", name="person-shared-partial")
