@@ -1,0 +1,48 @@
+
+    {% set venues = place.venues %}
+    {% if venues is not empty %}
+    <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.css">
+    <script src="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.js"></script>
+
+    <script>
+        $( document ).ready(function() {
+            $('#venues-table').DataTable({
+                paging: true,
+                searching: false,
+                info: false,
+                "columns": [
+                    { "orderSequence": [ "desc", "asc" ] },
+                ]
+            });
+        })
+    </script>
+
+
+    {% set childrenByType = place.getChildrenByType(em) %}
+
+    <div role="tabpanel" class="tab-pane active" id="venues">
+        <table id="venues-table" class="table table-striped table-bordered dataTable">
+            <thead>
+            <tr>
+                <th>Title</th>
+                <th># of Exhibitions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for location in venues %}
+                {% set birthPlace = person.birthPlace %}
+                <tr>
+                    <td><a href="{{ path('location', { 'id' : location.id }) }}"><b>{{ location.name }}</b></a></td>
+                    {% set count = location.exhibitions|length %}
+                    {% set divId = 'exhibitions' ~ location. id %}
+                    {% set numEntries = 0 %}
+                    <td><a class="" href="#{{ divId }}" >{{ count }}</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+
+    </div><!-- .tab-pane -->
+
+{% endif %}

@@ -55,6 +55,9 @@
                 {% embed "Place/Parts/tabcontent-artists.html.twig" %}
                 {% endembed %}
 
+                {% embed "Place/Parts/tabcontent-venues.html.twig" %}
+                {% endembed %}
+
 
 
 
@@ -64,55 +67,6 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-sm-8">
-        {% set childrenByType = place.getChildrenByType(em) %}
-        {% if childrenByType|length > 0 %}
-            {% for type, children in childrenByType %}
-            <h3>{{ type }}{#{ type|placeTypeLabel(children|length)|trans }#}</h3>
-            <ul class="list-group">
-                {% for child in childrenByType[type] %}
-                <li class="list-group-item">
-                    {{ helper.place_linked(child) }}
-                </li>
-                {% endfor %}
-            </ul>
-            {% endfor %}
-        {% endif %}
-
-        {% set venues = place.venues %}
-        {% if venues is not empty %}
-        <h3>Venues</h3>
-        <ul class="list-group">
-        {% for location in venues %}
-            <li class="list-group-item">
-                <a href="{{ path('location', { 'id' : location.id }) }}">
-                    <b>{{ location.name }}</b>
-                </a>
-            {% set count = location.exhibitions|length %}
-            {% if count > 0 %}
-                {% set divId = 'exhibitions' ~ location. id %}
-                {% set numEntries = 0 %}
-                {% for exhibition in location.exhibitions %}
-                    {% if exhibitionStats[ exhibition.id ] is defined and exhibitionStats[exhibition.id].numCatEntrySort > 0 %}
-                        {% set numEntries = numEntries + exhibitionStats[exhibition.id].numCatEntrySort %}
-                    {% endif %}
-                {% endfor %}
-
-                <a class="badge" style="color: white" href="#{{ divId }}" data-toggle="collapse">{{ count }} - {{ numEntries }}</a>
-                <div id="{{ divId }}" class="collapse">
-                {% for exhibition in location.exhibitions %}
-                    <p>
-                        {{ helper.exhibition_period(exhibition) }}
-                        <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}"><b>{{ exhibition.title }}</b>{{ exhibition.titleAppend }}</a>{% if exhibitionStats[ exhibition.id ] is defined and exhibitionStats[exhibition.id].numCatEntrySort > 0 -%}, {{ exhibitionStats[exhibition.id].numCatEntrySort }} entr. by {{ exhibitionStats[exhibition.id].numPersonSort }} art.{% endif %}
-                    </p>
-                {% endfor %}
-                </div>
-            {% endif %}
-            </li>
-        {% endfor %}
-        </ul>
-        {% endif %}
 
 
         {#
@@ -134,6 +88,5 @@
 
         </div>
         #}
-        </div>
-    </div><!-- .row -->
+
 {% endblock %}

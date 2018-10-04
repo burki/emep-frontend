@@ -11,8 +11,9 @@
                 <li role="presentation"><a href="#artists" aria-controls="similar" role="tab" data-toggle="tab">{{ 'Artists'|trans }}</a></li>
             {% endif %}
             {# authority files #}
+            {% set venues = place.venues %}
             {% if venues|length > 0 %}
-                <li role="presentation"><a href="#venues" aria-controls="authority" role="tab" data-toggle="tab">{{ 'Venues'|trans }}</a></li>
+                <li role="presentation"><a href="#venues" aria-controls="venues" role="tab" data-toggle="tab">{{ 'Venues'|trans }}</a></li>
             {% endif %}
         </ul>
 
