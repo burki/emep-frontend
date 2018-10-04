@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="83f6ca58-d621-4971-9ce4-caca212d12de" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/src/AppBundle/Controller/StatisticsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/AppBundle/Controller/StatisticsController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/css/custom.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/css/custom.css" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -17,6 +16,15 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="StatisticsController.php" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/AppBundle/Controller/StatisticsController.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="206">
+              <caret line="1337" column="70" lean-forward="true" selection-start-line="1337" selection-start-column="70" selection-end-line="1337" selection-end-column="70" />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="detail.html.twig" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/templates/Place/detail.html.twig">
           <provider selected="true" editor-type-id="text-editor">
@@ -35,7 +43,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="custom.css" pinned="false" current-in-tab="true">
+      <file leaf-file-name="custom.css" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/css/custom.css">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="190">
@@ -155,13 +163,13 @@
         <option value="$PROJECT_DIR$/templates/Person/Parts/tabs-header-index.html.twig" />
         <option value="$PROJECT_DIR$/src/AppBundle/Controller/MapController.php" />
         <option value="$PROJECT_DIR$/templates/Person/Parts/tabcontent-stats-index.html.twig" />
-        <option value="$PROJECT_DIR$/src/AppBundle/Controller/StatisticsController.php" />
         <option value="$PROJECT_DIR$/templates/Exhibition/index.html.twig" />
         <option value="$PROJECT_DIR$/templates/Base/base.html.twig" />
         <option value="$PROJECT_DIR$/templates/Place/Parts/tabs-header.html.twig" />
         <option value="$PROJECT_DIR$/templates/Place/detail.html.twig" />
         <option value="$PROJECT_DIR$/templates/Place/Parts/tabcontent-venues.html.twig" />
         <option value="$PROJECT_DIR$/web/css/custom.css" />
+        <option value="$PROJECT_DIR$/src/AppBundle/Controller/StatisticsController.php" />
       </list>
     </option>
   </component>
@@ -313,6 +321,13 @@
             <path>
               <item name="02_FRONTEND" type="b2602c69:ProjectViewProjectNode" />
               <item name="02_FRONTEND" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="AppBundle" type="462c0819:PsiDirectoryNode" />
+              <item name="Controller" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="02_FRONTEND" type="b2602c69:ProjectViewProjectNode" />
+              <item name="02_FRONTEND" type="462c0819:PsiDirectoryNode" />
               <item name="templates" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -421,12 +436,12 @@
       <workItem from="1537693644648" duration="36761000" />
       <workItem from="1538047079876" duration="13325000" />
       <workItem from="1538143468988" duration="5565000" />
-      <workItem from="1538563943448" duration="23409000" />
+      <workItem from="1538563943448" duration="23656000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="129074000" />
+    <option name="totallyTimeSpent" value="129321000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
@@ -763,13 +778,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/AppBundle/Controller/StatisticsController.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="18039">
-          <caret line="1428" column="35" selection-start-line="1428" selection-start-column="35" selection-end-line="1428" selection-end-column="35" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/templates/Person/Parts/tabcontent-stats-index.html.twig">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
@@ -826,6 +834,13 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="190">
           <caret line="267" column="25" selection-start-line="267" selection-start-column="25" selection-end-line="267" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/AppBundle/Controller/StatisticsController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="206">
+          <caret line="1337" column="70" lean-forward="true" selection-start-line="1337" selection-start-column="70" selection-end-line="1337" selection-end-column="70" />
         </state>
       </provider>
     </entry>
