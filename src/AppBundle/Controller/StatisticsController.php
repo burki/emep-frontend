@@ -1335,7 +1335,7 @@ EOT;
         $countryQueryString = '';
         $counterCountry = 0;
 
-        if (is_array($countriesQuery && count($countriesQuery) > 1 )){
+        if (is_array($countriesQuery) && count($countriesQuery) > 1 )){
             foreach($countriesQuery as $country){
                 if(counter > 0){
                     $countryQueryString .= ", ";

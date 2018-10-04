@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="83f6ca58-d621-4971-9ce4-caca212d12de" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/templates/Place/Parts/tabcontent-venues.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/Place/Parts/tabs-header.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Place/Parts/tabs-header.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/Place/detail.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Place/detail.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/AppBundle/Controller/StatisticsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/AppBundle/Controller/StatisticsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/css/custom.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/css/custom.css" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -27,11 +26,20 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="tabcontent-venues.html.twig" pinned="false" current-in-tab="true">
+      <file leaf-file-name="tabcontent-venues.html.twig" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/templates/Place/Parts/tabcontent-venues.html.twig">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="150">
               <caret line="10" column="33" selection-start-line="10" selection-start-column="33" selection-end-line="10" selection-end-column="33" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="custom.css" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/web/css/custom.css">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="190">
+              <caret line="267" column="25" selection-start-line="267" selection-start-column="25" selection-end-line="267" selection-end-column="25" />
             </state>
           </provider>
         </entry>
@@ -61,7 +69,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>exhibition</find>
       <find>exhibitionbyPlacePart</find>
       <find>getArrayQueryString</find>
       <find>Querystring</find>
@@ -91,6 +98,7 @@
       <find>datatables.min</find>
       <find>datatables-mobile</find>
       <find>datatables-responsive</find>
+      <find>count(</find>
     </findStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$/templates</dir>
@@ -150,10 +158,10 @@
         <option value="$PROJECT_DIR$/src/AppBundle/Controller/StatisticsController.php" />
         <option value="$PROJECT_DIR$/templates/Exhibition/index.html.twig" />
         <option value="$PROJECT_DIR$/templates/Base/base.html.twig" />
-        <option value="$PROJECT_DIR$/web/css/custom.css" />
         <option value="$PROJECT_DIR$/templates/Place/Parts/tabs-header.html.twig" />
         <option value="$PROJECT_DIR$/templates/Place/detail.html.twig" />
         <option value="$PROJECT_DIR$/templates/Place/Parts/tabcontent-venues.html.twig" />
+        <option value="$PROJECT_DIR$/web/css/custom.css" />
       </list>
     </option>
   </component>
@@ -413,12 +421,12 @@
       <workItem from="1537693644648" duration="36761000" />
       <workItem from="1538047079876" duration="13325000" />
       <workItem from="1538143468988" duration="5565000" />
-      <workItem from="1538563943448" duration="23201000" />
+      <workItem from="1538563943448" duration="23409000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="128866000" />
+    <option name="totallyTimeSpent" value="129074000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
@@ -783,13 +791,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/css/custom.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="130">
-          <caret line="253" lean-forward="true" selection-start-line="253" selection-end-line="253" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/templates/Base/base.html.twig">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="517">
@@ -818,6 +819,13 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="150">
           <caret line="10" column="33" selection-start-line="10" selection-start-column="33" selection-end-line="10" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/css/custom.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="190">
+          <caret line="267" column="25" selection-start-line="267" selection-start-column="25" selection-end-line="267" selection-end-column="25" />
         </state>
       </provider>
     </entry>
