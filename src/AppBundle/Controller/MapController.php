@@ -56,8 +56,6 @@ extends CrudController
         ;
 
 
-        // echo $querystr;
-
 
         // $querystr .= " WHERE " . $testQuery;
 
@@ -484,7 +482,7 @@ extends CrudController
                 . ' INNER JOIN Item ON ItemExhibition.id_item=Item.id AND Item.status <> -1'
             ;
 
-            $person = $request->get('person');
+            // $person = $request->get('person');
             if (!empty($person) && intval($person) > 0) {
                 $querystr .= ' INNER JOIN ItemPerson ON Item.id=ItemPerson.id_item'
                     . sprintf(' AND ItemPerson.id_person=%d', intval($person));
@@ -569,17 +567,17 @@ extends CrudController
 
 
             $values[$key]['exhibitions'][] =
-            sprintf('<a href="%s">%s</a> at <a href="%s">%s</a> (%s)',
-                htmlspecialchars($this->generateUrl('exhibition', [
-                    'id' => $row['exhibition_id'],
-                ])),
-                htmlspecialchars($row['title']),
-                htmlspecialchars($this->generateUrl('location', [
-                    'id' => $row['location_id'],
-                ])),
-                htmlspecialchars($row['location_name']),
-                $displayhelper->buildDisplayDate($row)
-            );
+                sprintf('<a href="%s">%s</a> at <a href="%s">%s</a> (%s)',
+                    htmlspecialchars($this->generateUrl('exhibition', [
+                        'id' => $row['exhibition_id'],
+                    ])),
+                    htmlspecialchars($row['title']),
+                    htmlspecialchars($this->generateUrl('location', [
+                        'id' => $row['location_id'],
+                    ])),
+                    htmlspecialchars($row['location_name']),
+                    $displayhelper->buildDisplayDate($row)
+                );
 
         }
 
@@ -597,7 +595,7 @@ extends CrudController
                 $value['latitude'], $value['longitude'],
                 $value['place'],
                 $entry_list,
-                'place-map' == count($value['exhibitions']),
+                count($value['exhibitions']),
             ];
         }
 
@@ -702,17 +700,17 @@ extends CrudController
 
 
             $values[$key]['exhibitions'][] =
-            sprintf('<a href="%s">%s</a> at <a href="%s">%s</a> (%s)',
-                htmlspecialchars($this->generateUrl('exhibition', [
-                    'id' => $row['exhibition_id'],
-                ])),
-                htmlspecialchars($row['title']),
-                htmlspecialchars($this->generateUrl('location', [
-                    'id' => $row['location_id'],
-                ])),
-                htmlspecialchars($row['location_name']),
-                $displayhelper->buildDisplayDate($row)
-            );
+                sprintf('<a href="%s">%s</a> at <a href="%s">%s</a> (%s)',
+                    htmlspecialchars($this->generateUrl('exhibition', [
+                        'id' => $row['exhibition_id'],
+                    ])),
+                    htmlspecialchars($row['title']),
+                    htmlspecialchars($this->generateUrl('location', [
+                        'id' => $row['location_id'],
+                    ])),
+                    htmlspecialchars($row['location_name']),
+                    $displayhelper->buildDisplayDate($row)
+                );
 
         }
 
@@ -730,7 +728,7 @@ extends CrudController
                 $value['latitude'], $value['longitude'],
                 $value['place'],
                 $entry_list,
-                'place-map' == count($value['exhibitions']),
+                count($value['exhibitions']),
             ];
         }
 
