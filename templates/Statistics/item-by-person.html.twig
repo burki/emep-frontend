@@ -272,7 +272,8 @@
                 {#{ dump(persons_by_place[person])}#}
                 {{ persons_by_year[person]['total_exhibition'] }} exhibition{% if persons_by_year[person]['total_exhibition'] != 1 %}s{% endif %}<br/>
                 {{ persons_by_year[person]['total_item'] }} work{% if persons_by_year[person]['total_item'] != 1 %}s{% endif %}
-                ( {% for key, label in { 'Naturalistic' : 'nat.', 'Stylized / form OR colour' : 'styl. OR', 'Stylized / form AND colour' : 'styl. AND', 'Non-representational' : 'non-rep.', 'Anti-illusionistic' : 'Anti-ill.', 'no visual evidence': 'no vis.' } %}{% if persons_by_year[person][key] is not empty %}{{ persons_by_year[person][key] }} {{ label }}, {% endif %}{% endfor %})
+                {{ persons_by_year[person]['total_display'] }} times on display
+                ( {% for key, label in { 'Naturalistic' : 'nat.', 'Stylized / form OR colour' : 'styl. OR', 'Stylized / form AND colour' : 'styl. AND', 'Non-representational' : 'non-rep.', 'Anti-illusionistic' : 'Anti-ill.', 'no visual evidence': 'no vis.', 'unknown': 'unknown' } %}{% if persons_by_year[person][key] is not empty %}{{ persons_by_year[person][key] }} {{ label }}, {% endif %}{% endfor %})
             {% endif %}
         </th>
         {% endfor %}

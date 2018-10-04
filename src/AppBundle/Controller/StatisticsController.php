@@ -745,8 +745,9 @@ EOT;
         $categories = array_keys($data);
         for ($i = 0; $i < count($categories); $i++) {
             $category = $categories[$i];
-            foreach (['works', 'works_exhibited', 'exhibitions']
-                     as $key) {
+            foreach ([ 'works', 'works_exhibited', 'exhibitions' ]
+                     as $key)
+            {
                 if ('works' == $key) {
                     foreach ($styles as $style) {
                         $total[$key][$style][] = [
@@ -768,7 +769,7 @@ EOT;
 
         // by place
         $place_data = [];
-        foreach (['works', 'works_exhibited', 'exhibitions' ] as $key) {
+        foreach ([ 'works', 'works_exhibited', 'exhibitions' ] as $key) {
             if ('works_exhibited' == $key) {
                 $querystr = 'SELECT COUNT(ItemExhibition.id) AS how_many, COALESCE(Geoname.name_alternate, Geoname.name) AS place'
                             . " FROM Exhibition"
@@ -808,6 +809,7 @@ EOT;
                           . ' ORDER BY Geoname.country_code, place'
                           ;
             }
+
             $stmt = $dbconn->query($querystr);
 
             while ($row = $stmt->fetch()) {
@@ -820,8 +822,9 @@ EOT;
         $place_categories = array_keys($place_data);
         for ($i = 0; $i < count($place_categories); $i++) {
             $category = $place_categories[$i];
-            foreach (['works', 'works_exhibited', 'exhibitions']
-                     as $key) {
+            foreach ([ 'works', 'works_exhibited', 'exhibitions']
+                     as $key)
+            {
                 $place_total[$key][$category] = [
                     'name' => $category,
                     'y' => isset($place_data[$category][$key])
@@ -875,6 +878,7 @@ EOT;
                 $persons_by_place[$place_key][$fullname]['exhibition_ids'][] = $row['exhibition_id'];
                 $persons_by_place[$place_key][$fullname]['total_exhibition'] += 1;
             }
+
             if (!in_array($row['item_id'], $persons_by_place[$place_key][$fullname]['item_ids'])) {
                 $persons_by_place[$place_key][$fullname]['item_ids'][] = $row['item_id'];
                 $persons_by_place[$place_key][$fullname]['total_item'] += 1;
@@ -904,12 +908,14 @@ EOT;
                 // new year
                 $persons_by_year[$year_key] = [];
             }
+
             $fullname = $row['lastname'] . ', ' . $row['firstname'];
 
             if (!array_key_exists($fullname, $persons_by_year[$year_key])) {
                 // new person in this year
                 $persons_by_year[$year_key][$fullname] = $row;
                 $persons_by_year[$year_key][$fullname]['total_item']
+                    = $persons_by_year[$year_key][$fullname]['total_display']
                     = $persons_by_year[$year_key][$fullname]['total_exhibition']
                     = 0;
                 $persons_by_year[$year_key][$fullname]['exhibition_ids']
@@ -925,10 +931,12 @@ EOT;
                 $persons_by_year[$year_key][$fullname]['exhibition_ids'][] = $row['exhibition_id'];
                 $persons_by_year[$year_key][$fullname]['total_exhibition'] += 1;
             }
+
+            $persons_by_year[$year_key][$fullname]['total_display'] += 1;
+            $persons_by_year[$year_key][$fullname][$row['style']] += 1;
             if (!in_array($row['item_id'], $persons_by_year[$year_key][$fullname]['item_ids'])) {
                 $persons_by_year[$year_key][$fullname]['item_ids'][] = $row['item_id'];
                 $persons_by_year[$year_key][$fullname]['total_item'] += 1;
-                $persons_by_year[$year_key][$fullname][$row['style']] += 1;
             }
         }
 
