@@ -479,7 +479,7 @@ extends CrudController
             . " INNER JOIN Location ON Location.id=Exhibition.id_location"
             . " INNER JOIN Geoname ON Geoname.tgn=Location.place_tgn";
 
-        if ('item-by-place' == $route) {
+        /*if ('item-by-place' == $route) {
             $querystr .= ' INNER JOIN ItemExhibition ON ItemExhibition.id_exhibition=Exhibition.id'
                 . ' INNER JOIN Item ON ItemExhibition.id_item=Item.id AND Item.status <> -1'
             ;
@@ -503,7 +503,7 @@ extends CrudController
                 ->where('I.status <> -1')
                 ->orderBy('P.familyName');
             $persons = $qbPerson->getQuery()->getResult();
-        }
+        }*/
 
         $andWhere = '';
         if (array_key_exists('location-type', $filterData) && !empty($filterData['location-type'])) {
