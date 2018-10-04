@@ -461,7 +461,7 @@ extends CrudController
 
 
 
-        if (in_array($route, [ 'location-by-place', 'exhibition-by-place' ])) {
+        /*if (in_array($route, [ 'location-by-place', 'exhibition-by-place' ])) {
             $types = 'exhibition-by-place' == $route
                 ? $this->buildOrganizerTypes()
                 : $this->buildVenueTypes();
@@ -472,7 +472,7 @@ extends CrudController
             ]);
 
 
-        }
+        }*/
 
         $querystr = "SELECT DISTINCT Exhibition.id AS exhibition_id, Exhibition.title, startdate, enddate, Exhibition.displaydate AS displaydate, Location.id AS location_id, Location.name AS location_name, COALESCE(Geoname.name_variant, Geoname.name) AS place, Geoname.tgn, Geoname.latitude, Geoname.longitude"
             . " FROM Exhibition"
@@ -709,29 +709,20 @@ extends CrudController
                 ];
             }
 
-            if ('location-by-place' == $route) {
-                $values[$key]['exhibitions'][] =
-                    sprintf('<a href="%s">%s</a>',
-                        htmlspecialchars($this->generateUrl('location', [
-                            'id' => $row['location_id'],
-                        ])),
-                        htmlspecialchars($row['location_name'])
-                    );
-            }
-            else if ('place-map' != $route) {
-                $values[$key]['exhibitions'][] =
-                    sprintf('<a href="%s">%s</a> at <a href="%s">%s</a> (%s)',
-                        htmlspecialchars($this->generateUrl('exhibition', [
-                            'id' => $row['exhibition_id'],
-                        ])),
-                        htmlspecialchars($row['title']),
-                        htmlspecialchars($this->generateUrl('location', [
-                            'id' => $row['location_id'],
-                        ])),
-                        htmlspecialchars($row['location_name']),
-                        $displayhelper->buildDisplayDate($row)
-                    );
-            }
+
+            $values[$key]['exhibitions'][] =
+            sprintf('<a href="%s">%s</a> at <a href="%s">%s</a> (%s)',
+                htmlspecialchars($this->generateUrl('exhibition', [
+                    'id' => $row['exhibition_id'],
+                ])),
+                htmlspecialchars($row['title']),
+                htmlspecialchars($this->generateUrl('location', [
+                    'id' => $row['location_id'],
+                ])),
+                htmlspecialchars($row['location_name']),
+                $displayhelper->buildDisplayDate($row)
+            );
+
         }
 
         $values_final = [];

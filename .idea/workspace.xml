@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="83f6ca58-d621-4971-9ce4-caca212d12de" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/src/AppBundle/Controller/StatisticsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/AppBundle/Controller/StatisticsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/AppBundle/Controller/MapController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/AppBundle/Controller/MapController.php" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -16,11 +16,29 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="StatisticsController.php" pinned="false" current-in-tab="true">
+      <file leaf-file-name="StatisticsController.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/AppBundle/Controller/StatisticsController.php">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="206">
-              <caret line="1337" column="70" lean-forward="true" selection-start-line="1337" selection-start-column="70" selection-end-line="1337" selection-end-column="70" />
+              <caret line="1337" column="70" selection-start-line="1337" selection-start-column="70" selection-end-line="1337" selection-end-column="70" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PersonController.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/AppBundle/Controller/PersonController.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="396">
+              <caret line="88" selection-start-line="88" selection-end-line="88" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MapController.php" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/AppBundle/Controller/MapController.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="299">
+              <caret line="447" lean-forward="true" selection-start-line="447" selection-end-line="447" />
             </state>
           </provider>
         </entry>
@@ -161,7 +179,6 @@
         <option value="$PROJECT_DIR$/templates/Location/Parts/tabcontent-map.html.twig" />
         <option value="$PROJECT_DIR$/src/AppBundle/Controller/PersonController.php" />
         <option value="$PROJECT_DIR$/templates/Person/Parts/tabs-header-index.html.twig" />
-        <option value="$PROJECT_DIR$/src/AppBundle/Controller/MapController.php" />
         <option value="$PROJECT_DIR$/templates/Person/Parts/tabcontent-stats-index.html.twig" />
         <option value="$PROJECT_DIR$/templates/Exhibition/index.html.twig" />
         <option value="$PROJECT_DIR$/templates/Base/base.html.twig" />
@@ -170,6 +187,7 @@
         <option value="$PROJECT_DIR$/templates/Place/Parts/tabcontent-venues.html.twig" />
         <option value="$PROJECT_DIR$/web/css/custom.css" />
         <option value="$PROJECT_DIR$/src/AppBundle/Controller/StatisticsController.php" />
+        <option value="$PROJECT_DIR$/src/AppBundle/Controller/MapController.php" />
       </list>
     </option>
   </component>
@@ -436,12 +454,12 @@
       <workItem from="1537693644648" duration="36761000" />
       <workItem from="1538047079876" duration="13325000" />
       <workItem from="1538143468988" duration="5565000" />
-      <workItem from="1538563943448" duration="23656000" />
+      <workItem from="1538563943448" duration="23883000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="129321000" />
+    <option name="totallyTimeSpent" value="129548000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
@@ -715,13 +733,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/AppBundle/Controller/PersonController.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="396">
-          <caret line="88" selection-start-line="88" selection-end-line="88" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/templates/Person/index.html.twig">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="510">
@@ -740,13 +751,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="240">
           <caret line="16" column="32" selection-start-line="16" selection-start-column="32" selection-end-line="16" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/AppBundle/Controller/MapController.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="82">
-          <caret line="40" column="20" lean-forward="true" selection-start-line="40" selection-start-column="20" selection-end-line="40" selection-end-column="20" />
         </state>
       </provider>
     </entry>
@@ -840,7 +844,21 @@
     <entry file="file://$PROJECT_DIR$/src/AppBundle/Controller/StatisticsController.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="206">
-          <caret line="1337" column="70" lean-forward="true" selection-start-line="1337" selection-start-column="70" selection-end-line="1337" selection-end-column="70" />
+          <caret line="1337" column="70" selection-start-line="1337" selection-start-column="70" selection-end-line="1337" selection-end-column="70" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/AppBundle/Controller/PersonController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="396">
+          <caret line="88" selection-start-line="88" selection-end-line="88" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/AppBundle/Controller/MapController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="299">
+          <caret line="447" lean-forward="true" selection-start-line="447" selection-end-line="447" />
         </state>
       </provider>
     </entry>
