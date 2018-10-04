@@ -1335,7 +1335,7 @@ EOT;
         $countryQueryString = '';
         $counterCountry = 0;
 
-        if (count($countriesQuery) > 1 && is_array($countriesQuery)){
+        if (is_array($countriesQuery && count($countriesQuery) > 1 )){
             foreach($countriesQuery as $country){
                 if(counter > 0){
                     $countryQueryString .= ", ";
@@ -1367,7 +1367,7 @@ EOT;
         if ($queryArray === '' or $queryArray === 'any'){
             $modelQueryString = $fallbackString;
         } else {
-            if(count($queryArray) > 0 && is_array($queryArray)){
+            if(is_array($queryArray) && count($queryArray) > 0 ){
                 foreach ($queryArray as $queryElement){
                     if($counterQueryArray > 0){
                         $modelQueryString .= ", ";
