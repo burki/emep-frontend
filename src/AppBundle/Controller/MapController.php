@@ -567,29 +567,20 @@ extends CrudController
                 ];
             }
 
-            if ('location-by-place' == $route) {
-                $values[$key]['exhibitions'][] =
-                    sprintf('<a href="%s">%s</a>',
-                        htmlspecialchars($this->generateUrl('location', [
-                            'id' => $row['location_id'],
-                        ])),
-                        htmlspecialchars($row['location_name'])
-                    );
-            }
-            else if ('place-map' != $route) {
-                $values[$key]['exhibitions'][] =
-                    sprintf('<a href="%s">%s</a> at <a href="%s">%s</a> (%s)',
-                        htmlspecialchars($this->generateUrl('exhibition', [
-                            'id' => $row['exhibition_id'],
-                        ])),
-                        htmlspecialchars($row['title']),
-                        htmlspecialchars($this->generateUrl('location', [
-                            'id' => $row['location_id'],
-                        ])),
-                        htmlspecialchars($row['location_name']),
-                        $displayhelper->buildDisplayDate($row)
-                    );
-            }
+
+            $values[$key]['exhibitions'][] =
+            sprintf('<a href="%s">%s</a> at <a href="%s">%s</a> (%s)',
+                htmlspecialchars($this->generateUrl('exhibition', [
+                    'id' => $row['exhibition_id'],
+                ])),
+                htmlspecialchars($row['title']),
+                htmlspecialchars($this->generateUrl('location', [
+                    'id' => $row['location_id'],
+                ])),
+                htmlspecialchars($row['location_name']),
+                $displayhelper->buildDisplayDate($row)
+            );
+
         }
 
         $values_final = [];
@@ -606,7 +597,7 @@ extends CrudController
                 $value['latitude'], $value['longitude'],
                 $value['place'],
                 $entry_list,
-                'place-map' == $route ? 1 : count($value['exhibitions']),
+                'place-map' == count($value['exhibitions']),
             ];
         }
 
@@ -619,7 +610,7 @@ extends CrudController
                 [ 60, -120 ],
                 [ -15, 120 ],
             ],
-            'markerStyle' => 'exhibition-by-place' == $route ? 'circle' : 'default',
+            'markerStyle' => 'exhibition-by-place' == 'default',
             'persons' => $persons,
         ]);
     }
@@ -739,7 +730,7 @@ extends CrudController
                 $value['latitude'], $value['longitude'],
                 $value['place'],
                 $entry_list,
-                'place-map' == $route ? 1 : count($value['exhibitions']),
+                'place-map' == count($value['exhibitions']),
             ];
         }
 
@@ -752,7 +743,7 @@ extends CrudController
                 [ 60, -120 ],
                 [ -15, 120 ],
             ],
-            'markerStyle' => 'exhibition-by-place' == $route ? 'circle' : 'default',
+            'markerStyle' => 'exhibition-by-place' == 'default',
             'persons' => $persons,
         ]);
     }

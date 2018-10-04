@@ -37,8 +37,8 @@
       <file leaf-file-name="MapController.php" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/AppBundle/Controller/MapController.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="280">
-              <caret line="481" column="10" selection-start-line="481" selection-start-column="10" selection-end-line="481" selection-end-column="10" />
+            <state relative-caret-position="550">
+              <caret line="894" column="14" lean-forward="true" selection-start-line="894" selection-start-column="14" selection-end-line="894" selection-end-column="14" />
             </state>
           </provider>
         </entry>
@@ -95,8 +95,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>exhibitionbyPlacePart</find>
-      <find>getArrayQueryString</find>
       <find>Querystring</find>
       <find>exhibitionna</find>
       <find>exhibitionbymi</find>
@@ -125,6 +123,8 @@
       <find>datatables-mobile</find>
       <find>datatables-responsive</find>
       <find>count(</find>
+      <find>part</find>
+      <find>route</find>
     </findStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$/templates</dir>
@@ -454,12 +454,12 @@
       <workItem from="1537693644648" duration="36761000" />
       <workItem from="1538047079876" duration="13325000" />
       <workItem from="1538143468988" duration="5565000" />
-      <workItem from="1538563943448" duration="24213000" />
+      <workItem from="1538563943448" duration="24408000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="129878000" />
+    <option name="totallyTimeSpent" value="130073000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
@@ -857,8 +857,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/AppBundle/Controller/MapController.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="280">
-          <caret line="481" column="10" selection-start-line="481" selection-start-column="10" selection-end-line="481" selection-end-column="10" />
+        <state relative-caret-position="550">
+          <caret line="894" column="14" lean-forward="true" selection-start-line="894" selection-start-column="14" selection-end-line="894" selection-end-column="14" />
         </state>
       </provider>
     </entry>
