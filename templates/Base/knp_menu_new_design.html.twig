@@ -18,16 +18,20 @@
         {# building the class of the item #}
         {%- set classes = item.attribute('class') is not empty ? [item.attribute('class')] : [] %}
 
+
         {# adding default classes to links #}
         {%- set classes = classes|merge(['nav-link', 'w-nav-link']) %}
 
 
-
-        {%- if matcher.isCurrent(item) %}
+        {%- if matcher.isCurrent(item) and item.name != 'Home'  %}
             {%- set classes = classes|merge([options.currentClass]) %}
         {%- elseif matcher.isAncestor(item, options.depth) %}
             {%- set classes = classes|merge([options.ancestorClass]) %}
         {%- endif %}
+
+
+
+
         {%- if item.actsLikeFirst %}
             {%- set classes = classes|merge([options.firstClass]) %}
         {%- endif %}

@@ -1,6 +1,6 @@
 Highcharts.theme = {
-    colors: ['#1869A3', '#02A5BE', '#484848', '#B8D4E3', '#00ffff', '#00ffff',
-        '#00ffff', '#00ffff', '#00ffff'],
+    colors: ['#1869A3', '#02A5BE', '#484848', '#B8D4E3', '#60BE02', '#4D318B',
+        '#BE6702', '#B0BE02', '#B7B7B7'],
     chart: {
         backgroundColor: 'transparent',
     },

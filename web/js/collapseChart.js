@@ -1,6 +1,7 @@
 
 
-$('.chart-header').on('click', function() {
+$('.chart-header').on('click', function(event) {
+    event.stopImmediatePropagation();
     var collapseId = $(this).data('collapse');
 
     console.log('collapse id: ', collapseId);

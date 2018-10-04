@@ -45,7 +45,7 @@
 
 
                             $(rows).eq( i ).before(
-                                '<tr class="group groupHeader" data-name="' + splitGroup + '" ><td colspan="5"><span class="minus-collapse">-</span> '+group+'</td></tr>'
+                                '<tr class="group groupHeader" data-name="' + splitGroup + '" ><td colspan="5"><span class="minus-collapse vorzeichen collapsed">-</span><span class="minus-collapse vorzeichen">+</span> '+group+'</td></tr>'
                             );
 
                             last = group;
@@ -73,6 +73,7 @@
                 // console.log('.collapseRow[data-rowname="' + splitGroup + '"]');
 
                 $('.collapseRow[data-rowname="' + splitGroup + '"]').toggleClass('collapsed');
+                $(this).find('.vorzeichen').toggleClass('collapsed');
 
 
                 // console.log($(this).data('name'));

@@ -6,6 +6,7 @@
         $( document ).ready(function() {
             $("#exhibitionsList").DataTable({
                 responsive: true,
+                ordering: false,
                 paging: false,
                 searching: false,
                 info: false
@@ -20,11 +21,11 @@
                 <thead>
                 <tr class="listviewheading">
                     <th>{{ helper.pagination_sortable(pagination, 'Date', 'dateSort') }}</th>
-                    <th>Title</th>
+                    <th><span>Title</span></th>
                     <th>{{ helper.pagination_sortable(pagination, 'City', 'placeSort') }}</th>
-                    <th>Venue</th>
+                    <th><span>Venue</span></th>
                     <th>{{ helper.pagination_sortable(pagination, 'Number of Cat. Entries', 'numCatEntrySort', 'desc') }}</th>
-                    <th>type</th>
+                    <th><span>type</span></th>
                 </tr>
                 </thead>
                 <tbody>

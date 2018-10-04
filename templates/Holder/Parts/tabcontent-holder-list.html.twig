@@ -1,8 +1,24 @@
+<script src="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.js"></script>
+<script src="{{ app.request.basepath }}/js/datatables-mobile.min.js"></script>
+
+<script>
+    $( document ).ready(function() {
+        $('#holderTable').DataTable({
+            responsive: true,
+            paging: false,
+            searching: false,
+            info: false,
+            ordering: false
+        });
+    })
+</script>
+
+
 <div role="tabpanel" class="tab-pane active" id="exhibitions">
 
     {# helper.pagination_count(pagination) #}
     {% set sortField = app.request.get('sort') %}
-    <table id="exhibitions" class="table table-striped table-bordered dataTable listviewcontainer">
+    <table id="holderTable" class="table table-striped table-bordered dataTable listviewcontainer">
         <thead>
         <tr class="listviewheading">
             <th>{{ helper.pagination_sortable(pagination, 'Name', 'nameSort') }}</th>
