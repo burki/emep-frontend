@@ -1335,7 +1335,7 @@ EOT;
         $countryQueryString = '';
         $counterCountry = 0;
 
-        if ($countriesQuery.length > 1 && is_array($countriesQuery)){
+        if (count($countriesQuery) > 1 && is_array($countriesQuery)){
             foreach($countriesQuery as $country){
                 if(counter > 0){
                     $countryQueryString .= ", ";
@@ -1396,7 +1396,7 @@ EOT;
             $personQueryString = $fallbackString;
         } else {
             // if nationality is set check if larger than one or only on value
-            if ($nationalityArray.length > 1) {
+            if (count($nationalityArray) > 1) {
                 foreach ($nationalityArray as $nationality) {
                     if ($counterNationalityArray > 0) {
                         $personQueryString .= ", ";
