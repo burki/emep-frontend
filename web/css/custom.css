@@ -6,6 +6,10 @@
     list-style: none;
 }
 
+#menu-main{
+    padding-left: 0;
+}
+
 a:hover {
     text-decoration: none!important;
 }
@@ -343,6 +347,10 @@ path.highcharts-tick {
 
     .branding {
         margin-bottom: 25px;
+    }
+
+    .w-container {
+        padding: 0px 10px;
     }
 
 }

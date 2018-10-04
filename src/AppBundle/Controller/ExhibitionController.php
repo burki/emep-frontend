@@ -88,6 +88,7 @@ extends CrudController
 
         $countries = $form->get('country')->getData();
         $organizerType = $form->get('organizer_type')->getData();
+        $stringQuery = $form->get('search')->getData();
 
 
 
@@ -107,7 +108,8 @@ extends CrudController
             'form' => $form->createView(),
             'realData' => $result,
             'countries' => $countries,
-            'organizerType' => $organizerType
+            'organizerType' => $organizerType,
+            'stringPart' => $stringQuery
         ]);
     }
 

@@ -84,6 +84,8 @@ extends CrudController
         // getting the form data fields to send it back down and use it in hinclude requests async
         $gender = $form->get('gender')->getData();
         $nationalities = $form->get('nationality')->getData();
+        $stringQuery = $form->get('search')->getData();
+
 
 
         $pagination = $this->buildPagination($request, $qb->getQuery(), [
@@ -97,7 +99,9 @@ extends CrudController
             'pagination' => $pagination,
             'form' => $form->createView(),
             'nationalities' => $nationalities,
-            'gender' => $gender
+            'gender' => $gender,
+            'stringPart' => $stringQuery
+
         ]);
     }
 

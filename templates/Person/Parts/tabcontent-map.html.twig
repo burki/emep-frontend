@@ -12,6 +12,7 @@
 
     {%  set countriesQuery = '' %}
     {%  set genderQuery = 'any' %}
+    {%  set stringQuery = 'any' %}
 
 
     {% if nationalities|length %}
@@ -22,6 +23,9 @@
         {% set genderQuery = gender %}
     {% endif %}
 
+    {% if stringPart|length %}
+        {% set stringQuery = stringPart %}
+    {% endif %}
 
-    {{ render_hinclude(controller('AppBundle\\Controller\\MapController::birthDeathPlacesIndex', {countriesQuery: countriesQuery, genderQuery: genderQuery}), {'default': 'Loading...'}) }}
+    {{ render_hinclude(controller('AppBundle\\Controller\\MapController::birthDeathPlacesIndex', {countriesQuery: countriesQuery, genderQuery: genderQuery, stringQuery: stringQuery}), {'default': 'Loading...'}) }}
 </div>

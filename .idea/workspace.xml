@@ -2,12 +2,23 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="83f6ca58-d621-4971-9ce4-caca212d12de" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/AppBundle/Controller/ExhibitionController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/AppBundle/Controller/ExhibitionController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/AppBundle/Controller/LocationController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/AppBundle/Controller/LocationController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/AppBundle/Controller/MapController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/AppBundle/Controller/MapController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/Default/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Default/index.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/Location/Parts/tabs-header-index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Location/Parts/tabs-header-index.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/AppBundle/Controller/PersonController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/AppBundle/Controller/PersonController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/AppBundle/Controller/StatisticsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/AppBundle/Controller/StatisticsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/Base/base.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Base/base.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/Exhibition/Parts/tabcontent-map.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Exhibition/Parts/tabcontent-map.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/Exhibition/Parts/tabcontent-stat-countries.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Exhibition/Parts/tabcontent-stat-countries.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/Location/Parts/tabcontent-location-list.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Location/Parts/tabcontent-location-list.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/Location/Parts/tabcontent-map.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Location/Parts/tabcontent-map.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/Map/place-map-index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Map/place-map-index.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/Map/place-map.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Map/place-map.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/Person/Parts/tabcontent-map.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Person/Parts/tabcontent-map.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/Person/Parts/tabcontent-stats-index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Person/Parts/tabcontent-stats-index.html.twig" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/Person/Parts/tabs-header-index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Person/Parts/tabs-header-index.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/css/custom.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/css/custom.css" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -21,84 +32,38 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="MapController.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/AppBundle/Controller/MapController.php">
+      <file leaf-file-name="StatisticsController.php" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/AppBundle/Controller/StatisticsController.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="337">
-              <caret line="743" column="29" lean-forward="true" selection-start-line="743" selection-start-column="29" selection-end-line="743" selection-end-column="29" />
+            <state relative-caret-position="458">
+              <caret line="1032" column="81" selection-start-line="1032" selection-start-column="81" selection-end-line="1032" selection-end-column="81" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="place-map-index.html.twig" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/templates/Map/place-map-index.html.twig">
+      <file leaf-file-name="Person.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/AppBundle/Entity/Person.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="612">
-              <caret line="167" selection-start-line="167" selection-end-line="167" />
+            <state relative-caret-position="308">
+              <caret line="97" column="28" selection-start-line="97" selection-start-column="25" selection-end-line="97" selection-end-column="28" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="tabcontent-map.html.twig" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/templates/Location/Parts/tabcontent-map.html.twig">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file leaf-file-name="index.html.twig" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/templates/Exhibition/index.html.twig">
+      <file leaf-file-name="tabcontent-stats-index.html.twig" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/templates/Person/Parts/tabcontent-stats-index.html.twig">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="6">
-              <caret line="13" column="13" selection-start-line="13" selection-start-column="13" selection-end-line="13" selection-end-column="13" />
+            <state relative-caret-position="465">
+              <caret line="31" column="186" selection-start-line="31" selection-start-column="186" selection-end-line="31" selection-end-column="186" />
             </state>
           </provider>
         </entry>
       </file>
       <file leaf-file-name="tabcontent-map.html.twig" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/templates/Exhibition/Parts/tabcontent-map.html.twig">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file leaf-file-name="tabs-header-index.html.twig" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/templates/Location/Parts/tabs-header-index.html.twig">
+        <entry file="file://$PROJECT_DIR$/templates/Person/Parts/tabcontent-map.html.twig">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="14" column="10" lean-forward="true" selection-start-line="14" selection-start-column="10" selection-end-line="14" selection-end-column="10" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="tabs-header-index.html.twig" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/templates/Exhibition/Parts/tabs-header-index.html.twig">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="17" column="4" selection-start-line="17" selection-start-column="4" selection-end-line="21" selection-end-column="13" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="index.html.twig" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/templates/Holder/index.html.twig">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="615">
-              <caret line="41" column="26" selection-start-line="41" selection-start-column="26" selection-end-line="41" selection-end-column="26" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="tabs-header-index.html.twig" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/templates/Holder/Parts/tabs-header-index.html.twig">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
-              <caret line="13" column="4" selection-start-line="13" selection-start-column="4" selection-end-line="17" selection-end-column="13" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="tabs-header-index.html.twig" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/templates/Person/Parts/tabs-header-index.html.twig">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="285">
-              <caret line="19" column="17" selection-start-line="19" selection-start-column="17" selection-end-line="19" selection-end-column="17" />
+            <state relative-caret-position="435">
+              <caret line="29" column="180" selection-start-line="29" selection-start-column="156" selection-end-line="29" selection-end-column="180" />
             </state>
           </provider>
         </entry>
@@ -114,29 +79,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>venues</find>
-      <find>map</find>
-      <find>location</find>
-      <find>person</find>
-      <find>dump</find>
-      <find>type</find>
-      <find>itemexhibition_detail</find>
-      <find>statistics</find>
-      <find>sort</find>
-      <find>rotation</find>
-      <find>ageD</find>
-      <find>exhibitionAgeD</find>
-      <find>inner</find>
-      <find>container</find>
-      <find>exhibition/{id</find>
-      <find>exhibition</find>
-      <find>person/by-year</find>
-      <find>person/exhibition-age</find>
-      <find>chart</find>
-      <find>person/distribution</find>
-      <find>person/popularity</find>
-      <find>location/by-place</find>
-      <find>getperson</find>
       <find>person/</find>
       <find>.my-tooltip</find>
       <find>text-field-c</find>
@@ -144,8 +86,32 @@
       <find>w-nac-</find>
       <find>places</find>
       <find>nav-brand</find>
+      <find>container</find>
+      <find>exhibition</find>
+      <find>exhibitionbyPlacePart</find>
+      <find>getArrayQueryString</find>
+      <find>Querystring</find>
+      <find>exhibitionna</find>
+      <find>exhibitionbymi</find>
+      <find>organi</find>
+      <find>title</find>
+      <find>place</find>
+      <find>exhibitionByPlaceIndexPart</find>
+      <find>exhibitionByPlacePart</find>
+      <find>exhibitionnat</find>
+      <find>canvas.getContext('2d')</find>
+      <find>birthDeathPlacesIndex</find>
+      <find>birth</find>
+      <find>foreach</find>
+      <find>personbyyear</find>
+      <find>personex</find>
+      <find>exhibitionper</find>
+      <find>person</find>
+      <find>personsWiki</find>
+      <find>sex</find>
     </findStrings>
     <dirStrings>
+      <dir>$PROJECT_DIR$/templates</dir>
       <dir>$PROJECT_DIR$</dir>
     </dirStrings>
   </component>
@@ -155,20 +121,9 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/AppBundle/Filter/PlaceFilterType.php" />
-        <option value="$PROJECT_DIR$/src/AppBundle/Filter/LocationFilterType.php" />
-        <option value="$PROJECT_DIR$/src/AppBundle/Controller/PersonController.php" />
-        <option value="$PROJECT_DIR$/templates/Person/Parts/tabcontent-map.html.twig" />
-        <option value="$PROJECT_DIR$/templates/Person/index.html.twig" />
-        <option value="$PROJECT_DIR$/web/js/collapseChart.js" />
-        <option value="$PROJECT_DIR$/src/AppBundle/Controller/LocationController.php" />
-        <option value="$PROJECT_DIR$/templates/Location/Parts/tabcontent-map.html.twig" />
-        <option value="$PROJECT_DIR$/templates/Exhibition/Parts/tabcontent-stat-countries.html.twig" />
-        <option value="$PROJECT_DIR$/templates/Person/Parts/tabcontent-stats-index.html.twig" />
         <option value="$PROJECT_DIR$/templates/Place/index.html.twig" />
         <option value="$PROJECT_DIR$/templates/Holder/Parts/tabcontent-holder-list.html.twig" />
         <option value="$PROJECT_DIR$/templates/Holder/index.html.twig" />
-        <option value="$PROJECT_DIR$/src/AppBundle/Controller/StatisticsController.php" />
         <option value="$PROJECT_DIR$/src/AppBundle/Controller/DefaultController.php" />
         <option value="$PROJECT_DIR$/web/js/datatables-mobile.min.js" />
         <option value="$PROJECT_DIR$/web/css/datatables-responsive.css" />
@@ -178,7 +133,6 @@
         <option value="$PROJECT_DIR$/templates/Person/Parts/tabcontent-exhibitions.html.twig" />
         <option value="$PROJECT_DIR$/templates/Exhibition/Parts/tabcontent-exhibition-list.html.twig" />
         <option value="$PROJECT_DIR$/templates/Location/index.html.twig" />
-        <option value="$PROJECT_DIR$/templates/Location/Parts/tabcontent-location-list.html.twig" />
         <option value="$PROJECT_DIR$/templates/Statistics/person-by-year-index.html.twig" />
         <option value="$PROJECT_DIR$/templates/Statistics/person-distribution.html.twig" />
         <option value="$PROJECT_DIR$/templates/Statistics/person-distribution-index.html.twig" />
@@ -196,16 +150,28 @@
         <option value="$PROJECT_DIR$/templates/Statistics/exhibition-by-month.html.twig" />
         <option value="$PROJECT_DIR$/templates/Statistics/birth-death.html.twig" />
         <option value="$PROJECT_DIR$/templates/Base/knp_menu_new_design.html.twig" />
-        <option value="$PROJECT_DIR$/web/css/custom.css" />
         <option value="$PROJECT_DIR$/web/js/menu.js" />
         <option value="$PROJECT_DIR$/src/AppBundle/Menu/Builder.php" />
-        <option value="$PROJECT_DIR$/templates/Map/place-map-index.html.twig" />
         <option value="$PROJECT_DIR$/templates/Base/base.html.twig" />
         <option value="$PROJECT_DIR$/templates/Exhibition/Parts/tabs-header-index.html.twig" />
         <option value="$PROJECT_DIR$/templates/Holder/Parts/tabs-header-index.html.twig" />
-        <option value="$PROJECT_DIR$/src/AppBundle/Controller/MapController.php" />
         <option value="$PROJECT_DIR$/templates/Location/Parts/tabs-header-index.html.twig" />
+        <option value="$PROJECT_DIR$/web/css/custom.css" />
+        <option value="$PROJECT_DIR$/src/AppBundle/Controller/ExhibitionController.php" />
+        <option value="$PROJECT_DIR$/templates/Exhibition/Parts/tabcontent-stat-countries.html.twig" />
+        <option value="$PROJECT_DIR$/src/AppBundle/Controller/LocationController.php" />
+        <option value="$PROJECT_DIR$/templates/Location/Parts/tabcontent-location-list.html.twig" />
+        <option value="$PROJECT_DIR$/templates/Map/place-map.html.twig" />
+        <option value="$PROJECT_DIR$/templates/Map/place-map-index.html.twig" />
+        <option value="$PROJECT_DIR$/templates/Person/index.html.twig" />
+        <option value="$PROJECT_DIR$/templates/Exhibition/Parts/tabcontent-map.html.twig" />
+        <option value="$PROJECT_DIR$/templates/Person/Parts/tabcontent-map.html.twig" />
+        <option value="$PROJECT_DIR$/templates/Location/Parts/tabcontent-map.html.twig" />
+        <option value="$PROJECT_DIR$/src/AppBundle/Controller/PersonController.php" />
         <option value="$PROJECT_DIR$/templates/Person/Parts/tabs-header-index.html.twig" />
+        <option value="$PROJECT_DIR$/src/AppBundle/Controller/MapController.php" />
+        <option value="$PROJECT_DIR$/templates/Person/Parts/tabcontent-stats-index.html.twig" />
+        <option value="$PROJECT_DIR$/src/AppBundle/Controller/StatisticsController.php" />
       </list>
     </option>
   </component>
@@ -359,31 +325,12 @@
               <item name="02_FRONTEND" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="AppBundle" type="462c0819:PsiDirectoryNode" />
-              <item name="Controller" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="02_FRONTEND" type="b2602c69:ProjectViewProjectNode" />
-              <item name="02_FRONTEND" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="AppBundle" type="462c0819:PsiDirectoryNode" />
-              <item name="Menu" type="462c0819:PsiDirectoryNode" />
+              <item name="Entity" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="02_FRONTEND" type="b2602c69:ProjectViewProjectNode" />
               <item name="02_FRONTEND" type="462c0819:PsiDirectoryNode" />
               <item name="templates" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="02_FRONTEND" type="b2602c69:ProjectViewProjectNode" />
-              <item name="02_FRONTEND" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-              <item name="Base" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="02_FRONTEND" type="b2602c69:ProjectViewProjectNode" />
-              <item name="02_FRONTEND" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-              <item name="Map" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="02_FRONTEND" type="b2602c69:ProjectViewProjectNode" />
@@ -402,30 +349,7 @@
               <item name="02_FRONTEND" type="b2602c69:ProjectViewProjectNode" />
               <item name="02_FRONTEND" type="462c0819:PsiDirectoryNode" />
               <item name="templates" type="462c0819:PsiDirectoryNode" />
-              <item name="Statistics" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="02_FRONTEND" type="b2602c69:ProjectViewProjectNode" />
-              <item name="02_FRONTEND" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="02_FRONTEND" type="b2602c69:ProjectViewProjectNode" />
-              <item name="02_FRONTEND" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="assets" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="02_FRONTEND" type="b2602c69:ProjectViewProjectNode" />
-              <item name="02_FRONTEND" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="css" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="02_FRONTEND" type="b2602c69:ProjectViewProjectNode" />
-              <item name="02_FRONTEND" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="js" type="462c0819:PsiDirectoryNode" />
+              <item name="Shared" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -485,12 +409,12 @@
       <workItem from="1537693644648" duration="36761000" />
       <workItem from="1538047079876" duration="13325000" />
       <workItem from="1538143468988" duration="5565000" />
-      <workItem from="1538563943448" duration="9857000" />
+      <workItem from="1538563943448" duration="20630000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="115522000" />
+    <option name="totallyTimeSpent" value="126295000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
@@ -524,121 +448,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/templates/Item/index.html.twig">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/var/cache/dev/twig/09/0931b7e168712cc133de45e6df4aad7091235ef4bb16cddc37e23ad3c47b6be0.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="298">
-          <caret line="65" column="4" selection-start-line="65" selection-start-column="4" selection-end-line="65" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/css/fwf.webflow.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="900">
-          <caret line="624" column="2" selection-start-line="624" selection-start-column="2" selection-end-line="624" selection-end-column="2" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/css/datatables-responsive.min.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="3839" selection-start-column="3839" selection-end-column="3839" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/Shared/Parts/tabcontent-exhibitions.html.twig">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" column="40" lean-forward="true" selection-start-line="6" selection-start-column="40" selection-end-line="6" selection-end-column="40" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/Person/detail.html.twig">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1215">
-          <caret line="81" column="40" selection-start-line="81" selection-start-column="34" selection-end-line="81" selection-end-column="40" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/Person/Parts/tabcontent-person-list.html.twig">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" column="29" selection-start-line="6" selection-start-column="29" selection-end-line="6" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/Exhibition/detail.html.twig">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <folding>
-            <element signature="e#27#33#1" expanded="true" />
-            <element signature="e#79#85#0" expanded="true" />
-            <element signature="e#85#91#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/Exhibition/Parts/tabcontent-exhibition-list.html.twig">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="40" selection-start-line="5" selection-start-column="40" selection-end-line="5" selection-end-column="40" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/Location/index.html.twig">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="20" selection-start-line="20" selection-end-line="20" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/Exhibition/Parts/tabcontent-stat-countries.html.twig">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="23" column="209" selection-start-line="23" selection-start-column="209" selection-end-line="23" selection-end-column="209" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/Exhibition/Parts/tabcontent-catalogue-entries.html.twig">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" column="9" selection-start-line="6" selection-start-column="9" selection-end-line="6" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/Person/Parts/tabcontent-exhibitions.html.twig">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="84" selection-start-line="4" selection-start-column="84" selection-end-line="4" selection-end-column="84" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/Location/Parts/tabcontent-location-list.html.twig">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="26" column="30" selection-start-line="26" selection-start-column="30" selection-end-line="26" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/Statistics/person-by-year-index.html.twig">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="816">
-          <caret line="116" column="67" selection-start-line="116" selection-start-column="49" selection-end-line="116" selection-end-column="67" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/Statistics/person-distribution.html.twig">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="786">
-          <caret line="57" column="16" lean-forward="true" selection-start-line="57" selection-start-column="16" selection-end-line="57" selection-end-column="16" />
-          <folding>
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/templates/Statistics/person-distribution-index.html.twig">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="774">
@@ -793,13 +602,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/css/custom.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="876">
-          <caret line="344" column="28" selection-start-line="344" selection-start-column="28" selection-end-line="344" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/web/js/seealso.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-878">
@@ -860,44 +662,17 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/AppBundle/Controller/MapController.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="337">
-          <caret line="743" column="29" lean-forward="true" selection-start-line="743" selection-start-column="29" selection-end-line="743" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/Exhibition/index.html.twig">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="6">
-          <caret line="13" column="13" selection-start-line="13" selection-start-column="13" selection-end-line="13" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/Exhibition/Parts/tabcontent-map.html.twig">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/Map/place-map-index.html.twig">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="612">
-          <caret line="167" selection-start-line="167" selection-end-line="167" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/Location/Parts/tabcontent-map.html.twig">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/Location/Parts/tabs-header-index.html.twig">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="14" column="10" lean-forward="true" selection-start-line="14" selection-start-column="10" selection-end-line="14" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/templates/Holder/Parts/tabs-header-index.html.twig">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="195">
           <caret line="13" column="4" selection-start-line="13" selection-start-column="4" selection-end-line="17" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/css/custom.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="861">
+          <caret line="351" column="18" selection-start-line="351" selection-start-column="18" selection-end-line="351" selection-end-column="18" />
         </state>
       </provider>
     </entry>
@@ -908,10 +683,156 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/templates/Exhibition/index.html.twig">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="659">
+          <caret line="50" column="32" selection-start-line="50" selection-start-column="32" selection-end-line="50" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/AppBundle/Entity/Exhibition.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-266">
+          <caret line="13" column="16" selection-start-line="13" selection-start-column="16" selection-end-line="13" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/AppBundle/Entity/Location.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="473">
+          <caret line="125" column="7" selection-start-line="125" selection-start-column="7" selection-end-line="125" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/Exhibition/Parts/tabcontent-stat-countries.html.twig">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="420">
+          <caret line="28" column="202" selection-start-line="28" selection-start-column="178" selection-end-line="28" selection-end-column="202" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/AppBundle/Controller/LocationController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="633">
+          <caret line="92" column="63" selection-start-line="92" selection-start-column="63" selection-end-line="92" selection-end-column="63" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/Location/Parts/tabs-header-index.html.twig">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="14" column="10" selection-start-line="14" selection-start-column="10" selection-end-line="14" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/Location/Parts/tabcontent-location-list.html.twig">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="12" column="13" lean-forward="true" selection-start-line="12" selection-start-column="13" selection-end-line="12" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/Shared/Parts/tabcontent-exhibitions.html.twig">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/Map/place-map.html.twig">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2415">
+          <caret line="161" column="37" selection-start-line="161" selection-start-column="37" selection-end-line="161" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/Shared/map-leaflet.html.twig">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="750">
+          <caret line="50" column="52" selection-start-line="50" selection-start-column="52" selection-end-line="50" selection-end-column="52" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/Map/place-map-index.html.twig">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1719">
+          <caret line="14" column="31" selection-start-line="14" selection-start-column="31" selection-end-line="14" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/Exhibition/Parts/tabcontent-map.html.twig">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret selection-end-line="9" selection-end-column="98" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/Exhibition/Parts/tabcontent-exhibition-list.html.twig">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/Location/Parts/tabcontent-map.html.twig">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="450">
+          <caret line="30" column="94" selection-start-line="30" selection-start-column="73" selection-end-line="30" selection-end-column="94" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/AppBundle/Controller/PersonController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="396">
+          <caret line="88" selection-start-line="88" selection-end-line="88" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/Person/index.html.twig">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="510">
+          <caret line="34" column="37" selection-start-line="34" selection-start-column="37" selection-end-line="34" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/AppBundle/Controller/ExhibitionController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1">
+          <caret line="79" column="24" selection-start-line="79" selection-start-column="24" selection-end-line="79" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/templates/Person/Parts/tabs-header-index.html.twig">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="19" column="17" selection-start-line="19" selection-start-column="17" selection-end-line="19" selection-end-column="17" />
+        <state relative-caret-position="240">
+          <caret line="16" column="32" selection-start-line="16" selection-start-column="32" selection-end-line="16" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/AppBundle/Controller/MapController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="82">
+          <caret line="40" column="20" lean-forward="true" selection-start-line="40" selection-start-column="20" selection-end-line="40" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/Person/Parts/tabcontent-map.html.twig">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="435">
+          <caret line="29" column="180" selection-start-line="29" selection-start-column="156" selection-end-line="29" selection-end-column="180" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/Person/Parts/tabcontent-stats-index.html.twig">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="465">
+          <caret line="31" column="186" selection-start-line="31" selection-start-column="186" selection-end-line="31" selection-end-column="186" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/AppBundle/Entity/Person.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="308">
+          <caret line="97" column="28" selection-start-line="97" selection-start-column="25" selection-end-line="97" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/AppBundle/Controller/StatisticsController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="458">
+          <caret line="1032" column="81" selection-start-line="1032" selection-start-column="81" selection-end-line="1032" selection-end-column="81" />
         </state>
       </provider>
     </entry>

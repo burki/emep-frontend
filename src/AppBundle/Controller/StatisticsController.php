@@ -18,12 +18,44 @@ extends Controller
     // . " INNER JOIN ExhibitionLocation ON ExhibitionLocation.id_exhibition=Exhibition.id_location"
 
 
+    public function getStringQueryForExhibitions($query, $shortOrLongQuery){
+        if ($query !== 'any'){
+            if($shortOrLongQuery === 'long'){
+                return " AND (Exhibition.title LIKE '%" . $query . "%' OR Location.name LIKE '%" . $query . "%' OR Location.place LIKE '%" . $query . "%')";
+            } else {
+                return " AND (E.title LIKE '%" . $query . "%' OR L.name LIKE '%" . $query . "%' OR L.placeLabel LIKE '%" . $query . "%')";
+            }
+        }
 
-    public function exhibitionByMonthIndex($countriesQuery, $organizerTypeQuery){
+        return " ";
+    }
+
+    public function getStringQueryForArtists($query, $shortOrLongQuery){
+        if ($query !== 'any'){
+            if($shortOrLongQuery === 'long'){
+                // return " AND (Person.lastname LIKE '%" . $query . "%' OR Person.firstname LIKE '%" . $query . "%' )";
+                return " AND (Person.lastname LIKE '%" . $query . "%' OR Person.firstname LIKE '%" . $query . "%' )";
+
+            } else {
+                return " AND (P.familyName LIKE '%" . $query . "%' OR P.sortName LIKE '%" . $query . "%' )";
+            }
+        }
+
+        return " ";
+    }
+
+
+
+
+
+
+    public function exhibitionByMonthIndex($countriesQuery, $organizerTypeQuery, $stringQuery){
 
         $em = $this->getDoctrine()->getEntityManager();
 
         $countryQueryString = $this->getCountryQueryString('Location', 'Exhibition', 'country', $countriesQuery);
+        $countryQueryString .= " AND ". $this->getArrayQueryString('Exhibition', 'organizer_type', $organizerTypeQuery, 'Exhibition.status <> -1');
+        $countryQueryString .= $this->getStringQueryForExhibitions($stringQuery, 'long');
 
         $dbconn = $em->getConnection();
         $querystr = "SELECT YEAR(startdate) AS start_year, MONTH(startdate) AS start_month"
@@ -270,14 +302,15 @@ extends Controller
         ]);
     }
 
-    public function personByYearActionPart($countriesQuery, $genderQuery)
+    public function personByYearActionPart($countriesQuery, $genderQuery, $stringQuery)
     {
         // display the artists by birth-year, the catalog-entries by exhibition-year
         $em = $this->getDoctrine()->getEntityManager();
 
         $andWhere = '';
         $andWhere = $this->getPersonQueryString('Person', 'Person.status >= 0', 'country', $countriesQuery);
-
+        $andWhere .= " AND ". $this->getArrayQueryString('Person', 'sex', $genderQuery, 'Person.status <> -1 ');
+        $andWhere .= $this->getStringQueryForArtists($stringQuery, 'long');
 
         $dbconn = $em->getConnection();
         $querystr = "SELECT 'active' AS type, COUNT(*) AS how_many FROM Person"
@@ -459,7 +492,7 @@ EOT;
         return $ids;
     }
 
-    public static function exhibitionAgeDistribution($em, $gender = null, $countryQuery = null, $exhibitionId = null)
+    public static function exhibitionAgeDistribution($em, $gender = null, $countryQuery = null, $stringQuery = null, $exhibitionId = null)
     {
         $dbconn = $em->getConnection();
 
@@ -482,6 +515,9 @@ EOT;
             }
 
             $where .= StatisticsController::getPersonQueryString('Person', 'Person.status >= 0', 'country', $countryQuery);
+            $where .= " AND ". StatisticsController::getArrayQueryString('Person', 'sex', $gender, 'Person.status <> -1 ');
+            $where .= StatisticsController::getStringQueryForArtists($stringQuery, 'long');
+
         }
 
 
@@ -613,10 +649,10 @@ EOT;
         ]);
     }
 
-    public function personExhibitionAgeActionPart($countriesQuery, $genderQuery)
+    public function personExhibitionAgeActionPart($countriesQuery, $genderQuery, $stringQuery)
     {
         // display the artists by birth-year, the catalog-entries by exhibition-year
-        $stats = self::exhibitionAgeDistribution($em = $this->getDoctrine()->getEntityManager(), $genderQuery, $countriesQuery);
+        $stats = self::exhibitionAgeDistribution($em = $this->getDoctrine()->getEntityManager(), $genderQuery, $countriesQuery, $stringQuery);
         $ageCount = & $stats['age_count'];
 
         $categories = $total = [];
@@ -856,7 +892,7 @@ EOT;
         ]);
     }
 
-    public function exhibitionPerPersonPart($countriesQuery, $genderQuery)
+    public function exhibitionPerPersonPart($countriesQuery, $genderQuery, $stringQuery)
     {
         $em = $this->getDoctrine()->getEntityManager();
 
@@ -867,6 +903,8 @@ EOT;
 
 
         $where = ' AND '. StatisticsController::getPersonQueryString('Person', 'Exhibition.status <> -1', 'country', $countriesQuery);
+        $where .= " AND ". StatisticsController::getArrayQueryString('Person', 'sex', $genderQuery, 'Person.status <> -1 ');
+        $where .= StatisticsController::getStringQueryForArtists($stringQuery, 'long');
 
 
         foreach ([ 'exhibition', 'item' ] as $type) {
@@ -982,7 +1020,7 @@ EOT;
     }
 
 
-    public function personsWikipediaPart($countriesQuery, $genderQuery)
+    public function personsWikipediaPart($countriesQuery, $genderQuery, $stringQuery)
     {
         $lang = 'en';
 
@@ -992,6 +1030,8 @@ EOT;
 
 
         $where = ' AND '. StatisticsController::getPersonQueryString('P', 'P.status <> -1', 'nationality', $countriesQuery);
+        $where .= " AND ". StatisticsController::getArrayQueryString('P', 'gender', $genderQuery, 'P.status <> -1 ');
+        $where .= StatisticsController::getStringQueryForArtists($stringQuery, 'short');
 
 
         $qb->select([
@@ -1295,7 +1335,7 @@ EOT;
         $countryQueryString = '';
         $counterCountry = 0;
 
-        if ($countriesQuery.length > 1){
+        if ($countriesQuery.length > 1 && is_array($countriesQuery)){
             foreach($countriesQuery as $country){
                 if(counter > 0){
                     $countryQueryString .= ", ";
@@ -1323,15 +1363,16 @@ EOT;
         $modelQueryString = '';
         $counterQueryArray = 0;
 
+
         if ($queryArray === '' or $queryArray === 'any'){
             $modelQueryString = $fallbackString;
         } else {
-            if($queryArray.length > 1){
+            if(count($queryArray) > 0 && is_array($queryArray)){
                 foreach ($queryArray as $queryElement){
                     if($counterQueryArray > 0){
                         $modelQueryString .= ", ";
                     }
-                    $modelQueryString .= "'" . $queryElement . "''";
+                    $modelQueryString .= "'" . $queryElement . "'";
                     $counterQueryArray++;
                 }
             }else {
@@ -1375,10 +1416,13 @@ EOT;
     }
 
     // controller is called by /exhibition route to load async the stats
-    function exhibitionNationalityIndex($countriesQuery, $organizerTypeQuery){
+    function exhibitionNationalityIndex($countriesQuery, $organizerTypeQuery, $stringQuery){
 
 
         $countryQueryString = $this->getCountryQueryString('Pl', 'L', 'countryCode', $countriesQuery);
+        $countryQueryString .= " AND ". $this->getArrayQueryString('E', 'organizerType', $organizerTypeQuery, 'L.status <> -1');
+        $countryQueryString .= $this->getStringQueryForExhibitions($stringQuery, 'short');
+
 
         $qb = $this->getDoctrine()
             ->getManager()
@@ -1408,6 +1452,8 @@ EOT;
             //->andWhere($countryQueryString)
             //->andWhere("Pl.countryCode IN(${countryQueryString})")
             ->andWhere("${countryQueryString}")
+            //->andWhere("${$stringQueryString}")
+            //->andWhere("${countryQueryString}")
             //->andWhere("Pl.countryCode IN('CH', 'NL')") // test
             ->groupBy('P.id')
             ->orderBy('C.name', 'DESC')

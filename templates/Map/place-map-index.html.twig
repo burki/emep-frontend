@@ -1,9 +1,19 @@
 {% import 'Shared/map-leaflet.html.twig' as map %}
 
+<script>
+
+    $(document).on("rerenderMap", function(e){
+        setTimeout(function(){
+            map.invalidateSize();
+            map.setZoom(2);
+        }, 200);
+    });
+
+</script>
+
     {{ map.head() }}
     {{ map.head_markercluster() }}
     {{ map.head_heatmap() }}
-
     <style>
     .my-tooltip {
         border: none;
@@ -165,18 +175,8 @@
 
         map.addLayer(markers);
 
-
-
-        $(document).on("rerenderMap", function(e){
-            console.log('it should be working');
-            setTimeout(function(){
-                map.invalidateSize();
-                map.setZoom(2);
-            }, 200);
-
-        });
-
     </script>
+
 
     {% if filter is not null %}
     <form class="filter" method="post" action="{{ path(app.request.attributes.get('_route')) }}">

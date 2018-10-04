@@ -91,13 +91,15 @@ extends CrudController
 
         $countries = $form->get('country')->getData();
         $locationType = $form->get('location_type')->getData();
+        $stringQuery = $form->get('search')->getData();
 
         return $this->render('Location/index.html.twig', [
             'pageTitle' => $this->get('translator')->trans('Venues'),
             'pagination' => $pagination,
             'form' => $form->createView(),
             'countries' => $countries,
-            'locationType' => $locationType
+            'locationType' => $locationType,
+            'stringPart' => $stringQuery
         ]);
     }
 

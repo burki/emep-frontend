@@ -16,7 +16,7 @@ extends CrudController
      * @Route("/person/by-place", name="person-by-place")
      */
 
-    public function birthDeathPlacesIndex($countriesQuery, $genderQuery)
+    public function birthDeathPlacesIndex($countriesQuery, $genderQuery, $stringQuery)
     {
         $maxDisplay = 15;
 
@@ -33,10 +33,12 @@ extends CrudController
 
         $andWhere = '';
 
+
         $andWhere = " AND ". StatisticsController::getArrayQueryString('Person', 'country', $countriesQuery, 'Person.status <> -1');
         $andWhere .= " AND ". StatisticsController::getArrayQueryString('Person', 'sex', $genderQuery, 'Person.status <> -1');
+        $testQuery = StatisticsController::getStringQueryForArtists($stringQuery, 'long');
 
-
+        // echo $testQuery;
         $queryTemplate .= $andWhere;
 
 
@@ -46,11 +48,18 @@ extends CrudController
         foreach ([ 'birth', 'death' ] as $key) {
             $unionParts[] = sprintf($queryTemplate,
                 $key, $key);
-
         }
+
         $querystr = join(' UNION ', $unionParts)
+            . $testQuery
             . " ORDER BY lastname, firstname, person_id"
         ;
+
+
+        // echo $querystr;
+
+
+        // $querystr .= " WHERE " . $testQuery;
 
         $stmt = $dbconn->query($querystr);
         $values = [];
@@ -115,17 +124,18 @@ extends CrudController
 
         // display
         return $this->render('Map/place-map-index.html.twig', [
-            'pageTitle' => 'Birth and Death Places',
+            //'pageTitle' => 'Birth and Death Places',
             'data' => json_encode($values_final),
             'disableClusteringAtZoom' => 7,
-            'maxCount' => $max_count,
-            'showHeatMap' => true,
+            // 'maxCount' => $max_count,
+            //'showHeatMap' => true,
             'markerStyle' => 'circle',
             'bounds' => [
                 [ 60, -120 ],
                 [ -15, 120 ],
             ],
         ]);
+
     }
 
     public function birthDeathPlaces(Request $request)
@@ -215,7 +225,7 @@ extends CrudController
         }
 
         // display
-        return $this->render('Map/place-map.html.twig', [
+        return $this->render('Map/place-map-index.html.twig', [
             'pageTitle' => 'Birth and Death Places',
             'data' => json_encode($values_final),
             'disableClusteringAtZoom' => 7,
@@ -433,8 +443,9 @@ extends CrudController
         ]);
     }
 
-    public function exhibitionByPlacePart($countriesQuery, $locationTypeQuery)
+    public function exhibitionByPlacePart($countriesQuery, $locationTypeQuery, $stringQuery)
     {
+
 
         $em = $this->getDoctrine()->getEntityManager();
         $dbconn = $em->getConnection();
@@ -460,12 +471,7 @@ extends CrudController
                     ? 'Type of Organizing Body' : 'Type of Venue',
             ]);
 
-            if ($request->getMethod() == 'POST') {
-                $form->handleRequest($request);
-                if ($form->isSubmitted() && $form->isValid()) {
-                    $filterData = $form->getData();
-                }
-            }
+
         }
 
         $querystr = "SELECT DISTINCT Exhibition.id AS exhibition_id, Exhibition.title, startdate, enddate, Exhibition.displaydate AS displaydate, Location.id AS location_id, Location.name AS location_name, COALESCE(Geoname.name_variant, Geoname.name) AS place, Geoname.tgn, Geoname.latitude, Geoname.longitude"
@@ -509,6 +515,16 @@ extends CrudController
         if($countriesQuery !== '' and $countriesQuery !== null){
             $andWhere .= " AND ". StatisticsController::getCountryQueryString('Location', 'Exhibition', 'country', $countriesQuery);
         }
+
+        $andWhere .= " AND ". StatisticsController::getArrayQueryString('Location', 'type', $locationTypeQuery, 'Exhibition.status <> -1');
+        $andWhere .= StatisticsController::getStringQueryForExhibitions($stringQuery, 'long');
+
+
+
+        /* if($countriesQuery !== '' and $countriesQuery !== null){
+            $andWhere .= " AND ". StatisticsController::getArrayQueryString('Exhibition', 'organizer_type', $locationTypeQuery, 'Exhibition.status <> -1');
+        }*/
+
 
 
         $querystr
@@ -608,7 +624,7 @@ extends CrudController
         ]);
     }
 
-    public function exhibitionByPlaceIndexPart($countriesQuery, $organizerTypeQuery)
+    public function exhibitionByPlaceIndexPart($countriesQuery, $organizerTypeQuery, $stringQuery)
     {
         $em = $this->getDoctrine()->getEntityManager();
         $dbconn = $em->getConnection();
@@ -649,13 +665,15 @@ extends CrudController
         $andWhere = '';
 
 
-        $andWhere = StatisticsController::getCountryQueryString('Location', 'Exhibition', 'country', $countriesQuery);
+        $andWhere = " AND " .  StatisticsController::getCountryQueryString('Location', 'Exhibition', 'country', $countriesQuery);
+        $andWhere .= " AND ". StatisticsController::getArrayQueryString('Exhibition', 'organizer_type', $organizerTypeQuery, 'Exhibition.status <> -1');
+        $andWhere .= StatisticsController::getStringQueryForExhibitions($stringQuery, 'long');
 
 
         $querystr
             .= " WHERE"
             . " Exhibition.status <> -1"
-            . " AND " . $andWhere
+            . $andWhere
             . " ORDER BY tgn, Exhibition.startdate, location_name, Exhibition.title"
         ;
 

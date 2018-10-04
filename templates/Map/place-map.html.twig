@@ -169,6 +169,16 @@
         */
 
         map.addLayer(markers);
+
+        $(document).on("rerenderMap", function(e){
+            console.log('it should be working');
+            setTimeout(function(){
+                map.invalidateSize();
+                map.setZoom(2);
+            }, 200);
+
+        });
+
     </script>
 
     {% if filter is not null %}

@@ -9,7 +9,8 @@
 
 
     {%  set countriesQuery = 'any' %}
-    {%  set organizerType = 'any' %}
+    {%  set organizerTypeQuery = 'any' %}
+    {%  set stringQuery = 'any' %}
 
 
     {% if countries|length %}
@@ -20,8 +21,12 @@
         {% set organizerTypeQuery = organizerType %}
     {% endif %}
 
-    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::exhibitionNationalityIndex', {countriesQuery: countriesQuery, organizerTypeQuery: organizerTypeQuery}), {'default': 'Loading... <br/>'}) }}
-    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::exhibitionByMonthIndex', {countriesQuery: countriesQuery, organizerTypeQuery: organizerTypeQuery}), {'default': 'Loading... <br/>'}) }}
+    {% if stringPart|length %}
+        {% set stringQuery = stringPart %}
+    {% endif %}
+
+    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::exhibitionNationalityIndex', {countriesQuery: countriesQuery, organizerTypeQuery: organizerTypeQuery, stringQuery: stringQuery}), {'default': 'Loading... <br/>'}) }}
+    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::exhibitionByMonthIndex', {countriesQuery: countriesQuery, organizerTypeQuery: organizerTypeQuery, stringQuery: stringQuery}), {'default': 'Loading... <br/>'}) }}
 
 
 </div>

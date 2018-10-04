@@ -10,6 +10,8 @@
 
     {%  set countriesQuery = '' %}
     {%  set genderQuery = 'any' %}
+    {%  set stringQuery = 'any' %}
+
 
 
     {% if nationalities|length %}
@@ -20,10 +22,14 @@
         {% set genderQuery = gender %}
     {% endif %}
 
-    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::personByYearActionPart', {countriesQuery: countriesQuery, genderQuery: genderQuery}), {'default': 'Loading... <br/>'}) }}
-    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::personExhibitionAgeActionPart', {countriesQuery: countriesQuery, genderQuery: genderQuery}), {'default': 'Loading... <br/>'}) }}
-    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::exhibitionPerPersonPart', {countriesQuery: countriesQuery, genderQuery: genderQuery}), {'default': 'Loading... <br/>'}) }}
-    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::personsWikipediaPart', {countriesQuery: countriesQuery, genderQuery: genderQuery}), {'default': 'Loading... <br/>'}) }}
+    {% if stringPart|length %}
+        {% set stringQuery = stringPart %}
+    {% endif %}
+
+    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::personByYearActionPart', {countriesQuery: countriesQuery, genderQuery: genderQuery, stringQuery: stringQuery}), {'default': 'Loading... <br/>'}) }}
+    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::personExhibitionAgeActionPart', {countriesQuery: countriesQuery, genderQuery: genderQuery, stringQuery: stringQuery}), {'default': 'Loading... <br/>'}) }}
+    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::exhibitionPerPersonPart', {countriesQuery: countriesQuery, genderQuery: genderQuery, stringQuery: stringQuery}), {'default': 'Loading... <br/>'}) }}
+    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::personsWikipediaPart', {countriesQuery: countriesQuery, genderQuery: genderQuery, stringQuery: stringQuery}), {'default': 'Loading... <br/>'}) }}
 
 
 </div>
