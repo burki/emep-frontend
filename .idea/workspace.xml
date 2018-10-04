@@ -2,9 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="83f6ca58-d621-4971-9ce4-caca212d12de" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/src/AppBundle/Controller/StatisticsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/AppBundle/Controller/StatisticsController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/Exhibition/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Exhibition/index.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/Person/Parts/tabcontent-stats-index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Person/Parts/tabcontent-stats-index.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/Base/base.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Base/base.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/Exhibition/Parts/tabcontent-exhibition-list.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Exhibition/Parts/tabcontent-exhibition-list.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/Location/Parts/tabcontent-location-list.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Location/Parts/tabcontent-location-list.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/Person/Parts/tabcontent-exhibitions.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Person/Parts/tabcontent-exhibitions.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/Person/Parts/tabcontent-person-list.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Person/Parts/tabcontent-person-list.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/Shared/Parts/tabcontent-exhibitions.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Shared/Parts/tabcontent-exhibitions.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/css/custom.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/css/custom.css" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -18,56 +23,20 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="StatisticsController.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/AppBundle/Controller/StatisticsController.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="18039">
-              <caret line="1428" column="35" selection-start-line="1428" selection-start-column="35" selection-end-line="1428" selection-end-column="35" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="base.html.twig" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/templates/Base/base.html.twig">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="315">
-              <caret line="21" column="51" selection-start-line="21" selection-start-column="51" selection-end-line="21" selection-end-column="51" />
+            <state relative-caret-position="517">
+              <caret line="43" column="23" selection-start-line="43" selection-start-column="23" selection-end-line="43" selection-end-column="23" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Person.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/AppBundle/Entity/Person.php">
+      <file leaf-file-name="custom.css" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/web/css/custom.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="308">
-              <caret line="97" column="28" selection-start-line="97" selection-start-column="25" selection-end-line="97" selection-end-column="28" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="tabcontent-stats-index.html.twig" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/templates/Person/Parts/tabcontent-stats-index.html.twig">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="135">
-              <caret line="9" selection-start-line="9" selection-end-line="9" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="index.html.twig" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/templates/Exhibition/index.html.twig">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="131">
-              <caret line="22" column="39" selection-start-line="22" selection-start-column="39" selection-end-line="22" selection-end-column="39" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="tabcontent-map.html.twig" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/templates/Person/Parts/tabcontent-map.html.twig">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="435">
-              <caret line="29" column="180" selection-start-line="29" selection-start-column="156" selection-end-line="29" selection-end-column="180" />
+            <state relative-caret-position="160">
+              <caret line="255" column="29" selection-start-line="255" selection-start-column="29" selection-end-line="255" selection-end-column="29" />
             </state>
           </provider>
         </entry>
@@ -83,9 +52,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>places</find>
-      <find>nav-brand</find>
-      <find>container</find>
       <find>exhibition</find>
       <find>exhibitionbyPlacePart</find>
       <find>getArrayQueryString</find>
@@ -113,6 +79,9 @@
       <find>.length</find>
       <find>.lengh</find>
       <find>is_array</find>
+      <find>datatables.min</find>
+      <find>datatables-mobile</find>
+      <find>datatables-responsive</find>
     </findStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$/templates</dir>
@@ -155,11 +124,9 @@
         <option value="$PROJECT_DIR$/templates/Base/knp_menu_new_design.html.twig" />
         <option value="$PROJECT_DIR$/web/js/menu.js" />
         <option value="$PROJECT_DIR$/src/AppBundle/Menu/Builder.php" />
-        <option value="$PROJECT_DIR$/templates/Base/base.html.twig" />
         <option value="$PROJECT_DIR$/templates/Exhibition/Parts/tabs-header-index.html.twig" />
         <option value="$PROJECT_DIR$/templates/Holder/Parts/tabs-header-index.html.twig" />
         <option value="$PROJECT_DIR$/templates/Location/Parts/tabs-header-index.html.twig" />
-        <option value="$PROJECT_DIR$/web/css/custom.css" />
         <option value="$PROJECT_DIR$/src/AppBundle/Controller/ExhibitionController.php" />
         <option value="$PROJECT_DIR$/templates/Exhibition/Parts/tabcontent-stat-countries.html.twig" />
         <option value="$PROJECT_DIR$/src/AppBundle/Controller/LocationController.php" />
@@ -176,6 +143,8 @@
         <option value="$PROJECT_DIR$/templates/Person/Parts/tabcontent-stats-index.html.twig" />
         <option value="$PROJECT_DIR$/src/AppBundle/Controller/StatisticsController.php" />
         <option value="$PROJECT_DIR$/templates/Exhibition/index.html.twig" />
+        <option value="$PROJECT_DIR$/templates/Base/base.html.twig" />
+        <option value="$PROJECT_DIR$/web/css/custom.css" />
       </list>
     </option>
   </component>
@@ -339,7 +308,30 @@
               <item name="02_FRONTEND" type="b2602c69:ProjectViewProjectNode" />
               <item name="02_FRONTEND" type="462c0819:PsiDirectoryNode" />
               <item name="templates" type="462c0819:PsiDirectoryNode" />
+              <item name="Base" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="02_FRONTEND" type="b2602c69:ProjectViewProjectNode" />
+              <item name="02_FRONTEND" type="462c0819:PsiDirectoryNode" />
+              <item name="templates" type="462c0819:PsiDirectoryNode" />
               <item name="Exhibition" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="02_FRONTEND" type="b2602c69:ProjectViewProjectNode" />
+              <item name="02_FRONTEND" type="462c0819:PsiDirectoryNode" />
+              <item name="web" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="02_FRONTEND" type="b2602c69:ProjectViewProjectNode" />
+              <item name="02_FRONTEND" type="462c0819:PsiDirectoryNode" />
+              <item name="web" type="462c0819:PsiDirectoryNode" />
+              <item name="css" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="02_FRONTEND" type="b2602c69:ProjectViewProjectNode" />
+              <item name="02_FRONTEND" type="462c0819:PsiDirectoryNode" />
+              <item name="web" type="462c0819:PsiDirectoryNode" />
+              <item name="js" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -399,12 +391,12 @@
       <workItem from="1537693644648" duration="36761000" />
       <workItem from="1538047079876" duration="13325000" />
       <workItem from="1538143468988" duration="5565000" />
-      <workItem from="1538563943448" duration="21646000" />
+      <workItem from="1538563943448" duration="22354000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="127311000" />
+    <option name="totallyTimeSpent" value="128019000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
@@ -438,16 +430,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/templates/Statistics/person-exhibition-age-index.html.twig">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="756">
-          <caret line="96" lean-forward="true" selection-start-line="96" selection-end-line="96" />
-          <folding>
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/templates/Statistics/person-wikipedia.html.twig">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="771">
@@ -632,13 +614,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/css/custom.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="861">
-          <caret line="351" column="18" selection-start-line="351" selection-start-column="18" selection-end-line="351" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/templates/Holder/index.html.twig">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="615">
@@ -785,13 +760,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/templates/Base/base.html.twig">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="21" column="51" selection-start-line="21" selection-start-column="51" selection-end-line="21" selection-end-column="51" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/composer.lock">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="324">
@@ -815,8 +783,29 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/templates/Exhibition/index.html.twig">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="131">
-          <caret line="22" column="39" selection-start-line="22" selection-start-column="39" selection-end-line="22" selection-end-column="39" />
+        <state relative-caret-position="240">
+          <caret line="16" column="16" lean-forward="true" selection-start-line="16" selection-start-column="16" selection-end-line="16" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/var/cache/dev/twig/66/668cd7455472b50b73520e9d5607e00e44a15fd355f9a2c1951f5b62deac24da.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="324">
+          <caret line="62" column="41" selection-start-line="62" selection-start-column="41" selection-end-line="62" selection-end-column="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/Base/base.html.twig">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="517">
+          <caret line="43" column="23" selection-start-line="43" selection-start-column="23" selection-end-line="43" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/css/custom.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="160">
+          <caret line="255" column="29" selection-start-line="255" selection-start-column="29" selection-end-line="255" selection-end-column="29" />
         </state>
       </provider>
     </entry>

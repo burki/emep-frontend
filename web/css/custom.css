@@ -252,6 +252,10 @@ path.highcharts-tick {
     text-align: center;
 }
 
+footer{
+    background-color: #F6F7FB!important;
+}
+
 
 @media (max-width: 767px) {
     input[type=text], #exhibition_filter_country, #holder_filter_search, #holder_filter_country, #place_filter_search, #place_filter_country, #exhibition_filter_search, #location_filter_search, #location_filter_country, #person_filter_search, #person_filter_gender, #person_filter_nationality {
