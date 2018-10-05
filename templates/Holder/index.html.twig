@@ -21,7 +21,7 @@
         <div class="searchbarcontainer w-form">
 
             <form class="filter" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
-                <div class="searchbarinputcontainer">
+                <div class="searchbarinputcontainer holder">
                     {{ form_rest(form) }}
                 </div>
                 <div class="searchbuttoncontainer"><input type="submit" name="submit-filter" value="Search" class="submit-button w-button">

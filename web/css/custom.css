@@ -279,6 +279,25 @@ footer{
 }
 
 
+.select2-container {
+    margin-left: 5px;
+}
+
+
+/* dont't show tabsymbols yet since there is no functionality included */
+.tabsymbols {
+    display: none;
+}
+
+.holder div:nth-child(1) {
+    width: 66%!important;
+}
+
+.holder div:nth-child(2) {
+    width: 64%!important;
+}
+
+
 @media (max-width: 767px) {
     input[type=text], #exhibition_filter_country, #holder_filter_search, #holder_filter_country, #place_filter_search, #place_filter_country, #exhibition_filter_search, #location_filter_search, #location_filter_country, #person_filter_search, #person_filter_gender, #person_filter_nationality {
         width: 100%!important;
