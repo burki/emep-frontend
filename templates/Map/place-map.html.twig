@@ -1,6 +1,8 @@
 {% extends 'Base/base.html.twig' %}
 {% import 'Shared/map-leaflet.html.twig' as map %}
 
+
+
 {% block head %}
     {{ map.head() }}
     {{ map.head_markercluster() }}
@@ -186,5 +188,7 @@
         {{ form_rest(filter) }}
         <input type="submit" name="submit-filter" value="filter" />
     </form>
+
+
     {% endif %}
 {% endblock %}

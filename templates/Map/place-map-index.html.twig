@@ -11,9 +11,6 @@
 
 </script>
 
-    {{ map.head() }}
-    {{ map.head_markercluster() }}
-    {{ map.head_heatmap() }}
     <style>
     .my-tooltip {
         border: none;
@@ -55,28 +52,14 @@
     <script src="{{ app.request.basepath }}/vendor/select2-4.0.3/js/select2.full.min.js"></script>
     <script>
 
-        console.log('its here its there');
 
             $('#map_filter_location-type').select2({
                 placeholder: 'all'
             });
 
-
     </script>
 
-    {% if pageTitle is not empty %}<h1>{{ pageTitle }}</h1>{% endif %}
-    {% if persons is not null %}
-        <form method="get">
-            <select name="person" onchange="this.form.submit()">
-                <option value="">-- all --</option>
-                {% for person in persons %}
-                    <option value="{{ person.id }}"{% if app.request.get('person') == person.id %} selected="selected"{% endif %}>
-                        {{ person.fullname }}
-                    </option>
-                {% endfor %}
-            </select>
-        </form>
-    {% endif %}
+
     <div id="map-container">
         <div id="map" style="width: 100%; min-height: 480px"></div>
     </div>
