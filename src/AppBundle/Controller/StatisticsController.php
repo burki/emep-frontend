@@ -492,7 +492,7 @@ EOT;
         return $ids;
     }
 
-    public static function exhibitionAgeDistribution($em, $gender = null, $countryQuery = null, $stringQuery = null, $exhibitionId = null)
+    public static function exhibitionAgeDistribution($em, $exhibitionId = null, $gender = null, $countryQuery = null, $stringQuery = null)
     {
         $dbconn = $em->getConnection();
 
@@ -501,23 +501,22 @@ EOT;
         $where = '';
 
         // build where query for exhibitionID
-        if(!is_null($exhibitionId)){
+        if (!is_null($exhibitionId)){
             $where = sprintf('WHERE Exhibition.id=%d', intval($exhibitionId));
             $conditionCounter++;
         }
 
         // build where query for nationality
-        if(!is_null($countryQuery) and $countryQuery !== 'any' ){
-            if($conditionCounter === 0){
+        if (!is_null($countryQuery) and $countryQuery !== 'any' ){
+            if ($conditionCounter === 0){
                 $where = 'WHERE ';
-            }else {
+            } else {
                 $where .= ' AND ';
             }
 
             $where .= StatisticsController::getPersonQueryString('Person', 'Person.status >= 0', 'country', $countryQuery);
             $where .= " AND ". StatisticsController::getArrayQueryString('Person', 'sex', $gender, 'Person.status <> -1 ');
             $where .= StatisticsController::getStringQueryForArtists($stringQuery, 'long');
-
         }
 
 
@@ -652,7 +651,7 @@ EOT;
     public function personExhibitionAgeActionPart($countriesQuery, $genderQuery, $stringQuery)
     {
         // display the artists by birth-year, the catalog-entries by exhibition-year
-        $stats = self::exhibitionAgeDistribution($em = $this->getDoctrine()->getEntityManager(), $genderQuery, $countriesQuery, $stringQuery);
+        $stats = self::exhibitionAgeDistribution($em = $this->getDoctrine()->getEntityManager(), null, $genderQuery, $countriesQuery, $stringQuery);
         $ageCount = & $stats['age_count'];
 
         $categories = $total = [];
