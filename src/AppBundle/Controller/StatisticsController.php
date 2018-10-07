@@ -58,15 +58,15 @@ extends Controller
         $countryQueryString .= $this->getStringQueryForExhibitions($stringQuery, 'long');
 
         $dbconn = $em->getConnection();
-        $querystr = "SELECT YEAR(startdate) AS start_year, MONTH(startdate) AS start_month"
-            . ", COUNT(*) AS how_many FROM Exhibition"
-            . " INNER JOIN ExhibitionLocation ON ExhibitionLocation.id_exhibition=Exhibition.id"
-            . " INNER JOIN Location ON Location.id=ExhibitionLocation.id_location"
-            . " WHERE Exhibition.status <> -1 AND MONTH(startdate) <> 0"
-            . " AND ${countryQueryString}" // FILTERING THE LOCATIONS
-            . " GROUP BY YEAR(startdate), MONTH(startdate)"
-            . " ORDER BY start_year, start_month"
-        ;
+
+        $querystr = " SELECT YEAR(startdate) AS start_year, MONTH(startdate) AS start_month, COUNT(*) AS how_many"
+        . " FROM Exhibition  LEFT JOIN Location  ON Exhibition.id_location = Location.id"
+        . " LEFT JOIN Geoname  ON Location.place_tgn = Geoname.tgn"
+        . " LEFT JOIN ItemExhibition ON (ItemExhibition.id_exhibition = Exhibition.id AND ItemExhibition.title IS NOT NULL)"
+        . " WHERE Exhibition.status <> -1 AND MONTH(startdate) <> 0"
+        . " AND ${countryQueryString}" // FILTERING THE LOCATIONS
+        . " GROUP BY YEAR(startdate), MONTH(startdate)"
+        . " ORDER BY start_year, start_month";
 
         //->andWhere("Pl.countryCode IN(${countryQueryString})")
 
@@ -117,7 +117,7 @@ extends Controller
         }
         $data_avg = round(1.0 * $sum / count($data), 1);
 
-        // display the static content
+
         return $this->render('Statistics/exhibition-by-month-index.html.twig', [
             'data_avg' => $data_avg,
             'categories' => json_encode($categories),
@@ -917,6 +917,7 @@ EOT;
                 . " GROUP BY id_person"
                 . " HAVING how_many >= 1"
             ;
+
             $stmt = $dbconn->query($querystr);
             $frequency_count = [];
             while ($row = $stmt->fetch()) {
@@ -931,8 +932,13 @@ EOT;
             $min = $keys[0]; $max = $keys[count($keys) - 1];
 
             $sum = 0;
+
+
             for ($i = $min; $i <= $max; $i++) {
-                $count = array_key_exists($i, $frequency_count) ? $frequency_count[$i] : 0;
+                $count = array_key_exists($i, $frequency_count) ? $frequency_count[$i] : 0; //old
+                // $count = array_key_exists($i, $frequency_count) ? $i : 0; // new
+
+
                 $data[$type][] = $count;
                 $sum += $count;
             }

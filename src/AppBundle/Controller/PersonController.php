@@ -87,7 +87,6 @@ extends CrudController
         $stringQuery = $form->get('search')->getData();
 
 
-
         $pagination = $this->buildPagination($request, $qb->getQuery(), [
             // the following leads to wrong display in combination with our
             // helper.pagination_sortable()

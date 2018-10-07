@@ -68,7 +68,6 @@ extends CrudController
             ;
 
 
-
         $organizerTypes = $this->buildOrganizerTypes();
         $form = $this->get('form.factory')->create(\AppBundle\Filter\ExhibitionFilterType::class, [
             'country_choices' => array_flip($this->buildCountries()),
@@ -89,6 +88,8 @@ extends CrudController
         $countries = $form->get('country')->getData();
         $organizerType = $form->get('organizer_type')->getData();
         $stringQuery = $form->get('search')->getData();
+
+
 
 
 
