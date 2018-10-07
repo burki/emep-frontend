@@ -7,14 +7,16 @@
         </div>
         <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 1em">
             {# co-appearnces #}
+
+            {% set venues = place.venues %}
+            {% if venues|length > 0 %}
+                <li role="presentation" class="active"><a href="#venues" aria-controls="venues" role="tab" data-toggle="tab">{{ 'Venues'|trans }}</a></li>
+            {% endif %}
+
             {% if persons|length > 0 %}
                 <li role="presentation"><a href="#artists" aria-controls="similar" role="tab" data-toggle="tab">{{ 'Artists'|trans }}</a></li>
             {% endif %}
             {# authority files #}
-            {% set venues = place.venues %}
-            {% if venues|length > 0 %}
-                <li role="presentation"><a href="#venues" aria-controls="venues" role="tab" data-toggle="tab">{{ 'Venues'|trans }}</a></li>
-            {% endif %}
         </ul>
 
     </div>

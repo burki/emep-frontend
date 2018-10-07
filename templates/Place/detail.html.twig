@@ -12,17 +12,14 @@
 {% block body %}
     {% set path = place.path(em) %}
     {% if path is not empty %}
-    <div class="smaller">
-        {% for child in path %}
-            {{ helper.place_linked(child) }}
-            {% if not loop.last %} &gt; {% endif %}
-        {% endfor %}
-    </div>
 
 
     <div class="contentcontainer nopadding w-container">
         <div class="lefthalf">
-            <div class="subheader">place</div>
+            <div class="subheader">{% for child in path %}
+                    {{ helper.place_linked(child) }}
+                    {% if not loop.last %} &gt; {% endif %}
+                {% endfor %}</div>
             <h1 class="heading">{{ place.nameLocalized(app.request.locale) }}</h1>
 
         </div>

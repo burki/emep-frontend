@@ -11,8 +11,9 @@
                 paging: true,
                 searching: false,
                 info: false,
+                order: [[ 1, "asc" ]],
                 "columns": [
-                    null,
+                    { "orderable": false},
                     { "orderSequence": [ "desc", "asc" ] },
                     { "orderSequence": [ "desc", "asc" ] },
                     { "orderSequence": [ "desc", "asc" ] },
@@ -64,7 +65,7 @@
                             {% set count = catalogueEntries[exhibition.id]|length %}
                             {% if count > 0 %}
                                 {% set divId = 'entries' ~ exhibition.id %}
-                                <a class="badge" style="color: white" href="#{{ divId }}" data-toggle="collapse">{{ count }}</a>
+                                {{ count }}
                             {% endif %}
                         {% else %}
                             {% set count = 0 %}

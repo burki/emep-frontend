@@ -7,9 +7,10 @@
                 paging: true,
                 searching: false,
                 info: false,
+                order: [[ 1, "asc" ]],
                 "columns": [
-                    null,
-                    { "orderSequence": [ "desc", "asc" ] },
+                    { "orderable": false},
+                    { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "desc", "asc" ] },
                     { "orderSequence": [ "desc", "asc" ] },
                     { "orderSequence": [ "desc", "asc" ] },
@@ -56,21 +57,15 @@
                             {{ exhibition.location.name }}
                         </a>
                     </td>
-                    <td>{% if catalogueEntries[exhibition.id] is defined %}
-                            {% set count = catalogueEntries[exhibition.id]|length %}
-                            {% if count > 0 %}
-                                {% set divId = 'entries' ~ exhibition.id %}
-                                <a class="badge" style="color: white" href="#{{ divId }}" data-toggle="collapse">{{ count }}</a>
-                            {% endif %}
-                        {% else %}
-                            {% set count = 0 %}
-                        {% endif %}
+                    <td>
+                        {{ exhibitionStats[exhibition.id].numCatEntrySort }}
                     </td>
                     <td>{{ exhibition.organizerType }}</td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
+        <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}"><b>{{ exhibition.title }}</b>{{ exhibition.titleAppend }}</a>{% if exhibitionStats[ exhibition.id ] is defined and exhibitionStats[exhibition.id].numCatEntrySort > 0 -%}, {{ exhibitionStats[exhibition.id].numCatEntrySort }} entr. by {{ exhibitionStats[exhibition.id].numPersonSort }} art.{% endif %}
 
 
     </div><!-- .tab-pane -->

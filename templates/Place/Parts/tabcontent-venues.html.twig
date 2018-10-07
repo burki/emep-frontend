@@ -11,6 +11,7 @@
                 searching: false,
                 info: false,
                 "columns": [
+                    null,
                     { "orderSequence": [ "desc", "asc" ] },
                 ]
             });
@@ -36,7 +37,7 @@
                     {% set count = location.exhibitions|length %}
                     {% set divId = 'exhibitions' ~ location. id %}
                     {% set numEntries = 0 %}
-                    <td><a class="" href="#{{ divId }}" >{{ count }}</a></td>
+                    <td>{{ count }}</td>
                 </tr>
             {% endfor %}
             </tbody>

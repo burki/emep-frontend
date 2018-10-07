@@ -126,6 +126,18 @@ tr {
 }
 
 
+.desc, .asc {
+    background-color: #F6F7FB;
+}
+
+.desc:after{
+    content: "\00a0 \00a0 \00a0 ↓";
+}
+
+.asc:after{
+    content: "\00a0 \00a0 \00a0 ↑";
+}
+
 
 
 /* END CUSTOM DATABLES STYLES */
@@ -243,16 +255,16 @@ path.highcharts-tick {
     display: none;
 }
 
-.chart-header{
+.chart-header, .artist-header{
     color: #5B6974;
     font-size: 1.7rem;
 }
 
-.chart-header:hover {
+.chart-header:hover, .artist-header:hover {
     color: rgba(91, 105, 115, 0.6);
 }
 
-.chartsymbol{
+.chartsymbol, .artistsymbol{
     color: #02A5BE;
     margin-right: 1rem;
     display: inline-block;
@@ -261,7 +273,7 @@ path.highcharts-tick {
     height: 23px;
 }
 
-.charttypeTitle{
+.charttypeTitle, a.charttypeTitle{
     color: #A4B1BA;
     margin-left: 1rem;
     font-size: 1rem;
@@ -296,6 +308,26 @@ footer{
 .holder div:nth-child(2) {
     width: 64%!important;
 }
+
+.expand-all, .collapse-all {
+    color: #5b6974;
+    padding:7px;
+    margin-right: -7px;
+    cursor: pointer;
+    font-weight: normal;
+    margin-left: 10px;
+}
+
+.groupHeader, .chart-header{
+    cursor: pointer;
+}
+
+.expand-all:hover, .collapse-all:hover {
+    color: #1869a3;
+}
+
+
+
 
 
 @media (max-width: 767px) {
