@@ -36,6 +36,110 @@
 
 
 
+    <div class="filter-combination-container">
+        <div class="filters-heading">Filters</div>
+        <div class="additional-filter-container">
+
+            {# refactor as macro #}
+            {% for countryAbbriviation in countries %}
+                <div class="filter-row">
+                    <div class="div-block-5">
+                        <div class="first-filter-term">
+                            <div>Country</div>
+                        </div>
+                        <div class="is_equal_to">
+                            <div>is equal to</div>
+                        </div>
+                        <div class="first-filter-term">
+                            {# find country to text method #}
+                            <div>{{ countryArray[countryAbbriviation]|capitalize }}</div>
+                        </div>
+                    </div>
+                    <div class="subfilter-buttons-container">
+                        <div class="subfilter-remove countryAbbr" data-country="{{ countryAbbriviation }}">
+                            <div>remove</div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+            {# refactor as macro #}
+            {% for organizer in organizerType %}
+                <div class="filter-row">
+                    <div class="div-block-5">
+                        <div class="first-filter-term">
+                            <div>Organizer Type</div>
+                        </div>
+                        <div class="is_equal_to">
+                            <div>is equal to</div>
+                        </div>
+                        <div class="first-filter-term">
+                            {# find country to text method #}
+                            <div>{{ organizer|capitalize }}</div>
+                        </div>
+                    </div>
+                    <div class="subfilter-buttons-container">
+                        <div class="subfilter-remove organizer" data-organizer="{{ organizer }}">
+                            <div>remove</div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('.countryAbbr').on('click', function () {
+                var currSelection = $('#exhibition_filter_country').val();
+                var currCountry = $(this).data('country');
+                // remove array element
+                currSelection.splice($.inArray(currCountry, currSelection), 1);
+                $('#exhibition_filter_country').val(currSelection);
+
+                // submit form
+                $( ".exhibitionFilterForm" ).submit();
+            });
+
+            $('.organizer').on('click', function () {
+                var currSelection = $('#exhibition_filter_organizer_type').val();
+                var currCountry = $(this).data('organizer');
+                // remove array element
+                currSelection.splice($.inArray(currCountry, currSelection), 1);
+                $('#exhibition_filter_organizer_type').val(currSelection);
+
+                // submit form
+                $( ".exhibitionFilterForm" ).submit();
+            });
+
+            $('.exhibitionFilterForm').on('submit', function (e) {
+                console.log('submiting now ....');
+
+                // countries
+                var currSelectionCountries = $('#exhibition_filter_country').val() !== null ? $('#exhibition_filter_country').val() : [];
+                var currCountrySelected = $('#countrySelector').val();
+                currSelectionCountries.push(currCountrySelected);
+                currSelectionCountries = jQuery.unique(currSelectionCountries);
+
+                currSelectionCountries = currSelectionCountries.filter(Boolean)  //filters all non-true values ---> especially empty strings
+                $('#exhibition_filter_country').val(currSelectionCountries);
+
+
+                // organization type
+                var currSelectionOrganizer = $('#exhibition_filter_organizer_type').val() ? $('#exhibition_filter_organizer_type').val() : [];
+                var currOrganizationSelected = $('#organizerSelectore').val();
+                currSelectionOrganizer.push(currOrganizationSelected);
+
+                currSelectionOrganizer = jQuery.unique(currSelectionOrganizer);
+                $('#exhibition_filter_organizer_type').val(currSelectionOrganizer);
+
+            });
+        });
+
+    </script>
+
+
+
     <div class="contentcontainer w-container">
 
 
