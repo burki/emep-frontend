@@ -22,6 +22,29 @@
 
     <h1 class="heading">{{ pageTitle }}</h1>
 
+    <div class="searchbarcontainer">
+        <!--<form  class="filter" method="get" action="{{ path(app.request.attributes.get('_route')) }}"> -->
+        <div class="searchbarinputcontainer">
+            <input type="text" class="text-field-class w-input" placeholder="search">
+            <select id="countrySelector" class="text-field-class w-select">
+                <option value>select country</option>
+                {% for abrriviation,countryname in countryArray %}
+                    <option value="{{ abrriviation }}">{{ countryname }}</option>
+                {% endfor %}
+            </select>
+            <select id="organizerSelectore" class="text-field-class w-select">
+                <option value>select type of organization body</option>
+                {% for organizer in organizerTypesArray %}
+                    <option value="{{ organizer }}">{{ organizer }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="searchbuttoncontainer"><input type="submit" name="submit-filter" value="Search" class="submit-button w-button">
+            <div class="div-block-2"><img src="{{ app.request.basepath }}/img/noun_Arrow-Down_1594877_ffffff.svg" width="75" class="image"></div>
+        </div>
+        <!--</form>-->
+    </div>
+
 
     <div class="searchbarcontainer w-form">
 
