@@ -57,120 +57,6 @@ class Builder
         return $this->createMainMenu($options);
     }
 
-    /* public function createMainMenu(array $options)
-    {
-        try {
-            $loggedIn = $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY');
-        }
-        catch (\Exception $e) {
-            // can happen on error pages
-            $loggedIn = false;
-        }
-
-        $showWorks = $loggedIn || !empty($_SESSION['user']);
-
-        // for translation, see http://symfony.com/doc/master/bundles/KnpMenuBundle/i18n.html
-        $menu = $this->factory->createItem('home', [
-            'label' => 'Home',
-            'route' => 'home',
-        ]);
-        $menu->setChildrenAttributes([ 'id' => 'menu-main', 'class' => 'nav-menu w-nav-menu', 'role' => 'navigation' ]);
-
-        $menu->addChild('Exhibitions', [ 'route' => 'exhibition' ]);
-        $menu['Exhibitions']->addChild('List', [
-            'route' => 'exhibition',
-        ]);
-        $menu['Exhibitions']->addChild('Map', [
-            'route' => 'exhibition-by-place',
-        ]);
-        $menu['Exhibitions']->addChild('Chart: By Month', [
-            'route' => 'exhibition-by-month',
-        ]);
-        $menu['Exhibitions']->addChild("Chart: Artists' Nationality", [
-            'route' => 'exhibition-nationality',
-        ]);
-
-        $menu->addChild('Venues', [ 'route' => 'location' ]);
-        $menu['Venues']->addChild('List', [
-            'route' => 'location',
-        ]);
-        $menu['Venues']->addChild('Map', [
-            'route' => 'location-by-place',
-        ]);
-
-        $menu->addChild('Artists', [ 'route' => 'person' ]);
-        $menu['Artists']->addChild('List', [
-            'route' => 'person',
-        ]);
-        $menu['Artists']->addChild('Map: Birth/Death Place', [
-            'route' => 'person-by-place',
-        ]);
-        $menu['Artists']->addChild('Chart: Birth/Death', [
-            'route' => 'person-by-year',
-        ]);
-        $menu['Artists']->addChild('Chart: Exhibiting Age', [
-            'route' => 'person-exhibition-age',
-        ]);
-        $menu['Artists']->addChild('Chart: Number of Exhibitions', [
-            'route' => 'person-distribution',
-        ]);
-        $menu['Artists']->addChild("Chart: Popularity according to Wikipedia", [
-            'route' => 'person-popularity',
-        ]);
-
-        $menu->addChild('Holding Institutions', [ 'route' => 'holder' ]);
-
-        if ($showWorks) {
-            $menu->addChild('Works', [ 'route' => 'item' ]);
-            $menu['Works']->addChild('List by Artist', [
-                'route' => 'item',
-            ]);
-            $menu['Works']->addChild('List by Exhibition', [
-                'route' => 'item-by-exhibition',
-            ]);
-            $menu['Works']->addChild('List by Style', [
-                'route' => 'item-by-style',
-            ]);
-            $menu['Works']->addChild('List by Style', [
-                'route' => 'item-by-style',
-            ]);
-            $menu['Works']->addChild('Exhibition Map', [
-                'route' => 'item-by-place',
-            ]);
-            $menu['Works']->addChild('Stats by Artist', [
-                'route' => 'item-by-person',
-            ]);
-        }
-
-        $menu->addChild('Places', [ 'route' => 'place' ]);
-        $menu['Places']->addChild('List', [
-            'route' => 'place',
-        ]);
-        $menu['Places']->addChild('Map', [
-            'route' => 'place-map',
-        ]);
-
-        // find the matching parent
-        // TODO: maybe use a voter, see https://gist.github.com/nateevans/9958390
-        $uriCurrent = $this->requestStack->getCurrentRequest()->getRequestUri();
-
-        // create the iterator
-        $itemIterator = new \Knp\Menu\Iterator\RecursiveItemIterator($menu);
-
-        // iterate recursively on the iterator
-        $iterator = new \RecursiveIteratorIterator($itemIterator, \RecursiveIteratorIterator::SELF_FIRST);
-
-        foreach ($iterator as $item) {
-            $uri = $item->getUri();
-            if (substr($uriCurrent, 0, strlen($uri)) === $uri) {
-                $item->setCurrent(true);
-                break;
-            }
-        }
-
-        return $menu;
-    }*/
-
     public function createMainMenu(array $options)
     {
         try {
@@ -211,7 +97,6 @@ class Builder
         ]); */
 
 
-
         $menu->addChild('Holding Institutions', [ 'route' => 'holder' ]);
 
         if ($showWorks) {
@@ -237,8 +122,18 @@ class Builder
         }
 
 
-        // find the matching parent
-        // TODO: maybe use a voter, see https://gist.github.com/nateevans/9958390
+        /*
+         * the following didn't work and is now handled
+         * by the RequestVoter registered in services, see
+         * https://gist.github.com/nateevans/9958390
+         *
+         * services:
+         *  app.menu_request_voter:
+         *      class: AppBundle\Menu\RequestVoter
+         *      arguments: [ "@request_stack" ]
+         *      tags:
+         *         - { name: knp_menu.voter }
+
         $uriCurrent = $this->requestStack->getCurrentRequest()->getRequestUri();
 
         // create the iterator
@@ -254,6 +149,7 @@ class Builder
                 break;
             }
         }
+        */
 
         return $menu;
     }
