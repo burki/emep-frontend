@@ -82,6 +82,9 @@ extends Kernel
             // see https://github.com/cocur/slugify#user-content-symfony2
             new Cocur\Slugify\Bridge\Symfony\CocurSlugifyBundle(),
 
+            // pagination
+            new WhiteOctober\PagerfantaBundle\WhiteOctoberPagerfantaBundle(),
+
             // own code
             new AppBundle\AppBundle(),
         ];

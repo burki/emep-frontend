@@ -36,9 +36,9 @@
 
         "symfony/validator": "^4.1",
         "symfony/form": "^4.1",
-        "shapecode/hidden-entity-type-bundle": "@stable",
+        "shapecode/hidden-entity-type-bundle": "^3.0",
 
-        "symfony/monolog-bundle": "@stable",
+        "symfony/monolog-bundle": "^3.3",
         "symfony/swiftmailer-bundle": "@stable",
         "sensio/framework-extra-bundle": "@stable",
         "knplabs/knp-menu-bundle": "@stable",
@@ -70,7 +70,8 @@
         "ddeboer/data-import": "0.20.*",
         "phpoffice/phpexcel": "1.8.*",
 
-        "kphoen/rulerz": "@stable"
+        "ifedko/php-doctrine-dbal-pagination": "^2.0",
+        "white-october/pagerfanta-bundle": "^1.2"
     },
 
     "autoload": {
