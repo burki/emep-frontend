@@ -1,0 +1,41 @@
+{% extends 'Base/base.html.twig' %}
+
+{% import 'Shared/helper.html.twig' as helper %}
+
+{% block body %}
+    <h1>{{ pageTtitle }}</h1>
+    <div class="row">
+        <div class="col-sm-12">
+            {% if pager.currentPageResults is not empty %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Date of Birth</th>
+                        <th>Place of Birth</th>
+                        <th>Date of Death</th>
+                        <th>Place of Death</th>
+                        <th># Cat. Entries</th>
+                        <th># Exhibitions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in pager.currentPageResults %}
+                    <tr>
+                        <td><a href="{{ path('person', { 'id' : row['person_id'] }) }}">{{ row['name'] }}</a></td>
+                        <td>{{ row['birthdate']|dateincomplete }}</td>
+                        <td>{{ row['deathdate']|dateincomplete }}</td>
+                        <td>TODO</td>
+                        <td>TODO</td>
+                        <td>{{ row['count_itemexhibition'] }}</td>
+                        <td>{{ row['count_exhibition'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="pagerfanta">{{ pagerfanta(pager, 'twitter_bootstrap3', { 'omitFirstPage': true }) }}</div>
+            {% endif %}
+        </div>
+    </div><!-- .row -->
+{% endblock %}

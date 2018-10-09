@@ -1,0 +1,46 @@
+{% extends 'Base/base.html.twig' %}
+
+{% import 'Shared/helper.html.twig' as helper %}
+
+{% block body %}
+    <h1>{{ pageTtitle }}</h1>
+    <div class="row">
+        <div class="col-sm-12">
+            {% if pager.currentPageResults is not empty %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Person</th>
+                        <th>Cat.&nbsp;#</th>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Exhibition</th>
+                        <th>Date</th>
+                        <th>Venue</th>
+                        <th>City</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in pager.currentPageResults %}
+                    <tr>
+                        <td>
+                            {{ row['person'] }}
+                            {% if row['lifespan'] is not empty %} ({{ row['lifespan'] }}){% endif %}
+                        </td>
+                        <td>{{ row['catalogueId'] }}</td>
+                        <td>{{ row['title'] }}</td>
+                        <td>{{ row['type'] }}</td>
+                        <td>{{ row['exhibition_title'] }}</td>
+                        <td>{{ row['startdate'] }}</td>
+                        <td>{{ row['location'] }}</td>
+                        <td>{{ row['place'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="pagerfanta">{{ pagerfanta(pager, 'twitter_bootstrap3', { 'omitFirstPage': true }) }}</div>
+            {% endif %}
+        </div>
+    </div><!-- .row -->
+{% endblock %}
