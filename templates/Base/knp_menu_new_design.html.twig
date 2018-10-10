@@ -23,7 +23,7 @@
         {%- set classes = classes|merge(['nav-link', 'w-nav-link']) %}
 
 
-        {%- if matcher.isCurrent(item) and item.name != 'Home'  %}
+        {%- if matcher.isCurrent(item)  %}
             {%- set classes = classes|merge([options.currentClass]) %}
         {%- elseif matcher.isAncestor(item, options.depth) %}
             {%- set classes = classes|merge([options.ancestorClass]) %}
