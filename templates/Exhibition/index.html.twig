@@ -25,30 +25,29 @@
     <div class="searchbarcontainer">
         <!--<form  class="filter" method="get" action="{{ path(app.request.attributes.get('_route')) }}"> -->
         <div class="searchbarinputcontainer">
-            <input type="text" class="text-field-class w-input" placeholder="search">
-            <select id="countrySelector" class="text-field-class w-select">
+            <input type="text" class="text-field-class w-input search-input input-text-search" placeholder="search" value="{{ stringPart }}">
+            <select id="countrySelector" class="text-field-class w-select middle-selector">
                 <option value>select country</option>
                 {% for abrriviation,countryname in countryArray %}
                     <option value="{{ abrriviation }}">{{ countryname }}</option>
                 {% endfor %}
             </select>
-            <select id="organizerSelectore" class="text-field-class w-select">
+            <select id="organizerSelectore" class="text-field-class w-select end-selector">
                 <option value>select type of organization body</option>
                 {% for organizer in organizerTypesArray %}
                     <option value="{{ organizer }}">{{ organizer }}</option>
                 {% endfor %}
             </select>
         </div>
-        <div class="searchbuttoncontainer"><input type="submit" name="submit-filter" value="Search" class="submit-button w-button">
-            <div class="div-block-2"><img src="{{ app.request.basepath }}/img/noun_Arrow-Down_1594877_ffffff.svg" width="75" class="image"></div>
+        <div class="searchbuttoncontainer"><input type="submit" name="submit-filter" value="Search" class="submit-button w-button submit-filter-visible">
         </div>
         <!--</form>-->
     </div>
 
 
-    <div class="searchbarcontainer w-form">
+    <div class="searchbarcontainer w-form hidden-form">
 
-        <form class="filter" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
+        <form class="filter exhibitionFilterForm" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
             <div class="searchbarinputcontainer">
                 {{ form_rest(form) }}
             </div>
@@ -119,7 +118,6 @@
                 // remove array element
                 currSelection.splice($.inArray(currCountry, currSelection), 1);
                 $('#exhibition_filter_country').val(currSelection);
-
                 // submit form
                 $( ".exhibitionFilterForm" ).submit();
             });
@@ -155,8 +153,15 @@
 
                 currSelectionOrganizer = jQuery.unique(currSelectionOrganizer);
                 $('#exhibition_filter_organizer_type').val(currSelectionOrganizer);
-
             });
+
+            $('.submit-filter-visible').on('click', function(){
+                $( ".exhibitionFilterForm" ).submit();
+            });
+            $('.input-text-search').bind('input', function(){
+                $('#exhibition_filter_search').val($(this).val());
+                // console.log('change event:', $(this).val());
+            })
         });
 
     </script>

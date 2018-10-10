@@ -28,6 +28,7 @@ extends CrudFilterType
 
         $builder->add('nationality', Filters\ChoiceFilterType::class, [
             'choices' => [ 'select nationality' => '' ] + $options['data']['choices'],
+            'multiple' => true
         ]);
     }
 

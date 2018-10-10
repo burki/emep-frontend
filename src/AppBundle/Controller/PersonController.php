@@ -98,9 +98,9 @@ extends CrudController
             'pagination' => $pagination,
             'form' => $form->createView(),
             'nationalities' => $nationalities,
+            'countryArray' => $this->buildCountries(),
             'gender' => $gender,
             'stringPart' => $stringQuery
-
         ]);
     }
 

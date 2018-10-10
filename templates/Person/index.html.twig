@@ -8,18 +8,127 @@
 
         <h1 class="heading">{{ pageTitle }}</h1>
 
+        <div class="searchbarcontainer">
+            <!--<form  class="filter" method="get" action="{{ path(app.request.attributes.get('_route')) }}"> -->
+            <div class="searchbarinputcontainer">
+                <input type="text" class="text-field-class w-input search-input input-text-search" placeholder="search" value="{{ stringPart }}">
+                <select id="personSelector" class="text-field-class w-select end-selector"><option value="" selected="selected">select gender</option><option value="F">female</option><option value="M">male</option></select>
+                <select id="countrySelector" class="text-field-class w-select middle-selector">
+                    <option value>select country</option>
+                    {% for abrriviation,countryname in countryArray %}
+                        <option value="{{ abrriviation }}">{{ countryname }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="searchbuttoncontainer"><input type="submit" name="submit-filter" value="Search" class="submit-button w-button submit-filter-visible">
+            </div>
+            <!--</form>-->
+        </div>
 
-        <div class="searchbarcontainer w-form">
+    </div>
 
-            <form class="filter" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
-                <div class="searchbarinputcontainer">
-                    {{ form_rest(form) }}
+
+    <div class="searchbarcontainer w-form hidden-form">
+
+        <form class="filter exhibitionFilterForm" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
+            <div class="searchbarinputcontainer">
+                {{ form_rest(form) }}
+            </div>
+            <div class="searchbuttoncontainer"><input type="submit" name="submit-filter" value="Search" class="submit-button w-button">
+            </div>
+        </form>
+    </div>
+
+    <div class="filter-combination-container">
+        <div class="filters-heading">Filters</div>
+        <div class="additional-filter-container">
+
+            {# refactor as macro #}
+            {% for countryAbbriviation in nationalities %}
+                <div class="filter-row">
+                    <div class="div-block-5">
+                        <div class="first-filter-term">
+                            <div>nationality</div>
+                        </div>
+                        <div class="is_equal_to">
+                            <div>is equal to</div>
+                        </div>
+                        <div class="first-filter-term">
+                            {# find country to text method #}
+                            <div>{{ countryArray[countryAbbriviation]|capitalize }}</div>
+                        </div>
+                    </div>
+                    <div class="subfilter-buttons-container">
+                        <div class="subfilter-remove countryAbbr" data-country="{{ countryAbbriviation }}">
+                            <div>remove</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="searchbuttoncontainer"><input type="submit" name="submit-filter" value="Search" class="submit-button w-button">
-                </div>
-            </form>
+            {% endfor %}
+
         </div>
     </div>
+
+
+    <script>
+        $(document).ready(function() {
+            $('#personSelector').val('{{ gender }}');
+
+
+
+            $('.countryAbbr').on('click', function () {
+                var currSelection = $('#person_filter_nationality').val();
+                var currCountry = $(this).data('country');
+                // remove array element
+                currSelection.splice($.inArray(currCountry, currSelection), 1);
+                $('#person_filter_nationality').val(currSelection);
+                // submit form
+                $( ".exhibitionFilterForm" ).submit();
+            });
+
+            $('.organizer').on('click', function () {
+                var currSelection = $('#exhibition_filter_organizer_type').val();
+                var currCountry = $(this).data('organizer');
+                // remove array element
+                currSelection.splice($.inArray(currCountry, currSelection), 1);
+                $('#exhibition_filter_organizer_type').val(currSelection);
+
+                // submit form
+                $( ".exhibitionFilterForm" ).submit();
+            });
+
+
+
+            $('.exhibitionFilterForm').on('submit', function (e) {
+                console.log('submiting now ....');
+
+                // countries
+                var currSelectionCountries = $('#person_filter_nationality').val() !== null ? $('#person_filter_nationality').val() : [];
+                var currCountrySelected = $('#countrySelector').val();
+                currSelectionCountries.push(currCountrySelected);
+                currSelectionCountries = jQuery.unique(currSelectionCountries);
+
+                currSelectionCountries = currSelectionCountries.filter(Boolean)  //filters all non-true values ---> especially empty strings
+                console.log('countries; ', currSelectionCountries);
+                $('#person_filter_nationality').val(currSelectionCountries);
+
+
+                // organization type
+                var currGender = $('#personSelector').val();
+
+                $('#person_filter_gender').val(currGender);
+            });
+
+            $('.submit-filter-visible').on('click', function(){
+                $( ".exhibitionFilterForm" ).submit();
+            });
+            $('.input-text-search').bind('input', function(){
+                $('#person_filter_search').val($(this).val());
+                // console.log('change event:', $(this).val());
+            })
+        });
+
+    </script>
 
 
     <div class="contentcontainer w-container">

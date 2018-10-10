@@ -77,11 +77,18 @@ extends CrudController
             // 'defaultSortFieldName' => 'countryPlaceNameSort', 'defaultSortDirection' => 'asc',
         ]);
 
+        $countries = $form->get('country')->getData();
+        $stringQuery = $form->get('search')->getData();
+
+
         // $holders = $qb->getQuery()->getResult();
 
         return $this->render('Holder/index.html.twig', [
             'pageTitle' => $this->get('translator')->trans('Holding Institutions'),
             'pagination' => $pagination,
+            'countryArray' => $this->buildCountries(),
+            'countries' => $countries,
+            'stringPart' => $stringQuery,
             'form' => $form->createView(),
         ]);
     }

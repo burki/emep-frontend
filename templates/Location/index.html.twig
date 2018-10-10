@@ -19,17 +19,152 @@
         <h1 class="heading">{{ pageTitle }}</h1>
 
 
-        <div class="searchbarcontainer w-form">
-
-            <form class="filter" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
-                <div class="searchbarinputcontainer">
-                    {{ form_rest(form) }}
-                </div>
-                <div class="searchbuttoncontainer"><input type="submit" name="submit-filter" value="Search" class="submit-button w-button">
-                </div>
-            </form>
+        <div class="searchbarcontainer">
+            <!--<form  class="filter" method="get" action="{{ path(app.request.attributes.get('_route')) }}"> -->
+            <div class="searchbarinputcontainer">
+                <input type="text" class="text-field-class w-input search-input input-text-search" placeholder="search" value="{{ stringPart }}">
+                <select id="countrySelector" class="text-field-class w-select middle-selector">
+                    <option value>select country</option>
+                    {% for abrriviation,countryname in countryArray %}
+                        <option value="{{ abrriviation }}">{{ countryname }}</option>
+                    {% endfor %}
+                </select>
+                <select id="organizerSelectore" class="text-field-class w-select end-selector">
+                    <option value>select type of organization body</option>
+                    {% for organizer in organizerTypesArray %}
+                        <option value="{{ organizer }}">{{ organizer }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="searchbuttoncontainer"><input type="submit" name="submit-filter" value="Search" class="submit-button w-button submit-filter-visible">
+            </div>
+            <!--</form>-->
         </div>
     </div>
+
+    <div class="searchbarcontainer w-form hidden-form">
+
+        <form class="filter exhibitionFilterForm" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
+            <div class="searchbarinputcontainer">
+                {{ form_rest(form) }}
+            </div>
+            <div class="searchbuttoncontainer"><input type="submit" name="submit-filter" value="Search" class="submit-button w-button">
+            </div>
+        </form>
+    </div>
+
+    <div class="filter-combination-container">
+        <div class="filters-heading">Filters</div>
+        <div class="additional-filter-container">
+
+            {# refactor as macro #}
+            {% for countryAbbriviation in countries %}
+                <div class="filter-row">
+                    <div class="div-block-5">
+                        <div class="first-filter-term">
+                            <div>Country</div>
+                        </div>
+                        <div class="is_equal_to">
+                            <div>is equal to</div>
+                        </div>
+                        <div class="first-filter-term">
+                            {# find country to text method #}
+                            <div>{{ countryArray[countryAbbriviation]|capitalize }}</div>
+                        </div>
+                    </div>
+                    <div class="subfilter-buttons-container">
+                        <div class="subfilter-remove countryAbbr" data-country="{{ countryAbbriviation }}">
+                            <div>remove</div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+            {# refactor as macro #}
+            {% for organizer in locationType %}
+                <div class="filter-row">
+                    <div class="div-block-5">
+                        <div class="first-filter-term">
+                            <div>Organizer Type</div>
+                        </div>
+                        <div class="is_equal_to">
+                            <div>is equal to</div>
+                        </div>
+                        <div class="first-filter-term">
+                            {# find country to text method #}
+                            <div>{{ organizer|capitalize }}</div>
+                        </div>
+                    </div>
+                    <div class="subfilter-buttons-container">
+                        <div class="subfilter-remove organizer" data-organizer="{{ organizer }}">
+                            <div>remove</div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('.countryAbbr').on('click', function () {
+                var currSelection = $('#location_filter_country').val();
+                var currCountry = $(this).data('country');
+                // remove array element
+                currSelection.splice($.inArray(currCountry, currSelection), 1);
+                $('#location_filter_country').val(currSelection);
+                // submit form
+                $( ".exhibitionFilterForm" ).submit();
+            });
+
+            $('.organizer').on('click', function () {
+                var currSelection = $('#location_filter_location_type').val();
+                var currCountry = $(this).data('organizer');
+                // remove array element
+                currSelection.splice($.inArray(currCountry, currSelection), 1);
+                $('#location_filter_location_type').val(currSelection);
+
+                // submit form
+                $( ".exhibitionFilterForm" ).submit();
+            });
+
+            $('.exhibitionFilterForm').on('submit', function (e) {
+                console.log('submiting now ....');
+
+                // countries
+                var currSelectionCountries = $('#location_filter_country').val() !== null ? $('#location_filter_country').val() : [];
+
+                var currCountrySelected = $('#countrySelector').val();
+
+                currSelectionCountries.push(currCountrySelected);
+                currSelectionCountries = jQuery.unique(currSelectionCountries);
+
+                currSelectionCountries = currSelectionCountries.filter(Boolean)  //filters all non-true values ---> especially empty strings
+
+
+
+                $('#location_filter_country').val(currSelectionCountries);
+
+
+                // organization type
+                var currSelectionOrganizer = $('#location_filter_location_type').val() ? $('#location_filter_location_type').val() : [];
+                var currOrganizationSelected = $('#organizerSelectore').val();
+                currSelectionOrganizer.push(currOrganizationSelected);
+
+                currSelectionOrganizer = jQuery.unique(currSelectionOrganizer);
+                $('#location_filter_location_type').val(currSelectionOrganizer);
+            });
+
+            $('.submit-filter-visible').on('click', function(){
+                $( ".exhibitionFilterForm" ).submit();
+            });
+            $('.input-text-search').bind('input', function(){
+                $('#location_filter_search').val($(this).val());
+                // console.log('change event:', $(this).val());
+            })
+        });
+
+    </script>
 
 
     <div class="contentcontainer w-container">

@@ -30,11 +30,12 @@ extends CrudFilterType
                 $paramName = sprintf('p_%s', str_replace('.', '_', $field));
 
                 // expression that represent the condition
-                $expression = $filterQuery->getExpr()->eq(/* $field */ 'P.countryCode', ':'.$paramName);
+                $expression = $filterQuery->getExpr()->in(/* $field */ 'P.countryCode', ':'.$paramName);
 
                 // expression parameters
-                $parameters = [ $paramName => $values['value'] ];
-
+                $parameters = [
+                    $paramName => [ $values['value'], \Doctrine\DBAL\Connection::PARAM_STR_ARRAY ],
+                ];
                 return $filterQuery->createCondition($expression, $parameters);
             },
         ]);

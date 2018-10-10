@@ -97,6 +97,8 @@ extends CrudController
             'pageTitle' => $this->get('translator')->trans('Venues'),
             'pagination' => $pagination,
             'form' => $form->createView(),
+            'countryArray' => $this->buildCountries(),
+            'organizerTypesArray' => $types,
             'countries' => $countries,
             'locationType' => $locationType,
             'stringPart' => $stringQuery

@@ -36,7 +36,10 @@ extends CrudController
 
         $andWhere = " AND ". StatisticsController::getArrayQueryString('Person', 'country', $countriesQuery, 'Person.status <> -1');
         $andWhere .= " AND ". StatisticsController::getArrayQueryString('Person', 'sex', $genderQuery, 'Person.status <> -1');
-        $testQuery = StatisticsController::getStringQueryForArtists($stringQuery, 'long');
+        $stringQueryPart = " " . StatisticsController::getStringQueryForArtists($stringQuery, 'fullname');
+
+        echo " " . $andWhere;
+
 
         // echo $testQuery;
         $queryTemplate .= $andWhere;
@@ -50,8 +53,10 @@ extends CrudController
                 $key, $key);
         }
 
+        $unionParts[0] .= $stringQueryPart;
+        $unionParts[1] .= $stringQueryPart;
+
         $querystr = join(' UNION ', $unionParts)
-            . $testQuery
             . " ORDER BY lastname, firstname, person_id"
         ;
 

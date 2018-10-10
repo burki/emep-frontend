@@ -108,6 +108,8 @@ extends CrudController
             'pagination' => $pagination,
             'form' => $form->createView(),
             'realData' => $result,
+            'countryArray' => $this->buildCountries(),
+            'organizerTypesArray' => $organizerTypes,
             'countries' => $countries,
             'organizerType' => $organizerType,
             'stringPart' => $stringQuery

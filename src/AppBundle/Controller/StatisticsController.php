@@ -25,6 +25,12 @@ extends Controller
             } else {
                 return " AND (E.title LIKE '%" . $query . "%' OR L.name LIKE '%" . $query . "%' OR L.placeLabel LIKE '%" . $query . "%')";
             }
+        }else{
+            if($shortOrLongQuery === 'long'){
+                return " AND Exhibition.status <> -1 ";
+            } else {
+                return " AND E.status <> -1";
+            }
         }
 
         return " ";
@@ -34,10 +40,14 @@ extends Controller
         if ($query !== 'any'){
             if($shortOrLongQuery === 'long'){
                 // return " AND (Person.lastname LIKE '%" . $query . "%' OR Person.firstname LIKE '%" . $query . "%' )";
-                return " AND (Person.lastname LIKE '%" . $query . "%' OR Person.firstname LIKE '%" . $query . "%' )";
+                return " AND ( CONCAT(Person.name_variant, ' ', Person.firstname, ' ', Person.lastname)  LIKE '%" . $query . "%' OR CONCAT(Person.name_variant, ' ', Person.lastname, ' ', Person.firstname)  LIKE '%" . $query . "%' OR  CONCAT(Person.lastname, '', Person.firstname) LIKE '%" . $query . "%' OR CONCAT(Person.firstname, '', Person.lastname) LIKE '%" . $query . "%' )";
 
+            } else if ($shortOrLongQuery === 'fullname') {
+                // return " AND THEfullname LIKE '%" . $query . "%' ";
+                return " AND ( CONCAT(Person.name_variant, ' ', Person.firstname, ' ', Person.lastname)  LIKE '%" . $query . "%' OR CONCAT(Person.name_variant, ' ', Person.lastname, ' ', Person.firstname)  LIKE '%" . $query . "%' OR  CONCAT(Person.lastname, ' ', Person.firstname) LIKE '%" . $query . "%'  OR CONCAT(Person.firstname, ' ', Person.lastname) LIKE '%" . $query . "%'   )";
+                //, CONCAT(Person.lastname, ' ', Person.firstname) AS THEfullname
             } else {
-                return " AND (P.familyName LIKE '%" . $query . "%' OR P.sortName LIKE '%" . $query . "%' )";
+                return " AND ( CONCAT(P.variantName, ' ', P.familyName, ' ', P.sortName) LIKE '%" . $query . "%' OR CONCAT(P.variantName, ' ', P.sortName, ' ', P.familyName) LIKE '%" . $query . "%' OR CONCAT(P.familyName, '', P.sortName) LIKE '%" . $query . "%' OR CONCAT(P.sortName, '', P.familyName) LIKE '%" . $query . "%' )";
             }
         }
 
@@ -53,20 +63,37 @@ extends Controller
 
         $em = $this->getDoctrine()->getEntityManager();
 
-        $countryQueryString = $this->getCountryQueryString('Location', 'Exhibition', 'country', $countriesQuery);
+        $countryQueryString = "";
+
+
+        // search in geoname and in location, apparently location.country is sometimes not set...
+        $countryQueryString .= " AND (". $this->getCountryQueryString('Location', 'Exhibition', 'country', $countriesQuery) ." OR " . $this->getCountryQueryString('Geoname', 'Exhibition', 'country_code', $countriesQuery) . " ) ";
         $countryQueryString .= " AND ". $this->getArrayQueryString('Exhibition', 'organizer_type', $organizerTypeQuery, 'Exhibition.status <> -1');
-        $countryQueryString .= $this->getStringQueryForExhibitions($stringQuery, 'long');
+        $countryQueryString .= " ". $this->getStringQueryForExhibitions($stringQuery, 'long');
 
         $dbconn = $em->getConnection();
 
-        $querystr = " SELECT YEAR(startdate) AS start_year, MONTH(startdate) AS start_month, COUNT(*) AS how_many"
+        /* $querystr = " SELECT YEAR(startdate) AS start_year, MONTH(startdate) AS start_month, COUNT(*) AS how_many"
         . " FROM Exhibition  LEFT JOIN Location  ON Exhibition.id_location = Location.id"
         . " LEFT JOIN Geoname  ON Location.place_tgn = Geoname.tgn"
         . " LEFT JOIN ItemExhibition ON (ItemExhibition.id_exhibition = Exhibition.id AND ItemExhibition.title IS NOT NULL)"
         . " WHERE Exhibition.status <> -1 AND MONTH(startdate) <> 0"
-        . " AND ${countryQueryString}" // FILTERING THE LOCATIONS
+        // . " AND ${countryQueryString}" // FILTERING THE LOCATIONS
         . " GROUP BY YEAR(startdate), MONTH(startdate)"
-        . " ORDER BY start_year, start_month";
+        . " ORDER BY start_year, start_month"; */
+
+
+        $querystr = "SELECT YEAR(startdate) AS start_year, MONTH(startdate) AS start_month"
+            . ", COUNT(*) AS how_many FROM Exhibition "
+            . " LEFT JOIN Location ON Exhibition.id_location = Location.id"
+            . " LEFT JOIN Geoname ON Location.place_tgn = Geoname.tgn"
+            //->from('AppBundle:Location', 'L')
+            // ->leftJoin('L.place', 'Pl')
+            . " WHERE Exhibition.status <> -1 AND MONTH(startdate) <> 0"
+            . " ". $countryQueryString
+            . " GROUP BY YEAR(startdate), MONTH(startdate)"
+            . " ORDER BY start_year, start_month"
+        ;
 
         //->andWhere("Pl.countryCode IN(${countryQueryString})")
 
@@ -304,13 +331,14 @@ extends Controller
 
     public function personByYearActionPart($countriesQuery, $genderQuery, $stringQuery)
     {
+
         // display the artists by birth-year, the catalog-entries by exhibition-year
         $em = $this->getDoctrine()->getEntityManager();
 
         $andWhere = '';
         $andWhere = $this->getPersonQueryString('Person', 'Person.status >= 0', 'country', $countriesQuery);
         $andWhere .= " AND ". $this->getArrayQueryString('Person', 'sex', $genderQuery, 'Person.status <> -1 ');
-        $andWhere .= $this->getStringQueryForArtists($stringQuery, 'long');
+        $andWhere .= $this->getStringQueryForArtists($stringQuery, 'fullname');
 
         $dbconn = $em->getConnection();
         $querystr = "SELECT 'active' AS type, COUNT(*) AS how_many FROM Person"
@@ -516,7 +544,7 @@ EOT;
 
             $where .= StatisticsController::getPersonQueryString('Person', 'Person.status >= 0', 'country', $countryQuery);
             $where .= " AND ". StatisticsController::getArrayQueryString('Person', 'sex', $gender, 'Person.status <> -1 ');
-            $where .= StatisticsController::getStringQueryForArtists($stringQuery, 'long');
+            $where .= StatisticsController::getStringQueryForArtists($stringQuery, 'fullname');
         }
 
 
@@ -903,7 +931,8 @@ EOT;
 
         $where = ' AND '. StatisticsController::getPersonQueryString('Person', 'Exhibition.status <> -1', 'country', $countriesQuery);
         $where .= " AND ". StatisticsController::getArrayQueryString('Person', 'sex', $genderQuery, 'Person.status <> -1 ');
-        $where .= StatisticsController::getStringQueryForArtists($stringQuery, 'long');
+        $where .= StatisticsController::getStringQueryForArtists($stringQuery, 'fullname');
+
 
 
         foreach ([ 'exhibition', 'item' ] as $type) {
@@ -917,6 +946,7 @@ EOT;
                 . " GROUP BY id_person"
                 . " HAVING how_many >= 1"
             ;
+
 
             $stmt = $dbconn->query($querystr);
             $frequency_count = [];
@@ -938,7 +968,6 @@ EOT;
                 $count = array_key_exists($i, $frequency_count) ? $frequency_count[$i] : 0; //old
                 // $count = array_key_exists($i, $frequency_count) ? $i : 0; // new
 
-
                 $data[$type][] = $count;
                 $sum += $count;
             }
@@ -947,6 +976,7 @@ EOT;
             $sum_half = $sum / 2.0;
             $sum = 0;
             for ($i = $min; $i <= $max; $i++) {
+
                 $count = array_key_exists($i, $frequency_count) ? $frequency_count[$i] : 0;
                 if ($sum + $count >= $sum_half) {
                     $delta_left = $sum_half - $sum;
@@ -958,6 +988,8 @@ EOT;
                 $sum += $count;
             }
         }
+
+        echo var_dump($data['exhibition']);
 
         // display the static content
         return $this->render('Statistics/person-distribution-index.html.twig', [
@@ -1340,13 +1372,12 @@ EOT;
         $countryQueryString = '';
         $counterCountry = 0;
 
-        if (is_array($countriesQuery) && count($countriesQuery) > 1 ){
+        if (is_array($countriesQuery)){
             foreach($countriesQuery as $country){
-                if(counter > 0){
+                if($counterCountry > 0){
                     $countryQueryString .= ", ";
                 }
                 $countryQueryString .= "'" . $country . "'";
-
                 $counterCountry++;
             }
         }else {
@@ -1372,7 +1403,7 @@ EOT;
         if ($queryArray === '' or $queryArray === 'any'){
             $modelQueryString = $fallbackString;
         } else {
-            if(is_array($queryArray) && count($queryArray) > 0 ){
+            if(is_array($queryArray)){
                 foreach ($queryArray as $queryElement){
                     if($counterQueryArray > 0){
                         $modelQueryString .= ", ";
@@ -1401,12 +1432,12 @@ EOT;
             $personQueryString = $fallbackString;
         } else {
             // if nationality is set check if larger than one or only on value
-            if (count($nationalityArray) > 1) {
+            if (is_array($nationalityArray)) {
                 foreach ($nationalityArray as $nationality) {
                     if ($counterNationalityArray > 0) {
                         $personQueryString .= ", ";
                     }
-                    $personQueryString .= "'" . $nationality . "''";
+                    $personQueryString .= "'" . $nationality . "'";
                     $counterNationalityArray++;
                 }
             } else {
