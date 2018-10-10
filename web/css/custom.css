@@ -1,3 +1,8 @@
+.text-block{
+    letter-spacing: normal!important;
+    font-size: inherit!important;
+}
+
 .top-level-container:hover .menu_level_1 {
     display: block;
 }
@@ -15,7 +20,8 @@ a:hover {
 }
 
 .w-container {
-    max-width: 1250px;
+    width: 85vw;
+    max-width: 2000px;
 }
 
 .searchbarcontainer.w-form form label {
@@ -59,8 +65,12 @@ a:hover {
 
 /* CUSTOM DATATABLES STYLES */
 
-.table-striped>tbody>tr:nth-of-type(odd), .table-striped>tbody>tr:nth-of-type(even) {
+.table-striped>tbody>tr:nth-of-type(odd) {
     background-color: transparent!important;
+}
+
+.table-striped>tbody>tr:nth-of-type(even){
+    background-color: #F6F7FB66;
 }
 
 .table-bordered>tbody>tr>td, .table-bordered>thead>tr>th {
@@ -357,6 +367,12 @@ footer{
 .subfilter-remove{
     cursor: pointer;
 }
+
+
+table a {
+    text-decoration: underline!important;
+}
+
 
 
 

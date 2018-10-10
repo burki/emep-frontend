@@ -64,6 +64,11 @@
             } );
 
 
+            //expand all on load
+            $('.collapseRow').removeClass("collapsed");
+            $('.plussign').addClass('collapsed');
+            $('.minussign').removeClass('collapsed');
+
 
             $('.expand-all').on('click', function(){
                 $('.collapseRow').removeClass("collapsed");
@@ -99,6 +104,8 @@
 
                 // console.log($(this).data('name'));
             } );
+
+
         } );
 
 
