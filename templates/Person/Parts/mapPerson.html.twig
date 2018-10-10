@@ -30,6 +30,28 @@
 
             {{ map.addTileLayer() }}
         </script>
+
+        <script>
+            var baseUrlMarkerImg = "/data/vendor/leaflet-color-markers/img/";
+            var violetIcon = new L.Icon({
+                iconUrl: baseUrlMarkerImg + 'marker-icon-2x-violet.png',
+                shadowUrl: baseUrlMarkerImg + 'marker-shadow.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41]
+            });
+            var blackIcon = new L.Icon({
+                iconUrl: baseUrlMarkerImg + 'marker-icon-2x-black.png',
+                shadowUrl: baseUrlMarkerImg + 'marker-shadow.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41]
+            });
+
+        </script>
+
     {% else %}
         <div class="no_data_block">
             <div>no map data available</div>

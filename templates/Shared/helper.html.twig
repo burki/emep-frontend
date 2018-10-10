@@ -23,7 +23,7 @@
         {% set first = (pagination.getCurrentPageNumber - 1) * pagination.getItemNumberPerPage %}
         {% set total = pagination.getTotalItemCount %}
         {% set last = min(first + pagination.getItemNumberPerPage, total) %}
-        {{ first + 1 }} - {{ last }} / {{ total }}
+        {{ first + 1 }} - {{ last }} of  {{ total }}
     </div>
 {% endmacro %}
 
