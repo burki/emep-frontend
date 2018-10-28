@@ -25,8 +25,9 @@
         {% set stringQuery = stringPart %}
     {% endif %}
 
-    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::exhibitionNationalityIndex', {countriesQuery: countriesQuery, organizerTypeQuery: organizerTypeQuery, stringQuery: stringQuery}), {'default': 'Loading... <br/>'}) }}
-    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::exhibitionByMonthIndex', {countriesQuery: countriesQuery, organizerTypeQuery: organizerTypeQuery, stringQuery: stringQuery}), {'default': 'Loading... <br/>'}) }}
+
+    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::exhibitionNationalityIndex', { countriesQuery: countriesQuery, organizerTypeQuery: organizerTypeQuery, stringQuery: stringQuery, currIds: ids }), {'default': 'Loading... <br/>'}) }}
+    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::exhibitionByMonthIndex', {countriesQuery: countriesQuery, organizerTypeQuery: organizerTypeQuery, stringQuery: stringQuery, currIds: ids }), {'default': 'Loading... <br/>'}) }}
 
 
 </div>

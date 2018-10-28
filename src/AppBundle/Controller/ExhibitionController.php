@@ -228,20 +228,13 @@ extends CrudController
             // 'defaultSortFieldName' => 'dateSort', 'defaultSortDirection' => 'asc',
         ]);
 
-        // echo ($mapdata['bounds']);
+
 
         $result = $qb->getQuery()->execute();
 
 
-
-        // print_r($csvResult);
-
-        /* END DATATABLE CREATION LIKE FRONTEND */
-
-
-
          return $this->render('Exhibition/index.html.twig', [
-            'pageTitle' => $this->get('translator')->trans('Exhibitions'),
+             'pageTitle' => $this->get('translator')->trans('Exhibitions'),
             'pagination' => $pagination,
             'form' => $form->createView(),
             //'formIds'=> $formIds->createView(),
@@ -437,6 +430,157 @@ extends CrudController
     }
 
     /**
+     * @Route("/exhibition/catalogue/csv/{id}", requirements={"id" = "\d+"}, name="exhibition-catalogue-csv")
+     */
+    public function detailActionCatalogueCSV(Request $request, $id = null)
+    {
+        $routeName = $request->get('_route'); $routeParams = [];
+
+        $repo = $this->getDoctrine()
+            ->getRepository('AppBundle:Exhibition');
+
+        if (!empty($id)) {
+            $routeParams = [ 'id' => $id ];
+            $exhibition = $repo->findOneById($id);
+        }
+
+        if (!isset($exhibition) || $exhibition->getStatus() == -1) {
+            return $this->redirectToRoute('exhibition-index');
+        }
+
+        $citeProc = $this->instantiateCiteProc($request->getLocale());
+        if ($exhibition->hasInfo()) {
+            // expand the publications
+            $exhibition->buildInfoFull($this->getDoctrine()->getManager(), $citeProc);
+        }
+
+
+        $result = $this->findCatalogueEntries($exhibition, $request->get('sort'));
+
+        $csvResult = [];
+
+        foreach ($result as $value) {
+            $innerArray = [];
+
+            $holder = $value;
+
+            array_push($innerArray, $holder->getExhibition()->getTitle(), $holder->person->getFullname(true) );
+
+            array_push($csvResult, $innerArray);
+        }
+
+        $response = new CSVResponse( $csvResult, 200, explode( ', ', 'Startdate, Enddate, Title, City, Venue, # of Cat. Entries, type' ) );
+        $response->setFilename( "data.csv" );
+        return $response;
+
+    }
+
+    /**
+     * @Route("/exhibition/similars/csv/{id}", requirements={"id" = "\d+"}, name="exhibition-similars-csv")
+     */
+    public function detailActionSimilarsCSV(Request $request, $id = null)
+    {
+        $routeName = $request->get('_route'); $routeParams = [];
+
+        $repo = $this->getDoctrine()
+            ->getRepository('AppBundle:Exhibition');
+
+        if (!empty($id)) {
+            $routeParams = [ 'id' => $id ];
+            $exhibition = $repo->findOneById($id);
+        }
+
+        if (!isset($exhibition) || $exhibition->getStatus() == -1) {
+            return $this->redirectToRoute('exhibition-index');
+        }
+
+        $citeProc = $this->instantiateCiteProc($request->getLocale());
+        if ($exhibition->hasInfo()) {
+            // expand the publications
+            $exhibition->buildInfoFull($this->getDoctrine()->getManager(), $citeProc);
+        }
+
+
+        $result = $this->findSimilar($exhibition);
+
+        $csvResult = [];
+
+        foreach ($result as $key=>$value) {
+
+            if($value['count'] > 1){
+                $innerArray = [];
+
+                array_push($innerArray, $value['title'], $value['count'] );
+
+                array_push($csvResult, $innerArray);
+            }
+        }
+
+        $response = new CSVResponse( $csvResult, 200, explode( ', ', 'Startdate, Enddate, Title, City, Venue, # of Cat. Entries, type' ) );
+        $response->setFilename( "data.csv" );
+        return $response;
+
+    }
+
+    /**
+     * @Route("/exhibition/artists/csv/{id}", requirements={"id" = "\d+"}, name="exhibition-artists-csv")
+     */
+    public function detailActionArtistsCSV(Request $request, $id = null)
+    {
+        $routeName = $request->get('_route'); $routeParams = [];
+
+        $repo = $this->getDoctrine()
+            ->getRepository('AppBundle:Exhibition');
+
+        if (!empty($id)) {
+            $routeParams = [ 'id' => $id ];
+            $exhibition = $repo->findOneById($id);
+        }
+
+        if (!isset($exhibition) || $exhibition->getStatus() == -1) {
+            return $this->redirectToRoute('exhibition-index');
+        }
+
+        $citeProc = $this->instantiateCiteProc($request->getLocale());
+        if ($exhibition->hasInfo()) {
+            // expand the publications
+            $exhibition->buildInfoFull($this->getDoctrine()->getManager(), $citeProc);
+        }
+
+
+        $catalogueEntries = $this->findCatalogueEntries($exhibition, $request->get('sort'));
+
+        $artists = [];
+
+        foreach ($catalogueEntries as $entry){
+            $currPerson = $entry->person;
+            if(!in_array($currPerson, $artists)){
+                array_push($artists, $currPerson );
+            }
+        }
+
+        $result = $artists;
+
+        $csvResult = [];
+
+        foreach ($result as $key=>$value) {
+
+            $innerArray = [];
+            $person = $value;
+
+            array_push($innerArray, $person->getFullname(true), $person->getBirthDate(), $person->getDeathDate() );
+
+            array_push($csvResult, $innerArray);
+        }
+
+        $response = new CSVResponse( $csvResult, 200, explode( ', ', 'Startdate, Enddate, Title, City, Venue, # of Cat. Entries, type' ) );
+        $response->setFilename( "data.csv" );
+        return $response;
+
+    }
+
+
+    /**
      * @Route("/exhibition/{id}", requirements={"id" = "\d+"}, name="exhibition")
      */
     public function detailAction(Request $request, $id = null)
@@ -466,12 +610,27 @@ extends CrudController
             $exhibition->buildInfoFull($this->getDoctrine()->getManager(), $citeProc);
         }
 
+        $catalogueEntries = $this->findCatalogueEntries($exhibition, $request->get('sort'));
+
+        $artists = [];
+
+        foreach ($catalogueEntries as $entry){
+            $currPerson = $entry->person;
+            if(!in_array($currPerson, $artists)){
+                array_push($artists, $currPerson );
+            }
+        }
+
+        //print_r($catalogueEntries);
+
+
         return $this->render('Exhibition/detail.html.twig', [
+            'artists' => $artists,
             'pageTitle' => $exhibition->title, // TODO: dates in brackets
             'exhibition' => $exhibition,
             'catalogue' => $exhibition->findBibitem($this->getDoctrine()->getManager(), 1),
             'citeProc' => $citeProc,
-            'catalogueEntries' => $this->findCatalogueEntries($exhibition, $request->get('sort')),
+            'catalogueEntries' => $catalogueEntries,
             'showWorks' => !empty($_SESSION['user']),
             'similar' => $this->findSimilar($exhibition),
             'pageMeta' => [

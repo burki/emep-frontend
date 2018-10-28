@@ -90,7 +90,7 @@
                     {# <ul class="list-group"> #}
                 {% endif %}
                 <tr class="listviewrow">
-                    <td class="title">
+                    <td class="title"><span class="checkmark {% if location.id in ids %} checked {% endif %}" data-id="{{ location.id }}"></span>
                         <a href="{{ path('location', { 'id' : location.id }) }}"><b>{{ location.name }}</b></a>
                     </td>
 

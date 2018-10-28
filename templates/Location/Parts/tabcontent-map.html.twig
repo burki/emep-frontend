@@ -28,5 +28,5 @@
     {% endif %}
 
 
-    {{ render_hinclude(controller('AppBundle\\Controller\\MapController::exhibitionByPlacePart', {countriesQuery: countriesQuery, locationTypeQuery: locationTypeQuery, stringQuery: stringQuery}), {'default': 'Loading...'}) }}
+    {{ render_hinclude(controller('AppBundle\\Controller\\MapController::exhibitionByPlacePart', {countriesQuery: countriesQuery, locationTypeQuery: locationTypeQuery, stringQuery: stringQuery, currIds: ids}), {'default': 'Loading...'}) }}
 </div>

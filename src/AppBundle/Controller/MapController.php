@@ -16,7 +16,7 @@ extends CrudController
      * @Route("/person/by-place", name="person-by-place")
      */
 
-    public function birthDeathPlacesIndex($countriesQuery, $genderQuery, $stringQuery)
+    public function birthDeathPlacesIndex($countriesQuery, $genderQuery, $stringQuery, $currIds = [])
     {
         $maxDisplay = 15;
 
@@ -38,7 +38,13 @@ extends CrudController
         $andWhere .= " AND ". StatisticsController::getArrayQueryString('Person', 'sex', $genderQuery, 'Person.status <> -1');
         $stringQueryPart = " " . StatisticsController::getStringQueryForArtists($stringQuery, 'fullname');
 
-        echo " " . $andWhere;
+        if (in_array("true", $currIds)) {
+        // remove true statement from ids
+            $pos = array_search('true', $currIds);
+            unset($currIds[$pos]);
+            $andWhere .= StatisticsController::getStringQueryForPersonIds($currIds, 'long');
+        }
+
 
 
         // echo $testQuery;
@@ -446,7 +452,7 @@ extends CrudController
         ]);
     }
 
-    public function exhibitionByPlacePart($countriesQuery, $locationTypeQuery, $stringQuery)
+    public function exhibitionByPlacePart($countriesQuery, $locationTypeQuery, $stringQuery, $currIds = [])
     {
 
 
@@ -522,6 +528,12 @@ extends CrudController
         $andWhere .= " AND ". StatisticsController::getArrayQueryString('Location', 'type', $locationTypeQuery, 'Exhibition.status <> -1');
         $andWhere .= StatisticsController::getStringQueryForExhibitions($stringQuery, 'long');
 
+        if (in_array("true", $currIds)) {
+            // remove true statement from ids
+            $pos = array_search('true', $currIds);
+            unset($currIds[$pos]);
+            $andWhere .= StatisticsController::getStringQueryForLocationIds($currIds, 'long');
+        }
 
 
         /* if($countriesQuery !== '' and $countriesQuery !== null){
@@ -618,7 +630,7 @@ extends CrudController
         ]);
     }
 
-    public function exhibitionByPlaceIndexPart($countriesQuery, $organizerTypeQuery, $stringQuery)
+    public function exhibitionByPlaceIndexPart($countriesQuery, $organizerTypeQuery, $stringQuery, $currIds = [])
     {
         $em = $this->getDoctrine()->getEntityManager();
         $dbconn = $em->getConnection();
@@ -663,6 +675,13 @@ extends CrudController
         $andWhere .= " AND ". StatisticsController::getArrayQueryString('Exhibition', 'organizer_type', $organizerTypeQuery, 'Exhibition.status <> -1');
         $andWhere .= StatisticsController::getStringQueryForExhibitions($stringQuery, 'long');
 
+
+        if (in_array("true", $currIds)) {
+            // remove true statement from ids
+            $pos = array_search('true', $currIds);
+            unset($currIds[$pos]);
+            $andWhere .= StatisticsController::getStringQueryForExhibitionIds($currIds, 'long');
+        }
 
         $querystr
             .= " WHERE"

@@ -24,7 +24,7 @@
         <thead>
         <tr class="listviewheading">
             <th>{{ helper.pagination_sortable(pagination, 'Name', 'nameSort') }}</th>
-            <th>{{ helper.pagination_sortable(pagination, 'Catalogues', 'numBibitemSort', 'desc') }}</th>
+            <th>{{ helper.pagination_sortable(pagination, 'no. of catalogues', 'numBibitemSort', 'desc') }}</th>
         </tr>
         </thead>
         <tbody>
@@ -75,7 +75,8 @@
             {% endif %}
             <tr class="listviewrow">
 
-                <td class="title"><a href="{{ path('holder', { 'id' : holder.id }) }}">
+                <td class="title"><span class="checkmark {% if holder.id in ids %} checked {% endif %}" data-id="{{ holder.id }}"></span>
+                    <a href="{{ path('holder', { 'id' : holder.id }) }}">
                         <b>{{ holder.name }}</b></a>
                 </td>
                 <td>

@@ -36,6 +36,86 @@ extends Controller
         return " ";
     }
 
+
+
+    public function getStringQueryForPersonIds($queryArray, $shortOrLongQuery){
+        if ($queryArray !== 'any'){
+            if($shortOrLongQuery === 'long'){
+
+                $query = "Person.id = " . join(" OR Person.id = ", $queryArray);
+                // print $query;
+
+                return " AND ( " . $query . " )";
+            } else {
+
+                $query = "P.id = " . join(" OR P.id = ", $queryArray);
+                // print $query;
+
+                return " AND (" . $query . ")";
+            }
+        }else{
+            if($shortOrLongQuery === 'long'){
+                return " AND Person.status <> -1 ";
+            } else {
+                return " AND P.status <> -1";
+            }
+        }
+
+        return " ";
+    }
+
+    public function getStringQueryForLocationIds($queryArray, $shortOrLongQuery){
+        if ($queryArray !== 'any'){
+            if($shortOrLongQuery === 'long'){
+
+                $query = "Location.id = " . join(" OR Location.id = ", $queryArray);
+                // print $query;
+
+                return " AND ( " . $query . " )";
+            } else {
+
+                $query = "L.id = " . join(" OR L.id = ", $queryArray);
+                // print $query;
+
+                return " AND (" . $query . ")";
+            }
+        }else{
+            if($shortOrLongQuery === 'long'){
+                return " AND Location.status <> -1 ";
+            } else {
+                return " AND L.status <> -1";
+            }
+        }
+
+        return " ";
+    }
+
+    public function getStringQueryForExhibitionIds($queryArray, $shortOrLongQuery){
+        if ($queryArray !== 'any'){
+            if($shortOrLongQuery === 'long'){
+
+                $query = "Exhibition.id = " . join(" OR Exhibition.id = ", $queryArray);
+                // print $query;
+
+                return " AND ( " . $query . " )";
+            } else {
+
+                $query = "E.id = " . join(" OR E.id = ", $queryArray);
+                // print $query;
+
+                return " AND (" . $query . ")";
+            }
+        }else{
+            if($shortOrLongQuery === 'long'){
+                return " AND Exhibition.status <> -1 ";
+            } else {
+                return " AND E.status <> -1";
+            }
+        }
+
+        return " ";
+    }
+
     public function getStringQueryForArtists($query, $shortOrLongQuery){
         if ($query !== 'any'){
             if($shortOrLongQuery === 'long'){
@@ -59,7 +139,7 @@ extends Controller
 
 
 
-    public function exhibitionByMonthIndex($countriesQuery, $organizerTypeQuery, $stringQuery){
+    public function exhibitionByMonthIndex($countriesQuery, $organizerTypeQuery, $stringQuery, $currIds = []){
 
         $em = $this->getDoctrine()->getEntityManager();
 
@@ -70,6 +150,13 @@ extends Controller
         $countryQueryString .= " AND (". $this->getCountryQueryString('Location', 'Exhibition', 'country', $countriesQuery) ." OR " . $this->getCountryQueryString('Geoname', 'Exhibition', 'country_code', $countriesQuery) . " ) ";
         $countryQueryString .= " AND ". $this->getArrayQueryString('Exhibition', 'organizer_type', $organizerTypeQuery, 'Exhibition.status <> -1');
         $countryQueryString .= " ". $this->getStringQueryForExhibitions($stringQuery, 'long');
+
+        if (in_array("true", $currIds)) {
+            // remove true statement from ids
+            $pos = array_search('true', $currIds);
+            unset($currIds[$pos]);
+            $countryQueryString .= $this->getStringQueryForExhibitionIds($currIds, 'long');
+        }
 
         $dbconn = $em->getConnection();
 
@@ -329,7 +416,7 @@ extends Controller
         ]);
     }
 
-    public function personByYearActionPart($countriesQuery, $genderQuery, $stringQuery)
+    public function personByYearActionPart($countriesQuery, $genderQuery, $stringQuery, $currIds = [])
     {
 
         // display the artists by birth-year, the catalog-entries by exhibition-year
@@ -339,6 +426,14 @@ extends Controller
         $andWhere = $this->getPersonQueryString('Person', 'Person.status >= 0', 'country', $countriesQuery);
         $andWhere .= " AND ". $this->getArrayQueryString('Person', 'sex', $genderQuery, 'Person.status <> -1 ');
         $andWhere .= $this->getStringQueryForArtists($stringQuery, 'fullname');
+
+
+        if (in_array("true", $currIds)) {
+            // remove true statement from ids
+            $pos = array_search('true', $currIds);
+            unset($currIds[$pos]);
+            $andWhere .= $this->getStringQueryForPersonIds($currIds, 'long');
+        }
 
         $dbconn = $em->getConnection();
         $querystr = "SELECT 'active' AS type, COUNT(*) AS how_many FROM Person"
@@ -520,7 +615,7 @@ EOT;
         return $ids;
     }
 
-    public static function exhibitionAgeDistribution($em, $exhibitionId = null, $gender = null, $countryQuery = null, $stringQuery = null)
+    public static function exhibitionAgeDistribution($em, $exhibitionId = null, $gender = null, $countryQuery = null, $stringQuery = null, $currIds = [])
     {
         $dbconn = $em->getConnection();
 
@@ -545,6 +640,13 @@ EOT;
             $where .= StatisticsController::getPersonQueryString('Person', 'Person.status >= 0', 'country', $countryQuery);
             $where .= " AND ". StatisticsController::getArrayQueryString('Person', 'sex', $gender, 'Person.status <> -1 ');
             $where .= StatisticsController::getStringQueryForArtists($stringQuery, 'fullname');
+
+            if (in_array("true", $currIds)) {
+                // remove true statement from ids
+                $pos = array_search('true', $currIds);
+                unset($currIds[$pos]);
+                $where .= StatisticsController::getStringQueryForPersonIds($currIds, 'long');
+            }
         }
 
 
@@ -676,10 +778,10 @@ EOT;
         ]);
     }
 
-    public function personExhibitionAgeActionPart($countriesQuery, $genderQuery, $stringQuery)
+    public function personExhibitionAgeActionPart($countriesQuery, $genderQuery, $stringQuery, $currIds = [])
     {
         // display the artists by birth-year, the catalog-entries by exhibition-year
-        $stats = self::exhibitionAgeDistribution($em = $this->getDoctrine()->getEntityManager(), null, $genderQuery, $countriesQuery, $stringQuery);
+        $stats = self::exhibitionAgeDistribution($em = $this->getDoctrine()->getEntityManager(), null, $genderQuery, $countriesQuery, $stringQuery, $currIds);
         $ageCount = & $stats['age_count'];
 
         $categories = $total = [];
@@ -919,7 +1021,7 @@ EOT;
         ]);
     }
 
-    public function exhibitionPerPersonPart($countriesQuery, $genderQuery, $stringQuery)
+    public function exhibitionPerPersonPart($countriesQuery, $genderQuery, $stringQuery, $currIds = [])
     {
         $em = $this->getDoctrine()->getEntityManager();
 
@@ -933,7 +1035,12 @@ EOT;
         $where .= " AND ". StatisticsController::getArrayQueryString('Person', 'sex', $genderQuery, 'Person.status <> -1 ');
         $where .= StatisticsController::getStringQueryForArtists($stringQuery, 'fullname');
 
-
+        if (in_array("true", $currIds)) {
+        // remove true statement from ids
+            $pos = array_search('true', $currIds);
+            unset($currIds[$pos]);
+            $where .= $this->getStringQueryForPersonIds($currIds, 'long');
+        }
 
         foreach ([ 'exhibition', 'item' ] as $type) {
             $what = 'item' == $type ? '*' : 'DISTINCT id_exhibition';
@@ -988,8 +1095,6 @@ EOT;
                 $sum += $count;
             }
         }
-
-        echo var_dump($data['exhibition']);
 
         // display the static content
         return $this->render('Statistics/person-distribution-index.html.twig', [
@@ -1057,7 +1162,7 @@ EOT;
     }
 
 
-    public function personsWikipediaPart($countriesQuery, $genderQuery, $stringQuery)
+    public function personsWikipediaPart($countriesQuery, $genderQuery, $stringQuery, $currIds = [])
     {
         $lang = 'en';
 
@@ -1070,6 +1175,12 @@ EOT;
         $where .= " AND ". StatisticsController::getArrayQueryString('P', 'gender', $genderQuery, 'P.status <> -1 ');
         $where .= StatisticsController::getStringQueryForArtists($stringQuery, 'short');
 
+        if (in_array("true", $currIds)) {
+        // remove true statement from ids
+            $pos = array_search('true', $currIds);
+            unset($currIds[$pos]);
+            $where .= StatisticsController::getStringQueryForPersonIds($currIds, 'short');
+        }
 
         $qb->select([
             'P',
@@ -1451,13 +1562,22 @@ EOT;
         return $personQueryString;
     }
 
+
+
     // controller is called by /exhibition route to load async the stats
-    function exhibitionNationalityIndex($countriesQuery, $organizerTypeQuery, $stringQuery){
+    function exhibitionNationalityIndex($countriesQuery, $organizerTypeQuery, $stringQuery, $currIds = []){
 
 
         $countryQueryString = $this->getCountryQueryString('Pl', 'L', 'countryCode', $countriesQuery);
         $countryQueryString .= " AND ". $this->getArrayQueryString('E', 'organizerType', $organizerTypeQuery, 'L.status <> -1');
         $countryQueryString .= $this->getStringQueryForExhibitions($stringQuery, 'short');
+
+        if (in_array("true", $currIds)) {
+            // remove true statement from ids
+            $pos = array_search('true', $currIds);
+            unset($currIds[$pos]);
+            $countryQueryString .= $this->getStringQueryForExhibitionIds($currIds, 'short');
+        }
 
 
         $qb = $this->getDoctrine()

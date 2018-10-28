@@ -18,8 +18,6 @@
 
 
 
-
-
     <h1 class="heading">{{ pageTitle }}</h1>
 
     <div class="searchbarcontainer">
@@ -109,6 +107,28 @@
                     </div>
                 </div>
             {% endfor %}
+
+            {% if "true" in ids %}
+                <div class="filter-row">
+                    <div class="div-block-5">
+                        <div class="first-filter-term">
+                            <div>Checkbox Filter</div>
+                        </div>
+                        <div class="is_equal_to">
+                            <div>is</div>
+                        </div>
+                        <div class="first-filter-term">
+                            {# find country to text method #}
+                            <div>active</div>
+                        </div>
+                    </div>
+                    <div class="subfilter-buttons-container">
+                        <div class="subfilter-remove exhibition-ids-filter-remove" data-organizer="{{ organizer }}">
+                            <div>remove</div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </div>
 
@@ -187,13 +207,101 @@
 
                 currIdArray = jQuery.unique(currIdArray);
 
-                console.log( 'should be unique: ', currIdArray );
                 $('#exhibition_filter_id').val( currIdArray );
 
-                console.log('exh val 2:', $('#exhibition_filter_id').val());
 
+                // rebuild paging urls
+                setNewPagingURLs();
             });
+
+            $('.advanced-search').on('click', function () {
+                if(!$(this).hasClass('active')){
+                    $(".checkmark").attr("style", "display:inline-block");;
+                    $(".advanced-search-settings").show();
+                }else{
+                    $(".checkmark").attr("style", "display:none");;
+                    $(".advanced-search-settings").hide();
+                }
+
+                $(this).toggleClass('active');
+                $(".advanced-search-settings").toggleClass('active');
+            });
+
+            $('.checkbox-filter-button').on('click', function(){
+
+                // add true to the filter array
+                var currIdArray = $('#exhibition_filter_id').val() ? $('#exhibition_filter_id').val() : [];
+                currIdArray.push('true');
+                // currIdArray = jQuery.unique('true');
+                $('#exhibition_filter_id').val( currIdArray );
+                // submit form
+                $( ".indexForm" ).submit();
+            });
+
+            $('.exhibition-ids-filter-remove').on('click', function(){
+                // remove true option from array
+                var currIdArray = $('#exhibition_filter_id').val() ? $('#exhibition_filter_id').val() : [];
+                var index = currIdArray.indexOf('true');
+                if (index !== -1) currIdArray.splice(index, 1);
+
+                $('#exhibition_filter_id').val( currIdArray );
+                // submit form
+                $( ".indexForm" ).submit();
+            });
+
+
+            $('.download-csv').on('click', function(){
+                var action = $('.exhibitionFilterForm').attr('action');
+                console.log('first action: ', action);
+                $('.exhibitionFilterForm').attr('action', '/exhibition/csv');
+                $('.exhibitionFilterForm').submit();
+                // resetting action to old one
+                $('.exhibitionFilterForm').attr('action', action);
+            });
+
+
+            // show checkmarks if filter is already set
+            {% if ids|length > 0 %}
+                $(".checkmark").attr("style", "display:inline-block");;
+                $(".advanced-search-settings").show();
+            {% endif %}
+
         });
+
+        function setNewPagingURLs(){
+            var pages = $(".pagination").find('a');
+            for (j = 0; j<pages.length; j++){
+
+                var componentsToDelete = [];
+
+                var currPageURL = new URL(decodeURIComponent(pages[j].href));
+
+                console.log(currPageURL.searchParams);
+                currPageURL.searchParams.forEach(function(param, key){
+                    // console.log('param: ', param); console.log('key: ', key);
+                    if(key.indexOf("exhibition_filter[id]") >= 0 ){
+                        componentsToDelete.push(key);
+                    }else{
+                        // creating url
+
+                    }
+                });
+
+                for (i = 0; i < componentsToDelete.length; i++){
+                    currPageURL.searchParams.delete(componentsToDelete[i]);
+                }
+                // console.log(new URL(decodeURIComponent(pages[i].href)).searchParams.getAll("exhibition_filter[id][1]"));
+                // console.log(pages[i].href.searchParams.getAll("exhibition_filter[id]"));
+
+                var exhibitionIdsVal = $('#exhibition_filter_id').val() ? $('#exhibition_filter_id').val() : [];
+                for(i = 0; i < exhibitionIdsVal.length; i++){
+                    currPageURL.searchParams.append( 'exhibition_filter[id][' + i + ']', exhibitionIdsVal[i] );
+                }
+
+                // set page url
+                pages[j].href = currPageURL;
+            }
+        }
 
     </script>
 

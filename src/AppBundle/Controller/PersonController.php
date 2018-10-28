@@ -9,6 +9,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
+use AppBundle\Utils\CsvResponse;
+
 /**
  *
  */
@@ -44,6 +46,89 @@ extends CrudController
     }
 
     /**
+     * @Route("/person/csv", name="person-csv")
+     */
+    public function indexToCsvAction(Request $request)
+    {
+        $route = $request->get('_route');
+
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb->select([
+            'P',
+            'COUNT(DISTINCT E.id) AS numExhibitionSort',
+            'COUNT(DISTINCT IE.id) AS numCatEntrySort',
+            "P.sortName HIDDEN nameSort"
+        ])
+            ->from('AppBundle:Person', 'P')
+            ->leftJoin('P.exhibitions', 'E')
+            ->leftJoin('P.catalogueEntries', 'IE')
+            ->where('P.status <> -1')
+            ->groupBy('P.id') // for Count
+            ->orderBy('nameSort')
+        ;
+
+        $form = $this->get('form.factory')->create(\AppBundle\Filter\PersonFilterType::class, [
+            'choices' => array_flip($this->buildCountries()),
+            'ids' => range(0, 9999)
+        ]);
+
+        if ($request->query->has($form->getName())) {
+            // manually bind values from the request
+            $form->submit($request->query->get($form->getName()));
+
+            // build the query from the given form object
+            $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($form, $qb);
+        }
+
+        // getting the form data fields to send it back down and use it in hinclude requests async
+        $gender = $form->get('gender')->getData();
+        $nationalities = $form->get('nationality')->getData();
+        $stringQuery = $form->get('search')->getData();
+        $ids = $form->get('id')->getData();
+
+
+
+        $pagination = $this->buildPagination($request, $qb->getQuery(), [
+            // the following leads to wrong display in combination with our
+            // helper.pagination_sortable()
+            // 'defaultSortFieldName' => 'nameSort', 'defaultSortDirection' => 'asc',
+        ]);
+
+        // echo ($mapdata['bounds']);
+
+        $result = $qb->getQuery()->execute();
+
+
+        /*  CREATE DATABLE LIKE THE FRONTEND */
+
+
+        $csvResult = [];
+
+        foreach ($result as $value) {
+            $innerArray = [];
+
+            $person = $value[0];
+
+            array_push($innerArray, $person->getFullname(true), $person->getBirthDate(), $person->getDeathDate(), $value['numExhibitionSort'], $value['numCatEntrySort'] );
+
+
+            array_push($csvResult, $innerArray);
+        }
+
+        // print_r($csvResult);
+
+        /* END DATATABLE CREATION LIKE FRONTEND */
+
+
+        $response = new CSVResponse( $csvResult, 200, explode( ', ', 'Startdate, Enddate, Title, City, Venue, # of Cat. Entries, type' ) );
+        $response->setFilename( "data.csv" );
+        return $response;
+    }
+
+    /**
      * @Route("/person", name="person-index")
      * @Route("/person-by-nationality", name="person-nationality")
      */
@@ -71,6 +156,7 @@ extends CrudController
 
         $form = $this->get('form.factory')->create(\AppBundle\Filter\PersonFilterType::class, [
             'choices' => array_flip($this->buildCountries()),
+            'ids' => range(0, 9999)
         ]);
 
         if ($request->query->has($form->getName())) {
@@ -85,6 +171,8 @@ extends CrudController
         $gender = $form->get('gender')->getData();
         $nationalities = $form->get('nationality')->getData();
         $stringQuery = $form->get('search')->getData();
+        $ids = $form->get('id')->getData();
+
 
 
         $pagination = $this->buildPagination($request, $qb->getQuery(), [
@@ -100,6 +188,7 @@ extends CrudController
             'nationalities' => $nationalities,
             'countryArray' => $this->buildCountries(),
             'gender' => $gender,
+            'ids' => $ids,
             'stringPart' => $stringQuery
         ]);
     }
@@ -277,6 +366,131 @@ extends CrudController
         // TODO: sort each exhibition by catalogueId
 
         return $entriesByExhibition;
+    }
+
+    /**
+     * @Route("/person/coappearances/csv/{id}", requirements={"id" = "\d+"}, name="person-coappearances-csv")
+     */
+    public function detailActionCoappearances(Request $request, $id = null, $ulan = null, $gnd = null)
+    {
+        $routeName = 'person';
+        $routeParams = [];
+
+        $criteria = new \Doctrine\Common\Collections\Criteria();
+        $personRepo = $this->getDoctrine()
+            ->getRepository('AppBundle:Person');
+
+        if (!empty($id)) {
+            $routeParams = [ 'id' => $id ];
+            $criteria->where($criteria->expr()->eq('id', $id));
+        }
+        else if (!empty($ulan)) {
+            $routeName = 'person-by-ulan';
+            $routeParams = [ 'ulan' => $ulan ];
+            $criteria->where($criteria->expr()->eq('ulan', $ulan));
+        }
+        else if (!empty($gnd)) {
+            $routeName = 'person-by-gnd';
+            $routeParams = [ 'gnd' => $gnd ];
+            $criteria->where($criteria->expr()->eq('gnd', $gnd));
+        }
+
+        $criteria->andWhere($criteria->expr()->neq('status', -1));
+
+        $persons = $personRepo->matching($criteria);
+
+        if (0 == count($persons)) {
+            return $this->redirectToRoute('person-index');
+        }
+
+        $person = $persons[0];
+
+        $locale = $request->getLocale();
+        if (in_array($request->get('_route'), [ 'person-jsonld', 'person-by-ulan-json', 'person-by-gnd-jsonld' ])) {
+            return new JsonLdResponse($person->jsonLdSerialize($locale));
+        }
+
+        $result = $this->findSimilar($person);
+        $csvResult = [];
+
+        foreach ($result as $key=>$value) {
+
+            $person = $value;
+
+            $innerArray = [];
+
+            array_push($innerArray, $person['name'], $person['count'] );
+
+            array_push($csvResult, $innerArray);
+        }
+
+        $response = new CSVResponse( $csvResult, 200, explode( ', ', 'Startdate, Enddate, Title, City, Venue, # of Cat. Entries, type' ) );
+        $response->setFilename( "data.csv" );
+        return $response;
+    }
+
+    /**
+     * @Route("/person/exhibition/csv/{id}", requirements={"id" = "\d+"}, name="person-exhibition-csv")
+     */
+    public function detailActionExhibition(Request $request, $id = null, $ulan = null, $gnd = null)
+    {
+        $routeName = 'person';
+        $routeParams = [];
+
+        $criteria = new \Doctrine\Common\Collections\Criteria();
+        $personRepo = $this->getDoctrine()
+            ->getRepository('AppBundle:Person');
+
+        if (!empty($id)) {
+            $routeParams = [ 'id' => $id ];
+            $criteria->where($criteria->expr()->eq('id', $id));
+        }
+        else if (!empty($ulan)) {
+            $routeName = 'person-by-ulan';
+            $routeParams = [ 'ulan' => $ulan ];
+            $criteria->where($criteria->expr()->eq('ulan', $ulan));
+        }
+        else if (!empty($gnd)) {
+            $routeName = 'person-by-gnd';
+            $routeParams = [ 'gnd' => $gnd ];
+            $criteria->where($criteria->expr()->eq('gnd', $gnd));
+        }
+
+        $criteria->andWhere($criteria->expr()->neq('status', -1));
+
+        $persons = $personRepo->matching($criteria);
+
+        if (0 == count($persons)) {
+            return $this->redirectToRoute('person-index');
+        }
+
+        $person = $persons[0];
+
+        $locale = $request->getLocale();
+        if (in_array($request->get('_route'), [ 'person-jsonld', 'person-by-ulan-json', 'person-by-gnd-jsonld' ])) {
+            return new JsonLdResponse($person->jsonLdSerialize($locale));
+        }
+
+        $result = $person->getExhibitions();
+
+        $csvResult = [];
+
+        $catalogueEntries = $this->findCatalogueEntries($person);
+
+        foreach ($result as $key=>$value) {
+
+            $exhibition = $value;
+
+            $innerArray = [];
+
+            array_push($innerArray, $exhibition->getStartdate(), $exhibition->getTitle(), $exhibition->location->getPlaceLabel(), count($catalogueEntries[$exhibition->getId()]), $exhibition->getOrganizerType() );
+
+            array_push($csvResult, $innerArray);
+        }
+
+        $response = new CSVResponse( $csvResult, 200, explode( ', ', 'Startdate, Enddate, Title, City, Venue, # of Cat. Entries, type' ) );
+        $response->setFilename( "data.csv" );
+        return $response;
     }
 
     /**

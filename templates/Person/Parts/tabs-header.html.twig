@@ -2,14 +2,14 @@
     <!-- Nav tabs -->
     <div>
         <div class="tabsymbols">
-            <div class="icontab"><img src="{{ app.request.basepath }}/img/setttings_icon_blue.svg" class="iconimage"></div>
-            <div class="icontab"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage"></div>
+            <div class="icontab download-csv-exhibition" style="display: none;"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage"></div>
+            <div class="icontab download-csv-coappearances" style="display: none;"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage"></div>
         </div>
         <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 1em">
-            <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">{{ 'Exhibitions'|trans }}</a></li>
+            <li role="presentation" class="active exhibitions-tab"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">{{ 'Exhibitions'|trans }}</a></li>
             {# co-appearnces #}
             {% if similar|length > 0 %}
-                <li role="presentation"><a href="#similar" aria-controls="similar" role="tab" data-toggle="tab">{{ 'Frequent co-appearances'|trans }}</a></li>
+                <li role="presentation" class="similars-tab"><a href="#similar" aria-controls="similar" role="tab" data-toggle="tab">{{ 'Frequent co-appearances'|trans }}</a></li>
             {% endif %}
             {# authority files #}
             {% if person.gnd is not empty or person.ulan is not empty %}
@@ -18,5 +18,34 @@
         </ul>
 
     </div>
+
+    <script>
+        $('.download-csv-exhibition').on('click', function(){
+            window.location.href =  "/person/exhibition/csv/{{ person.getId() }}";
+        });
+
+        $('.download-csv-coappearances').on('click', function(){
+            window.location.href =  "/person/coappearances/csv/{{ person.getId() }}";
+        });
+
+        // make the right export button visible
+        $( document ).ready(function() {
+            //hide all export buttons
+            hideAll();
+
+            setInterval(function(){
+                if( $('.exhibitions-tab').hasClass('active') ){ hideAll(); $('.download-csv-exhibition').show(); }
+                else if( $('.similars-tab').hasClass('active') ){ hideAll(); $('.download-csv-coappearances').show(); }
+                else {
+                    hideAll();
+                }
+            }, 250);
+        });
+
+        function hideAll(){
+            $('.download-csv-exhibition').hide();
+            $('.download-csv-coappearances').hide();
+        }
+    </script>
 
 {% endblock %}

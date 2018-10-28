@@ -76,20 +76,13 @@ extends CrudFilterType
             'multiple' => true,
             'apply_filter' => function (QueryInterface $filterQuery, $field, $values) {
 
-                echo 'applying filter';
-                echo 'values: ';
-                print_r ($values['value']);
-                print_r ($field);
+
 
                 if (empty($values['value'])) {
                     return null;
                 }
 
                 $paramName = sprintf('p_%s', str_replace('.', '_', $field));
-
-                print "\n";
-                print "pramname: ";
-                print_r($paramName);
 
                 // expression that represent the condition
 
@@ -102,7 +95,6 @@ extends CrudFilterType
 
                 // check if it should be filtered by ids as well
                 if (in_array("true", $values['value'])) {
-                    echo "true enthalten";
                     return $filterQuery->createCondition($expression, $parameters);
                 }
 

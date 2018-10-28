@@ -36,6 +36,33 @@
 }
 
 
+.checkmark, .advanced-search-settings {
+    display: none;
+}
+
+.icontab.active {
+    background-color: #eaeaea;
+}
+
+
+/* ADVANCED SEARCH */
+.advanced-search-settings{
+    height: 34px;
+    line-height: 34px;
+    padding: 0px 10px;
+    margin-right: -10px;
+}
+
+.checkbox-filter-button {
+    background-color: transparent;
+    padding: 5px 10px;
+    border-radius: 3px;
+    border: 1px solid #1E6AA1;
+    color: #1E6AA1;
+    cursor: pointer;
+}
+
+
 .text-block{
     letter-spacing: normal!important;
     font-size: inherit!important;
@@ -184,6 +211,26 @@ tr {
 
 .asc:after{
     content: "\00a0 \00a0 \00a0 ↑";
+}
+
+table.dataTable.dtr-inline.collapsed>tbody>tr[role="row"]>td:first-child:before, table.dataTable.dtr-inline.collapsed>tbody>tr[role="row"]>th:first-child:before {
+    top: calc(50% - 6px )!important;
+    left: 4px;
+    height: 14px;
+    width: 14px;
+    display: block;
+    position: absolute;
+    color: white;
+    border:none!important;
+    border-radius: 2px!important;
+    box-shadow: none!important;;
+    box-sizing: content-box;
+    text-align: center;
+    text-indent: 0 !important;
+    font-family: 'Courier New', Courier, monospace;
+    line-height: 14px;
+    content: '+';
+    background-color: #1E6AA1!important;
 }
 
 
@@ -344,10 +391,6 @@ footer{
 }
 
 
-/* dont't show tabsymbols yet since there is no functionality included */
-.tabsymbols {
-    display: none;
-}
 
 .holder div:nth-child(1) {
     width: 66%!important;
@@ -551,4 +594,9 @@ table a {
         display: block;
     }
 
+}
+
+.highcharts-root {
+    background-color: #f5f5f5;
+    border-radius: 5px;
 }

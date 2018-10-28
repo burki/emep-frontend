@@ -2,11 +2,10 @@
     <!-- Nav tabs -->
     <div>
         <div class="tabsymbols">
-            <div class="icontab"><img src="{{ app.request.basepath }}/img/setttings_icon_blue.svg" class="iconimage"></div>
-            <div class="icontab"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage"></div>
+            <div class="icontab download-csv-catalogues" style="display:none;"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage"></div>
         </div>
         <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 1em">
-            <li role="presentation" class="active" ><a href="#entries" aria-controls="entries" role="tab" data-toggle="tab">{{ 'Catalogues'|trans }}</a></li>
+            <li role="presentation" class="active entries-tab" ><a href="#entries" aria-controls="entries" role="tab" data-toggle="tab">{{ 'Catalogues'|trans }}</a></li>
             {# co-appearnces #}
             {% if holder.gnd is not empty %}
             {# authority files #}
@@ -15,5 +14,30 @@
         </ul>
 
     </div>
+
+    <script>
+
+        $('.download-csv-catalogues').on('click', function(){
+            window.location.href =  "/holder/catalogues/csv/{{ holder.getId() }}";
+        });
+
+        // make the right export button visible
+        $( document ).ready(function() {
+            //hide all export buttons
+            hideAll();
+
+            setInterval(function(){
+                if( $('.entries-tab').hasClass('active') ){ hideAll(); $('.download-csv-catalogues').show(); }
+                else {
+                    hideAll();
+                }
+            }, 250);
+        });
+
+        function hideAll(){
+            $('.download-csv-catalogues').hide();
+        }
+
+    </script>
 
 {% endblock %}

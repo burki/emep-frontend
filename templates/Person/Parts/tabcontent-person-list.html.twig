@@ -74,6 +74,7 @@
 
                 <tr class="listviewrow">
                     <td class="title">
+                        <span class="checkmark {% if person.id in ids %} checked {% endif %}" data-id="{{ person.id }}"></span>
                         <a href="{{ path('person', { 'id' : person.id }) }}">{{ person.fullname(true) }}</a>
                     </td>
 

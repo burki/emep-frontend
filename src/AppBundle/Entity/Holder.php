@@ -102,6 +102,13 @@ implements \JsonSerializable, JsonLdSerializable
     private $nameTransliterated;
 
     /**
+     * @var string Label of the address.
+     *
+     * @ORM\Column(nullable=true,name="address")
+     */
+    protected $placeAddress;
+
+    /**
      * @var string Label of the place.
      *
      * @ORM\Column(nullable=true,name="town")
@@ -235,6 +242,27 @@ implements \JsonSerializable, JsonLdSerializable
     }
     */
 
+
+    /**
+     * Gets placeAdress.
+     *
+     * @return string
+     */
+    public function getPlaceAddress()
+    {
+        return $this->placeAddress;
+    }
+
+    /**
+     * Gets placeLabel.
+     *
+     * @return string
+     */
+    public function getPlaceLabel()
+    {
+        return $this->placeLabel;
+    }
+
     /**
      * Sets countryCode.
      *
@@ -332,12 +360,12 @@ implements \JsonSerializable, JsonLdSerializable
      *
      * @return string
      */
-    /*
+
     public function getFoundingDate()
     {
         return $this->foundingDate;
     }
-    */
+
 
     /**
      * Sets name.

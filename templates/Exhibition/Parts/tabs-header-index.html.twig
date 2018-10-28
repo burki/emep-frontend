@@ -3,11 +3,12 @@
     <div>
         <div class="tabsymbols">
             <!--<div class="icontab"><img src="{{ app.request.basepath }}/img/setttings_icon_blue.svg" class="iconimage"></div>-->
-            <div class="icontab"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage download-csv"></div>
+            <div class="advanced-search-settings"><span class="checkbox-filter-button">apply checkbox filter</span></div>
+            <div class="icontab advanced-search"><img src="{{ app.request.basepath }}/img/setttings_icon_blue.svg" class="iconimage"></div>
+            <div class="icontab download-csv"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage"></div>
         </div>
         <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 1em">
             <li role="presentation" class="active"><a href="#exhibitions" aria-controls="entries" role="tab" data-toggle="tab">{{ 'Exhibitions'|trans }}</a></li>
-
             <li role="presentation"><a href="#map" role="tab" onclick="clickMap()" data-toggle="tab">{{ 'Map'|trans }}</a></li>
             <li role="presentation"><a href="#stats" role="tab" data-toggle="tab" >{{ 'Stats'|trans }}</a></li>
 
@@ -20,18 +21,6 @@
             $(document).trigger("rerenderMap");
         }
 
-
-        $('.download-csv').on('click', function(){
-
-
-            var action = $('.exhibitionFilterForm').attr('action');
-            console.log('first action: ', action);
-            $('.exhibitionFilterForm').attr('action', '/exhibition/csv');
-            $('.exhibitionFilterForm').submit();
-            // resetting action to old one
-            $('.exhibitionFilterForm').attr('action', action);
-
-        });
     </script>
 
 {% endblock %}
