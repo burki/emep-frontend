@@ -47,7 +47,7 @@
 
     <div class="searchbarcontainer w-form hidden-form">
 
-        <form class="filter exhibitionFilterForm" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
+        <form class="filter exhibitionFilterForm indexForm" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
             <div class="searchbarinputcontainer">
                 {{ form_rest(form) }}
             </div>
@@ -55,6 +55,8 @@
             </div>
         </form>
     </div>
+
+
 
 
 
@@ -156,12 +158,41 @@
             });
 
             $('.submit-filter-visible').on('click', function(){
-                $( ".exhibitionFilterForm" ).submit();
+                $( ".indexForm" ).submit();
             });
             $('.input-text-search').bind('input', function(){
                 $('#exhibition_filter_search').val($(this).val());
                 // console.log('change event:', $(this).val());
             })
+
+
+
+            // checkmark worker
+            $('.checkmark').on('click', function(){
+                console.log('checkbox checked: ', $(this).data('id'));
+                const currId = $(this).data('id').toString();
+                var currIdArray = $('#exhibition_filter_id').val() ? $('#exhibition_filter_id').val() : [];
+
+
+                if($(this).hasClass("checked")){
+                    var index = currIdArray.indexOf(currId);
+                    if (index > -1) {
+                        currIdArray.splice(index, 1);
+                    }
+                }else{
+                    currIdArray.push(currId);
+                }
+
+                $(this).toggleClass( "checked" );
+
+                currIdArray = jQuery.unique(currIdArray);
+
+                console.log( 'should be unique: ', currIdArray );
+                $('#exhibition_filter_id').val( currIdArray );
+
+                console.log('exh val 2:', $('#exhibition_filter_id').val());
+
+            });
         });
 
     </script>

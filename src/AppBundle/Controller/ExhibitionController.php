@@ -8,6 +8,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
+use AppBundle\Utils\CsvResponse;
+
+
 /**
  *
  */
@@ -36,6 +39,118 @@ extends CrudController
     }
 
 
+    /**
+     * @Route("/exhibition/csv", name="exhibition-csv")
+     */
+    public function indexToCsvAction(Request $request){
+        $route = $request->get('_route');
+
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb->select([
+            'E',
+            // 'COUNT(DISTINCT A.id) AS numArtistSort',
+            'COUNT(DISTINCT IE.id) AS numCatEntrySort',
+            "E.startdate HIDDEN dateSort",
+            "CONCAT(COALESCE(P.alternateName, P.name), E.startdate) HIDDEN placeSort"
+        ])
+            ->from('AppBundle:Exhibition', 'E')
+            ->leftJoin('E.location', 'L')
+            ->leftJoin('L.place', 'P')
+            // ->leftJoin('E.artists', 'A')
+            ->leftJoin('AppBundle:ItemExhibition', 'IE',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE.exhibition = E AND IE.title IS NOT NULL')
+            ->where('E.status <> -1')
+            ->groupBy('E.id')
+            ->orderBy('dateSort')
+        ;
+
+
+        $organizerTypes = $this->buildOrganizerTypes();
+        $form = $this->get('form.factory')->create(\AppBundle\Filter\ExhibitionFilterType::class, [
+            'country_choices' => array_flip($this->buildCountries()),
+            'organizer_type_choices' => array_combine($organizerTypes, $organizerTypes),
+            'ids' => range(0, 9999)
+        ]);
+
+
+
+        if ($request->query->has($form->getName())) {
+            // manually bind values from the request
+            $form->submit($request->query->get($form->getName()));
+
+            // build the query from the given form object
+            $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($form, $qb);
+        }
+
+
+        $countries = $form->get('country')->getData();
+        $organizerType = $form->get('organizer_type')->getData();
+        $stringQuery = $form->get('search')->getData();
+        $ids = $form->get('id')->getData();
+
+
+
+
+        // echo ($mapdata['bounds']);
+
+        $result = $qb->getQuery()->execute();
+
+
+        /*  CREATE DATABLE LIKE THE FRONTEND */
+
+
+        $csvResult = [];
+
+        foreach ($result as $value) {
+                $innerArray = [];
+
+                // echo ('  |   ');
+
+
+                // print_r( $value[0]->getStartdate() );
+                // echo '  |   ';
+                // print_r( $value[0]->getEnddate() );
+                // echo '  |   ';
+                // print_r( $value[0]->title );
+                // echo '  |   ';
+
+                $location = $value[0]->location;
+                $locationLabel = '';
+                $locationName = '';
+
+                if($location){
+                    $locationLabel = $value[0]->location->getPlaceLabel();
+                    $locationName = $value[0]->location->getName();
+                }
+
+                // print_r( $locationLabel );
+                // echo '  |   ';
+                // print_r( $locationName );
+                // echo '  |   ';
+                // print_r( $value['numCatEntrySort'] );
+                // echo '  |   ';
+                // print_r( $value[0]->getOrganizerType() );
+                // echo '  |   ';
+
+                array_push($innerArray, $value[0]->getStartdate(), $value[0]->getEnddate(), $value[0]->title, $locationLabel, $locationName, $value['numCatEntrySort'], $value[0]->getOrganizerType() );
+
+
+                array_push($csvResult, $innerArray);
+        }
+
+        // print_r($csvResult);
+
+        /* END DATATABLE CREATION LIKE FRONTEND */
+
+
+        $response = new CSVResponse( $csvResult, 200, explode( ', ', 'Startdate, Enddate, Title, City, Venue, # of Cat. Entries, type' ) );
+        $response->setFilename( "data.csv" );
+        return $response;
+    }
 
     /**
      * @Route("/exhibition", name="exhibition-index")
@@ -72,7 +187,11 @@ extends CrudController
         $form = $this->get('form.factory')->create(\AppBundle\Filter\ExhibitionFilterType::class, [
             'country_choices' => array_flip($this->buildCountries()),
             'organizer_type_choices' => array_combine($organizerTypes, $organizerTypes),
+            'ids' => range(0, 9999)
         ]);
+
+
+        // $formIds = $this->get('form.factory')->create(\AppBundle\Filter\ExhibitionFilterTypeIds::class, []);
 
 
 
@@ -85,12 +204,22 @@ extends CrudController
         }
 
 
+        /* if ($request->query->has($formIds->getName())) {
+            // manually bind values from the request
+            $formIds->submit($request->query->get($formIds->getName()));
+
+            // build the query from the given form object
+            $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($formIds, $qb);
+        }*/
+
+
+        // $ids = $formIds->get('id')->getData();
+
+
         $countries = $form->get('country')->getData();
         $organizerType = $form->get('organizer_type')->getData();
         $stringQuery = $form->get('search')->getData();
-
-
-
+        $ids = $form->get('id')->getData();
 
 
         $pagination = $this->buildPagination($request, $qb->getQuery(), [
@@ -103,14 +232,24 @@ extends CrudController
 
         $result = $qb->getQuery()->execute();
 
-        return $this->render('Exhibition/index.html.twig', [
+
+
+        // print_r($csvResult);
+
+        /* END DATATABLE CREATION LIKE FRONTEND */
+
+
+
+         return $this->render('Exhibition/index.html.twig', [
             'pageTitle' => $this->get('translator')->trans('Exhibitions'),
             'pagination' => $pagination,
             'form' => $form->createView(),
+            //'formIds'=> $formIds->createView(),
             'realData' => $result,
             'countryArray' => $this->buildCountries(),
             'organizerTypesArray' => $organizerTypes,
             'countries' => $countries,
+            'ids' => $ids,
             'organizerType' => $organizerType,
             'stringPart' => $stringQuery
         ]);
