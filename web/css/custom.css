@@ -213,6 +213,32 @@ tr {
     content: "\00a0 \00a0 \00a0 ↑";
 }
 
+.cat-entries-button{
+    cursor: pointer;
+    color: #1E6AA1;
+    border: 1px solid #1E6AA1;
+    padding: 5px;
+    margin-right: 10px;
+    border-radius: 4px;
+}
+
+.cat-entries-button.active{
+    color: white;
+    background-color: #1E6AA1;
+}
+
+.right-buttons{
+    float: right;
+}
+
+.catalogue-entries-data-management{
+    margin-top: 30px;
+}
+
+.entrytable-list-view_wrapper{
+    margin-top: 10px;
+}
+
 table.dataTable.dtr-inline.collapsed>tbody>tr[role="row"]>td:first-child:before, table.dataTable.dtr-inline.collapsed>tbody>tr[role="row"]>th:first-child:before {
     top: calc(50% - 6px )!important;
     left: 4px;
