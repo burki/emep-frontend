@@ -201,10 +201,10 @@
 
                 <tr dclass="listviewrow">
 
-                    <td>{{ helper.itemexhibition_detail(catalogueEntry) }}</td>
+                    <td>{{ catalogueEntry.getTitleFull }}</td>
                     <td><a href="{% if catalogueEntry.person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : catalogueEntry.person.ulan }) }}{% elseif catalogueEntry.person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : catalogueEntry.person.gnd }) }}{% else %}{{ path('person', { 'id' : catalogueEntry.person.id }) }}{% endif %}">{{ catalogueEntry.person.fullname(true) }}</a></td>
-                    <td>{{ catalogueEntry.price }}</td>
                     <td>{{ catalogueEntry.displaylocation }}</td>
+                    <td>{{ catalogueEntry.price }}</td>
                 </tr>
             {% endfor %}
             </tbody>
