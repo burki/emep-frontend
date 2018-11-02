@@ -1,0 +1,20 @@
+{% extends 'Base/base.html.twig' %}
+
+{% block body %}
+    <h2>Set a new Password for {{ username }}</h2>
+    {% if error %}
+        <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+    {% endif %}
+    {% form_theme form 'bootstrap_3_horizontal_layout.html.twig' %}
+
+    {{ form_start(form) }}
+        {{ form_row(form.plainPassword.first) }}
+        {{ form_row(form.plainPassword.second) }}
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit">Set new Password</button>
+            </div>
+        </div>
+    {{ form_end(form) }}
+{% endblock %}
