@@ -1,3 +1,23 @@
+<?php
+
+namespace AppBundle\Controller;
+
+use Symfony\Component\HttpFoundation\Request;
+
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+
+use Ifedko\DoctrineDbalPagination\ListBuilder;
+
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+
+use Pagerfanta\Pagerfanta;
+
+/**
+ *
+ */
+class SearchController
+extends Controller
+{
     const PAGE_SIZE = 50;
 
     static $entities = [
