@@ -83,10 +83,11 @@
             {% endif %}
             </dl>
 
-            {% if location.exhibitions is not empty or artists|length > 0 %}
+            {% if location.exhibitions is not empty or location.organizerOf is not empty or artists|length > 0 %}
             <!-- Nav tabs -->
             <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 1em">
-                <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">{{ 'Exhibitions'|trans }}</a></li>
+                {% if location.exhibitions is not empty %}<li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">{{ 'Exhibitions'|trans }}</a></li>{% endif %}
+                {% if location.organizerOf is not empty %}<li role="presentation"{% if location.exhibitions is empty %} class="active"{% endif %}><a href="#home" aria-controls="home" role="tab" data-toggle="tab">{{ 'Organized Exhibitions'|trans }}</a></li>{% endif %}
                 {% if artists|length > 0 %}<li role="presentation"><a href="#artists-pane" aria-controls="similar" role="tab" data-toggle="tab">{{ 'Artists'|trans }}</a></li>{% endif %}
             </ul>
             <div class="tab-content">
@@ -103,6 +104,20 @@
                 </ul>
                 </div><!-- .tab-pane -->
                 {% endif %}
+
+                {% if location.organizerOf is not empty %}
+                <div role="tabpanel" class="tab-pane active" id="home">
+                <h3>Organized Exhibitions</h3>
+                <ul class="list-group">
+                    {% for exhibition in location.organizerOf %}
+                    <li class="list-group-item">
+                        {{ helper.exhibition_period(exhibition) }}
+                        <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}"><b>{{ exhibition.title }}</b>{{ exhibition.titleAppend }}</a>{% if exhibitionStats[ exhibition.id ] is defined and exhibitionStats[exhibition.id].numCatEntrySort > 0 -%}, {{ exhibitionStats[exhibition.id].numCatEntrySort }} entr. by {{ exhibitionStats[exhibition.id].numPersonSort }} art.{% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+                </div><!-- .tab-pane -->
+            {% endif %}
 
                 {% if artists|length > 0 %}
                 <div role="tabpanel" class="tab-pane active" id="artists-pane">

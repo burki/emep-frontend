@@ -129,6 +129,14 @@
                 {% endif %}
                 </dd>
             {% endif %}
+            {% if exhibition.organizers is not empty %}
+                <dt>Organized by:</dt>
+                <dd>
+                    {% for organizer in exhibition.organizers %}
+                        <a href="{{ path('organizer', { 'id' : organizer.id }) }}">{{ organizer.name }}</a>{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                </dd>
+            {% endif %}
 
             {% if exhibition.organizingCommittee is not empty %}
                 <dt>Organizing Committee:</dt>
