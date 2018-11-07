@@ -114,7 +114,7 @@ extends Controller
                 readfile($fnameFull);
             }, Response::HTTP_OK, [
                 'Content-Type' => 'text/plain',
-                // 'Content-Disposition' => 'attachment; filename="' . $fname . '.gdf' . '"'
+                'Content-Disposition' => 'attachment; filename="' . $fname . '.gdf' . '"'
             ]
         );
     }
