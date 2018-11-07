@@ -53,15 +53,15 @@ extends Controller
         $fname = 'person';
 
         $fnameFull = realpath($exportPath) . DIRECTORY_SEPARATOR . $fname . '.gdf';
+        $fnameLock = realpath($exportPath) . DIRECTORY_SEPARATOR . $fname . '.lock';
 
         $regenerate = true;
+
         if (file_exists($fnameFull)) {
-            // TODO: check if stil current
             $regenerate = false;
         }
 
-        if ($regenerate) {
-            $fnameLock = realpath($exportPath) . DIRECTORY_SEPARATOR . $fname . '.lock';
+        if ($regenerate || file_exists($fnameLock)) {
             if (!file_exists($fnameLock)) {
                 $phpBin = self::getPhpBin();
 

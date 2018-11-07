@@ -129,7 +129,7 @@ extends ContainerAwareCommand
             ->where('P.status <> -1 AND E.status <> -1')
             ->groupBy('P.id') // for Count
             ->having('numExhibitionSort >= 2')
-            // ->orderBy('numExhibitionSort', 'DESC')
+            ->orderBy('numExhibitionSort', 'DESC')
             // ->setMaxResults(5)
             ;
 
