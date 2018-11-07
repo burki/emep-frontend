@@ -13,3 +13,5 @@ parameters:
     mailer.port: ~
     mailer.username: ~
     mailer.password: ~
+
+    # app.export.path: "%kernel.project_dir%/../site/htdocs/uploads/export" # default
