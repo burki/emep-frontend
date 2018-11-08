@@ -45,6 +45,18 @@ class Exhibition
     protected $location;
 
     /**
+     * @var ArrayCollection<Location> The organizer(s) of this exhibition.
+     *
+     * @ORM\ManyToMany(targetEntity="Location", inversedBy="organizerOf")
+     * @ORM\JoinTable(name="ExhibitionLocation",
+     *      joinColumns={@ORM\JoinColumn(name="id_exhibition", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="id_location", referencedColumnName="id")}
+     * )
+     * @ORM\OrderBy({"id" = "ASC"})
+     */
+    protected $organizers;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="startdate", type="string", nullable=true)
@@ -342,6 +354,11 @@ class Exhibition
     public function getOrganizerType()
     {
         return $this->organizerType;
+    }
+
+    public function getOrganizers()
+    {
+        return $this->organizers;
     }
 
     public function getOrganizingCommittee()

@@ -33,7 +33,7 @@
 {% endif %}
 
 
-
+{# legacy #}
 {% if exhibition.organizer is not empty %}
     <div class="artist-information-container">
         <div class="artist-information-label">Organized by:</div>
@@ -42,6 +42,18 @@
             {% if exhibition.organizerType is not empty %}
                 [{{ exhibition.organizerType }}]
             {% endif %}
+        </div>
+    </div>
+{% endif %}
+
+{# new #}
+{% if exhibition.organizers is not empty %}
+    <div class="artist-information-container">
+        <div class="artist-information-label">Organized by:</div>
+        <div class="artist-information-text">
+            {% for organizer in exhibition.organizers %}
+                <a href="{{ path('organizer', { 'id' : organizer.id }) }}">{{ organizer.name }}</a>{% if not loop.last %} / {% endif %}
+            {% endfor %}
         </div>
     </div>
 {% endif %}

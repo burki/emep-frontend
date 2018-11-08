@@ -183,6 +183,12 @@ implements \JsonSerializable, JsonLdSerializable
     protected $exhibitions;
 
     /**
+     * @ORM\ManyToMany(targetEntity="Exhibition", mappedBy="organizers")
+     * @ORM\OrderBy({"startdate" = "ASC"})
+     */
+    protected $organizerOf;
+
+    /**
      * Sets id.
      *
      * @param int $id
@@ -488,7 +494,24 @@ implements \JsonSerializable, JsonLdSerializable
         }
 
         return $this->exhibitions->filter(
-            function($entity) {
+            function ($entity) {
+               return -1 != $entity->getStatus();
+            }
+        );
+    }
+
+    /**
+     * Gets organized exhibitions.
+     *
+     */
+    public function getOrganizerOf()
+    {
+        if (is_null($this->organizerOf)) {
+            return null;
+        }
+
+        return $this->organizerOf->filter(
+            function ($entity) {
                return -1 != $entity->getStatus();
             }
         );
