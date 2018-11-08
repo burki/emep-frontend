@@ -85,8 +85,6 @@ extends CrudController
         $stringQuery = $form->get('search')->getData();
         $ids = $form->get('id')->getData();
 
-
-
         $result = $qb->getQuery()->execute();
 
         $csvResult = [];
@@ -96,14 +94,12 @@ extends CrudController
 
             $entry = $value[0];
 
-
-
-            array_push($innerArray, $entry->person->getFullname(true), $value['numBibitemSort'] );
+            array_push($innerArray, $entry->getName(), $value['numBibitemSort'] );
 
             array_push($csvResult, $innerArray);
         }
 
-        $response = new CSVResponse( $csvResult, 200, explode( ', ', 'Startdate, Enddate, Title, City, Venue, # of Cat. Entries, type' ) );
+        $response = new CSVResponse( $csvResult, 200, explode( ', ', 'Name, # of Catalogues' ) );
         $response->setFilename( "data.csv" );
         return $response;
     }
@@ -191,24 +187,15 @@ extends CrudController
             return $this->redirectToRoute('holder-index');
         }
 
-        $locale = $request->getLocale();
-        if (in_array($request->get('_route'), [ 'location-jsonld' ])) {
-            return new JsonLdResponse($person->jsonLdSerialize($locale));
-        }
-
-        $citeProc = $this->instantiateCiteProc($request->getLocale());
-
         $result = $holder->findBibitems($this->getDoctrine()->getManager());
 
         $csvResult = [];
 
-        foreach ($result as $key=>$value) {
+        foreach ($result as $key => $value) {
 
             $bibitem = $value[0];
 
             $innerArray = [];
-
-
 
             array_push($innerArray, $bibitem->getTitle(), $bibitem->getPublicationLocation(), $bibitem->getDatePublished());
 
@@ -217,6 +204,7 @@ extends CrudController
 
         $response = new CSVResponse( $csvResult, 200, explode( ', ', 'Startdate, Enddate, Title, City, Venue, # of Cat. Entries, type' ) );
         $response->setFilename( "data.csv" );
+
         return $response;
     }
 

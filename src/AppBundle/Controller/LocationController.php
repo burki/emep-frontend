@@ -355,6 +355,7 @@ extends CrudController
         $qb = $this->getDoctrine()
             ->getManager()
             ->createQueryBuilder();
+
         $qb->select([
             'E.id AS id',
             'COUNT(DISTINCT IE.id) AS numCatEntrySort',
@@ -379,12 +380,9 @@ extends CrudController
 
         $csvResult = [];
 
-        foreach ($result as $key=>$value) {
-
-            $exhibition = $value;
-
+        foreach ($result as $exhibition) {
             $innerArray = [];
-            array_push($innerArray, $exhibition->getStartdate(), $exhibition->getEnddate(), $exhibition->location->getPlaceLabel(), $exhibitionStats[$exhibition->getID()]->numCatEntrySort );
+            array_push($innerArray, $exhibition->getStartdate(), $exhibition->getEnddate(), $exhibition->getLocation()->getPlaceLabel(), $exhibitionStats[$exhibition->getId()]['numCatEntrySort'] );
 
             array_push($csvResult, $innerArray);
         }

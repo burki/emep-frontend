@@ -253,7 +253,7 @@
             $('.download-csv').on('click', function(){
                 var action = $('.exhibitionFilterForm').attr('action');
                 console.log('first action: ', action);
-                $('.exhibitionFilterForm').attr('action', '/exhibition/csv');
+                $('.exhibitionFilterForm').attr('action', '{{ path('exhibition-csv') }}');
                 $('.exhibitionFilterForm').submit();
                 // resetting action to old one
                 $('.exhibitionFilterForm').attr('action', action);
@@ -401,5 +401,3 @@
 
 
 {% endblock %}
-
-
