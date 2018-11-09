@@ -1,0 +1,63 @@
+{% extends 'Base/base.html.twig' %}
+
+{% import 'Shared/helper.html.twig' as helper %}
+
+{% block body %}
+    <h1>{{ pageTitle }}</h1>
+    <div class="row">
+        <div class="col-sm-12">
+            {% set entities =
+                {
+                    'ItemExhibition' : 'Catalogue Entries',
+                    'Exhibition' : 'Exhibitions',
+                    'Location' : 'Venues',
+                    'Person' : 'Artists',
+                }
+            %}
+            Display: {% for entity, label in entities %}
+                <a href="{{ path(app.request.get('_route'), { 'entity' : entity }) }}">{{ label }}</a>
+                {% if not loop.last%} | {% endif %}
+            {% endfor %}
+            <form action="{{ path(app.request.get('_route')) }}" method="GET">
+                <input type="hidden" name="entity" value="{{ listBuilder.entity }}" />
+                {% set filter = listBuilder.queryFilters %}
+                <input type="text" name="filter[search]" value="{{ filter.search }}" />
+                <input type="submit" value="Search" />
+            </form>
+            {% if pager.currentPageResults is not empty %}
+                {{ pager.currentPageOffsetStart }} - {{ pager.currentPageOffsetEnd }} of {{ pager.getNbResults() }}
+                <br />Export: <a href="{{ path(app.request.get('_route') ~ '-export') }}">Excel</a>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        {% for key, label in listBuilder.buildHeaderRow() %}
+                        <th>
+                            {% set sortInfo = listBuilder.sortInfo(key) %}
+                            {% if sortInfo is not empty %}
+                                <a href="{{ sortInfo.action }}"{% if sortInfo.active is not empty %} class="{{ sortInfo.active }}"{% endif %}>{{ label }}</a>
+                            {% else %}
+                                {{ label }}
+                            {% endif %}
+                        </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in pager.currentPageResults %}
+                    <tr>
+                        {% set rowValues = listBuilder.buildRow(row, 'html') %}
+                        {% for val in rowValues %}
+                        <td>{{ val|raw }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="pagerfanta">{{ pagerfanta(pager, 'twitter_bootstrap3', { 'omitFirstPage': true }) }}</div>
+            {% else %}
+                No matching entry. Please adjust your search.
+            {% endif %}
+        </div>
+    </div><!-- .row -->
+{% endblock %}
