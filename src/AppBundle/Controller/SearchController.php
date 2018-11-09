@@ -50,6 +50,8 @@ extends Controller
     {
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, true);
 
+        set_time_limit(5 * 60); // ItemExhibition is large
+
         $writer = \Box\Spout\Writer\WriterFactory::create(\Box\Spout\Common\Type::XLSX);
         $writer->openToBrowser($listBuilder->getEntity() . '.xlsx');
 
@@ -129,6 +131,7 @@ extends ListBuilder
         self::STATUS_EDIT => 'in progress',
         self::STATUS_COMPLETED => 'completed',
         self::STATUS_PROOFREAD => 'proof read',
+        self::STATUS_PENDINGIMG => 'pictures pending',
         self::STATUS_PUBLISHED => 'published',
     ];
 
@@ -375,7 +378,7 @@ extends ListBuilder
 class ItemExhibitionListBuilder
 extends SearchListBuilder
 {
-    var $entity = 'ItemExhibition';
+    protected $entity = 'ItemExhibition';
 
     var $rowDescr = [
         'person' => [
@@ -566,6 +569,15 @@ extends SearchListBuilder
                 'person' => [
                     'label' => 'Person',
                 ],
+                'lifespan' => [
+                    'label' => 'Life Span',
+                ],
+                'gender' => [
+                    'label' => 'Gender',
+                ],
+                'nationality' => [
+                    'label' => '(Preferred) Nationality',
+                ],
                 'catalogueId' => [
                     'label' => 'Cat.No.',
                 ],
@@ -574,6 +586,18 @@ extends SearchListBuilder
                 ],
                 'type' => [
                     'label' => 'Type',
+                ],
+                'displaydate' => [
+                    'label' => 'Creation Date',
+                ],
+                'owner' => [
+                    'label' => 'Owner',
+                ],
+                'forsale' => [
+                    'label' => 'For Sale',
+                ],
+                'price' => [
+                    'label' => 'Price',
                 ],
                 'exhibition' => [
                     'label' => 'Exhibition',
@@ -586,6 +610,12 @@ extends SearchListBuilder
                 ],
                 'location' => [
                     'label' => 'Venue',
+                ],
+                'organizers' => [
+                    'label' => 'Organizing Body',
+                ],
+                'organizer_type' => [
+                    'label' => 'Type of Organizing Body',
                 ],
             ];
         }
@@ -638,7 +668,7 @@ extends SearchListBuilder
             'P.id AS person_id',
             "CONCAT(IFNULL(YEAR(birthdate), ''), IF(deathdate IS NOT NULL, CONCAT('-', YEAR(deathdate)), '')) AS lifespan",
             'P.sex AS gender',
-            'P.country AS country',
+            'P.country AS nationality',
             'IE.catalogueId AS catalogueId',
             'IE.title AS title',
             'TypeTerm.name AS type',
@@ -657,7 +687,8 @@ extends SearchListBuilder
             'L.place AS place',
             'L.place_tgn AS place_tgn',
             'E.organizer_type AS organizer_type',
-            "GROUP_CONCAT(O.name ORDER BY EL.ord SEPARATOR '; ')",
+            "GROUP_CONCAT(O.name ORDER BY EL.ord SEPARATOR '; ') AS organizers",
+
             "1 AS status",
         ]);
 
@@ -689,7 +720,7 @@ extends SearchListBuilder
                                 'E.id_location=L.id AND L.status <> -1');
         $queryBuilder->leftJoin('E',
                                 'ExhibitionLocation', 'EL',
-                                'E.id=EL.id AND EL.role = 0');
+                                'E.id=EL.id_exhibition AND EL.role = 0');
         $queryBuilder->leftJoin('EL',
                                 'Location', 'O',
                                 'O.id=EL.id_location');
@@ -722,7 +753,7 @@ extends SearchListBuilder
 class ExhibitionListBuilder
 extends SearchListBuilder
 {
-    var $entity = 'Exhibition';
+    protected $entity = 'Exhibition';
 
     var $rowDescr = [
         'startdate' => [
@@ -892,6 +923,12 @@ extends SearchListBuilder
                 'count_person' => [
                     'label' => 'Number of Artists',
                 ],
+                'status' => [
+                    'label' => 'Status',
+                    'buildValue' => function (&$row, $val, $listBuilder, $key, $format) {
+                        return $this->formatRowValue($listBuilder->buildStatusLabel($val), [], $format);
+                    },
+                ],
             ];
         }
         else {
@@ -937,6 +974,7 @@ extends SearchListBuilder
             'L.place_tgn AS place_tgn',
             'L.name AS location',
             'L.id AS location_id',
+            'E.status AS status',
             'COUNT(DISTINCT IE.id) AS count_itemexhibition',
             'COUNT(DISTINCT IE.id_person) AS count_person',
         ]);
@@ -991,7 +1029,7 @@ extends SearchListBuilder
 class VenueListBuilder
 extends SearchListBuilder
 {
-    var $entity = 'Location';
+    protected $entity = 'Location';
 
     var $rowDescr = [
         'location' => [
@@ -1146,6 +1184,14 @@ extends SearchListBuilder
         };
     }
 
+    /**
+     * @override
+     */
+    public function getEntity()
+    {
+        return 'Venue';
+    }
+
     protected function setSelect($queryBuilder)
     {
         $queryBuilder->select([
@@ -1214,7 +1260,7 @@ extends SearchListBuilder
 class PersonListBuilder
 extends SearchListBuilder
 {
-    var $entity = 'Person';
+    protected $entity = 'Person';
 
     var $rowDescr = [
         'person' => [
@@ -1232,11 +1278,11 @@ extends SearchListBuilder
         'deathplace' => [
             'label' => 'Place of Death',
         ],
-        'nationality' => [
-            'label' => '(Primary) Nationality',
-        ],
         'gender' => [
             'label' => 'Gender',
+        ],
+        'nationality' => [
+            'label' => '(Preferred) Nationality',
         ],
         'count_exhibition' => [
             'label' => 'Number of Exhibitions',
@@ -1445,7 +1491,7 @@ extends SearchListBuilder
                 };
         }
 
-        $this->rowDescr['name']['buildValue'] = function (&$row, $val, $listBuilder, $key, $format) {
+        $this->rowDescr['person']['buildValue'] = function (&$row, $val, $listBuilder, $key, $format) {
             return $listBuilder->buildLinkedValue($val, 'person', [ 'id' => $row['id'] ], $format);
         };
 
