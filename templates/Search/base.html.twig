@@ -26,7 +26,7 @@
             </form>
             {% if pager.currentPageResults is not empty %}
                 {{ pager.currentPageOffsetStart }} - {{ pager.currentPageOffsetEnd }} of {{ pager.getNbResults() }}
-                <br />Export: <a href="{{ path(app.request.get('_route') ~ '-export') }}">Excel</a>
+                <br />Export: <a href="{{ path(app.request.get('_route') ~ '-export', app.request.query.all) }}">Excel</a>
             <table class="table table-striped">
                 <thead>
                     <tr>
