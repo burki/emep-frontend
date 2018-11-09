@@ -15,7 +15,7 @@
                 }
             %}
             Display: {% for entity, label in entities %}
-                <a href="{{ path(app.request.get('_route'), { 'entity' : entity }) }}">{{ label }}</a>
+                <a {% if entity == listBuilder.entity %} style="font-weight: bold"{% endif %} href="{{ path(app.request.get('_route'), { 'entity' : entity }) }}">{{ label }}</a>
                 {% if not loop.last%} | {% endif %}
             {% endfor %}
             <form action="{{ path(app.request.get('_route')) }}" method="GET">

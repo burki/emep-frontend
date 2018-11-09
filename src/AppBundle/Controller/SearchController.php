@@ -22,9 +22,9 @@ extends Controller
     const PAGE_SIZE = 50;
 
     static $entities = [
-        'Venue',
         'ItemExhibition',
         'Exhibition',
+        'Venue',
         'Person',
     ];
 
