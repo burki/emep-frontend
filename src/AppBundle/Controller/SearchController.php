@@ -87,7 +87,6 @@ extends Controller
                 return new VenueListBuilder($connection, $request, $urlGenerator, $extended);
                 break;
 
-
             case 'Person':
                 return new PersonListBuilder($connection, $request, $urlGenerator, $extended);
                 break;
