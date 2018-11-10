@@ -18,8 +18,10 @@ extends AbstractType
         $builder->add('search', TextType::class);
 
         // entity filters
-        $builder->add('person', PersonFilterType::class, $options);
+        $builder->add('catentry', ItemExhibitionFilterType::class, $options);
+        $builder->add('exhibition', ExhibitionFilterType::class, $options);
         $builder->add('location', LocationFilterType::class, $options);
+        $builder->add('person', PersonFilterType::class, $options);
 
         // submit
         $builder->add('submit', SubmitType::class, [

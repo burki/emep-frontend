@@ -58,6 +58,41 @@ extends CrudController
         return $countriesActive;
     }
 
+    /**
+     *
+     */
+    protected function buildItemExhibitionTypes()
+    {
+        $conn = $this->getDoctrine()->getEntityManager()->getConnection();
+
+        $queryBuilder = $conn->createQueryBuilder();
+        $queryBuilder->select('DISTINCT IE.type')
+            ->from('ItemExhibition', 'IE')
+            ->where('IE.type IS NOT NULL')
+            ;
+
+        $termIds = $queryBuilder->execute()->fetchAll(\PDO::FETCH_COLUMN);
+
+        $queryBuilder = $conn->createQueryBuilder();
+        $queryBuilder->select('T.id, T.name')
+            ->from('Term', 'T')
+            ->where('T.id IN (:ids)')
+            ->setParameter('ids', $termIds, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
+            ->orderBy('T.name')
+            ;
+
+        $types = [];
+
+        foreach ($queryBuilder->execute()->fetchAll() as $row)  {
+            if ('0_unknown' == $row['name']) {
+                continue;
+            }
+            $types[$row['id']] = $row['name'];
+        }
+
+        return $types;
+    }
+
     // TODO: share with ExhibitionController
     protected function buildVenueCountries()
     {
@@ -130,13 +165,20 @@ extends CrudController
         }
 
         $venueTypes = $this->buildVenueTypes();
+        $exhibitionTypes = [ 'group', 'solo', 'auction' ];
+        $organizerTypes = $this->buildOrganizerTypes();
+
         $this->form = $this->createForm(\AppBundle\Form\Type\SearchFilterType::class, [
             'choices' => [
                 'nationality' => array_flip($this->buildPersonNationalities()),
                 'location_country' => array_flip($this->buildVenueCountries()),
                 'location_type' => array_combine($venueTypes, $venueTypes),
+                'exhibition_type' => array_combine($exhibitionTypes, $exhibitionTypes),
+                'organizer_type' => array_combine($organizerTypes, $organizerTypes),
+                'itemexhibition_type' => array_flip($this->buildItemExhibitionTypes()),
             ],
         ]);
+
         $parameters = $request->query->all();
         if (array_key_exists('filter', $parameters)) {
             $this->form->submit($parameters['filter']);
@@ -425,13 +467,13 @@ extends ListBuilder
                 }
             }
 
-            foreach ([ 'birthdate', 'deathdate' ] as $key) {
+            foreach ([ 'birthdate' => 'P.birthdate', 'deathdate' => 'P.deathdate' ] as $key => $field) {
                 if (!empty($personFilters[$key]) && is_array($personFilters[$key])) {
                     foreach ([ 'from', 'until'] as $part) {
                         if (array_key_exists($part, $personFilters[$key])) {
                             $paramName = $key . '_' . $part;
                             $queryBuilder->andWhere(sprintf('YEAR(%s) %s %s',
-                                                            'P.' . $key,
+                                                            $field,
                                                             'from' == $part ? '>=' : '<',
                                                             ':' . $paramName))
                                 ->setParameter($paramName,
@@ -450,6 +492,45 @@ extends ListBuilder
                     $queryBuilder->andWhere(sprintf('%s = %s',
                                                     $field, ':' . $key))
                         ->setParameter($key, $locationFilters[$key]);
+                }
+            }
+        }
+
+        if (array_key_exists('exhibition', $this->queryFilters)) {
+            $exhibitionFilters = & $this->queryFilters['exhibition'];
+            foreach ([ 'type' => 'E.type', 'organizer_type' => 'E.organizer_type'  ] as $key => $field) {
+                if (!empty($exhibitionFilters[$key])) {
+                    $queryBuilder->andWhere(sprintf('%s = %s',
+                                                    $field, ':' . $key))
+                        ->setParameter($key, $exhibitionFilters[$key]);
+                }
+            }
+
+            foreach ([ 'date' => 'E.startdate' ] as $key => $field) {
+                if (!empty($exhibitionFilters[$key]) && is_array($exhibitionFilters[$key])) {
+                    foreach ([ 'from', 'until' ] as $part) {
+                        if (array_key_exists($part, $exhibitionFilters[$key])) {
+                            $paramName = $key . '_' . $part;
+                            $queryBuilder->andWhere(sprintf('YEAR(%s) %s %s',
+                                                            $field,
+                                                            'from' == $part ? '>=' : '<',
+                                                            ':' . $paramName))
+                                ->setParameter($paramName,
+                                               intval($exhibitionFilters[$key][$part])
+                                               + ('until' == $part ? 1 : 0));
+                        }
+                    }
+                }
+            }
+        }
+
+        if (array_key_exists('catentry', $this->queryFilters)) {
+            $itemExhibitionFilters = & $this->queryFilters['catentry'];
+            foreach ([ 'type' => 'IE.type', 'forsale' => 'IE.forsale' ] as $key => $field) {
+                if (!empty($itemExhibitionFilters[$key])) {
+                    $queryBuilder->andWhere(sprintf('%s = %s',
+                                                    $field, ':' . $key))
+                        ->setParameter($key, $itemExhibitionFilters[$key]);
                 }
             }
         }

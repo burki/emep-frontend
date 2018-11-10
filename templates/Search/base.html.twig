@@ -45,8 +45,28 @@
 
                 {% block filters %}
                 {% form_theme form 'bootstrap_3_horizontal_layout.html.twig' %}
+                <div id="filter-panel-catentry" class="collapse filter-panel">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Filter by Catalogue Entry</div>
+                        <div class="panel-body">
+                            {{ form_row(form.catentry.type) }}
+                            {{ form_row(form.catentry.forsale) }}
+                        </div>
+                    </div>
+                </div>
+                <div id="filter-panel-exhibition" class="collapse filter-panel">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Filter by Exhibition</div>
+                        <div class="panel-body">
+                            {{ form_row(form.exhibition.date) }}
+                            {{ form_row(form.exhibition.type) }}
+                            {{ form_row(form.exhibition.organizer_type) }}
+                        </div>
+                    </div>
+                </div>
                 <div id="filter-panel-venue" class="collapse filter-panel">
                     <div class="panel panel-default">
+                        <div class="panel-heading">Filter by Venue</div>
                         <div class="panel-body">
                             {{ form_row(form.location.type) }}
                             {{ form_row(form.location.country) }}
@@ -55,6 +75,7 @@
                 </div>
                 <div id="filter-panel-person" class="collapse filter-panel">
                     <div class="panel panel-default">
+                        <div class="panel-heading">Filter by Artist</div>
                         <div class="panel-body">
                             {{ form_row(form.person.gender) }}
                             {{ form_row(form.person.nationality) }}
@@ -66,6 +87,14 @@
 
                 <div>
                     Filter by:
+
+                    <button type="button" class="btn" data-toggle="collapse" data-target="#filter-panel-catentry">
+                        <span class="glyphicon glyphicon-cog"></span> Cat. Entry
+                    </button>
+
+                    <button type="button" class="btn" data-toggle="collapse" data-target="#filter-panel-exhibition">
+                        <span class="glyphicon glyphicon-cog"></span> Exhibition
+                    </button>
 
                     <button type="button" class="btn" data-toggle="collapse" data-target="#filter-panel-venue">
                         <span class="glyphicon glyphicon-cog"></span> Venue
