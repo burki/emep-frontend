@@ -2,6 +2,25 @@
 
 {% import 'Shared/helper.html.twig' as helper %}
 
+{% block head %}
+    <script>
+    $(document).ready(function($){
+        // Remove empty fields from GET forms
+        // Author: Bill Erickson
+        // URL: http://www.billerickson.net/code/hide-empty-fields-get-form/
+
+        // Change 'form' to class or ID of your specific form
+        $("form").submit(function() {
+            $(this).find(":input").filter(function(){ return !this.value; }).attr("disabled", "disabled");
+            return true; // ensure form still submits
+        });
+
+        // Un-disable form fields when page loads, in case they click back after submission
+        $( "form" ).find( ":input" ).prop( "disabled", false );
+    });
+    </script>
+{% endblock %}
+
 {% block body %}
     <h1>{{ pageTitle }}</h1>
     <div class="row">
@@ -22,7 +41,41 @@
                 <input type="hidden" name="entity" value="{{ listBuilder.entity }}" />
                 {% set filter = listBuilder.queryFilters %}
                 <input type="text" name="filter[search]" value="{{ filter.search }}" />
-                <input type="submit" value="Search" />
+                {{ form_widget(form.submit) }}
+
+                {% block filters %}
+                {% form_theme form 'bootstrap_3_horizontal_layout.html.twig' %}
+                <div id="filter-panel-venue" class="collapse filter-panel">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            {{ form_row(form.location.type) }}
+                            {{ form_row(form.location.country) }}
+                        </div>
+                    </div>
+                </div>
+                <div id="filter-panel-person" class="collapse filter-panel">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            {{ form_row(form.person.gender) }}
+                            {{ form_row(form.person.nationality) }}
+                            {{ form_row(form.person.birthdate) }}
+                            {{ form_row(form.person.deathdate) }}
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    Filter by:
+
+                    <button type="button" class="btn" data-toggle="collapse" data-target="#filter-panel-venue">
+                        <span class="glyphicon glyphicon-cog"></span> Venue
+                    </button>
+
+                    <button type="button" class="btn" data-toggle="collapse" data-target="#filter-panel-person">
+                        <span class="glyphicon glyphicon-cog"></span> Artist
+                    </button>
+                </div>
+                {% endblock %}
             </form>
             {% if pager.currentPageResults is not empty %}
                 {{ pager.currentPageOffsetStart }} - {{ pager.currentPageOffsetEnd }} of {{ pager.getNbResults() }}

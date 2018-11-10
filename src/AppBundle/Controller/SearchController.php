@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Intl\Intl;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -17,7 +18,7 @@ use Pagerfanta\Pagerfanta;
  *
  */
 class SearchController
-extends Controller
+extends CrudController
 {
     const PAGE_SIZE = 50;
 
@@ -27,6 +28,54 @@ extends Controller
         'Venue',
         'Person',
     ];
+
+    /**
+     * TODO: move into a shared trait
+     */
+    protected function buildPersonNationalities()
+    {
+        $qb = $this->getDoctrine()
+                ->getManager()
+                ->createQueryBuilder();
+
+        $qb->select([
+                'P.nationality',
+            ])
+            ->distinct()
+            ->from('AppBundle:Person', 'P')
+            ->where('P.status <> -1 AND P.nationality IS NOT NULL')
+            ;
+
+        $countriesActive = [];
+
+        foreach ($qb->getQuery()->getResult() as $result) {
+            $countryCode = $result['nationality'];
+            $countriesActive[$countryCode] = Intl::getRegionBundle()->getCountryName($countryCode);
+        }
+
+        asort($countriesActive);
+
+        return $countriesActive;
+    }
+
+    // TODO: share with ExhibitionController
+    protected function buildVenueCountries()
+    {
+        $qb = $this->getDoctrine()
+                ->getManager()
+                ->createQueryBuilder();
+
+        $qb->select([
+                'P.countryCode',
+            ])
+            ->distinct()
+            ->from('AppBundle:Location', 'L')
+            ->leftJoin('L.place', 'P')
+            ->where('L.status <> -1 AND 0 = BIT_AND(L.flags, 256) AND P.countryCode IS NOT NULL')
+            ;
+
+        return $this->buildActiveCountries($qb);
+    }
 
     /**
      * @Route("/search", name="search")
@@ -80,22 +129,36 @@ extends Controller
             $entity = self::$entities[0];
         }
 
+        $venueTypes = $this->buildVenueTypes();
+        $this->form = $this->createForm(\AppBundle\Form\Type\SearchFilterType::class, [
+            'choices' => [
+                'nationality' => array_flip($this->buildPersonNationalities()),
+                'location_country' => array_flip($this->buildVenueCountries()),
+                'location_type' => array_combine($venueTypes, $venueTypes),
+            ],
+        ]);
+        $parameters = $request->query->all();
+        if (array_key_exists('filter', $parameters)) {
+            $this->form->submit($parameters['filter']);
+        }
+        $filters = $this->form->getData();
+
         switch ($entity) {
             case 'Exhibition':
-                return new ExhibitionListBuilder($connection, $request, $urlGenerator, $extended);
+                return new ExhibitionListBuilder($connection, $request, $urlGenerator, $filters, $extended);
                 break;
 
             case 'Venue':
-                return new VenueListBuilder($connection, $request, $urlGenerator, $extended);
+                return new VenueListBuilder($connection, $request, $urlGenerator, $filters, $extended);
                 break;
 
             case 'Person':
-                return new PersonListBuilder($connection, $request, $urlGenerator, $extended);
+                return new PersonListBuilder($connection, $request, $urlGenerator, $filters, $extended);
                 break;
 
             case 'ItemExhibition':
             default:
-                return new ItemExhibitionListBuilder($connection, $request, $urlGenerator, $extended);
+                return new ItemExhibitionListBuilder($connection, $request, $urlGenerator, $filters, $extended);
         }
     }
 
@@ -110,6 +173,7 @@ extends Controller
             'pageTitle' => $this->get('translator')->trans('Advanced Search'),
             'pager' => $pager,
             'listBuilder' => $listBuilder,
+            'form' => $this->form->createView(),
         ]);
     }
 }
@@ -135,6 +199,28 @@ extends ListBuilder
         self::STATUS_PUBLISHED => 'published',
     ];
 
+    /**
+     * Remove any elements where the callback returns true
+     *
+     * @param  array    $array    the array to walk
+     * @param  callable $callback callback takes ($value, $key, $userdata)
+     * @param  mixed    $userdata additional data passed to the callback.
+     * @return array
+     */
+    static function array_walk_recursive_delete(array &$array, callable $callback, $userdata = null)
+    {
+        foreach ($array as $key => &$value) {
+            if (is_array($value)) {
+                $value = self::array_walk_recursive_delete($value, $callback, $userdata);
+            }
+            if ($callback($value, $key, $userdata)) {
+                unset($array[$key]);
+            }
+        }
+
+        return $array;
+    }
+
     var $request = null;
     var $urlGenerator = null;
     var $orders = [];
@@ -142,15 +228,34 @@ extends ListBuilder
 
     public function __construct(\Doctrine\DBAL\Connection $connection,
                                 Request $request,
-                                UrlGeneratorInterface $urlGenerator)
+                                UrlGeneratorInterface $urlGenerator,
+                                $queryFilters = null)
     {
         parent::__construct($connection);
 
         $this->request = $request;
         $this->urlGenerator = $urlGenerator;
 
-        $queryFilters = $this->request->get('filter');
+        if (is_null($queryFilters)) {
+            $queryFilters = $this->request->get('filter');
+        }
+
         if (!empty($queryFilters) && is_array($queryFilters)) {
+            self::array_walk_recursive_delete($queryFilters, function ($val) {
+                if (is_null($val)) {
+                    return true;
+                }
+
+                if (is_array($val)) {
+                    return empty($val);
+                }
+                else if (is_string($val)) {
+                    return '' === trim($val);
+                }
+
+                return false;
+            });
+
             $this->queryFilters = $queryFilters;
         }
     }
@@ -303,6 +408,48 @@ extends ListBuilder
                 }
                 foreach ($condition['andWhere'] as $andWhere) {
                     $queryBuilder->andWhere($andWhere);
+                }
+            }
+        }
+    }
+
+    protected function addQueryFilters($queryBuilder)
+    {
+        if (array_key_exists('person', $this->queryFilters)) {
+            $personFilters = & $this->queryFilters['person'];
+            foreach ([ 'gender' => 'P.sex', 'nationality' => 'P.country' ] as $key => $field) {
+                if (!empty($personFilters[$key])) {
+                    $queryBuilder->andWhere(sprintf('%s = %s',
+                                                    $field, ':' . $key))
+                        ->setParameter($key, $personFilters[$key]);
+                }
+            }
+
+            foreach ([ 'birthdate', 'deathdate' ] as $key) {
+                if (!empty($personFilters[$key]) && is_array($personFilters[$key])) {
+                    foreach ([ 'from', 'until'] as $part) {
+                        if (array_key_exists($part, $personFilters[$key])) {
+                            $paramName = $key . '_' . $part;
+                            $queryBuilder->andWhere(sprintf('YEAR(%s) %s %s',
+                                                            'P.' . $key,
+                                                            'from' == $part ? '>=' : '<',
+                                                            ':' . $paramName))
+                                ->setParameter($paramName,
+                                               intval($personFilters[$key][$part])
+                                               + ('until' == $part ? 1 : 0));
+                        }
+                    }
+                }
+            }
+        }
+
+        if (array_key_exists('location', $this->queryFilters)) {
+            $locationFilters = & $this->queryFilters['location'];
+            foreach ([ 'type' => 'L.type', 'country' => 'PL.country_code' ] as $key => $field) {
+                if (!empty($locationFilters[$key])) {
+                    $queryBuilder->andWhere(sprintf('%s = %s',
+                                                    $field, ':' . $key))
+                        ->setParameter($key, $locationFilters[$key]);
                 }
             }
         }
@@ -557,9 +704,10 @@ extends SearchListBuilder
     public function __construct(\Doctrine\DBAL\Connection $connection,
                                 Request $request,
                                 UrlGeneratorInterface $urlGenerator,
+                                $queryFilters = null,
                                 $extended = false)
     {
-        parent::__construct($connection, $request, $urlGenerator);
+        parent::__construct($connection, $request, $urlGenerator, $queryFilters);
 
         if ($extended) {
             $this->rowDescr = [
@@ -718,6 +866,9 @@ extends SearchListBuilder
         $queryBuilder->leftJoin('E',
                                 'Location', 'L',
                                 'E.id_location=L.id AND L.status <> -1');
+        $queryBuilder->leftJoin('L',
+                                'Geoname', 'PL',
+                                'L.place_tgn=PL.tgn');
         $queryBuilder->leftJoin('E',
                                 'ExhibitionLocation', 'EL',
                                 'E.id=EL.id_exhibition AND EL.role = 0');
@@ -730,8 +881,8 @@ extends SearchListBuilder
 
     protected function setFilter($queryBuilder)
     {
-        // default is not to show other media
-        $queryBuilder->andWhere('IE.title IS NOT NULL');
+        // we show other media but not anonymous links to work
+        $queryBuilder->andWhere('IE.title IS NOT NULL OR IE.id_item IS NULL');
 
         $this->addSearchFilters($queryBuilder, [
             'IE.title',
@@ -745,6 +896,8 @@ extends SearchListBuilder
             'L.name',
             'L.place',
         ]);
+
+        $this->addQueryFilters($queryBuilder);
 
         return $this;
     }
@@ -887,9 +1040,10 @@ extends SearchListBuilder
     public function __construct(\Doctrine\DBAL\Connection $connection,
                                 Request $request,
                                 UrlGeneratorInterface $urlGenerator,
+                                $queryFilters = null,
                                 $extended = false)
     {
-        parent::__construct($connection, $request, $urlGenerator);
+        parent::__construct($connection, $request, $urlGenerator, $queryFilters);
 
         if ($extended) {
             $this->rowDescr = [
@@ -995,16 +1149,27 @@ extends SearchListBuilder
 
         $queryBuilder->leftJoin('E',
                                 'ItemExhibition', 'IE',
-                                'E.id=IE.id_exhibition' /* AND IE.title IS NOT NULL' */);
+                                'E.id=IE.id_exhibition AND (IE.title IS NOT NULL OR IE.id_item IS NULL)');
         $queryBuilder->leftJoin('E',
                                 'Location', 'L',
                                 'E.id_location=L.id AND L.status <> -1');
+        $queryBuilder->leftJoin('L',
+                                'Geoname', 'PL',
+                                'L.place_tgn=PL.tgn');
         $queryBuilder->leftJoin('E',
                                 'ExhibitionLocation', 'EL',
                                 'E.id=EL.id AND EL.role = 0');
         $queryBuilder->leftJoin('EL',
                                 'Location', 'O',
                                 'O.id=EL.id_location');
+
+        if (array_key_exists('person', $this->queryFilters)) {
+            // so we can filter on P.*
+            $queryBuilder->join('IE',
+                                    'Person', 'P',
+                                    'P.id=IE.id_person AND P.status <> -1');
+        }
+
         return $this;
     }
 
@@ -1021,6 +1186,8 @@ extends SearchListBuilder
             'L.name',
             'L.place',
         ]);
+
+        $this->addQueryFilters($queryBuilder);
 
         return $this;
     }
@@ -1123,9 +1290,10 @@ extends SearchListBuilder
     public function __construct(\Doctrine\DBAL\Connection $connection,
                                 Request $request,
                                 UrlGeneratorInterface $urlGenerator,
+                                $queryFilters = null,
                                 $extended = false)
     {
-        parent::__construct($connection, $request, $urlGenerator);
+        parent::__construct($connection, $request, $urlGenerator, $queryFilters);
 
         if ($extended) {
             $this->rowDescr = [
@@ -1234,7 +1402,14 @@ extends SearchListBuilder
 
         $queryBuilder->leftJoin('E',
                                 'ItemExhibition', 'IE',
-                                'E.id=IE.id_exhibition' /* AND IE.title IS NOT NULL' */);
+                                'E.id=IE.id_exhibition AND (IE.title IS NOT NULL OR IE.id_item IS NULL)');
+
+        if (array_key_exists('person', $this->queryFilters)) {
+            // so we can filter on P.*
+            $queryBuilder->join('IE',
+                                    'Person', 'P',
+                                    'P.id=IE.id_person AND P.status <> -1');
+        }
 
         return $this;
     }
@@ -1252,6 +1427,8 @@ extends SearchListBuilder
             'L.ulan',
             'L.place',
         ]);
+
+        $this->addQueryFilters($queryBuilder);
 
         return $this;
     }
@@ -1430,9 +1607,10 @@ extends SearchListBuilder
     public function __construct(\Doctrine\DBAL\Connection $connection,
                                 Request $request,
                                 UrlGeneratorInterface $urlGenerator,
+                                $queryFilters = null,
                                 $extended = false)
     {
-        parent::__construct($connection, $request, $urlGenerator);
+        parent::__construct($connection, $request, $urlGenerator, $queryFilters);
 
         if ($extended) {
             $this->rowDescr = [
@@ -1546,7 +1724,24 @@ extends SearchListBuilder
 
         $queryBuilder->leftJoin('P',
                                 'ItemExhibition', 'IE',
-                                'IE.id_person=P.id' /* AND IE.title IS NOT NULL' */);
+                                'IE.id_person=P.id AND (IE.title IS NOT NULL OR IE.id_item IS NULL)');
+
+        if (array_key_exists('exhibition', $this->queryFilters) || array_key_exists('location', $this->queryFilters)) {
+            // so we can filter on E.*
+            $queryBuilder->leftJoin('IE',
+                                    'Exhibition', 'E',
+                                    'E.id=IE.id_exhibition AND (IE.title IS NOT NULL OR IE.id_item IS NULL)');
+
+            if (array_key_exists('location', $this->queryFilters)) {
+                // so we can filter on E.*
+                $queryBuilder->leftJoin('E',
+                                        'Location', 'L',
+                                        'E.id_location=L.id AND L.status <> -1');
+                $queryBuilder->leftJoin('L',
+                                        'Geoname', 'PL',
+                                        'L.place_tgn=PL.tgn');
+            }
+        }
 
         return $this;
     }
@@ -1566,6 +1761,8 @@ extends SearchListBuilder
             'P.birthplace',
             'P.deathplace',
         ]);
+
+        $this->addQueryFilters($queryBuilder);
 
         return $this;
     }
