@@ -157,6 +157,8 @@ extends CrudController
                 "L.name HIDDEN nameSort",
                 'COUNT(DISTINCT E.id) AS numExhibitionSort',
                 'COUNT(DISTINCT IE.id) AS numCatEntrySort',
+                "P.name HIDDEN placeSort",
+                "L.type HIDDEN typeSort"
             ])
             ->from('AppBundle:Location', 'L')
             ->leftJoin('L.place', 'P')

@@ -161,7 +161,8 @@ extends CrudController
                 'P',
                 'COUNT(DISTINCT E.id) AS numExhibitionSort',
                 'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-                "P.sortName HIDDEN nameSort"
+                "P.sortName HIDDEN nameSort",
+
             ])
             ->from('AppBundle:Person', 'P')
             ->leftJoin('P.exhibitions', 'E')
@@ -222,6 +223,10 @@ extends CrudController
             // 'defaultSortFieldName' => 'nameSort', 'defaultSortDirection' => 'asc',
         ]);
 
+
+        $artists = $qb->getQuery()->getResult();
+        $indexDataNumberCountries = $this->indexDataNumberCountries($artists);
+
         return $this->render('Person/index.html.twig', [
             'pageTitle' => $this->get('translator')->trans('Artists'),
             'pagination' => $pagination,
@@ -239,8 +244,62 @@ extends CrudController
             'deathDate' => $deathDate,
             'birthDate' => $birthDate,
             'exhibitionCountries' => $exhibitionCountries,
-            'organizerTypesQuery' => $organizerTypesQuery
+            'organizerTypesQuery' => $organizerTypesQuery,
+            'indexDataNumberCountries' => $indexDataNumberCountries,
+            'artists' => $artists
         ]);
+    }
+
+
+    public function indexDataNumberCountries($artists)
+    {
+        //$exhibitions = $location->getExhibitions();
+
+        $nationalities = [];
+
+        foreach ($artists as $artist) {
+
+            //print count($entries);
+            //print '   ';
+
+            $currNat = (string) $artist[0]->getNationality() == '' ? 'unknown' : $artist[0]->getNationality() ;
+
+            array_push($nationalities, (string) $currNat );
+
+        }
+
+        $nationalitiesTotal = array_count_values ( $nationalities );
+
+        //$exhibitionPlacesArray = array_keys($exhibitionPlaces);
+
+        // print_r($exhibitionPlacesArray);
+
+        $nationalitiesOnly = ( array_keys($nationalitiesTotal) );
+        $valuesOnly =  array_values( $nationalitiesTotal );
+
+
+        $sumOfAllNationalities= array_sum(array_values($nationalitiesTotal));
+
+        $i = 0;
+        $finalDataJson = '[';
+
+        foreach ($nationalitiesOnly as $place){
+
+            $i > 0 ? $finalDataJson .= ", " : "";
+
+            $numberOfNationalities = $valuesOnly[$i] ;
+
+            $finalDataJson .= '{ name: "' .$place. '", y: '. $numberOfNationalities . '} ';
+            $i += 1;
+        }
+        $finalDataJson .= ']';
+
+
+
+        $returnArray = [$finalDataJson, $sumOfAllNationalities];
+
+
+        return $returnArray;
     }
 
 

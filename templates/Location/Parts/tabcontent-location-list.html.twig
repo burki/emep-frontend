@@ -31,8 +31,8 @@
             <thead>
             <tr class="listviewheading">
                 <th>{{ helper.pagination_sortable(pagination, 'Name', 'nameSort') }}</th>
-                <th>{{ helper.pagination_sortable(pagination, 'Place', 'countryPlaceNameSort') }}</th>
-                <th>type</th>
+                <th>{{ helper.pagination_sortable(pagination, 'Place', 'placeSort') }}</th>
+                <th>{{ helper.pagination_sortable(pagination, 'Type', 'typeSort') }}</th>
                 <th>{{ helper.pagination_sortable(pagination, 'Number of Exhibitions', 'numExhibitionSort', 'desc') }}</th>
                 <th>{{ helper.pagination_sortable(pagination, 'Number of Cat. Entries', 'numCatEntrySort', 'desc') }}</th>
             </tr>
@@ -43,7 +43,11 @@
             {% set last_countryCode = '' %}
 
             {% for row in pagination %}
+
+
                 {% set location = row[0] %}
+
+
                 {% set place = location.place %}
                 {# <ul class="list-unstyled"> #}
                 {% if 'nameSort' == sortField %}
@@ -95,6 +99,7 @@
                     </td>
 
                     <td class="normal">
+
                         {{ helper.place_linked(place) }}
                     </td>
 
