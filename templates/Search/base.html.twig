@@ -137,10 +137,18 @@
                 </div>
                 {% endblock %}
             </form>
+            <div>
+                {% if 'search-map' == app.request.get('_route') %}
+                <a href="{{ path('search', app.request.query.all) }}">Show List</a> |
+                {% elseif 'Person' == listBuilder.entity %}
+                <a href="{{ path('search-map', app.request.query.all) }}">Show Map</a> |
+                {% endif %}
+                <a href="{{ path('search-export', app.request.query.all) }}">Export Excel</a>
+            </div>
+
+            {% block content %}
             {% if pager.currentPageResults is not empty %}
                 {{ pager.currentPageOffsetStart }} - {{ pager.currentPageOffsetEnd }} of {{ pager.getNbResults() }}
-                <br />
-                Export: <a href="{{ path('search-export', app.request.query.all) }}">Excel</a>
             <table class="table table-striped">
                 <thead>
                     <tr>
@@ -172,6 +180,7 @@
             {% else %}
                 No matching entry. Please adjust your search.
             {% endif %}
+            {% endblock %}
         </div>
     </div><!-- .row -->
 {% endblock %}
