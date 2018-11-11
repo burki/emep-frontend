@@ -1,0 +1,12 @@
+K	K	Austro-Hungarian Krone
+BEC	fr	Belgian Franc
+FRF	F	French Franc
+Mk	M	German Goldmark
+GBP	s	Great Britain Pound (in Shilling)
+ITL	L	Italian Lira
+NLG	fl	Netherlands Guilder
+RUB	RUB	Russian Imperial Ruble
+ESP	Pta	Spanish Peseta
+SEK	kr	Swedish Krona
+CHF	SFr.	Swiss Franc
+USD	$	United States Dollar

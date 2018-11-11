@@ -739,6 +739,38 @@ extends ListBuilder
         return htmlspecialchars($val, ENT_COMPAT, 'utf-8');
     }
 
+    protected function formatPrice($val, $currency)
+    {
+        static $currencies = null;
+
+        if (empty($val) || empty($currency)) {
+            return $currency;
+        }
+
+        if (is_null($currencies)) {
+            $currencies = [];
+
+            $fpath = realpath(__DIR__ . '/../Resources/currencies.txt');
+            if (false !== $fpath) {
+                $lines = file($fpath);
+                $col_name = 2;
+
+                foreach ($lines as $line) {
+                    $line = chop($line);
+                    $parts = preg_split('/\t/', $line);
+                    if (!empty($parts[0])) {
+                        $currencies[$parts[0]] = $parts[1];
+                    }
+                }
+            }
+        }
+
+        $symbol = array_key_exists($currency, $currencies)
+            ? $currencies[$currency] : $currency;
+
+        return $symbol . "\xC2\xA0" . $val;
+    }
+
     public function buildRow($row, $format = 'plain')
     {
         $ret = [];
@@ -988,6 +1020,12 @@ extends SearchListBuilder
                 ],
                 'price' => [
                     'label' => 'Price',
+                    'buildValue' => function (&$row, $val, $listBuilder, $key, $format) {
+                        if (!empty($val)) {
+                            return $this->formatRowValue($this->formatPrice($val, $row['currency']),
+                                                         [], $format);
+                        }
+                    },
                 ],
                 'exhibition' => [
                     'label' => 'Exhibition',
@@ -1066,6 +1104,7 @@ extends SearchListBuilder
             'IE.owner AS owner',
             'IE.forsale AS forsale',
             'IE.price AS price',
+            'E.currency AS currency',
             "E.title AS exhibition",
             "E.id AS exhibition_id",
             'DATE(E.startdate) AS startdate',
