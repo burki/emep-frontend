@@ -2,6 +2,8 @@
 {% import 'Shared/map-leaflet.html.twig' as map %}
 
 {% block head %}
+    {{ parent() }}
+
     {{ map.head() }}
     {{ map.head_markercluster() }}
     {{ map.head_heatmap() }}
