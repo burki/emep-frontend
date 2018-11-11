@@ -276,8 +276,44 @@ extends Controller
             . " ORDER BY start_year, start_month"
         ;
 
-        //print $querystr;
 
+        $nationalitySubquery = " ";
+
+        if(!empty($artistNationalities)){
+
+            $nationalitySubquery = " WHERE ( ";
+            $count = 0;
+            foreach($artistNationalities as $nationality){
+                if($count !== 0){
+                    $nationalitySubquery .= " OR ";
+                }
+                $nationalitySubquery .= " Person.country = '". $nationality ."' ";
+                $count = $count + 1;
+            }
+
+            //$nationalityquery .= " WHERE ( Person.country = 'BE' OR Person.country = 'CZ' ) ";
+
+            $nationalitySubquery .= " ) ";
+        }
+
+        $querystr = "SELECT YEAR(startdate) AS start_year, MONTH(startdate) AS start_month, COUNT(DISTINCT EArtist.exhId) AS how_many 
+                        FROM (
+                            Select Exhibition.id as exhId, Exhibition.id_location as id_location, Exhibition.status as status, Exhibition.startdate as startdate 
+                            FROM Exhibition
+                            LEFT JOIN ItemExhibition ON ItemExhibition.id_exhibition = Exhibition.id 
+                            LEFT JOIN Person ON Person.id = ItemExhibition.id_person 
+                            " . $nationalitySubquery . "
+                            GROUP BY Exhibition.id
+                            ORDER BY Exhibition.id, Person.id 
+                                ) as EArtist 
+                        
+                        WHERE EArtist.status <> -1 AND MONTH(startdate) <> 0 
+                        GROUP BY start_year, MONTH(startdate) 
+                        ORDER BY start_year, start_month";
+
+
+
+        
         //->andWhere("Pl.countryCode IN(${countryQueryString})")
 
 
@@ -1661,6 +1697,18 @@ EOT;
 
 
     // controller is called by /exhibition route to load async the stats
+
+    /**
+     * @param $countriesQuery
+     * @param $organizerTypeQuery
+     * @param $stringQuery
+     * @param array $currIds
+     * @param string $artistGender
+     * @param array $artistNationalities
+     * @param string $exhibitionStartDateLeft
+     * @param string $exhibitionStartDateRight
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     function exhibitionNationalityIndex($countriesQuery, $organizerTypeQuery, $stringQuery, $currIds = [], $artistGender = "", $artistNationalities = [], $exhibitionStartDateLeft = 'any', $exhibitionStartDateRight = 'any'){
 
 
@@ -1669,7 +1717,7 @@ EOT;
         $countryQueryString .= $this->getStringQueryForExhibitions($stringQuery, 'short');
 
 
-        $queryStringArtistCountry = $this->getStringQueryForPersonsInExhibitions($artistNationalities, 'nationality', 'short');
+        // $queryStringArtistCountry = $this->getStringQueryForPersonsInExhibitions($artistNationalities, 'nationality', 'short');
 
 
         if(!empty($artistGender)){
@@ -1716,39 +1764,11 @@ EOT;
             ->groupBy('E.id');
 
 
-        print 'test';
         $resultInner = $qbInner->getQuery()->getResult();
-        print_r(count($resultInner));
+        // print_r(count($resultInner));
 
 
         $qb->select([
-            'P.id',
-            'P.nationality',
-            'Pl.countryCode',
-            'COUNT(DISTINCT IE.id) AS numEntries',
-            'C.name'
-        ])
-            ->from($qbInner->getQuery()->getSQL(), 'ExhibitionsWithArtist')
-            ->leftJoin('E.location', 'L')
-            ->leftJoin('L.place', 'Pl')
-            ->leftJoin('Pl.country', 'C')
-            //->leftJoin('L.place', 'Person')
-            // ->leftJoin('E.artists', 'A')
-            ->leftJoin('AppBundle:ItemExhibition', 'IE',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = ExhibitionsWithArtist.exhId AND IE.title IS NOT NULL')
-            ->leftJoin('AppBundle:Person', 'P',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'P = IE.person')
-            ->where('E.status <> -1')
-            ->where('L.status <> -1')
-            ->andWhere("${countryQueryString}")
-            ->groupBy('P.id')
-            ->orderBy('C.name', 'DESC')
-        ;
-
-
-        /*$qb->select([
             'P.id',
             'P.nationality',
             'Pl.countryCode',
@@ -1772,20 +1792,17 @@ EOT;
             ->andWhere("${countryQueryString}")
             ->groupBy('P.id')
             ->orderBy('C.name', 'DESC')
-        ;*/
+        ;
 
         // TODO SQL QUERY SHOULD NOT FILTER ALL ARTISTS BUT THE EXHIBITIONS WHERE ARTSIST FROM THIS COUNTRIES ARE
 
-        $lastCountry = '';
-        print 'what up';
-
-        print $qb->getQuery()->getSQL();
 
         $result = $qb->getQuery()->getResult();
 
         $statsByCountry = [];
         $statsByNationality = [];
         foreach ($result as $row) {
+
             $cc = $row['countryCode'];
             if (array_key_exists($cc, self::$countryMap)) {
                 $cc = self::$countryMap[$cc];
@@ -1837,6 +1854,7 @@ EOT;
 
         $countries = array_keys($statsByCountry);
 
+
         uksort($nationalities, function ($idxA, $idxB) use ($countries, $nationalities) {
             if ('XX' == $idxA) {
                 $a = 0;
@@ -1861,6 +1879,9 @@ EOT;
             return ($a < $b) ? 1 : -1;
         });
 
+
+
+
         $maxNationality = 16;
         $xCategories = array_keys($nationalities);
         if (count($xCategories) > $maxNationality) {
@@ -1872,35 +1893,64 @@ EOT;
         $valuesFinal = [];
         $y = 0;
         foreach ($statsByCountry as $cc => $stats) {
-            $values = [];
-            foreach ($stats['countByNationality'] as $nationality => $counts) {
-                $x = array_search('XX' === $nationality ? 'unknown' : $nationality, $xCategories);
-                if (false === $x) {
-                    $x = array_search('other', $xCategories);
-                }
-                if (false !== $x) {
-                    $percentage = 100.0 * $counts[$key] / $stats['totalItemExhibition'];
-                    $valuesFinal[] = [
-                        'x' => $x,
-                        'y' => $y,
-                        'value' => $percentage,
-                        'total' => $counts[$key],
-                    ];
-                }
-                // $values[$nationality] = $counts[$key];
-            }
-            /*
-            arsort($values);
 
-            $valuesFinal[$cc] = array_map(function ($idx) use ($values) {
-                                        return [
-                                            'name' => $idx,
-                                            'y' => $values[$idx],
-                                        ];
-                                     },
-                                     array_keys($values));
-            */
-            $y++;
+
+            //print_r($stats['countByNationality']);
+
+            $doAnyOfTheArtistCountriesExist = 1; // if 0 --> this dataset will be jumped
+
+
+
+            // checking if any of the nationalites exist
+
+            if(!empty($artistNationalities)){
+
+                // reseting the filtering
+                $doAnyOfTheArtistCountriesExist = 0;
+                foreach($artistNationalities as $nationality){
+
+                    in_array($nationality, array_keys($stats['countByNationality']) ) ? $doAnyOfTheArtistCountriesExist = 1 : '';
+                }
+            }
+
+
+            if($doAnyOfTheArtistCountriesExist)
+            {
+                $values = [];
+                foreach ($stats['countByNationality'] as $nationality => $counts) {
+                    $x = array_search('XX' === $nationality ? 'unknown' : $nationality, $xCategories);
+                    if (false === $x) {
+                        $x = array_search('other', $xCategories);
+                    }
+                    if (false !== $x) {
+                        $percentage = 100.0 * $counts[$key] / $stats['totalItemExhibition'];
+                        $valuesFinal[] = [
+                            'x' => $x,
+                            'y' => $y,
+                            'value' => $percentage,
+                            'total' => $counts[$key],
+                        ];
+                    }
+                    // $values[$nationality] = $counts[$key];
+                }
+                /*
+                arsort($values);
+
+                $valuesFinal[$cc] = array_map(function ($idx) use ($values) {
+                                            return [
+                                                'name' => $idx,
+                                                'y' => $values[$idx],
+                                            ];
+                                         },
+                                         array_keys($values));
+                */
+
+                $y++;
+            }
+
+
+
+
         }
         // var_dump($valuesFinal);
 
