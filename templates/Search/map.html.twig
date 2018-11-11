@@ -120,7 +120,7 @@
         for (var i = 0; i < addressPoints.length; i++) {
             var a = addressPoints[i];
             var title = a[2];
-            var count = a[4] + a[5];
+            var count = a[4] + (a.length > 5 ? a[5] : 0);
 
             if ('circle' === markerStyle || 'pie' == markerStyle) {
                 var radius = 6;
@@ -140,6 +140,9 @@
                     };
                     marker = L.circleMarker(L.latLng(a[0], a[1]), markerProperties);
 
+                    marker.bindTooltip(title + ' (' + a[4] + ')',
+                       { className: 'my-tooltip'});
+
                 }
                 else {
                     // pie
@@ -151,10 +154,10 @@
                         data: [ a[4], a[5] ]
                     };
                     var marker = L.minichart(L.latLng(a[0], a[1]), markerProperties);
-                }
 
-                marker.bindTooltip(title + ' (' + a[4] + '/' + a[5] + ')',
-                                   { className: 'my-tooltip'});
+                    marker.bindTooltip(title + ' (' + a[4] + '/' + a[5] + ')',
+                                       { className: 'my-tooltip'});
+                }
             }
             else {
                 var marker = L.marker(L.latLng(a[0], a[1]),

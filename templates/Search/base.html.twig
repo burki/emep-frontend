@@ -46,7 +46,7 @@
                     {% set params = { 'entity' : entity } %}
                 {% else %}
                     {# so we keep active filters #}
-                    {% set params = app.request.query.all | merge({ 'entity' : entity }) %}
+                    {% set params = app.request.query.all | merge({ 'entity' : entity, 'page' : 1 }) %}
                 {% endif %}
                 <a {% if active %} style="font-weight: bold"{% endif %} href="{{ path(app.request.get('_route'), params) }}">{{ label }}</a>
                 {% if not loop.last%} | {% endif %}
@@ -140,7 +140,7 @@
             <div>
                 {% if 'search-map' == app.request.get('_route') %}
                 <a href="{{ path('search', app.request.query.all) }}">Show List</a> |
-                {% elseif 'Person' == listBuilder.entity %}
+                {% elseif 'Person' == listBuilder.entity or 'Venue' == listBuilder.entity %}
                 <a href="{{ path('search-map', app.request.query.all) }}">Show Map</a> |
                 {% endif %}
                 <a href="{{ path('search-export', app.request.query.all) }}">Export Excel</a>

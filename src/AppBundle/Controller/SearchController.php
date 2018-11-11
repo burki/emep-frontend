@@ -248,6 +248,15 @@ extends CrudController
         exit;
     }
 
+    /* TODO: move to shared helper */
+    private function buildDisplayDate ($row) {
+        if (!empty($row['displaydate'])) {
+            return $row['displaydate'];
+        }
+
+        return \AppBundle\Utils\Formatter::daterangeIncomplete($row['startdate'], $row['enddate']);
+    }
+
     /**
      * @Route("/search/map", name="search-map")
      */
@@ -256,7 +265,7 @@ extends CrudController
                               UserInterface $user = null)
     {
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, true);
-        if ($listBuilder->getEntity() != 'Person') {
+        if (!in_array($entity = $listBuilder->getEntity(), [ 'Venue', 'Person'])) {
             $routeParams = [
                 'entity' => $listBuilder->getEntity(),
                 'filter' => $listBuilder->getQueryFilters(),
@@ -268,21 +277,117 @@ extends CrudController
         $query = $listBuilder->query();
         // echo($query->getSQL());
 
+        $maxDisplay = 'Person' == $entity ? 15 : 10;
+
         $stmt = $query->execute();
 
-        $values = [];
-        while ($row = $stmt->fetch()) {
-            foreach ([ 'birth', 'death'] as $type) {
-                $latitude = $row[$type . 'place_latitude'];
-                $longitude = $row[$type . 'place_longitude'];
+        if ('Person' == $entity) {
+            $values = [];
+            while ($row = $stmt->fetch()) {
+                foreach ([ 'birth', 'death'] as $type) {
+                    $latitude = $row[$type . 'place_latitude'];
+                    $longitude = $row[$type . 'place_longitude'];
 
-                if (is_null($latitude) || is_null($longitude)
-                    || ($latitude == 0 && $longitude == 0))
-                {
-                    continue;
+                    if (is_null($latitude) || is_null($longitude)
+                        || ($latitude == 0 && $longitude == 0))
+                    {
+                        continue;
+                    }
+
+                    $key = $latitude . ':' . $longitude;
+
+                    if (!array_key_exists($key, $values)) {
+                        $values[$key]  = [
+                            'latitude' => (double)$latitude,
+                            'longitude' => (double)$longitude,
+                            'place' => sprintf('<a href="%s">%s</a>',
+                                               htmlspecialchars($this->generateUrl('place-by-tgn', [
+                                                    'tgn' => $row[$type . 'place_tgn'],
+                                               ])),
+                                               htmlspecialchars($row[$type . 'place'])),
+                            'persons' => [],
+                            'person_ids' => [ 'birth' => [], 'death' => [] ],
+                        ];
+                    }
+
+                    if (!in_array($row['person_id'], $values[$key]['person_ids']['birth'])
+                        && !in_array($row['person_id'], $values[$key]['person_ids']['death']))
+                    {
+                        $values[$key]['persons'][] = [
+                            'id' => $row['person_id'],
+                            'label' => sprintf('<a href="%s">%s</a>',
+                                               htmlspecialchars($this->generateUrl('person', [
+                                                   'id' => $row['person_id'],
+                                               ])),
+                                               htmlspecialchars($row['person'], ENT_COMPAT, 'utf-8')),
+                        ];
+                    }
+
+                    $values[$key]['person_ids'][$type][] = $row['person_id'];
+                }
+            }
+
+            // display
+            $values_final = [];
+            $max_count = 0;
+
+            foreach ($values as $key => $value) {
+                $idsByType = & $values[$key]['person_ids'];
+
+                $buildRow = function ($entry) use ($idsByType) {
+                    $ret = $entry['label'];
+
+                    $append = '';
+                    if (in_array($entry['id'], $idsByType['birth'])) {
+                        $append .= '*';
+                    }
+                    if (in_array($entry['id'], $idsByType['death'])) {
+                        $append .= '+';
+                    }
+
+                    return $ret . ('' !== $append ? ' ' . $append : '');
+                };
+
+                $count_entries = count($value['persons']);
+
+                if ($count_entries <= $maxDisplay) {
+                    $entry_list = implode('<br />', array_map($buildRow, $value['persons']));
+                }
+                else {
+                    $entry_list = implode('<br />', array_map($buildRow, array_slice($value['persons'], 0, $maxDisplay - 1)))
+                                . sprintf('<br />... (%d more)', $count_entries - $maxDisplay);
                 }
 
-                $key = $latitude . ':' . $longitude;
+                $values_final[] = [
+                    $value['latitude'], $value['longitude'],
+                    $value['place'],
+                    $entry_list,
+                    $count_birth = count($value['person_ids']['birth']),
+                    $count_death = count($value['person_ids']['death'])
+                ];
+
+                if (($count = $count_birth + $count_death) > $max_count) {
+                    $max_count = $count;
+                }
+            }
+        }
+        else {
+            // Venue
+            $values = [];
+            $values_country = [];
+            while ($row = $stmt->fetch()) {
+                if (empty($row['location_geo']) && $row['longitude'] == 0 && $row['latitude'] == 0) {
+                    continue;
+                }
+                $key = $row['latitude'] . ':' . $row['longitude'];
+                if (!empty($row['location_geo'])) {
+                    list($latitude, $longitude) = preg_split('/\s*,\s*/', $row['location_geo'], 2);
+                    $key = $latitude . ':' . $longitude;
+                }
+                else {
+                    $latitude = $row['latitude'];
+                    $longitude = $row['longitude'];
+                }
 
                 if (!array_key_exists($key, $values)) {
                     $values[$key]  = [
@@ -290,74 +395,56 @@ extends CrudController
                         'longitude' => (double)$longitude,
                         'place' => sprintf('<a href="%s">%s</a>',
                                            htmlspecialchars($this->generateUrl('place-by-tgn', [
-                                                'tgn' => $row[$type . 'place_tgn'],
+                                                'tgn' => $row['place_tgn'],
                                            ])),
-                                           htmlspecialchars($row[$type . 'place'])),
-                        'persons' => [],
-                        'person_ids' => [ 'birth' => [], 'death' => [] ],
+                                           htmlspecialchars($row['place'])),
+                        'exhibitions' => [],
                     ];
                 }
 
-                if (!in_array($row['person_id'], $values[$key]['person_ids']['birth'])
-                    && !in_array($row['person_id'], $values[$key]['person_ids']['death']))
-                {
-                    $values[$key]['persons'][] = [
-                        'id' => $row['person_id'],
-                        'label' => sprintf('<a href="%s">%s</a>',
-                                           htmlspecialchars($this->generateUrl('person', [
-                                               'id' => $row['person_id'],
-                                           ])),
-                                           htmlspecialchars($row['person'], ENT_COMPAT, 'utf-8')),
-                    ];
+                if ('Venue' == $entity) {
+                    $values[$key]['exhibitions'][] =
+                        sprintf('<a href="%s">%s</a>',
+                                htmlspecialchars($this->generateUrl('location', [
+                                    'id' => $row['location_id'],
+                                ])),
+                                htmlspecialchars($row['location'])
+                        );
                 }
-
-                $values[$key]['person_ids'][$type][] = $row['person_id'];
-            }
-        }
-
-        // display
-        $maxDisplay = 15; // for person
-
-        $values_final = [];
-        $max_count = 0;
-
-        foreach ($values as $key => $value) {
-            $idsByType = & $values[$key]['person_ids'];
-
-            $buildRow = function ($entry) use ($idsByType) {
-                $ret = $entry['label'];
-
-                $append = '';
-                if (in_array($entry['id'], $idsByType['birth'])) {
-                    $append .= '*';
+                /*
+                else if ('place-map' != $route) {
+                    $values[$key]['exhibitions'][] =
+                        sprintf('<a href="%s">%s</a> at <a href="%s">%s</a> (%s)',
+                                htmlspecialchars($this->generateUrl('exhibition', [
+                                    'id' => $row['exhibition_id'],
+                                ])),
+                                htmlspecialchars($row['title']),
+                                htmlspecialchars($this->generateUrl('location', [
+                                    'id' => $row['location_id'],
+                                ])),
+                                htmlspecialchars($row['location_name']),
+                                $this->buildDisplayDate($row)
+                        );
                 }
-                if (in_array($entry['id'], $idsByType['death'])) {
-                    $append .= '+';
-                }
-
-                return $ret . ('' !== $append ? ' ' . $append : '');
-            };
-
-            $count_entries = count($value['persons']);
-
-            if ($count_entries <= $maxDisplay) {
-                $entry_list = implode('<br />', array_map($buildRow, $value['persons']));
-            }
-            else {
-                $entry_list = implode('<br />', array_map($buildRow, array_slice($value['persons'], 0, $maxDisplay - 1)))
-                            . sprintf('<br />... (%d more)', $count_entries - $maxDisplay);
+                */
             }
 
-            $values_final[] = [
-                $value['latitude'], $value['longitude'],
-                $value['place'],
-                $entry_list,
-                $count_birth = count($value['person_ids']['birth']),
-                $count_death = count($value['person_ids']['death'])
-            ];
-
-            if (($count = $count_birth + $count_death) > $max_count) {
-                $max_count = $count;
+            $values_final = [];
+            foreach ($values as $key => $value) {
+                $count_entries = count($value['exhibitions']);
+                if ($count_entries <= $maxDisplay) {
+                    $entry_list = implode('<br />', $value['exhibitions']);
+                }
+                else {
+                    $entry_list = implode('<br />', array_slice($value['exhibitions'], 0, $maxDisplay - 1))
+                                . sprintf('<br />... (%d more)', $count_entries - $maxDisplay);
+                }
+                $values_final[] = [
+                    $value['latitude'], $value['longitude'],
+                    $value['place'],
+                    $entry_list,
+                    count($value['exhibitions']),
+                ];
             }
         }
 
@@ -365,10 +452,10 @@ extends CrudController
             'pageTitle' => 'Advanced Search',
             'subTitle' => 'Birth and Death Places',
             'data' => json_encode($values_final),
-            'disableClusteringAtZoom' => 7,
-            'maxCount' => $max_count,
-            'showHeatMap' => true,
-            'markerStyle' => 'pie', // 'circle' is other option
+            'disableClusteringAtZoom' => 'Person' == $entity ? 7 : 5,
+            'maxCount' => isset($max_count) ? $max_count : null,
+            'showHeatMap' => 'Person' == $entity,
+            'markerStyle' => 'Person' == $entity ? 'pie' : 'circle', // 'circle' is other option
             'bounds' => [
                 [ 60, -120 ],
                 [ -15, 120 ],
@@ -378,6 +465,7 @@ extends CrudController
             'form' => $this->form->createView(),
             'searches' => $this->lookupSearches($user),
         ]);
+
     }
 
     protected function instantiateListBuilder(Request $request,
@@ -1786,6 +1874,8 @@ extends SearchListBuilder
             'L.gnd AS gnd', 'L.ulan AS ulan',
             'L.type AS type',
             'L.status AS status',
+            'L.place_geo',
+            'PL.latitude', 'PL.longitude',
             'COUNT(DISTINCT IE.id) AS count_itemexhibition',
             '(SELECT COUNT(*) FROM Exhibition EC WHERE EC.id_location=L.id AND EC.status <> -1) AS count_exhibition',
         ]);
