@@ -38,6 +38,21 @@ extends AbstractType
             */
             'required' => false,
         ]);
+
+        $builder->add('price_available', ChoiceType::class, [
+            'label' => 'Price available',
+            // 'multiple' => true,
+            'choices' => [
+                '- all - ' => '',
+                'yes' => 'Y',
+            ],
+            /*
+            'attr' => [
+                'data-placeholder' => '- all - ',
+            ],
+            */
+            'required' => false,
+        ]);
     }
 
     public function getBlockPrefix()

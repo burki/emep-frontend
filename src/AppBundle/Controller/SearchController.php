@@ -690,6 +690,10 @@ extends ListBuilder
                         ->setParameter($key, $itemExhibitionFilters[$key]);
                 }
             }
+
+            if (!empty($itemExhibitionFilters['price_available'])) {
+                $queryBuilder->andWhere('IE.price IS NOT NULL');
+            }
         }
     }
 
