@@ -59,22 +59,33 @@ extends CrudController
             ->from('AppBundle:Exhibition', 'E')
             ->leftJoin('E.location', 'L')
             ->leftJoin('L.place', 'P')
+            //->leftJoin('L.place', 'Person')
             // ->leftJoin('E.artists', 'A')
             ->leftJoin('AppBundle:ItemExhibition', 'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'IE.exhibition = E AND IE.title IS NOT NULL')
+            ->leftJoin('AppBundle:Person', 'Person',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'Person = IE.person')
             ->where('E.status <> -1')
             ->groupBy('E.id')
             ->orderBy('dateSort')
         ;
 
 
+        $leftYear = 1905;
+        $rightYear = 1915;
+
         $organizerTypes = $this->buildOrganizerTypes();
         $form = $this->get('form.factory')->create(\AppBundle\Filter\ExhibitionFilterType::class, [
             'country_choices' => array_flip($this->buildCountries()),
             'organizer_type_choices' => array_combine($organizerTypes, $organizerTypes),
-            'ids' => range(0, 9999)
+            'ids' => range(0, 9999),
+            'years' => [$leftYear, $rightYear]
         ]);
+
+
+        // $formIds = $this->get('form.factory')->create(\AppBundle\Filter\ExhibitionFilterTypeIds::class, []);
 
 
 
@@ -85,13 +96,6 @@ extends CrudController
             // build the query from the given form object
             $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($form, $qb);
         }
-
-
-        $countries = $form->get('country')->getData();
-        $organizerType = $form->get('organizer_type')->getData();
-        $stringQuery = $form->get('search')->getData();
-        $ids = $form->get('id')->getData();
-
 
 
 
@@ -173,21 +177,29 @@ extends CrudController
             ->from('AppBundle:Exhibition', 'E')
             ->leftJoin('E.location', 'L')
             ->leftJoin('L.place', 'P')
+            //->leftJoin('L.place', 'Person')
             // ->leftJoin('E.artists', 'A')
             ->leftJoin('AppBundle:ItemExhibition', 'IE',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'IE.exhibition = E AND IE.title IS NOT NULL')
+            ->leftJoin('AppBundle:Person', 'Person',
+                        \Doctrine\ORM\Query\Expr\Join::WITH,
+                       'Person = IE.person')
             ->where('E.status <> -1')
             ->groupBy('E.id')
             ->orderBy('dateSort')
             ;
 
 
+        $leftYear = 1905;
+        $rightYear = 1915;
+
         $organizerTypes = $this->buildOrganizerTypes();
         $form = $this->get('form.factory')->create(\AppBundle\Filter\ExhibitionFilterType::class, [
             'country_choices' => array_flip($this->buildCountries()),
             'organizer_type_choices' => array_combine($organizerTypes, $organizerTypes),
-            'ids' => range(0, 9999)
+            'ids' => range(0, 9999),
+            'years' => [$leftYear, $rightYear]
         ]);
 
 
@@ -204,22 +216,14 @@ extends CrudController
         }
 
 
-        /* if ($request->query->has($formIds->getName())) {
-            // manually bind values from the request
-            $formIds->submit($request->query->get($formIds->getName()));
-
-            // build the query from the given form object
-            $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($formIds, $qb);
-        }*/
-
-
-        // $ids = $formIds->get('id')->getData();
-
 
         $countries = $form->get('country')->getData();
         $organizerType = $form->get('organizer_type')->getData();
         $stringQuery = $form->get('search')->getData();
         $ids = $form->get('id')->getData();
+        $artistGender = $form->get('gender')->getData();
+        $artistNationalities = $form->get('nationality')->getData();
+        $exhibitionStartDate = $form->get('startdate')->getData();
 
 
         $pagination = $this->buildPagination($request, $qb->getQuery(), [
@@ -227,7 +231,6 @@ extends CrudController
             // helper.pagination_sortable()
             // 'defaultSortFieldName' => 'dateSort', 'defaultSortDirection' => 'asc',
         ]);
-
 
 
         $result = $qb->getQuery()->execute();
@@ -244,7 +247,12 @@ extends CrudController
             'countries' => $countries,
             'ids' => $ids,
             'organizerType' => $organizerType,
-            'stringPart' => $stringQuery
+            'stringPart' => $stringQuery,
+             'minStartYear' => $leftYear,
+             'maxStartYear' => $rightYear,
+             'artistGender' => $artistGender,
+            'artistNationalities' => $artistNationalities,
+            'exhibitionStartDate' => $exhibitionStartDate
         ]);
     }
 
@@ -633,6 +641,7 @@ extends CrudController
             'catalogueEntries' => $catalogueEntries,
             'showWorks' => !empty($_SESSION['user']),
             'similar' => $this->findSimilar($exhibition),
+            'currentPageId' => $id,
             'pageMeta' => [
                 /*
                 'jsonLd' => $exhibition->jsonLdSerialize($locale),

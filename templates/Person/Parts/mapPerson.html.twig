@@ -44,7 +44,11 @@
             var actions = L.featureGroup([
                 {% for exhibition in person.exhibitions %}
                 {% set exhPlace = exhibition.location.geo %}
-                    {% if exhPlace is not empty %}
+                {% if exhPlace is empty %}
+                    {% set exhPlace = exhibition.location.place.geo %}
+                {% endif %}
+
+                {% if exhPlace is not empty %}
                         L.marker([{{ exhPlace }}], { icon: greenIcon }).bindPopup('<strong>exhibition:</strong> <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">{{ exhibition.title }}</a>'),
                     {% endif %}
                 {% endfor %}

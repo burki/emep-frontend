@@ -44,6 +44,40 @@
     background-color: #eaeaea;
 }
 
+/* ADVANCED CUSTOM SEARCH */
+
+.filters-heading{
+    width: 100%;
+}
+
+.filters-heading{
+    display: inline-flex;
+}
+
+#advancedFilterType{
+    min-width: 250px;
+    margin-right: 4rem;
+    font-weight: normal;
+}
+
+.advanced-ftilers-container{
+    width: 100%;
+    display: inline-flex;
+}
+
+.advanced-filters-title{
+    width: 85px;
+    pointer: cursor;
+    color: #165E99;
+    text-decoration: underline;
+}
+
+.advanced-filters-startDateRangeExhibition, .advanced-filters-birthDateRangeArtist, .advanced-filters-deathDateRangeArtist {
+    min-width: 300px;
+    width: 100%;
+    margin-left: 4rem;
+
+}
 
 /* ADVANCED SEARCH */
 .advanced-search-settings{
@@ -85,7 +119,7 @@ a:hover {
 }
 
 .w-container {
-    width: 85vw;
+    width: 90vw;
     max-width: 2000px;
 }
 

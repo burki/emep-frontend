@@ -7,7 +7,7 @@
     <script src="{{ app.request.basepath }}/js/highchart_custom_theme.js"></script>
 
 
-    {{ render_hinclude(controller('AppBundle\\Controller\\ExhibitionController::statsActionDetail', {id: 1085}), {'default': 'Loading...'}) }}
+    {{ render_hinclude(controller('AppBundle\\Controller\\ExhibitionController::statsActionDetail', {id: currentPageId}), {'default': 'Loading...'}) }}
 
 
 </div>

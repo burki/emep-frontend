@@ -266,13 +266,18 @@ extends CrudController
 
         $place = ($qb->getQuery()->execute());
 
+        $bibitems = $holder->findBibitems($this->getDoctrine()->getManager());
+
+        $dataNumberOfItemType = $this->detailDataNumberOfItemType($bibitems);
+
 
         return $this->render('Holder/detail.html.twig', [
             'place' => $place[0],
             'pageTitle' => $holder->getName(),
             'holder' => $holder,
-            'bibitems' => $holder->findBibitems($this->getDoctrine()->getManager()),
+            'bibitems' => $bibitems,
             'citeProc' => $citeProc,
+            'dataNumberOfItemType' => $dataNumberOfItemType,
             'pageMeta' => [
                 /*
                 'jsonLd' => $exhibition->jsonLdSerialize($locale),
@@ -282,4 +287,59 @@ extends CrudController
             ],
         ]);
     }
+
+    public function detailDataNumberOfItemType($bibitems){
+
+        $exhibitionPlaces = [];
+        // publicationLocation
+
+
+        foreach ($bibitems as $bibi){
+
+            // print_r( $exhibition->getLocation()->getPlace()->getCountryCode() );
+
+            //print date('Y', strtotime($exhibition->getStartDate())) ;
+
+
+            array_push($exhibitionPlaces, (string) $bibi[0]->getItemType() );
+        }
+
+
+
+        $exhibitionPlacesTotal = array_count_values ( $exhibitionPlaces );
+
+        //$exhibitionPlacesArray = array_keys($exhibitionPlaces);
+
+        // print_r($exhibitionPlacesArray);
+
+        $placesOnly = ( array_keys($exhibitionPlacesTotal) );
+        $valuesOnly =  array_values( $exhibitionPlacesTotal );
+
+
+        $sumOfAllExhibitions = array_sum(array_values($exhibitionPlacesTotal));
+
+        $i = 0;
+        $finalDataJson = '[';
+
+        foreach ($placesOnly as $place){
+
+            $i > 0 ? $finalDataJson .= ", " : "";
+
+            $numberOfExhibitions = $valuesOnly[$i] ;
+
+            $finalDataJson .= "{ name: '${place}', y: ${numberOfExhibitions} } ";
+            $i += 1;
+        }
+        $finalDataJson .= ']';
+
+
+
+        $returnArray = [$finalDataJson, $sumOfAllExhibitions];
+
+
+        return $returnArray;
+    }
+
+
+
 }

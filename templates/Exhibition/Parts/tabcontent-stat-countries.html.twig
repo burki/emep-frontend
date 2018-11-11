@@ -26,8 +26,14 @@
     {% endif %}
 
 
-    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::exhibitionNationalityIndex', { countriesQuery: countriesQuery, organizerTypeQuery: organizerTypeQuery, stringQuery: stringQuery, currIds: ids }), {'default': 'Loading... <br/>'}) }}
-    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::exhibitionByMonthIndex', {countriesQuery: countriesQuery, organizerTypeQuery: organizerTypeQuery, stringQuery: stringQuery, currIds: ids }), {'default': 'Loading... <br/>'}) }}
+    {% if exhibitionStartDate['left_date'] %}
+        {% set exhibitionStartDateLeft = exhibitionStartDate['left_date']|date('Y-m-d') %}
+        {% set exhibitionStartDateRight = exhibitionStartDate['right_date']|date('Y-m-d') %}
+    {% endif %}
+
+
+    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::exhibitionNationalityIndex', { countriesQuery: countriesQuery, organizerTypeQuery: organizerTypeQuery, stringQuery: stringQuery, currIds: ids, artistGender:artistGender, artistNationalities:artistNationalities, exhibitionStartDateLeft:exhibitionStartDateLeft, exhibitionStartDateRight: exhibitionStartDateRight }), {'default': 'Loading... <br/>'}) }}
+    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::exhibitionByMonthIndex', {countriesQuery: countriesQuery, organizerTypeQuery: organizerTypeQuery, stringQuery: stringQuery, currIds: ids, artistGender:artistGender, artistNationalities:artistNationalities, exhibitionStartDateLeft:exhibitionStartDateLeft, exhibitionStartDateRight: exhibitionStartDateRight }), {'default': 'Loading... <br/>'}) }}
 
 
 </div>

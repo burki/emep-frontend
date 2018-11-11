@@ -27,5 +27,23 @@
         {% set stringQuery = stringPart %}
     {% endif %}
 
-    {{ render_hinclude(controller('AppBundle\\Controller\\MapController::birthDeathPlacesIndex', {countriesQuery: countriesQuery, genderQuery: genderQuery, stringQuery: stringQuery, currIds: ids}), {'default': 'Loading...'}) }}
+    {% set artistBirthDateLeft = 'any' %}
+    {% set artistBirthDateRight = 'any' %}
+
+    {% set artistDeathDateLeft = 'any' %}
+    {% set artistDeathDateRight = 'any' %}
+
+    {% if birthDate['left_date'] %}
+        {% set artistBirthDateLeft = birthDate['left_date']|date('Y-m-d') %}
+        {% set artistBirthDateRight = birthDate['right_date']|date('Y-m-d') %}
+    {% endif %}
+
+    {% if deathDate['left_date'] %}
+        {% set artistDeathDateLeft = deathDate['left_date']|date('Y-m-d') %}
+        {% set artistDeathDateRight = deathDate['right_date']|date('Y-m-d') %}
+    {% endif %}
+
+
+
+    {{ render_hinclude(controller('AppBundle\\Controller\\MapController::birthDeathPlacesIndex', {countriesQuery: countriesQuery, genderQuery: genderQuery, stringQuery: stringQuery, currIds: ids, exhibitionCountries: exhibitionCountries, organizerTypesQuery: organizerTypesQuery, artistBirthDateLeft: artistBirthDateLeft, artistBirthDateRight: artistBirthDateRight, artistDeathDateLeft: artistDeathDateLeft, artistDeathDateRight: artistDeathDateRight}), {'default': 'Loading...'}) }}
 </div>

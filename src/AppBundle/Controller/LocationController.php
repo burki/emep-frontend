@@ -199,6 +199,8 @@ extends CrudController
         $stringQuery = $form->get('search')->getData();
         $ids = $form->get('id')->getData();
 
+        $indexDataNumberVenueType = $this->indexDataNumberVenueType($locations);
+        $indexDataNumberCountries = $this->indexDataNumberCountries($locations);
 
         return $this->render('Location/index.html.twig', [
             'pageTitle' => $this->get('translator')->trans('Venues'),
@@ -209,8 +211,115 @@ extends CrudController
             'countries' => $countries,
             'ids' => $ids,
             'locationType' => $locationType,
-            'stringPart' => $stringQuery
+            'stringPart' => $stringQuery,
+            'locations' => $locations,
+            'indexDataNumberVenueType' => $indexDataNumberVenueType,
+            'indexDataNumberCountries' => $indexDataNumberCountries
         ]);
+    }
+
+
+    public function indexDataNumberCountries($locations)
+    {
+        //$exhibitions = $location->getExhibitions();
+
+        $venueTypes = [];
+
+        foreach ($locations as $location) {
+
+            //print count($entries);
+            //print '   ';
+
+            $currType = (string) $location[0]->getCountry();
+
+            array_push($venueTypes, (string) $currType );
+
+        }
+
+        $typesTotal = array_count_values ( $venueTypes );
+
+        //$exhibitionPlacesArray = array_keys($exhibitionPlaces);
+
+        // print_r($exhibitionPlacesArray);
+
+        $typesOnly = ( array_keys($typesTotal) );
+        $valuesOnly =  array_values( $typesTotal );
+
+
+        $sumOfAllTypes= array_sum(array_values($typesTotal));
+
+        $i = 0;
+        $finalDataJson = '[';
+
+        foreach ($typesOnly as $place){
+
+            $i > 0 ? $finalDataJson .= ", " : "";
+
+            $numberOfExhibitions = $valuesOnly[$i] ;
+
+            $finalDataJson .= '{ name: "' .$place. '", y: '. $numberOfExhibitions . '} ';
+            $i += 1;
+        }
+        $finalDataJson .= ']';
+
+
+
+        $returnArray = [$finalDataJson, $sumOfAllTypes];
+
+
+        return $returnArray;
+    }
+
+
+    public function indexDataNumberVenueType($locations)
+    {
+        //$exhibitions = $location->getExhibitions();
+
+        $venueTypes = [];
+
+        foreach ($locations as $location) {
+
+            //print count($entries);
+            //print '   ';
+
+            $currType = (string) $location[0]->getType() == '' ? 'unknown' : (string) $location[0]->getType();
+
+            array_push($venueTypes, (string) $currType );
+
+        }
+
+        $typesTotal = array_count_values ( $venueTypes );
+
+        //$exhibitionPlacesArray = array_keys($exhibitionPlaces);
+
+        // print_r($exhibitionPlacesArray);
+
+        $typesOnly = ( array_keys($typesTotal) );
+        $valuesOnly =  array_values( $typesTotal );
+
+
+        $sumOfAllTypes= array_sum(array_values($typesTotal));
+
+        $i = 0;
+        $finalDataJson = '[';
+
+        foreach ($typesOnly as $place){
+
+            $i > 0 ? $finalDataJson .= ", " : "";
+
+            $numberOfExhibitions = $valuesOnly[$i] ;
+
+            $finalDataJson .= '{ name: "' .$place. '", y: '. $numberOfExhibitions . '} ';
+            $i += 1;
+        }
+        $finalDataJson .= ']';
+
+
+
+        $returnArray = [$finalDataJson, $sumOfAllTypes];
+
+
+        return $returnArray;
     }
 
 
@@ -486,12 +595,18 @@ extends CrudController
 
         $place = ($qbAlt->getQuery()->execute());
 
+        $dataNumberOfArtistsPerCountry = $this->detailDataNumberOfArtistsPerCountry($artists);
+        
+        $detailDataNumberItemTypes = $this->detailDataNumberItemTypes($location);
+
         return $this->render('Location/detail.html.twig', [
             'pageTitle' => $location->getName(),
             'location' => $location,
             'altPlace' => $place[0],
             'exhibitionStats' => $exhibitionStats,
             'artists' => $artists,
+            'dataNumberOfArtistsPerCountry' => $dataNumberOfArtistsPerCountry,
+            'detailDataNumberItemTypes' => $detailDataNumberItemTypes,
             'pageMeta' => [
                 /*
                 'jsonLd' => $exhibition->jsonLdSerialize($locale),
@@ -500,5 +615,115 @@ extends CrudController
                 */
             ],
         ]);
+    }
+
+    public function detailDataNumberItemTypes($location)
+    {
+        $exhibitions = $location->getExhibitions();
+
+        $types = [];
+
+        foreach ($exhibitions as $exhibition) {
+            $entries = $exhibition->catalogueEntries;
+
+            //print count($entries);
+            //print '   ';
+            foreach ($entries as $entry){
+                if($entry->type){
+                    //print_r($entry->type->getName());
+                    $currType = $entry->type->getName();
+                    array_push($types, (string) $currType == '0_unknown' ? 'unknown' : $currType );
+                }
+                //print_r($entry);
+            };
+        }
+
+        $typesTotal = array_count_values ( $types );
+
+        //$exhibitionPlacesArray = array_keys($exhibitionPlaces);
+
+        // print_r($exhibitionPlacesArray);
+
+        $typesOnly = ( array_keys($typesTotal) );
+        $valuesOnly =  array_values( $typesTotal );
+
+
+        $sumOfAllTypes= array_sum(array_values($typesTotal));
+
+        $i = 0;
+        $finalDataJson = '[';
+
+        foreach ($typesOnly as $place){
+
+            $i > 0 ? $finalDataJson .= ", " : "";
+
+            $numberOfExhibitions = $valuesOnly[$i] ;
+
+            $finalDataJson .= "{ name: '${place}', y: ${numberOfExhibitions} } ";
+            $i += 1;
+        }
+        $finalDataJson .= ']';
+
+
+
+        $returnArray = [$finalDataJson, $sumOfAllTypes];
+
+
+        return $returnArray;
+    }
+
+
+
+
+    public function detailDataNumberOfArtistsPerCountry($artists){
+
+        $artistNationalities = [];
+
+
+
+        foreach ($artists as $artist){
+
+            // print_r( $exhibition->getLocation()->getPlace()->getCountryCode() );
+
+            //print date('Y', strtotime($exhibition->getStartDate())) ;
+
+
+            array_push($artistNationalities, (string) $artist[0]->getNationality() );
+        }
+
+
+
+        $artistNationalitiesTotal = array_count_values ( $artistNationalities );
+
+        //$exhibitionPlacesArray = array_keys($exhibitionPlaces);
+
+        // print_r($exhibitionPlacesArray);
+
+        $nationalitiesOnly = ( array_keys($artistNationalitiesTotal) );
+        $valuesOnly =  array_values( $artistNationalitiesTotal );
+
+
+        $sumOfAllNationalities = array_sum(array_values($artistNationalitiesTotal));
+
+        $i = 0;
+        $finalDataJson = '[';
+
+        foreach ($nationalitiesOnly as $place){
+
+            $i > 0 ? $finalDataJson .= ", " : "";
+
+            $numberOfExhibitions = $valuesOnly[$i] ;
+
+            $finalDataJson .= "{ name: '${place}', y: ${numberOfExhibitions} } ";
+            $i += 1;
+        }
+        $finalDataJson .= ']';
+
+
+
+        $returnArray = [$finalDataJson, $sumOfAllNationalities];
+
+
+        return $returnArray;
     }
 }

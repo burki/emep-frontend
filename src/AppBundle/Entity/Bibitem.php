@@ -107,11 +107,15 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
+
+
+
     /**
      * @var integer
      *
      * @ORM\Column(type="integer", nullable=false)
      */
+
     protected $status = 0;
 
     /**
@@ -317,6 +321,16 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
     public function getAuthor()
     {
         return $this->author;
+    }
+
+    /**
+     * Gets author(s).
+     *
+     * @return string
+     */
+    public function getItemType()
+    {
+        return $this->itemType;
     }
 
     /**

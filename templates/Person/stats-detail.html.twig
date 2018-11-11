@@ -1,0 +1,26 @@
+
+{# {% import 'Shared/helper.html.twig' as helper %}
+ #}
+
+
+
+    <h3 class="chart-header" data-collapse="container-age"><span class="chartsymbol">+</span>Artists’ Age at Exhibition Start<span class="charttypeTitle">(Bar Chart)</span></h3>
+    <div class="collapse" id="container-age" style="width: 100%; height: auto; margin: 0"></div>
+    <h3 class="chart-header" data-collapse="container-nationality"><span class="chartsymbol">+</span>Nationalities<span class="charttypeTitle">(Pie Chart)</span></h3>
+    <div class="collapse" id="container-nationality" style="width: 60%; height: auto; margin: 0;"></div>
+    <h3 class="chart-header" data-collapse="container-type"><span class="chartsymbol">+</span>Types of Work as in Catalogue<span class="charttypeTitle">(Pie Chart)</span></h3>
+    <div class="collapse" id="container-type" style="width: 60%; height: auto; margin: 0;"></div>
+
+    <script src="{{ app.request.basepath }}/vendor/highcharts/highcharts.js"></script>
+    <script src="{{ app.request.basepath }}/vendor/highcharts/modules/exporting.js"></script>
+    <script src="{{ app.request.basepath }}/js/highchart_custom_theme.js"></script>
+    <script src="{{ app.request.basepath }}/js/collapseChart.js"></script>
+
+
+    <script type="text/javascript">
+    {{ chart|raw }}
+    </script>
+
+    {% if app.request.attributes.get('_route') != 'exhibition-stats-partial' %}
+    {{ helper.show_detailmodal() }}
+    {% endif %}

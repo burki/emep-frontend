@@ -57,9 +57,56 @@
 
 
 
+    {%  set startyear = startYear %}
 
     <div class="filter-combination-container">
-        <div class="filters-heading">Filters</div>
+        <div class="filters-heading">
+            <div class="advanced-filters-title"><span class="advanced-filters-title-sign">+</span> Filters</div>
+            <div class="advanced-ftilers-container" style="display:none">
+                <div class="advanced-filters-selection">
+                    <select id="advancedFilterType" class="text-field-class w-select">
+                        <option value="startDateRangeExhibition">starting date range of exhibition</option>
+                        <option value="nationalityArtist">nationality of artist</option>
+                        <option value="genderArtist">gender of artist</option>
+                    </select>
+                </div>
+                <div class="advanced-filters-startDateRangeExhibition">
+                    <div id="advanced-filters-startDateRangeExhibition-range"></div>
+                    <select class="advanced-filters-startDateRangeExhibition-startdate-year" class="text-field-class w-select">
+                        <option value=""></option>
+                        {% for i in minStartYear..maxStartYear %}
+                            <option value="{{ i }}">{{ i }}</option>
+                        {% endfor %}
+                    </select>
+                    <select class="advanced-filters-startDateRangeExhibition-enddate-year" class="text-field-class w-select">
+                        <option value=""></option>
+                        {% for i in minStartYear..maxStartYear %}
+                            <option value="{{ i }}">{{ i }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="advanced-filters-nationalityArtist" style="display:none">
+                    <select id="advanced-filters-nationalityArtist-select" class="advanced-filters-nationalityArtist-select text-field-class w-select">
+                        <option value="">select country</option>
+                        {% for abrriviation,countryname in countryArray %}
+                            <option value="{{ abrriviation }}">{{ countryname }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="advanced-filters-genderArtist" style="display:none">
+                    <select class="advanced-filters-genderArtist-select text-field-class w-select">
+                        <option value>select gender</option>
+                        <option value="F">female</option>
+                        <option value="M">male</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+
+        {#  ADVANCED FILTERS  #}
+
+
         <div class="additional-filter-container">
 
             {# refactor as macro #}
@@ -108,6 +155,80 @@
                 </div>
             {% endfor %}
 
+
+
+            {% for gender in artistGender %}
+                {% set genderLong = gender == 'M' ? 'Male' : 'Female' %}
+                <div class="filter-row">
+                    <div class="div-block-5">
+                        <div class="first-filter-term">
+                            <div>Artist Gender</div>
+                        </div>
+                        <div class="is_equal_to">
+                            <div>is equal to</div>
+                        </div>
+                        <div class="first-filter-term">
+                            {# find country to text method #}
+                            <div>{{ genderLong }}</div>
+                        </div>
+                    </div>
+                    <div class="subfilter-buttons-container">
+                        <div class="subfilter-remove artistGender" id="removeArtistGender">
+                            <div>remove</div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+            {% for nationality in artistNationalities %}
+                <div class="filter-row">
+                    <div class="div-block-5">
+                        <div class="first-filter-term">
+                            <div>Artist Nationality</div>
+                        </div>
+                        <div class="is_equal_to">
+                            <div>is equal to</div>
+                        </div>
+                        <div class="first-filter-term">
+                            {# find country to text method #}
+                            <div>{{ countryArray[nationality]|capitalize }}</div>
+                        </div>
+                    </div>
+                    <div class="subfilter-buttons-container">
+                        <div class="subfilter-remove artistNationality" id="removeArtistNationality" data-artistNationality="{{ nationality }}">
+                            <div>remove</div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+
+
+            {% if exhibitionStartDate['left_date'] %}
+
+                <div class="filter-row">
+                    <div class="div-block-5">
+                        <div class="first-filter-term">
+                            <div>Exhibition Startdate</div>
+                        </div>
+                        <div class="is_equal_to">
+                            <div>is in between</div>
+                        </div>
+                        <div class="first-filter-term">
+                            {# find country to text method #}
+                            <div>{{ exhibitionStartDate['left_date']|date("Y") }} and {{ exhibitionStartDate['right_date']|date("Y") }}</div>
+                        </div>
+                    </div>
+                    <div class="subfilter-buttons-container">
+                        <div class="subfilter-remove startDate" id="remove-start-date-filter">
+                            <div>remove</div>
+                        </div>
+                    </div>
+                </div>
+
+            {% endif %}
+
+
             {% if "true" in ids %}
                 <div class="filter-row">
                     <div class="div-block-5">
@@ -134,6 +255,180 @@
 
     <script>
         $(document).ready(function() {
+
+
+            // ADVANED SEARCH FILTERS
+
+            var rangeSliderExhibitionStartDate = document.getElementById('advanced-filters-startDateRangeExhibition-range');
+
+            noUiSlider.create(rangeSliderExhibitionStartDate, {
+
+                range: {
+                    'min': {{ minStartYear }},
+                    'max': {{ maxStartYear }}
+                },
+
+                step: 1,
+
+                // Handles start at ...
+                start: [{{ exhibitionStartDate['left_date'] ? exhibitionStartDate['left_date']|date("Y") : minStartYear }}, {{ exhibitionStartDate['left_date'] ? exhibitionStartDate['right_date']|date("Y") :maxStartYear }}],
+
+                // ... must be at least 300 apart
+                margin: 0,
+
+                // ... but no more than 600
+                limit: 100,
+
+                // Display colored bars between handles
+                connect: true,
+
+                // Put '0' at the bottom of the slider
+                //direction: 'rtl',
+                orientation: 'horizontal',
+
+                // Move handle on tap, bars are draggable
+                behaviour: 'tap-drag',
+                tooltips: false,
+                //format: ({
+                //    decimals: 0
+                //}),
+
+                // Show a scale with the slider
+                pips: {
+                    mode: 'steps',
+                    stepped: true,
+                    density: 1
+                }
+            });
+
+            rangeSliderExhibitionStartDate.noUiSlider.on('change', function(values){
+                console.log('UI Slider changed value: ', values);
+
+                // set the form elements to value
+                $('.advanced-filters-startDateRangeExhibition-startdate-year').val(Math.round(values[0]));
+                $('.advanced-filters-startDateRangeExhibition-enddate-year').val(Math.round(values[1]));
+
+            });
+
+
+            $('.advanced-filters-title').on('click', function(){
+                $('.advanced-ftilers-container').toggle();
+
+                // toggle + / -  sign
+                if($('.advanced-filters-title-sign').text() == '+'){
+                    $('.advanced-filters-title-sign').text('-');
+                }else{
+                    $('.advanced-filters-title-sign').text('+');
+                }
+            });
+
+
+            $('#advancedFilterType').on('change', function(){
+
+                console.log('something changed here: ', $(this).val());
+               var currAdvancedFilterSelection = $(this).val();
+
+               hideAllAdvancedFilterOptions();
+
+               if( currAdvancedFilterSelection === "startDateRangeExhibition" ){
+                   $('.advanced-filters-startDateRangeExhibition').show();
+               }else if( currAdvancedFilterSelection === "nationalityArtist" ){
+                   $('.advanced-filters-nationalityArtist').show();
+               }else if( currAdvancedFilterSelection === "genderArtist" ){
+                   $('.advanced-filters-genderArtist').show();
+               }
+            });
+
+
+            /* REMOVE FUNCTIONS */
+
+            $('#removeArtistGender').on('click', function(){
+                $('#exhibition_filter_gender').val('');
+                $( ".indexForm" ).submit();
+            })
+
+            $('#removeArtistNationality').on('click', function(){
+                console.log('this data: ', $(this).attr('data-artistNationality'));
+                removeValueFromMultiSelect($(this).attr('data-artistNationality'), "#exhibition_filter_nationality");
+                $( ".indexForm" ).submit();
+            });
+
+            $('#remove-start-date-filter').on('click', function(){
+                $('#exhibition_filter_startdate_left_date_year').val('');
+                $('#exhibition_filter_startdate_left_date_month').val('');
+                $('#exhibition_filter_startdate_left_date_day').val('');
+
+                $('#exhibition_filter_startdate_right_date_year').val('');
+                $('#exhibition_filter_startdate_right_date_month').val('');
+                $('#exhibition_filter_startdate_right_date_day').val('');
+
+                $( ".indexForm" ).submit();
+            });
+
+            /* END REMOVE FUNCTIONS */
+
+            function hideAllAdvancedFilterOptions(){
+                $('.advanced-filters-startDateRangeExhibition').hide();
+                $('.advanced-filters-nationalityArtist').hide();
+                $('.advanced-filters-genderArtist').hide();
+            }
+
+            function setAdvancedCustomFilterValues(){
+                // get currently visible filter options
+                const currAdvancedFilterSelection = $('#advancedFilterType').val();
+
+                console.log('current filter: ', currAdvancedFilterSelection);
+
+                if( currAdvancedFilterSelection === "startDateRangeExhibition" ){
+                    //set date current start end enddate
+                    const startyear = $('.advanced-filters-startDateRangeExhibition-startdate-year').val();
+                    const endyear = $('.advanced-filters-startDateRangeExhibition-enddate-year').val();
+
+                    // check if set
+                    if(startyear && endyear){
+                        $('#exhibition_filter_startdate_left_date_year').val(startyear);
+                        $('#exhibition_filter_startdate_left_date_month').val(1);
+                        $('#exhibition_filter_startdate_left_date_day').val(1);
+
+                        $('#exhibition_filter_startdate_right_date_year').val(endyear);
+                        $('#exhibition_filter_startdate_right_date_month').val(12);
+                        $('#exhibition_filter_startdate_right_date_day').val(31);
+                    }
+
+                }else if( currAdvancedFilterSelection === "nationalityArtist" ){
+                    // set/add natioanlity of Artist to current selection
+                    addValueToMutliSelect($('#advanced-filters-nationalityArtist-select').val(), '#exhibition_filter_nationality')
+
+                }else if( currAdvancedFilterSelection === "genderArtist" ){
+                    // set gender of artist
+                    console.log('current val of artist: ', $('.advanced-filters-genderArtist-select').val() );
+                    $('#exhibition_filter_gender').val( $('.advanced-filters-genderArtist-select').val() );
+
+                }
+            }
+
+            function removeValueFromMultiSelect(valueToRemove, selector){
+                var currIdArray = $(selector).val() ? $(selector).val() : [];
+                var index = currIdArray.indexOf(valueToRemove);
+                if (index !== -1) currIdArray.splice(index, 1);
+
+                $(selector).val( currIdArray );
+            }
+
+
+            // adding value to a multiselect field
+            function addValueToMutliSelect(valueToAdd, selector){
+                var currSelection = $(selector).val() ? $(selector).val() : [];
+                currSelection.push(valueToAdd);
+
+                currSelection = jQuery.unique(currSelection);
+                $(selector).val(currSelection);
+            }
+
+
+            // END ADVANCED SEARCH FILTERS
+
+
             $('.countryAbbr').on('click', function () {
                 var currSelection = $('#exhibition_filter_country').val();
                 var currCountry = $(this).data('country');
@@ -155,8 +450,11 @@
                 $( ".exhibitionFilterForm" ).submit();
             });
 
+            // submitting form
             $('.exhibitionFilterForm').on('submit', function (e) {
                 console.log('submiting now ....');
+
+                setAdvancedCustomFilterValues();
 
                 // countries
                 var currSelectionCountries = $('#exhibition_filter_country').val() !== null ? $('#exhibition_filter_country').val() : [];
@@ -339,7 +637,7 @@
                 var table = $('#exhibitions').DataTable({
                     paging: false,
                     searching: false,
-                    info: false,
+                    info: true,
                     "columnDefs": [
                         { "visible": false, "targets": groupColumn }
                     ],

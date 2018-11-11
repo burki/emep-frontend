@@ -27,10 +27,46 @@
         {% set stringQuery = stringPart %}
     {% endif %}
 
+
+    <script>
+        $(document).ready(function() {
+            $('#container-artists-nationality').highcharts({
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie'
+                },
+                title: {
+                    text: ' '
+                },
+                tooltip: {
+                    pointFormat: '{point.y} org. bodies (<b>{point.percentage:.1f}%</b>)'
+                },
+                plotOptions: {
+                    pie: {
+                    }
+                },
+                series: [{
+                    name: 'Country: ',
+                    type: 'pie',
+                    innerSize: '50%',
+                    data: {{ dataNumberOfExhibitionsPerOrgBody[0]|raw }}
+                }]
+            });
+        });
+    </script>
+
+    <h3 class="chart-header" data-collapse="container-artists-nationality"><span class="chartsymbol">+</span>Nationality of Artists<span class="charttypeTitle">(Pie Chart)</span></h3>
+    <div class="collapse" id="container-artists-nationality" style="width: 100%; height: 400px; margin: 0 auto;"></div>
+
+
+
     {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::personByYearActionPart', {countriesQuery: countriesQuery, genderQuery: genderQuery, stringQuery: stringQuery, currIds: ids}), {'default': 'Loading... <br/>'}) }}
     {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::personExhibitionAgeActionPart', {countriesQuery: countriesQuery, genderQuery: genderQuery, stringQuery: stringQuery, currIds: ids}), {'default': 'Loading... <br/>'}) }}
     {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::exhibitionPerPersonPart', {countriesQuery: countriesQuery, genderQuery: genderQuery, stringQuery: stringQuery, currIds: ids}), {'default': 'Loading... <br/>'}) }}
     {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::personsWikipediaPart', {countriesQuery: countriesQuery, genderQuery: genderQuery, stringQuery: stringQuery, currIds: ids}), {'default': 'Loading... <br/>'}) }}
+
 
 
 </div>

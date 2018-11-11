@@ -64,15 +64,32 @@ extends CrudController
         ])
             ->from('AppBundle:Person', 'P')
             ->leftJoin('P.exhibitions', 'E')
+
+            ->leftJoin('E.location', 'L')
+            ->leftJoin('L.place', 'Pl')
+
             ->leftJoin('P.catalogueEntries', 'IE')
             ->where('P.status <> -1')
             ->groupBy('P.id') // for Count
             ->orderBy('nameSort')
         ;
 
+        $organizerTypes = $this->buildOrganizerTypes();
+
+        $minBirthYear = 1800;
+        $maxBirthYear = 1905;
+
+        $minDeathYear = 1850;
+        $maxDeathYear = 2000;
+
+
         $form = $this->get('form.factory')->create(\AppBundle\Filter\PersonFilterType::class, [
             'choices' => array_flip($this->buildCountries()),
-            'ids' => range(0, 9999)
+            'ids' => range(0, 9999),
+            'birthyears' => [$minBirthYear, $maxBirthYear],
+            'deathyears' => [$minDeathYear, $maxDeathYear],
+            'country_choices' => array_flip($this->buildCountries()),
+            'organizer_type_choices' => array_combine($organizerTypes, $organizerTypes)
         ]);
 
         if ($request->query->has($form->getName())) {
@@ -148,16 +165,37 @@ extends CrudController
             ])
             ->from('AppBundle:Person', 'P')
             ->leftJoin('P.exhibitions', 'E')
+
+            ->leftJoin('E.location', 'L')
+            ->leftJoin('L.place', 'Pl')
+
             ->leftJoin('P.catalogueEntries', 'IE')
             ->where('P.status <> -1')
             ->groupBy('P.id') // for Count
             ->orderBy('nameSort')
             ;
 
+
+        $organizerTypes = $this->buildOrganizerTypes();
+
+        $minBirthYear = 1800;
+        $maxBirthYear = 1905;
+
+        $minDeathYear = 1850;
+        $maxDeathYear = 2000;
+
+
         $form = $this->get('form.factory')->create(\AppBundle\Filter\PersonFilterType::class, [
             'choices' => array_flip($this->buildCountries()),
-            'ids' => range(0, 9999)
+            'ids' => range(0, 9999),
+            'birthyears' => [$minBirthYear, $maxBirthYear],
+            'deathyears' => [$minDeathYear, $maxDeathYear],
+            'country_choices' => array_flip($this->buildCountries()),
+            'organizer_type_choices' => array_combine($organizerTypes, $organizerTypes)
         ]);
+
+
+
 
         if ($request->query->has($form->getName())) {
             // manually bind values from the request
@@ -172,7 +210,10 @@ extends CrudController
         $nationalities = $form->get('nationality')->getData();
         $stringQuery = $form->get('search')->getData();
         $ids = $form->get('id')->getData();
-
+        $deathDate = $form->get('deathDate')->getData();
+        $birthDate = $form->get('birthDate')->getData();
+        $exhibitionCountries = $form->get('country')->getData();
+        $organizerTypesQuery = $form->get('organizer_type')->getData();
 
 
         $pagination = $this->buildPagination($request, $qb->getQuery(), [
@@ -189,7 +230,16 @@ extends CrudController
             'countryArray' => $this->buildCountries(),
             'gender' => $gender,
             'ids' => $ids,
-            'stringPart' => $stringQuery
+            'stringPart' => $stringQuery,
+            'minBirthYear' => $minBirthYear,
+            'maxBirthYear' => $maxBirthYear,
+            'minDeathYear' => $minDeathYear,
+            'maxDeathYear' => $maxDeathYear,
+            'organizerTypes' => $organizerTypes,
+            'deathDate' => $deathDate,
+            'birthDate' => $birthDate,
+            'exhibitionCountries' => $exhibitionCountries,
+            'organizerTypesQuery' => $organizerTypesQuery
         ]);
     }
 
@@ -537,12 +587,33 @@ extends CrudController
             return new JsonLdResponse($person->jsonLdSerialize($locale));
         }
 
+        $dataNumberOfExhibitionsPerYear = $this->detailDataNumberOfExhibitionsPerYear($person);
+
+        $dataNumberOfExhibitionsPerCity = $this->detailDataNumberOfExhibitionsPerCity($person);
+
+        $dataNumberOfExhibitionsPerCountry = $this->detailDataNumberOfExhibitionsPerCountry($person);
+
+        $dataNumberOfWorksPerYear = $this->detailDataNumberOfWorksPerYear($person, $this->findCatalogueEntries($person));
+
+        $dataNumberOfWorksPerType = $this->detailDataNumberOfWorksPerType($this->findCatalogueEntries($person));
+
+        $dataNumberOfExhibitionsPerOrgBody = $this->detailDataNumberOfExhibitionsPerOrgBody($person);
+
+
+
         return $this->render('Person/detail.html.twig', [
             'pageTitle' => $person->getFullname(true), // TODO: lifespan in brackets
             'person' => $person,
             'showWorks' => !empty($_SESSION['user']),
             'catalogueEntries' => $this->findCatalogueEntries($person),
             'similar' => $this->findSimilar($person),
+            'currentPageId' => $id,
+            'dataNumberOfExhibitionsPerYear' => $dataNumberOfExhibitionsPerYear,
+            'dataNumberOfExhibitionsPerCity' => $dataNumberOfExhibitionsPerCity,
+            'dataNumberOfExhibitionsPerCountry' => $dataNumberOfExhibitionsPerCountry,
+            'dataNumberOfWorksPerYear' => $dataNumberOfWorksPerYear,
+            'dataNumberOfWorksPerType' => $dataNumberOfWorksPerType,
+            'dataNumberOfExhibitionsPerOrgBody' => $dataNumberOfExhibitionsPerOrgBody,
             'pageMeta' => [
                 'jsonLd' => $person->jsonLdSerialize($locale),
                 'og' => $this->buildOg($person, $routeName, $routeParams),
@@ -550,6 +621,329 @@ extends CrudController
             ],
         ]);
     }
+
+
+    public function detailDataNumberOfWorksPerType($catalogueEntries){
+
+        $works = [];
+
+
+        foreach ($catalogueEntries as $catalogueEntry){
+
+            $currExhibition = $catalogueEntry[0]->exhibition;
+
+            foreach ($catalogueEntry as $entry){
+                if($entry->type) {
+                    $currType = $entry->type->getName();
+                    array_push($works, (string)$currType == '0_unknown' ? 'unknown' : $currType);
+                }
+            }
+
+        }
+
+        $worksTotalPerYear = array_count_values ( $works );
+
+        //$exhibitionPlacesArray = array_keys($exhibitionPlaces);
+
+
+        $typesOnly = array_keys($worksTotalPerYear) ;
+        $valuesOnly =  array_values( $worksTotalPerYear );
+
+
+        $sumOfAllWorks = array_sum(array_values($worksTotalPerYear));
+
+        $i = 0;
+        $finalDataJson = '[';
+
+        foreach ($typesOnly as $type){
+
+            $i > 0 ? $finalDataJson .= ", " : "";
+
+            $numberOfWorks = $valuesOnly[$i] ;
+
+            $finalDataJson .= "{ name: '${type}', y: ${numberOfWorks} } ";
+            $i += 1;
+        }
+        $finalDataJson .= ']';
+
+
+
+        $returnArray = [$finalDataJson, $sumOfAllWorks];
+
+
+        return $returnArray;
+    }
+
+    public function detailDataNumberOfWorksPerYear($person, $catalogueEntries){
+
+        $works = [];
+
+
+        foreach ($catalogueEntries as $catalogueEntry){
+
+            $currExhibition = $catalogueEntry[0]->exhibition;
+
+
+            $currExhibitionYear =  (int) date('Y', strtotime($currExhibition->getStartDate())) ;
+
+
+            foreach ($catalogueEntry as $entry){
+                array_push($works, (string) $currExhibitionYear );
+            }
+
+        }
+
+        $worksTotalPerYear = array_count_values ( $works );
+
+        //$exhibitionPlacesArray = array_keys($exhibitionPlaces);
+
+
+        $yearsArray = array_keys($worksTotalPerYear);
+
+
+        $min = $yearsArray[0];
+        $max = max(array_keys($worksTotalPerYear));
+
+        $arrayWithoutGaps = [];
+
+        // create an array without any year gaps inbetween
+        for ($i = $min; $i <= $max; $i++) {
+            $arrayWithoutGaps[(string)$i] = ($worksTotalPerYear[(string)$i] > 0 ? $worksTotalPerYear[(string)$i] : 0);
+            //array_push( $arrayWithoutGaps, (string)$i => 'test');
+        }
+
+
+
+        $yearsOnly = json_encode( array_keys($arrayWithoutGaps) );
+        $valuesOnly = json_encode ( array_values($arrayWithoutGaps) );
+        $sumOfAllExhibitions = array_sum(array_values($arrayWithoutGaps));
+        $yearActive = $max - $min > 0 ? $max - $min : 1;
+
+
+        $averagePerYear = round( $sumOfAllExhibitions / $yearActive, 1 );
+
+        //return $worksPerYear;
+
+
+
+
+        $returnArray = [$yearsOnly, $valuesOnly, $sumOfAllExhibitions, $yearActive, $averagePerYear];
+
+        return $returnArray;
+    }
+
+
+    public function detailDataNumberOfExhibitionsPerOrgBody($person){
+
+        $exhibitionPlaces = [];
+
+
+        $exhibitions = $person->exhibitions;
+
+        foreach ($exhibitions as $exhibition){
+
+            // print_r( $exhibition->getLocation()->getPlace()->getCountryCode() );
+
+            //print date('Y', strtotime($exhibition->getStartDate())) ;
+
+
+            array_push($exhibitionPlaces, (string) $exhibition->getOrganizerType() );
+        }
+
+
+
+        $exhibitionPlacesTotal = array_count_values ( $exhibitionPlaces );
+
+        //$exhibitionPlacesArray = array_keys($exhibitionPlaces);
+
+        // print_r($exhibitionPlacesArray);
+
+        $placesOnly = ( array_keys($exhibitionPlacesTotal) );
+        $valuesOnly =  array_values( $exhibitionPlacesTotal );
+
+
+        $sumOfAllExhibitions = array_sum(array_values($exhibitionPlacesTotal));
+
+        $i = 0;
+        $finalDataJson = '[';
+
+        foreach ($placesOnly as $place){
+
+            $i > 0 ? $finalDataJson .= ", " : "";
+
+            $numberOfExhibitions = $valuesOnly[$i] ;
+
+            $finalDataJson .= "{ name: '${place}', y: ${numberOfExhibitions} } ";
+            $i += 1;
+        }
+        $finalDataJson .= ']';
+
+
+
+        $returnArray = [$finalDataJson, $sumOfAllExhibitions];
+
+
+        return $returnArray;
+    }
+
+    public function detailDataNumberOfExhibitionsPerCountry($person){
+
+        $exhibitionPlaces = [];
+
+
+        $exhibitions = $person->exhibitions;
+
+        foreach ($exhibitions as $exhibition){
+
+            // print_r( $exhibition->getLocation()->getPlace()->getCountryCode() );
+
+            //print date('Y', strtotime($exhibition->getStartDate())) ;
+
+
+            array_push($exhibitionPlaces, (string) $exhibition->getLocation()->getPlace()->getCountryCode() );
+        }
+
+
+
+        $exhibitionPlacesTotal = array_count_values ( $exhibitionPlaces );
+
+        //$exhibitionPlacesArray = array_keys($exhibitionPlaces);
+
+        // print_r($exhibitionPlacesArray);
+
+        $placesOnly = ( array_keys($exhibitionPlacesTotal) );
+        $valuesOnly =  array_values( $exhibitionPlacesTotal );
+
+
+        $sumOfAllExhibitions = array_sum(array_values($exhibitionPlacesTotal));
+
+        $i = 0;
+        $finalDataJson = '[';
+
+        foreach ($placesOnly as $place){
+
+            $i > 0 ? $finalDataJson .= ", " : "";
+
+            $numberOfExhibitions = $valuesOnly[$i] ;
+
+            $finalDataJson .= "{ name: '${place}', y: ${numberOfExhibitions} } ";
+            $i += 1;
+        }
+        $finalDataJson .= ']';
+
+
+
+        $returnArray = [$finalDataJson, $sumOfAllExhibitions];
+
+
+        return $returnArray;
+    }
+
+
+    public function detailDataNumberOfExhibitionsPerCity($person){
+
+        $exhibitionPlaces = [];
+
+
+        $exhibitions = $person->exhibitions;
+
+        foreach ($exhibitions as $exhibition){
+
+            // print_r( $exhibition->getLocation()->getPlaceLabel() );
+
+            //print date('Y', strtotime($exhibition->getStartDate())) ;
+
+
+            array_push($exhibitionPlaces, (string) $exhibition->getLocation()->getPlaceLabel() );
+        }
+
+
+
+        $exhibitionPlacesTotal = array_count_values ( $exhibitionPlaces );
+
+        //$exhibitionPlacesArray = array_keys($exhibitionPlaces);
+
+        // print_r($exhibitionPlacesArray);
+
+        $placesOnly = ( array_keys($exhibitionPlacesTotal) );
+        $valuesOnly =  array_values( $exhibitionPlacesTotal );
+
+
+        $sumOfAllExhibitions = array_sum(array_values($exhibitionPlacesTotal));
+
+        $i = 0;
+        $finalDataJson = '[';
+
+        foreach ($placesOnly as $place){
+
+            $i > 0 ? $finalDataJson .= ", " : "";
+
+            $numberOfExhibitions = $valuesOnly[$i] ;
+
+            $finalDataJson .= "{ name: '${place}', y: ${numberOfExhibitions} } ";
+            $i += 1;
+        }
+        $finalDataJson .= ']';
+
+
+
+        $returnArray = [$finalDataJson, $sumOfAllExhibitions];
+
+
+        return $returnArray;
+    }
+
+
+    public function detailDataNumberOfExhibitionsPerYear($person){
+
+        $exhibitionYear = [];
+
+
+        $exhibitions = $person->exhibitions;
+
+        foreach ($exhibitions as $exhibition){
+
+            //print date('Y', strtotime($exhibition->getStartDate())) ;
+
+
+            array_push($exhibitionYear, (int) date('Y', strtotime($exhibition->getStartDate())) );
+        }
+
+        $exhibitionYear = array_count_values ( $exhibitionYear );
+
+
+        $yearsArray = array_keys($exhibitionYear);
+
+
+        $min = $yearsArray[0];
+        $max = $yearsArray[ (count($exhibitionYear)-1) ];
+
+        $arrayWithoutGaps = [];
+
+        // create an array without any year gaps inbetween
+        for ($i = $min; $i <= $max; $i++) {
+            $arrayWithoutGaps[(string)$i] = ($exhibitionYear[(string)$i] > 0 ? $exhibitionYear[(string)$i] : 0);
+            //array_push( $arrayWithoutGaps, (string)$i => 'test');
+        }
+
+
+
+        $yearsOnly = json_encode( array_keys($arrayWithoutGaps) );
+        $valuesOnly = json_encode ( array_values($arrayWithoutGaps) );
+        $sumOfAllExhibitions = array_sum(array_values($arrayWithoutGaps));
+        $yearActive = $max - $min > 0 ? $max - $min : 1;
+        $averagePerYear = round( $sumOfAllExhibitions / $yearActive, 1 );
+
+
+
+
+
+        $returnArray = [$yearsOnly, $valuesOnly, $sumOfAllExhibitions, $yearActive, $averagePerYear];
+
+        return $returnArray;
+    }
+
+
 
     /*
      * TODO: mode=ulan
@@ -590,5 +984,103 @@ extends CrudController
 
         return new \Symfony\Component\HttpFoundation\Response($ret, \Symfony\Component\HttpFoundation\Response::HTTP_OK,
                                                               [ 'Content-Type' => 'text/plain; charset=UTF-8' ]);
+    }
+
+
+    public function statsActionDetail($id)
+    {
+        $repo = $this->getDoctrine()
+            ->getRepository('AppBundle:Person');
+
+        if (!empty($id)) {
+            $routeParams = [ 'id' => $id ];
+            $exhibition = $repo->findOneById($id);
+        }
+
+        if (!isset($exhibition) || $exhibition->getStatus() == -1) {
+            return $this->redirectToRoute('exhibition-index');
+        }
+
+        // display the artists by birth-year
+        $stats = StatisticsController::exhibitionAgeDistribution($em = $this->getDoctrine()->getEntityManager(), $exhibition->getId());
+        $ageCount = & $stats['age_count'];
+
+        $categories = $total = [];
+        for ($age = $stats['min_age']; $age <= $stats['max_age'] && $age < 120; $age++) {
+            $categories[] = $age; // 0 == $age % 5 ? $year : '';
+
+            foreach ([ 'living', 'deceased' ] as $cat) {
+                $total['age_' . $cat][$age] = [
+                    'name' => $age,
+                    'y' => isset($ageCount[$age]) && isset($ageCount[$age][$cat])
+                        ? intval($ageCount[$age][$cat]) : 0,
+                ];
+            }
+        }
+
+        $template = $this->get('twig')->loadTemplate('Statistics/person-exhibition-age.html.twig');
+        $charts = [
+            $template->renderBlock('chart', [
+                'container' => 'container-age',
+                'categories' => json_encode($categories),
+                'age_at_exhibition_living' => json_encode(array_values($total['age_living'])),
+                'age_at_exhibition_deceased' => json_encode(array_values($total['age_deceased'])),
+                'exhibition_id' => $id,
+            ]),
+        ];
+
+        // nationalities of participating artists
+        $stats = StatisticsController::itemExhibitionNationalityDistribution($em, $exhibition->getId());
+        $data = [];
+        $key = 'ItemExhibition'; // alternative is 'Artists'
+        foreach ($stats['nationalities'] as $nationality => $counts) {
+            $count = $counts['count' . $key];
+            $percentage = 100.0 * $count / $stats['total' . $key];
+            $dataEntry = [
+                'name' => $nationality,
+                'y' => (int)$count,
+                'artists' => $counts['countArtists'],
+                'itemExhibition' => $counts['countItemExhibition'],
+            ];
+            if ($percentage < 5) {
+                $dataEntry['dataLabels'] = [ 'enabled' => false ];
+            }
+            $data[] = $dataEntry;
+        }
+        $template = $this->get('twig')->loadTemplate('Statistics/itemexhibition-nationality.html.twig');
+        $charts[] = $template->renderBlock('chart', [
+            'container' => 'container-nationality',
+            'totalArtists' => $stats['totalArtists'],
+            'totalItemExhibition' => $stats['totalItemExhibition'],
+            'data' => json_encode($data),
+        ]);
+
+        // type of work
+        $stats = StatisticsController::itemExhibitionTypeDistribution($em, $exhibition->getId());
+        $data = [];
+        foreach ($stats['types'] as $type => $count) {
+            $percentage = 100.0 * $count / $stats['total'];
+            $dataEntry = [
+                'name' => $type,
+                'y' => (int)$count,
+            ];
+            if ($percentage < 5) {
+                $dataEntry['dataLabels'] = [ 'enabled' => false ];
+            }
+            $data[] = $dataEntry;
+        }
+
+        $template = $this->get('twig')->loadTemplate('Statistics/itemexhibition-type.html.twig');
+        $charts[] = $template->renderBlock('chart', [
+            'container' => 'container-type',
+            'total' => $stats['total'],
+            'data' => json_encode($data),
+        ]);
+
+        // display the static content
+        return $this->render('Person/stats-detail.html.twig', [
+            'chart' => implode("\n", $charts),
+        ]);
+
     }
 }

@@ -36,6 +36,86 @@ extends Controller
         return " ";
     }
 
+    public function getStringQueryForPersonsInExhibitions($queryArray, $querySubject, $shortOrLongQuery){
+        if (!empty($queryArray)){
+            if($shortOrLongQuery === 'long'){
+                $query = $query = "Person." . $querySubject. " = '" . join("' OR Person." . $querySubject. " = '", $queryArray) . "'";
+                return " AND ( " . $query . " )";
+            } else {
+                $query = $query = "P." . $querySubject. " = '" . join("' OR P." . $querySubject. " = '", $queryArray) . "'";
+                return " AND ( " . $query . " )";
+            }
+        }else{
+            if($shortOrLongQuery === 'long'){
+                return " ";
+            } else {
+                return " ";
+            }
+        }
+
+        return " ";
+    }
+
+    public function getStringQueryForExhibitionsInArtist($queryArray, $querySubject, $shortOrLongQuery){
+        if (!empty($queryArray)){
+            if($shortOrLongQuery === 'long'){
+                $query = $query = "Exhibition." . $querySubject. " = '" . join("' OR Exhibition." . $querySubject. " = '", $queryArray) . "'";
+                return " AND ( " . $query . " )";
+            } else {
+                $query = $query = "E." . $querySubject. " = '" . join("' OR E." . $querySubject. " = '", $queryArray) . "'";
+                return " AND ( " . $query . " )";
+            }
+        }else{
+            if($shortOrLongQuery === 'long'){
+                return " ";
+            } else {
+                return " ";
+            }
+        }
+
+        return " ";
+    }
+
+
+    public function getStringQueryForLocationInArtist($queryArray, $querySubject, $shortOrLongQuery){
+        if (!empty($queryArray)){
+            if($shortOrLongQuery === 'long'){
+                $query = $query = "Location." . $querySubject. " = '" . join("' OR Location." . $querySubject. " = '", $queryArray) . "'";
+                return " AND ( " . $query . " )";
+            } else {
+                $query = $query = "L." . $querySubject. " = '" . join("' OR L." . $querySubject. " = '", $queryArray) . "'";
+                return " AND ( " . $query . " )";
+            }
+        }else{
+            if($shortOrLongQuery === 'long'){
+                return " ";
+            } else {
+                return " ";
+            }
+        }
+
+        return " ";
+    }
+
+
+    public function getStringQueryExhibitionsStartdate($startdate, $enddate, $shortOrLongQuery)
+    {
+        if($shortOrLongQuery === 'long') {
+            return " AND Exhibition.startdate BETWEEN '". $startdate . "' AND '". $enddate . "' ";
+        }
+
+        return " AND E.startdate BETWEEN '". $startdate . "' AND '". $enddate . "' ";
+    }
+
+    public function getStringQueryArtistsBirthAndDeathDate($startdate, $enddate, $birthOrDeath, $shortOrLongQuery)
+    {
+        if($shortOrLongQuery === 'long') {
+            return " AND Person.". $birthOrDeath ." BETWEEN '". $startdate . "' AND '". $enddate . "' ";
+        }
+
+        return " AND P.". $birthOrDeath ." BETWEEN '". $startdate . "' AND '". $enddate . "' ";
+    }
+
 
 
     public function getStringQueryForPersonIds($queryArray, $shortOrLongQuery){
@@ -139,7 +219,7 @@ extends Controller
 
 
 
-    public function exhibitionByMonthIndex($countriesQuery, $organizerTypeQuery, $stringQuery, $currIds = []){
+    public function exhibitionByMonthIndex($countriesQuery, $organizerTypeQuery, $stringQuery, $currIds = [], $artistGender = "", $artistNationalities = [], $exhibitionStartDateLeft = 'any', $exhibitionStartDateRight = 'any'){
 
         $em = $this->getDoctrine()->getEntityManager();
 
@@ -150,6 +230,20 @@ extends Controller
         $countryQueryString .= " AND (". $this->getCountryQueryString('Location', 'Exhibition', 'country', $countriesQuery) ." OR " . $this->getCountryQueryString('Geoname', 'Exhibition', 'country_code', $countriesQuery) . " ) ";
         $countryQueryString .= " AND ". $this->getArrayQueryString('Exhibition', 'organizer_type', $organizerTypeQuery, 'Exhibition.status <> -1');
         $countryQueryString .= " ". $this->getStringQueryForExhibitions($stringQuery, 'long');
+
+
+        //print_r(StatisticsController::getStringQueryForPersonsInExhibitions($artistNationalities, 'country', 'long'));
+        $artistNationalitiesQueryString = StatisticsController::getStringQueryForPersonsInExhibitions($artistNationalities, 'country', 'long');
+
+
+        /*if(!empty($artistGender)){
+            $countryQueryString .= StatisticsController::getStringQueryForPersonsInExhibitions($artistGender, 'sex', 'long');
+        }*/
+
+        /*if($exhibitionStartDateLeft !== 'any' && $exhibitionStartDateRight !== 'any'){
+            $countryQueryString .= StatisticsController::getStringQueryExhibitionsStartdate($exhibitionStartDateLeft, $exhibitionStartDateRight, 'long');
+        }*/
+
 
         if (in_array("true", $currIds)) {
             // remove true statement from ids
@@ -169,18 +263,20 @@ extends Controller
         . " GROUP BY YEAR(startdate), MONTH(startdate)"
         . " ORDER BY start_year, start_month"; */
 
-
         $querystr = "SELECT YEAR(startdate) AS start_year, MONTH(startdate) AS start_month"
-            . ", COUNT(*) AS how_many FROM Exhibition "
+            . ", COUNT(DISTINCT Exhibition.id) AS how_many FROM Exhibition "
             . " LEFT JOIN Location ON Exhibition.id_location = Location.id"
-            . " LEFT JOIN Geoname ON Location.place_tgn = Geoname.tgn"
+            . " LEFT JOIN ItemExhibition ON ItemExhibition.id_exhibition = Exhibition.id "
+            . " LEFT JOIN Person ON Person.id = ItemExhibition.id_person " . $artistNationalitiesQueryString
             //->from('AppBundle:Location', 'L')
             // ->leftJoin('L.place', 'Pl')
             . " WHERE Exhibition.status <> -1 AND MONTH(startdate) <> 0"
-            . " ". $countryQueryString
-            . " GROUP BY YEAR(startdate), MONTH(startdate)"
+            // . " ". $countryQueryString
+            . " GROUP BY start_year, MONTH(startdate)"
             . " ORDER BY start_year, start_month"
         ;
+
+        //print $querystr;
 
         //->andWhere("Pl.countryCode IN(${countryQueryString})")
 
@@ -1565,12 +1661,25 @@ EOT;
 
 
     // controller is called by /exhibition route to load async the stats
-    function exhibitionNationalityIndex($countriesQuery, $organizerTypeQuery, $stringQuery, $currIds = []){
+    function exhibitionNationalityIndex($countriesQuery, $organizerTypeQuery, $stringQuery, $currIds = [], $artistGender = "", $artistNationalities = [], $exhibitionStartDateLeft = 'any', $exhibitionStartDateRight = 'any'){
 
 
         $countryQueryString = $this->getCountryQueryString('Pl', 'L', 'countryCode', $countriesQuery);
         $countryQueryString .= " AND ". $this->getArrayQueryString('E', 'organizerType', $organizerTypeQuery, 'L.status <> -1');
         $countryQueryString .= $this->getStringQueryForExhibitions($stringQuery, 'short');
+
+
+        $queryStringArtistCountry = $this->getStringQueryForPersonsInExhibitions($artistNationalities, 'nationality', 'short');
+
+
+        if(!empty($artistGender)){
+            $countryQueryString .= $this->getStringQueryForPersonsInExhibitions($artistGender, 'gender', 'short');
+        }
+
+        if($exhibitionStartDateLeft !== 'any' && $exhibitionStartDateRight !== 'any'){
+            $countryQueryString .= $this->getStringQueryExhibitionsStartdate($exhibitionStartDateLeft, $exhibitionStartDateRight, 'short');
+        }
+
 
         if (in_array("true", $currIds)) {
             // remove true statement from ids
@@ -1587,6 +1696,31 @@ EOT;
 
         // >where("u.created_date BETWEEN '${fromdateaccounts}'
 
+
+        // inner query to get exhibitions where artists from given countries are exhibiting
+        $qbInner = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qbInner->select([
+            'E.id as exhId'
+            ])
+            ->from('AppBundle:Exhibition', 'E')
+            ->leftJoin('AppBundle:ItemExhibition', 'IE',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                "IE.exhibition = E")
+            ->leftJoin('AppBundle:Person', 'P',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'P = IE.person')
+            ->where(" ( P.nationality = 'BE' OR P.nationality = 'CZ' ) ")
+            ->groupBy('E.id');
+
+
+        print 'test';
+        $resultInner = $qbInner->getQuery()->getResult();
+        print_r(count($resultInner));
+
+
         $qb->select([
             'P.id',
             'P.nationality',
@@ -1594,28 +1728,59 @@ EOT;
             'COUNT(DISTINCT IE.id) AS numEntries',
             'C.name'
         ])
-            ->from('AppBundle:Location', 'L')
+            ->from($qbInner->getQuery()->getSQL(), 'ExhibitionsWithArtist')
+            ->leftJoin('E.location', 'L')
             ->leftJoin('L.place', 'Pl')
             ->leftJoin('Pl.country', 'C')
-            ->leftJoin('AppBundle:Exhibition', 'E',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'E.location = L AND E.status <> -1')
+            //->leftJoin('L.place', 'Person')
+            // ->leftJoin('E.artists', 'A')
             ->leftJoin('AppBundle:ItemExhibition', 'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = E AND IE.title IS NOT NULL')
-            ->innerJoin('IE.person', 'P')
+                'IE.exhibition = ExhibitionsWithArtist.exhId AND IE.title IS NOT NULL')
+            ->leftJoin('AppBundle:Person', 'P',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'P = IE.person')
+            ->where('E.status <> -1')
             ->where('L.status <> -1')
-            //->andWhere($countryQueryString)
-            //->andWhere("Pl.countryCode IN(${countryQueryString})")
             ->andWhere("${countryQueryString}")
-            //->andWhere("${$stringQueryString}")
-            //->andWhere("${countryQueryString}")
-            //->andWhere("Pl.countryCode IN('CH', 'NL')") // test
             ->groupBy('P.id')
             ->orderBy('C.name', 'DESC')
         ;
 
+
+        /*$qb->select([
+            'P.id',
+            'P.nationality',
+            'Pl.countryCode',
+            'COUNT(DISTINCT IE.id) AS numEntries',
+            'C.name'
+        ])
+            ->from('AppBundle:Exhibition', 'E')
+            ->leftJoin('E.location', 'L')
+            ->leftJoin('L.place', 'Pl')
+            ->leftJoin('Pl.country', 'C')
+            //->leftJoin('L.place', 'Person')
+            // ->leftJoin('E.artists', 'A')
+            ->leftJoin('AppBundle:ItemExhibition', 'IE',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE.exhibition = E AND IE.title IS NOT NULL')
+            ->leftJoin('AppBundle:Person', 'P',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'P = IE.person')
+            ->where('E.status <> -1')
+            ->where('L.status <> -1')
+            ->andWhere("${countryQueryString}")
+            ->groupBy('P.id')
+            ->orderBy('C.name', 'DESC')
+        ;*/
+
+        // TODO SQL QUERY SHOULD NOT FILTER ALL ARTISTS BUT THE EXHIBITIONS WHERE ARTSIST FROM THIS COUNTRIES ARE
+
         $lastCountry = '';
+        print 'what up';
+
+        print $qb->getQuery()->getSQL();
+
         $result = $qb->getQuery()->getResult();
 
         $statsByCountry = [];

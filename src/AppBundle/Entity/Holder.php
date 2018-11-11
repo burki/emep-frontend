@@ -42,6 +42,7 @@ implements \JsonSerializable, JsonLdSerializable
      */
     protected $id;
 
+
     /**
      * @var int
      *

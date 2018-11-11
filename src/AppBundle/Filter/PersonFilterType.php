@@ -65,6 +65,70 @@ extends CrudFilterType
 
             },
         ]);
+
+
+        $builder->add('birthDate', Filters\DateRangeFilterType::class, [
+                'left_date_options'  => array('years' => range($options['data']['birthyears'][0], $options['data']['birthyears'][1])),
+                'right_date_options' => array('years' => range($options['data']['birthyears'][0], $options['data']['birthyears'][1]))
+            ]
+        );
+
+        $builder->add('deathDate', Filters\DateRangeFilterType::class, [
+                'left_date_options'  => array('years' => range($options['data']['deathyears'][0], $options['data']['deathyears'][1])),
+                'right_date_options' => array('years' => range($options['data']['deathyears'][0], $options['data']['deathyears'][1]))
+            ]
+        );
+
+
+        $builder->add('organizer_type', Filters\ChoiceFilterType::class, [
+            'label' => 'Type of Organizing Body',
+            'multiple' => true,
+            'choices' => $options['data']['organizer_type_choices'],
+            'attr' => [
+                'data-placeholder' => 'select type of organizing body',
+            ],
+            'apply_filter' => function (QueryInterface $filterQuery, $field, $values) {
+                if (empty($values['value'])) {
+                    return null;
+                }
+
+                $paramName = sprintf('e_%s', str_replace('.', '_', $field));
+
+                // expression that represent the condition
+                $expression = $filterQuery->getExpr()->in('E.organizerType', ':'.$paramName);
+
+                // expression parameters
+                $parameters = [
+                    $paramName => [ $values['value'], \Doctrine\DBAL\Connection::PARAM_STR_ARRAY ],
+                ];
+
+                return $filterQuery->createCondition($expression, $parameters);
+            },
+        ]);
+
+
+
+        $builder->add('country', Filters\ChoiceFilterType::class, [
+            'choices' => [ 'select country' => '' ] + $options['data']['country_choices'],
+            'multiple' => true,
+            'apply_filter' => function (QueryInterface $filterQuery, $field, $values) {
+                if (empty($values['value'])) {
+                    return null;
+                }
+
+                $paramName = sprintf('p_%s', str_replace('.', '_', $field));
+
+                // expression that represent the condition
+                $expression = $filterQuery->getExpr()->in('Pl.countryCode', ':'.$paramName);
+
+                // expression parameters
+                $parameters = [
+                    $paramName => [ $values['value'], \Doctrine\DBAL\Connection::PARAM_STR_ARRAY ],
+                ];
+                return $filterQuery->createCondition($expression, $parameters);
+            },
+        ]);
+
     }
 
     public function getBlockPrefix()

@@ -12,7 +12,7 @@
             $('#entries').DataTable({
                 paging: false,
                 searching: false,
-                info: false,
+                info: true,
                 "columns": [
                     { "orderSequence": [ "desc", "asc" ] },
                     { "orderSequence": [ "desc", "asc" ] }
@@ -26,7 +26,7 @@
             var table = $('#entrytable').DataTable({
                 paging: true,
                 searching: false,
-                info: false,
+                info: true,
                 "columnDefs": [
                     { "visible": false, "targets": groupColumn }
                 ],
@@ -39,9 +39,8 @@
 
                     api.column(groupColumn, {page:'current'} ).data().each( function ( group, i ) {
                         if ( last !== group ) {
-                            var splitGroup = group.split('>');
-                            splitGroup  = splitGroup[1].split('</a');
-                            splitGroup = splitGroup[0];
+
+                            splitGroup = group;
 
 
                             $(rows).eq( i ).before(

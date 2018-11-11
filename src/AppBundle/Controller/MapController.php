@@ -16,7 +16,7 @@ extends CrudController
      * @Route("/person/by-place", name="person-by-place")
      */
 
-    public function birthDeathPlacesIndex($countriesQuery, $genderQuery, $stringQuery, $currIds = [])
+    public function birthDeathPlacesIndex($countriesQuery, $genderQuery, $stringQuery, $currIds = [], $exhibitionCountries = [], $organizerTypesQuery = [], $artistBirthDateLeft = 'any' , $artistBirthDateRight= 'any', $artistDeathDateLeft = 'any' , $artistDeathDateRight =  'any')
     {
         $maxDisplay = 15;
 
@@ -25,18 +25,69 @@ extends CrudController
         $em = $this->getDoctrine()->getEntityManager();
         $dbconn = $em->getConnection();
 
-        $queryTemplate = "SELECT '%s' AS type, Person.id AS person_id, lastname, firstname, birthdate, deathdate, COALESCE(Geoname.name_variant, Geoname.name) AS place, Geoname.tgn AS tgn, latitude, longitude"
+        print 'here';
+
+        $queryTemplate = "SELECT '%s' AS type, Person.id AS person_id, lastname, firstname, birthdate, deathdate, COALESCE(Geoname.name_variant, Geoname.name) AS place, Geoname.tgn AS tgn, Geoname.latitude, Geoname.longitude"
             . " FROM Person"
             . " INNER JOIN Geoname ON Person.%splace_tgn=Geoname.tgn"
+            . " LEFT JOIN ExhibitionPerson ON ExhibitionPerson.id_person = Person.id"
+            . " LEFT JOIN Exhibition ON Exhibition.id = ExhibitionPerson.id_exhibition"
+            . " LEFT JOIN Location ON Location.id = Exhibition.id_location "
             . " WHERE Person.status <> -1";
+
+        /*
+        $qb->select([
+            'P',
+            'COUNT(DISTINCT E.id) AS numExhibitionSort',
+            'COUNT(DISTINCT IE.id) AS numCatEntrySort',
+            "P.sortName HIDDEN nameSort"
+        ])
+            ->from('AppBundle:Person', 'P')
+            ->leftJoin('P.exhibitions', 'E')
+
+            ->leftJoin('E.location', 'L')
+            ->leftJoin('L.place', 'Pl')
+
+            ->leftJoin('P.catalogueEntries', 'IE')
+            ->where('P.status <> -1')
+            ->groupBy('P.id') // for Count
+            ->orderBy('nameSort')
+        ;*/
+
 
 
         $andWhere = '';
 
 
+        // getStringQueryForExhibitionsInArtist($queryArray, $querySubject, $shortOrLongQuery)
+        // getStringQueryArtistsBirthAndDeathDate($startdate, $enddate, $birthOrDeath, $shortOrLongQuery)
+
         $andWhere = " AND ". StatisticsController::getArrayQueryString('Person', 'country', $countriesQuery, 'Person.status <> -1');
         $andWhere .= " AND ". StatisticsController::getArrayQueryString('Person', 'sex', $genderQuery, 'Person.status <> -1');
+
         $stringQueryPart = " " . StatisticsController::getStringQueryForArtists($stringQuery, 'fullname');
+
+
+
+        if($artistBirthDateLeft !== 'any' && $artistBirthDateRight !== 'any'){
+            $andWhere .= StatisticsController::getStringQueryArtistsBirthAndDeathDate($artistBirthDateLeft, $artistBirthDateRight, 'birthdate', 'long');
+        }
+
+        if($artistDeathDateLeft !== 'any' && $artistDeathDateRight !== 'any'){
+            $andWhere .= StatisticsController::getStringQueryArtistsBirthAndDeathDate($artistDeathDateLeft, $artistDeathDateRight, 'deathdate', 'long');
+        }
+
+
+        print (StatisticsController::getStringQueryForLocationInArtist($exhibitionCountries, 'country', 'long'));
+        // $andWhere .= StatisticsController::getStringQueryForLocationInArtist($exhibitionCountries, 'country', 'long');
+
+        $andWhere .= "AND Location.country IN('BE') ";
+
+        print $andWhere;
+
+        //$andWhere .= StatisticsController::getStringQueryForLocationInArtist($exhibitionCountries, 'country', 'long');
+
+
 
         if (in_array("true", $currIds)) {
         // remove true statement from ids
@@ -51,6 +102,7 @@ extends CrudController
         $queryTemplate .= $andWhere;
 
 
+        print '\n';
 
         $unionParts = [];
 
@@ -65,6 +117,9 @@ extends CrudController
         $querystr = join(' UNION ', $unionParts)
             . " ORDER BY lastname, firstname, person_id"
         ;
+
+
+        print $querystr;
 
 
 
@@ -630,7 +685,7 @@ extends CrudController
         ]);
     }
 
-    public function exhibitionByPlaceIndexPart($countriesQuery, $organizerTypeQuery, $stringQuery, $currIds = [])
+    public function exhibitionByPlaceIndexPart($countriesQuery, $organizerTypeQuery, $stringQuery, $currIds = [], $artistGender = "", $artistNationalities = [], $exhibitionStartDateLeft = 'any', $exhibitionStartDateRight = 'any')
     {
         $em = $this->getDoctrine()->getEntityManager();
         $dbconn = $em->getConnection();
@@ -666,14 +721,27 @@ extends CrudController
         $querystr = "SELECT DISTINCT Exhibition.id AS exhibition_id, Exhibition.title, startdate, enddate, Exhibition.displaydate AS displaydate, Location.id AS location_id, Location.name AS location_name, COALESCE(Geoname.name_variant, Geoname.name) AS place, Geoname.tgn, Geoname.latitude, Geoname.longitude"
             . " FROM Exhibition"
             . " INNER JOIN Location ON Location.id=Exhibition.id_location"
-            . " INNER JOIN Geoname ON Geoname.tgn=Location.place_tgn";
+            . " INNER JOIN Geoname ON Geoname.tgn=Location.place_tgn"
+            . " LEFT JOIN ItemExhibition ON ItemExhibition.id_exhibition = Exhibition.id AND ItemExhibition.title IS NOT NULL"
+            . " LEFT JOIN Person ON Person.id = ItemExhibition.id_person ";
 
-        $andWhere = '';
 
 
-        $andWhere = " AND " .  StatisticsController::getCountryQueryString('Location', 'Exhibition', 'country', $countriesQuery);
+        $andWhere  = " AND " .  StatisticsController::getCountryQueryString('Location', 'Exhibition', 'country', $countriesQuery);
         $andWhere .= " AND ". StatisticsController::getArrayQueryString('Exhibition', 'organizer_type', $organizerTypeQuery, 'Exhibition.status <> -1');
         $andWhere .= StatisticsController::getStringQueryForExhibitions($stringQuery, 'long');
+
+        $andWhere .= StatisticsController::getStringQueryForPersonsInExhibitions($artistNationalities, 'country', 'long');
+
+
+        if(!empty($artistGender)){
+            $andWhere .= StatisticsController::getStringQueryForPersonsInExhibitions($artistGender, 'sex', 'long');
+        }
+
+        if($exhibitionStartDateLeft !== 'any' && $exhibitionStartDateRight !== 'any'){
+            $andWhere .= StatisticsController::getStringQueryExhibitionsStartdate($exhibitionStartDateLeft, $exhibitionStartDateRight, 'long');
+        }
+
 
 
         if (in_array("true", $currIds)) {
@@ -682,6 +750,8 @@ extends CrudController
             unset($currIds[$pos]);
             $andWhere .= StatisticsController::getStringQueryForExhibitionIds($currIds, 'long');
         }
+
+        print $andWhere;
 
         $querystr
             .= " WHERE"

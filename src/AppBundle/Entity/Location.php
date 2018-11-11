@@ -67,6 +67,14 @@ implements \JsonSerializable, JsonLdSerializable
      */
     protected $type = null;
 
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $country = null;
+
     /**
      * @var string A short description of the item.
      *
@@ -241,6 +249,16 @@ implements \JsonSerializable, JsonLdSerializable
     }
 
     /**
+     * Gets country.
+     *
+     * @return string
+     */
+    public function getCountry()
+    {
+        return $this->country;
+    }
+
+    /**
      * Returns false if self::FLAGS_NOT_VENUE is set.
      *
      * @return bool
@@ -262,6 +280,20 @@ implements \JsonSerializable, JsonLdSerializable
         $this->description = $description;
 
         return $this;
+    }
+
+
+    /**
+     * Sets description.
+     *
+     * @param string $description
+     *
+     * @return $this
+     */
+    public function getType()
+    {
+        return $this->type;
+
     }
 
     /**
