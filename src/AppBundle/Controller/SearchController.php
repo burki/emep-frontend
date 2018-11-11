@@ -251,7 +251,9 @@ extends CrudController
     /**
      * @Route("/search/map", name="search-map")
      */
-    public function mapAction(Request $request, UrlGeneratorInterface $urlGenerator)
+    public function mapAction(Request $request,
+                              UrlGeneratorInterface $urlGenerator,
+                              UserInterface $user = null)
     {
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, true);
         if ($listBuilder->getEntity() != 'Person') {
@@ -374,6 +376,7 @@ extends CrudController
 
             'listBuilder' => $listBuilder,
             'form' => $this->form->createView(),
+            'searches' => $this->lookupSearches($user),
         ]);
     }
 
@@ -430,6 +433,10 @@ extends CrudController
 
     protected function lookupSearches($user)
     {
+        if (is_null($user)) {
+            return [];
+        }
+
         $qb = $this->getDoctrine()
                 ->getManager()
                 ->createQueryBuilder();
@@ -458,18 +465,13 @@ extends CrudController
         $pager->setMaxPerPage($listPage['limit']);
         $pager->setCurrentPage(intval($listPage['offset'] / $listPage['limit']) + 1);
 
-        $searches = [];
-        if (!is_null($user)) {
-            // look for saved searches
-            $searches = $this->lookupSearches($user);
-        }
-
         return $this->render('Search/base.html.twig', [
             'pageTitle' => $this->get('translator')->trans('Advanced Search'),
             'pager' => $pager,
+
             'listBuilder' => $listBuilder,
             'form' => $this->form->createView(),
-            'searches' => $searches,
+            'searches' => $this->lookupSearches($user),
         ]);
     }
 }
