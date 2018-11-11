@@ -36,9 +36,9 @@
 
         "symfony/validator": "^4.1",
         "symfony/form": "^4.1",
-        "shapecode/hidden-entity-type-bundle": "@stable",
+        "shapecode/hidden-entity-type-bundle": "^3.0",
 
-        "symfony/monolog-bundle": "@stable",
+        "symfony/monolog-bundle": "^3.3",
         "symfony/swiftmailer-bundle": "@stable",
         "sensio/framework-extra-bundle": "@stable",
         "knplabs/knp-menu-bundle": "@stable",
@@ -60,6 +60,8 @@
         "stof/doctrine-extensions-bundle": "~1.2",
         "beberlei/DoctrineExtensions": "@stable",
 
+        "wikimedia/utfnormal": "^2.0",
+
         "semsol/arc2": "@stable",
         "easyrdf/easyrdf": "@stable",
         "seboettg/citeproc-php": "dev-name-as-sort-order-fix#bf446dc",
@@ -68,7 +70,10 @@
         "ddeboer/data-import": "0.20.*",
         "phpoffice/phpexcel": "1.8.*",
 
-        "kphoen/rulerz": "@stable"
+        "cocur/background-process": "0.7.*",
+
+        "ifedko/php-doctrine-dbal-pagination": "^2.0",
+        "white-october/pagerfanta-bundle": "^1.2"
     },
 
     "autoload": {

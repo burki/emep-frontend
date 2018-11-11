@@ -636,7 +636,7 @@
             $('.download-csv').on('click', function(){
                 var action = $('.exhibitionFilterForm').attr('action');
                 console.log('first action: ', action);
-                $('.exhibitionFilterForm').attr('action', '/person/csv');
+                $('.exhibitionFilterForm').attr('action', '{{ path('person-csv') }}');
                 $('.exhibitionFilterForm').submit();
                 // resetting action to old one
                 $('.exhibitionFilterForm').attr('action', action);

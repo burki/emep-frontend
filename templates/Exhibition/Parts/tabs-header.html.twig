@@ -33,15 +33,15 @@
     <script>
 
         $('.download-csv-catalogue').on('click', function(){
-            window.location.href =  "/exhibition/catalogue/csv/{{ exhibition.getId() }}";
+            window.location.href =  "{{ path('exhibition-catalogue-csv', { 'id': exhibition.getId() }) }}";
         });
 
         $('.download-csv-artists').on('click', function(){
-            window.location.href =  "/exhibition/artists/csv/{{ exhibition.getId() }}";
+            window.location.href =  "{{ path('exhibition-artists-csv', { 'id': exhibition.getId() }) }}";
         });
 
         $('.download-csv-similars').on('click', function(){
-            window.location.href =  "/exhibition/similars/csv/{{ exhibition.getId() }}";
+            window.location.href =  "{{ path('exhibition-similars-csv', { 'id': exhibition.getId() }) }}";
         });
 
 

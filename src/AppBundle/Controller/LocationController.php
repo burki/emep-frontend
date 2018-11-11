@@ -142,6 +142,7 @@ extends CrudController
 
     /**
      * @Route("/location", name="location-index")
+     * @Route("/organizer", name="organizer-index")
      */
     public function indexAction(Request $request)
     {
@@ -163,13 +164,29 @@ extends CrudController
             ->from('AppBundle:Location', 'L')
             ->leftJoin('L.place', 'P')
             ->leftJoin('P.country', 'C')
-            ->leftJoin('AppBundle:Exhibition', 'E',
-                       \Doctrine\ORM\Query\Expr\Join::WITH,
-                       'E.location = L AND E.status <> -1')
+            ;
+
+        if ('organizer-index' == $route) {
+            $qb
+                ->innerJoin('AppBundle:Exhibition', 'E',
+                           \Doctrine\ORM\Query\Expr\Join::WITH,
+                           'L MEMBER OF E.organizers AND E.status <> -1')
+                ->where('L.status <> -1')
+                ;
+        }
+        else {
+            $qb
+                ->leftJoin('AppBundle:Exhibition', 'E',
+                           \Doctrine\ORM\Query\Expr\Join::WITH,
+                           'E.location = L AND E.status <> -1')
+                ->where('L.status <> -1 AND 0 = BIT_AND(L.flags, 256)')
+                ;
+        }
+
+        $qb
             ->leftJoin('AppBundle:ItemExhibition', 'IE',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'IE.exhibition = E AND IE.title IS NOT NULL')
-            ->where('L.status <> -1 AND 0 = BIT_AND(L.flags, 256)')
             ->groupBy('L.id')
             ->orderBy('countryPlaceNameSort')
             ;
@@ -205,7 +222,7 @@ extends CrudController
         $indexDataNumberCountries = $this->indexDataNumberCountries($locations);
 
         return $this->render('Location/index.html.twig', [
-            'pageTitle' => $this->get('translator')->trans('Venues'),
+            'pageTitle' => $this->get('translator')->trans('organizer-index' == $route ? 'Organizing Bodies' : 'Venues'),
             'pagination' => $pagination,
             'form' => $form->createView(),
             'countryArray' => $this->buildCountries(),
@@ -466,6 +483,7 @@ extends CrudController
         $qb = $this->getDoctrine()
             ->getManager()
             ->createQueryBuilder();
+
         $qb->select([
             'E.id AS id',
             'COUNT(DISTINCT IE.id) AS numCatEntrySort',
@@ -490,12 +508,9 @@ extends CrudController
 
         $csvResult = [];
 
-        foreach ($result as $key=>$value) {
-
-            $exhibition = $value;
-
+        foreach ($result as $exhibition) {
             $innerArray = [];
-            array_push($innerArray, $exhibition->getStartdate(), $exhibition->getEnddate(), $exhibition->location->getPlaceLabel(), $exhibitionStats[$exhibition->getID()]->numCatEntrySort );
+            array_push($innerArray, $exhibition->getStartdate(), $exhibition->getEnddate(), $exhibition->getLocation()->getPlaceLabel(), $exhibitionStats[$exhibition->getId()]['numCatEntrySort'] );
 
             array_push($csvResult, $innerArray);
         }
@@ -507,6 +522,7 @@ extends CrudController
 
     /**
      * @Route("/location/{id}", requirements={"id" = "\d+"}, name="location")
+     * @Route("/organizer/{id}", requirements={"id" = "\d+"}, name="organizer")
      */
     public function detailAction(Request $request, $id = null, $ulan = null, $gnd = null)
     {

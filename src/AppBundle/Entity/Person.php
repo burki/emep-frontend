@@ -18,6 +18,9 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
 {
     use AddressesTrait;
 
+    static $entityfactsLocales = [ 'en' ]; // enabled locales in preferred order
+
+    /* add -00-00 or -00 to dates without month / day */
     static function formatDateIncomplete($dateStr)
     {
         if (preg_match('/^\d{4}$/', $dateStr)) {
@@ -38,41 +41,48 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
+
     /**
      * @var integer
      *
      * @ORM\Column(type="integer", nullable=false)
      */
     protected $status = 0;
+
     /**
      * @var string An additional name for a Person, can be used for a middle name.
      *
      */
     protected $additionalName;
+
     /**
      * @var string An additional name for a Person, can be used for a middle name.
      *
      * @ORM\Column(name="name_variant",nullable=true)
      */
     protected $variantName;
+
     /**
      * @var string An award won by or for this item.
      *
      * @ORM\Column(nullable=true)
      */
     protected $award;
+
     /**
      * @var string Date of birth.
      *
      * @ORM\Column(type="string", nullable=true)
      */
     protected $birthDate;
+
     /**
      * @var string Date of death.
      *
      * @ORM\Column(type="string", nullable=true)
      */
     protected $deathDate;
+
     /**
      * @var string A short description of the item.
      *
@@ -80,48 +90,56 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
      *
      */
     protected $description;
+
     /**
      * @var string Family name. In the U.S., the last name of an Person. This can be used along with givenName instead of the name property.
      *
-     * @ORM\Column(name="lastname",nullable=true)
+     * @ORM\Column(name="lastname", nullable=true)
      */
     protected $familyName;
+
     /**
-     * @var string Generated Column for fast sorting.
+     * @var string Generated Column for faster sorting.
      *
-     * @ORM\Column(name="sortname",nullable=true)
+     * @ORM\Column(name="sortname", nullable=true)
      */
     protected $sortName;
+
     /**
      * @var string Gender of the person.
      *
-     * @ORM\Column(name="sex",nullable=true)
+     * @ORM\Column(name="sex", nullable=true)
      */
     protected $gender;
+
     /**
      * @var string Given name. In the U.S., the first name of a Person. This can be used along with familyName instead of the name property.
      *
-     * @ORM\Column(name="firstname",nullable=true)
+     * @ORM\Column(name="firstname", nullable=true)
      */
     protected $givenName;
+
     /**
      * @var string The job title of the person (for example, Financial Manager).
      *
      * @ORM\Column(name="profession", nullable=true)
      */
     protected $jobTitle;
+
     /**
      * @var string Nationality of the person.
      *
      * @ORM\Column(name="country", nullable=true)
      */
     protected $nationality;
+
     /**
      * @var string URL of the item.
      *
      * @ORM\Column(nullable=true)
      */
     protected $url;
+
     /**
      * @var Place The place where the person was born.
      *
@@ -199,7 +217,8 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
     protected $wikidata;
 
     /**
-     */
+    * @ORM\Column(type="json_array", nullable=true)
+    */
     protected $entityfacts;
 
     /**
@@ -616,6 +635,11 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
         return $this->birthPlaceLabel;
     }
 
+    /**
+     * Gets indivdual addresses.
+     *
+     * @return array
+     */
     public function getAddressesSeparated($filterExhibition = null)
     {
         return $this->buildAddresses($this->addresses, false, $filterExhibition);
@@ -638,10 +662,12 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
         if (is_null($entityfacts) || !array_key_exists($key, $entityfacts)) {
             return;
         }
+
         $place = $entityfacts[$key][0];
         if (empty($place)) {
             return;
         }
+
         $placeInfo = [ 'name' => $place['preferredName'] ];
 
         if (!empty($place['@id'])) {
@@ -662,6 +688,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
         if (is_null($wikidata) || !array_key_exists($key, $wikidata)) {
             return;
         }
+
         return [ 'name' => $wikidata[$key] ];
     }
 
@@ -669,7 +696,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
      * Gets birthPlace info
      *
      */
-    public function getBirthPlaceInfo($locale = 'de')
+    public function getBirthPlaceInfo($locale = 'en')
     {
         if (!is_null($this->birthPlace)) {
             return self::buildPlaceInfo($this->birthPlace, $locale);
@@ -725,7 +752,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
      * Gets deathPlace info
      *
      */
-    public function getDeathPlaceInfo($locale = 'de')
+    public function getDeathPlaceInfo($locale = 'en')
     {
         if (!is_null($this->deathPlace)) {
             return self::buildPlaceInfo($this->deathPlace, $locale);
@@ -901,12 +928,13 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
      *
      * @return $this
      */
-    public function setEntityfacts($entityfacts, $locale = 'de')
+    public function setEntityfacts($entityfacts, $locale = 'en')
     {
-        if (in_array($locale, ['de', 'en'])) {
+        if (in_array($locale, self::$entityfactsLocales)) {
             if (is_null($this->entityfacts)) {
                 $this->entityfacts = [];
             }
+
             $this->entityfacts[$locale] = $entityfacts;
         }
 
@@ -918,7 +946,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
      *
      * @return array
      */
-    public function getEntityfacts($locale = 'de', $force_locale = false)
+    public function getEntityfacts($locale = 'en', $forceLocale = false)
     {
         if (is_null($this->entityfacts)) {
             return null;
@@ -929,9 +957,9 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
             return $this->entityfacts[$locale];
         }
 
-        if (!$force_locale) {
+        if (!$forceLocale) {
             // try to use fallback
-            foreach ( ['de', 'en'] as $locale) {
+            foreach (self::$entityfactsLocales as $locale) {
                 if (array_key_exists($locale, $this->entityfacts)) {
                     return $this->entityfacts[$locale];
                 }
@@ -989,6 +1017,14 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
         return $this->slug;
     }
 
+    /*
+     * Returns
+     *  familyName, givenName
+     * or
+     *  givenName familyName
+     *
+     * @return string
+     */
     public function getFullname($givenNameFirst = false)
     {
         $parts = [];
@@ -997,14 +1033,17 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
                 $parts[] = $this->$key;
             }
         }
+
         if (empty($parts)) {
             return '';
         }
+
         return $givenNameFirst
             ? implode(' ', array_reverse($parts))
             : implode(', ', $parts);
     }
 
+    /* filter removed items */
     public function getItems($minStatus = 0)
     {
         if (is_null($this->items)) {
@@ -1012,15 +1051,24 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
         }
 
         return $this->items->filter(
-            function($entity) use ($minStatus) {
+            function ($entity) use ($minStatus) {
                return $entity->getStatus() >= $minStatus;
             }
         );
     }
 
-    public function getExhibitions()
+    /* filter removed exhibitions */
+    public function getExhibitions($minStatus = 0)
     {
-        return $this->exhibitions;
+        if (is_null($this->exhibitions)) {
+            return $this->exhibitions;
+        }
+
+        return $this->exhibitions->filter(
+            function ($entity) use ($minStatus) {
+               return $entity->getStatus() >= $minStatus;
+            }
+        );
     }
 
     public function jsonSerialize()

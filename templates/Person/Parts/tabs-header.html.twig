@@ -23,11 +23,11 @@
 
     <script>
         $('.download-csv-exhibition').on('click', function(){
-            window.location.href =  "/person/exhibition/csv/{{ person.getId() }}";
+            window.location.href =  "{{ path('person-exhibition-csv', { id: person.getId() }) }}";
         });
 
         $('.download-csv-coappearances').on('click', function(){
-            window.location.href =  "/person/coappearances/csv/{{ person.getId() }}";
+            window.location.href =  "{{ path('person-coappearances-csv', { id: person.getId() }) }}";
         });
 
         // make the right export button visible

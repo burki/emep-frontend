@@ -21,7 +21,7 @@
     <script>
 
         $('.download-csv-catalogues').on('click', function(){
-            window.location.href =  "/holder/catalogues/csv/{{ holder.getId() }}";
+            window.location.href =  "{{ path('holder-catalogue-csv', { 'id': holder.getId() }) }}";
         });
 
         // make the right export button visible

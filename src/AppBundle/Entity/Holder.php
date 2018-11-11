@@ -83,9 +83,9 @@ implements \JsonSerializable, JsonLdSerializable
     /**
      * @var string The date that this organization was founded.
      *
-     * @ORM\Column(type="string", nullable=true)
+     * #ORM\Column(type="string", nullable=true)
      */
-    //protected $foundingDate;
+    protected $foundingDate;
 
     /**
      * @var string The name of the item.

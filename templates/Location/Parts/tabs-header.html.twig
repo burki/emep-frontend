@@ -26,11 +26,11 @@
     <script>
 
         $('.download-csv-exhibitions').on('click', function(){
-            window.location.href =  "/location/exhibitions/csv/{{ location.getId() }}";
+            window.location.href =  "{{ path('location-exhibitions-csv', { id: location.getId() }) }}";
         });
 
         $('.download-csv-artists').on('click', function(){
-            window.location.href =  "/location/artists/csv/{{ location.getId() }}";
+            window.location.href =  "{{ path('location-artists-csv', { id: location.getId() }) }}";
         });
 
         // make the right export button visible

@@ -244,9 +244,35 @@
                 {#{ dump(persons_by_place[person])}#}
                 {{ persons_by_place[person]['total_exhibition'] }} exhibition{% if persons_by_place[person]['total_exhibition'] != 1 %}s{% endif %}<br/>
                 {{ persons_by_place[person]['total_item'] }} work{% if persons_by_place[person]['total_item'] != 1 %}s{% endif %}
-                ({{ persons_by_place[person]['Figurative'] }} fig.,
-                {{ persons_by_place[person]['Abstracted'] }} absted.,
-                {{ persons_by_place[person]['Abstract'] }} abst.)
+                ( {% for key, label in { 'Naturalistic' : 'nat.', 'Stylized / form OR colour' : 'styl. OR', 'Stylized / form AND colour' : 'styl. AND', 'Non-representational' : 'non-rep.', 'Anti-illusionistic' : 'Anti-ill.' } %}{% if persons_by_place[person][key] is not empty %}{{ persons_by_place[person][key] }} {{ label }}, {% endif %}{% endfor %})
+            {% endif %}
+        </th>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+
+    <table class="table table-striped">
+    <thead>
+    <tr>
+        <th>&nbsp;</th>
+        {% for person in persons_by_place_persons %}
+        <th>{{ person }}</th>
+        {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+    {% for year, persons_by_year in persons_by_year %}
+    <tr>
+        <td>{{ year }}</td>
+        {% for person in persons_by_place_persons %}
+        <td>
+            {% if persons_by_year[person] is not empty %}
+                {#{ dump(persons_by_place[person])}#}
+                {{ persons_by_year[person]['total_exhibition'] }} exhibition{% if persons_by_year[person]['total_exhibition'] != 1 %}s{% endif %}<br/>
+                {{ persons_by_year[person]['total_item'] }} work{% if persons_by_year[person]['total_item'] != 1 %}s{% endif %}
+                ( {% for key, label in { 'Naturalistic' : 'nat.', 'Stylized / form OR colour' : 'styl. OR', 'Stylized / form AND colour' : 'styl. AND', 'Non-representational' : 'non-rep.', 'Anti-illusionistic' : 'Anti-ill.', 'no visual evidence': 'no vis.' } %}{% if persons_by_year[person][key] is not empty %}{{ persons_by_year[person][key] }} {{ label }}, {% endif %}{% endfor %})
             {% endif %}
         </th>
         {% endfor %}
