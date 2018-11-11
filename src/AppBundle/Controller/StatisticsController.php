@@ -313,7 +313,7 @@ extends Controller
 
 
 
-        
+
         //->andWhere("Pl.countryCode IN(${countryQueryString})")
 
 
@@ -548,7 +548,7 @@ extends Controller
         ]);
     }
 
-    public function personByYearActionPart($countriesQuery, $genderQuery, $stringQuery, $currIds = [])
+    public function personByYearActionPart($countriesQuery, $genderQuery, $stringQuery, $currIds = [], $exhibitionCountries = [], $organizerTypesQuery = [], $artistBirthDateLeft = 'any' , $artistBirthDateRight= 'any', $artistDeathDateLeft = 'any' , $artistDeathDateRight =  'any')
     {
 
         // display the artists by birth-year, the catalog-entries by exhibition-year
@@ -560,6 +560,23 @@ extends Controller
         $andWhere .= $this->getStringQueryForArtists($stringQuery, 'fullname');
 
 
+        if($artistBirthDateLeft !== 'any' && $artistBirthDateRight !== 'any'){
+            $andWhere .= StatisticsController::getStringQueryArtistsBirthAndDeathDate($artistBirthDateLeft, $artistBirthDateRight, 'birthdate', 'long');
+        }
+
+        if($artistDeathDateLeft !== 'any' && $artistDeathDateRight !== 'any'){
+            $andWhere .= StatisticsController::getStringQueryArtistsBirthAndDeathDate($artistDeathDateLeft, $artistDeathDateRight, 'deathdate', 'long');
+        }
+
+        $organizerQuery = "";
+        if(!empty($organizerTypesQuery)) {
+            $organizerQuery = " " . StatisticsController::getStringQueryForExhibitionsInArtist($organizerTypesQuery, 'organizer_type', 'long');
+        }
+
+
+        $exhibitionCountryQuery = StatisticsController::getStringQueryForLocationInArtist($exhibitionCountries, 'country', 'long');
+
+
         if (in_array("true", $currIds)) {
             // remove true statement from ids
             $pos = array_search('true', $currIds);
@@ -568,20 +585,32 @@ extends Controller
         }
 
         $dbconn = $em->getConnection();
-        $querystr = "SELECT 'active' AS type, COUNT(*) AS how_many FROM Person"
-            . " WHERE status >= 0 AND birthdate IS NOT NULL"
+
+        // this query calculates the total results only
+        $querystr = "SELECT 'active' AS type, COUNT(DISTINCT Person.id) AS how_many FROM Person"
+            . " LEFT JOIN ItemExhibition ON ItemExhibition.id_person = Person.id"
+            . " LEFT JOIN Exhibition ON Exhibition.id = ItemExhibition.id_exhibition "
+            . " LEFT JOIN Location ON Location.id = Exhibition.id_location "
+            . " WHERE Person.status >= 0 AND birthdate IS NOT NULL"
+
             // . "  AND sex IS NOT NULL"
         ;
 
         // for the selected ones
-        $querystr .= " AND " . $andWhere;
+        $querystr .= " AND " . $andWhere . " " .$exhibitionCountryQuery . " " . $organizerQuery ;
 
 
-        $querystr .= " UNION SELECT 'total' AS type, COUNT(*) AS how_many"
-            . " FROM Person WHERE status >= 0";
+        $querystr .= " UNION SELECT 'total' AS type, COUNT(DISTINCT Person.id) AS how_many"
+            . " FROM Person "
+            . " LEFT JOIN ItemExhibition ON ItemExhibition.id_person = Person.id"
+            . " LEFT JOIN Exhibition ON Exhibition.id = ItemExhibition.id_exhibition "
+            . " LEFT JOIN Location ON Location.id = Exhibition.id_location "
+            . " WHERE Person.status >= 0 "
+        ;
 
         // for the total number of personas
-        $querystr .= " AND " . $andWhere;
+        $querystr .= " AND " . $andWhere . " " .$exhibitionCountryQuery . " ". $organizerQuery ;
+
 
 
         $stmt = $dbconn->query($querystr);
@@ -602,9 +631,13 @@ extends Controller
 
             $querystr = 'SELECT YEAR(' . $date_field . ') AS year'
                 // . ', sex'
-                . ', COUNT(*) AS how_many'
-                . ' FROM Person WHERE status >= 0 AND ' . $date_field . ' IS NOT NULL'
-                . ' AND ' . $andWhere // country code filter
+                . ', COUNT(DISTINCT Person.id) AS how_many'
+                . ' FROM Person '
+                . " LEFT JOIN ItemExhibition ON ItemExhibition.id_person = Person.id"
+                . " LEFT JOIN Exhibition ON Exhibition.id = ItemExhibition.id_exhibition "
+                . " LEFT JOIN Location ON Location.id = Exhibition.id_location "
+                . " WHERE Person.status >= 0 AND ' . $date_field . ' IS NOT NULL "
+                . ' AND ' . " " . $andWhere . " " . $exhibitionCountryQuery . " ". $organizerQuery // country code filter
                 // . ' AND sex IS NOT NULL'
                 . ' GROUP BY YEAR(' . $date_field. ')'
                 // . ', sex'
@@ -747,7 +780,7 @@ EOT;
         return $ids;
     }
 
-    public static function exhibitionAgeDistribution($em, $exhibitionId = null, $gender = null, $countryQuery = null, $stringQuery = null, $currIds = [])
+    public static function exhibitionAgeDistribution($em, $exhibitionId = null, $gender = null, $countryQuery = null, $stringQuery = null, $currIds = [], $exhibitionCountries = [], $organizerTypesQuery = [], $artistBirthDateLeft = 'any' , $artistBirthDateRight= 'any', $artistDeathDateLeft = 'any' , $artistDeathDateRight =  'any')
     {
         $dbconn = $em->getConnection();
 
@@ -773,6 +806,23 @@ EOT;
             $where .= " AND ". StatisticsController::getArrayQueryString('Person', 'sex', $gender, 'Person.status <> -1 ');
             $where .= StatisticsController::getStringQueryForArtists($stringQuery, 'fullname');
 
+            if($artistBirthDateLeft !== 'any' && $artistBirthDateRight !== 'any'){
+                $where .= StatisticsController::getStringQueryArtistsBirthAndDeathDate($artistBirthDateLeft, $artistBirthDateRight, 'birthdate', 'long');
+            }
+
+            if($artistDeathDateLeft !== 'any' && $artistDeathDateRight !== 'any'){
+                $where .= StatisticsController::getStringQueryArtistsBirthAndDeathDate($artistDeathDateLeft, $artistDeathDateRight, 'deathdate', 'long');
+            }
+
+
+            if(!empty($organizerTypesQuery)) {
+                $where .= StatisticsController::getStringQueryForExhibitionsInArtist($organizerTypesQuery, 'organizer_type', 'long');
+            }
+
+            $where .=  StatisticsController::getStringQueryForLocationInArtist($exhibitionCountries, 'country', 'long');
+
+
+
             if (in_array("true", $currIds)) {
                 // remove true statement from ids
                 $pos = array_search('true', $currIds);
@@ -791,6 +841,7 @@ FROM
 FROM Exhibition
 INNER JOIN ItemExhibition ON ItemExhibition.id_exhibition=Exhibition.id
 INNER JOIN Person ON ItemExhibition.id_person=Person.id AND Person.birthdate IS NOT NULL
+LEFT JOIN Location ON Location.id = Exhibition.id_location 
 $where
 GROUP BY Exhibition.id, Person.id) AS EB
 GROUP BY age, state
@@ -910,10 +961,10 @@ EOT;
         ]);
     }
 
-    public function personExhibitionAgeActionPart($countriesQuery, $genderQuery, $stringQuery, $currIds = [])
+    public function personExhibitionAgeActionPart($countriesQuery, $genderQuery, $stringQuery, $currIds = [], $exhibitionCountries = [], $organizerTypesQuery = [], $artistBirthDateLeft = 'any' , $artistBirthDateRight= 'any', $artistDeathDateLeft = 'any' , $artistDeathDateRight =  'any')
     {
         // display the artists by birth-year, the catalog-entries by exhibition-year
-        $stats = self::exhibitionAgeDistribution($em = $this->getDoctrine()->getEntityManager(), null, $genderQuery, $countriesQuery, $stringQuery, $currIds);
+        $stats = self::exhibitionAgeDistribution($em = $this->getDoctrine()->getEntityManager(), null, $genderQuery, $countriesQuery, $stringQuery, $currIds, $exhibitionCountries, $organizerTypesQuery, $artistBirthDateLeft, $artistBirthDateRight, $artistDeathDateLeft, $artistDeathDateRight);
         $ageCount = & $stats['age_count'];
 
         $categories = $total = [];
@@ -1153,7 +1204,7 @@ EOT;
         ]);
     }
 
-    public function exhibitionPerPersonPart($countriesQuery, $genderQuery, $stringQuery, $currIds = [])
+    public function exhibitionPerPersonPart($countriesQuery, $genderQuery, $stringQuery, $currIds = [], $exhibitionCountries = [], $organizerTypesQuery = [], $artistBirthDateLeft = 'any' , $artistBirthDateRight= 'any', $artistDeathDateLeft = 'any' , $artistDeathDateRight =  'any')
     {
         $em = $this->getDoctrine()->getEntityManager();
 
@@ -1166,6 +1217,22 @@ EOT;
         $where = ' AND '. StatisticsController::getPersonQueryString('Person', 'Exhibition.status <> -1', 'country', $countriesQuery);
         $where .= " AND ". StatisticsController::getArrayQueryString('Person', 'sex', $genderQuery, 'Person.status <> -1 ');
         $where .= StatisticsController::getStringQueryForArtists($stringQuery, 'fullname');
+
+
+        if($artistBirthDateLeft !== 'any' && $artistBirthDateRight !== 'any'){
+            $where .= StatisticsController::getStringQueryArtistsBirthAndDeathDate($artistBirthDateLeft, $artistBirthDateRight, 'birthdate', 'long');
+        }
+
+        if($artistDeathDateLeft !== 'any' && $artistDeathDateRight !== 'any'){
+            $where .= StatisticsController::getStringQueryArtistsBirthAndDeathDate($artistDeathDateLeft, $artistDeathDateRight, 'deathdate', 'long');
+        }
+
+        if(!empty($organizerTypesQuery)) {
+            $where .= StatisticsController::getStringQueryForExhibitionsInArtist($organizerTypesQuery, 'organizer_type', 'long');
+        }
+
+        $where .= StatisticsController::getStringQueryForLocationInArtist($exhibitionCountries, 'country', 'long');
+
 
         if (in_array("true", $currIds)) {
         // remove true statement from ids
@@ -1180,6 +1247,7 @@ EOT;
             $querystr = "SELECT id_person, COUNT({$what}) AS how_many"
                 . " FROM ItemExhibition INNER JOIN Exhibition ON Exhibition.id=ItemExhibition.id_exhibition AND Exhibition.status <> -1 AND 0 = (Exhibition.flags & 0x100)"
                 . " INNER JOIN Person ON Person.id=ItemExhibition.id_person AND Person.status <> -1"
+                . " LEFT JOIN Location ON Location.id = Exhibition.id_location "
                 . " WHERE ItemExhibition.title IS NOT NULL"
                 . $where
                 . " GROUP BY id_person"
@@ -1294,7 +1362,7 @@ EOT;
     }
 
 
-    public function personsWikipediaPart($countriesQuery, $genderQuery, $stringQuery, $currIds = [])
+    public function personsWikipediaPart($countriesQuery, $genderQuery, $stringQuery, $currIds = [], $exhibitionCountries = [], $organizerTypesQuery = [], $artistBirthDateLeft = 'any' , $artistBirthDateRight= 'any', $artistDeathDateLeft = 'any' , $artistDeathDateRight =  'any')
     {
         $lang = 'en';
 
@@ -1307,6 +1375,23 @@ EOT;
         $where .= " AND ". StatisticsController::getArrayQueryString('P', 'gender', $genderQuery, 'P.status <> -1 ');
         $where .= StatisticsController::getStringQueryForArtists($stringQuery, 'short');
 
+        if($artistBirthDateLeft !== 'any' && $artistBirthDateRight !== 'any'){
+            $where .= StatisticsController::getStringQueryArtistsBirthAndDeathDate($artistBirthDateLeft, $artistBirthDateRight, 'birthDate', 'short');
+        }
+
+        if($artistDeathDateLeft !== 'any' && $artistDeathDateRight !== 'any'){
+            $where .= StatisticsController::getStringQueryArtistsBirthAndDeathDate($artistDeathDateLeft, $artistDeathDateRight, 'deathDate', 'short');
+        }
+
+        if(!empty($organizerTypesQuery)) {
+            $where .= StatisticsController::getStringQueryForExhibitionsInArtist($organizerTypesQuery, 'organizerType', 'short');
+        }
+
+
+        $where .= StatisticsController::getStringQueryForLocationInArtist($exhibitionCountries, 'country', 'short');
+
+
+
         if (in_array("true", $currIds)) {
         // remove true statement from ids
             $pos = array_search('true', $currIds);
@@ -1314,12 +1399,16 @@ EOT;
             $where .= StatisticsController::getStringQueryForPersonIds($currIds, 'short');
         }
 
+
         $qb->select([
             'P',
             'COUNT(DISTINCT E.id) AS numExhibitionSort'
         ])
             ->from('AppBundle:Person', 'P')
             ->leftJoin('P.exhibitions', 'E')
+            ->leftJoin('E.location', 'L')
+        //. " LEFT JOIN Location ON Location.id = Exhibition.id_location "
+
             // ->leftJoin('P.catalogueEntries', 'IE')
             ->where('P.status <> -1 AND P.wikidata IS NOT NULL '. $where)
             ->groupBy('P.id') // for Count

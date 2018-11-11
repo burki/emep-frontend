@@ -27,13 +27,18 @@ extends CrudController
 
         print 'here';
 
+
+        $exhibitionCountryQuery = StatisticsController::getStringQueryForLocationInArtist($exhibitionCountries, 'country', 'long');
+
+
         $queryTemplate = "SELECT '%s' AS type, Person.id AS person_id, lastname, firstname, birthdate, deathdate, COALESCE(Geoname.name_variant, Geoname.name) AS place, Geoname.tgn AS tgn, Geoname.latitude, Geoname.longitude"
             . " FROM Person"
             . " INNER JOIN Geoname ON Person.%splace_tgn=Geoname.tgn"
-            . " LEFT JOIN ExhibitionPerson ON ExhibitionPerson.id_person = Person.id"
-            . " LEFT JOIN Exhibition ON Exhibition.id = ExhibitionPerson.id_exhibition"
+            . " LEFT JOIN ItemExhibition ON ItemExhibition.id_person = Person.id"
+            . " LEFT JOIN Exhibition ON Exhibition.id = ItemExhibition.id_exhibition "
             . " LEFT JOIN Location ON Location.id = Exhibition.id_location "
-            . " WHERE Person.status <> -1";
+            . " WHERE Person.status <> -1"
+            . " ".$exhibitionCountryQuery;
 
         /*
         $qb->select([
@@ -77,11 +82,14 @@ extends CrudController
             $andWhere .= StatisticsController::getStringQueryArtistsBirthAndDeathDate($artistDeathDateLeft, $artistDeathDateRight, 'deathdate', 'long');
         }
 
+        if(!empty($organizerTypesQuery)) {
+            $andWhere .= StatisticsController::getStringQueryForExhibitionsInArtist($organizerTypesQuery, 'organizer_type', 'long');
+        }
 
-        print (StatisticsController::getStringQueryForLocationInArtist($exhibitionCountries, 'country', 'long'));
+
         // $andWhere .= StatisticsController::getStringQueryForLocationInArtist($exhibitionCountries, 'country', 'long');
 
-        $andWhere .= "AND Location.country IN('BE') ";
+        // $andWhere .= "AND Location.country IN('BE') ";
 
         print $andWhere;
 
