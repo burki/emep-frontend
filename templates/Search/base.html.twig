@@ -18,6 +18,12 @@
         // Un-disable form fields when page loads, in case they click back after submission
         $( "form" ).find( ":input" ).prop( "disabled", false );
     });
+
+    function saveQuery() {
+        $form = $('#search');
+        $("#search").attr("action", '{{ path('search-save') }}');
+        $form.submit();
+    }
     </script>
 {% endblock %}
 
@@ -45,7 +51,23 @@
                 <a {% if active %} style="font-weight: bold"{% endif %} href="{{ path(app.request.get('_route'), params) }}">{{ label }}</a>
                 {% if not loop.last%} | {% endif %}
             {% endfor %}
-            <form action="{{ path(app.request.get('_route')) }}" method="GET">
+
+            <form action="{{ path(app.request.get('_route'), { 'entity' : entity }) }}" method="POST">
+            Query:  {% if searches is not empty %}
+                    <select name="useraction" id="saved-searches" onchange="this.form.submit()">
+                        <option value="">- Select Saved Query -</option>
+                        {% for id, label in searches %}
+                        <option value="{{ id }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                   {% endif %}
+
+                    <button type="button" class="btn" onclick="saveQuery()">
+                        <span class="glyphicon glyphicon-floppy-disk"></span> Save Query
+                    </button>
+            </form>
+
+            <form id="search" action="{{ path(app.request.get('_route')) }}" method="GET">
                 <input type="hidden" name="entity" value="{{ listBuilder.entity }}" />
                 {% set filter = listBuilder.queryFilters %}
                 <input type="text" name="filter[search]" value="{{ filter.search }}" />
@@ -116,7 +138,8 @@
             </form>
             {% if pager.currentPageResults is not empty %}
                 {{ pager.currentPageOffsetStart }} - {{ pager.currentPageOffsetEnd }} of {{ pager.getNbResults() }}
-                <br />Export: <a href="{{ path(app.request.get('_route') ~ '-export', app.request.query.all) }}">Excel</a>
+                <br />
+                Export: <a href="{{ path('search-export', app.request.query.all) }}">Excel</a>
             <table class="table table-striped">
                 <thead>
                     <tr>

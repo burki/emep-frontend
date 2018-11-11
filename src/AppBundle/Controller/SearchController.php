@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -136,8 +137,30 @@ extends CrudController
     /**
      * @Route("/search", name="search")
      */
-    public function searchAction(Request $request, UrlGeneratorInterface $urlGenerator)
+    public function searchAction(Request $request,
+                                 UrlGeneratorInterface $urlGenerator,
+                                 UserInterface $user = null)
     {
+        if ('POST' == $request->getMethod() && !is_null($user)) {
+            // check a useraction was requested
+            $userActionId = $request->request->get('useraction');
+            if (!empty($userActionId)) {
+                $userAction = $this->getDoctrine()
+                    ->getManager()
+                    ->getRepository('AppBundle:UserAction')
+                    ->findOneBy([
+                        'id' => $userActionId,
+                        'user' => $user,
+                        'route' => 'search',
+                    ]);
+
+                if (!is_null($userAction)) {
+                    return $this->redirectToRoute($userAction->getRoute(),
+                                                  $userAction->getRouteParams());
+                }
+            }
+        }
+
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator);
 
         $listPagination = new SearchListPagination($listBuilder);
@@ -145,7 +168,58 @@ extends CrudController
         $page = $request->get('page', 1);
         $listPage = $listPagination->get(self::PAGE_SIZE, ($page - 1) * self::PAGE_SIZE);
 
-        return $this->renderResult($listPage, $listBuilder);
+        return $this->renderResult($listPage, $listBuilder, $user);
+    }
+
+    /**
+     * @Route("/search/save", name="search-save")
+     */
+    public function saveSearchAction(Request $request,
+                                     UrlGeneratorInterface $urlGenerator,
+                                     UserInterface $user)
+    {
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator);
+        $filters = $listBuilder->getQueryFilters();
+
+        $routeParams = [
+            'entity' => $listBuilder->getEntity()
+        ];
+
+        if (empty($filters)) {
+            // nothing to save
+            return $this->redirectToRoute('search', $routeParams);
+        }
+
+        $routeParams['filter'] = $filters;
+
+        $form = $this->createForm(\AppBundle\Form\Type\SaveSearchType::class);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+
+            $userAction = new \AppBundle\Entity\UserAction();
+
+            $userAction->setUser($user);
+            $userAction->setRoute($route = 'search');
+            $userAction->setRouteParams($routeParams);
+
+            $userAction->setName($data['name']);
+
+            $em = $this->getDoctrine()
+                ->getManager();
+
+            $em->persist($userAction);
+            $em->flush();
+
+            return $this->redirectToRoute($route, $routeParams);
+        }
+
+        return $this->render('Search/save.html.twig', [
+            'pageTitle' => $this->get('translator')->trans('Save your query'),
+            'form' => $form->createView(),
+        ]);
     }
 
     /**
@@ -225,18 +299,48 @@ extends CrudController
         }
     }
 
-    protected function renderResult($listPage, $listBuilder)
+    protected function lookupSearches($user)
+    {
+        $qb = $this->getDoctrine()
+                ->getManager()
+                ->createQueryBuilder();
+
+        $qb->select('UA')
+            ->from('AppBundle:UserAction', 'UA')
+            ->where("UA.route = 'search'")
+            ->andWhere("UA.user = :user")
+            ->orderBy("UA.createdAt", "DESC")
+            ->setParameter('user', $user)
+            ;
+
+        $searches = [];
+
+        foreach ($qb->getQuery()->getResult() as $userAction) {
+            $searches[$userAction->getId()] = $userAction->getName();
+        }
+
+        return $searches;
+    }
+
+    protected function renderResult($listPage, $listBuilder, UserInterface $user = null)
     {
         $adapter = new SearchListAdapter($listPage);
         $pager = new Pagerfanta($adapter);
         $pager->setMaxPerPage($listPage['limit']);
         $pager->setCurrentPage(intval($listPage['offset'] / $listPage['limit']) + 1);
 
+        $searches = [];
+        if (!is_null($user)) {
+            // look for saved searches
+            $searches = $this->lookupSearches($user);
+        }
+
         return $this->render('Search/base.html.twig', [
             'pageTitle' => $this->get('translator')->trans('Advanced Search'),
             'pager' => $pager,
             'listBuilder' => $listBuilder,
             'form' => $this->form->createView(),
+            'searches' => $searches,
         ]);
     }
 }
@@ -303,26 +407,7 @@ extends ListBuilder
             $queryFilters = $this->request->get('filter');
         }
 
-        if (!empty($queryFilters) && is_array($queryFilters)) {
-            self::array_walk_recursive_delete($queryFilters, function ($val) {
-                if (is_null($val)) {
-                    return true;
-                }
-
-                if (is_array($val)) {
-                    $keys = array_keys($val);
-                    // $form->getData() gets 'choices' of subforms we don't care about
-                    return empty($val) || (count($keys) == 1 && 'choices' == $keys[0]);
-                }
-                else if (is_string($val)) {
-                    return '' === trim($val);
-                }
-
-                return false;
-            });
-
-            $this->queryFilters = $queryFilters;
-        }
+        $this->setQueryFilters($queryFilters);
     }
 
 	protected function baseQuery()
@@ -419,6 +504,41 @@ extends ListBuilder
     public function getEntity()
     {
         return $this->entity;
+    }
+
+    public function setQueryFilters($queryFilters)
+    {
+        if (!empty($queryFilters) && is_array($queryFilters)) {
+            // $form->getData() gets 'choices' of subforms we don't care about
+            foreach (array_keys($queryFilters) as $key) {
+                if ('choices' == $key) {
+                    unset($queryFilters[$key]);
+                }
+                else if (is_array($queryFilters[$key]) && array_key_exists('choices', $queryFilters[$key])) {
+                    unset($queryFilters[$key]['choices']);
+                }
+            }
+
+            // remove empty options
+            self::array_walk_recursive_delete($queryFilters, function ($val) {
+                if (is_null($val)) {
+                    return true;
+                }
+
+                if (is_array($val)) {
+                    return empty($val);
+                }
+                else if (is_string($val)) {
+                    return '' === trim($val);
+                }
+
+                return false;
+            });
+        }
+
+        $this->queryFilters = $queryFilters;
+
+        return $this;
     }
 
     public function getQueryFilters()
@@ -1523,7 +1643,6 @@ extends SearchListBuilder
                                 'E.id=IE.id_exhibition AND (IE.title IS NOT NULL OR IE.id_item IS NULL)');
 
         if (array_key_exists('person', $this->queryFilters)) {
-            var_dump($this->queryFilters['person']);
             // so we can filter on P.*
             $queryBuilder->join('IE',
                                     'Person', 'P',
