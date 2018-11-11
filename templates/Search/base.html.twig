@@ -33,8 +33,16 @@
                     'Person' : 'Artists',
                 }
             %}
-            Display: {% for entity, label in entities %}
-                <a {% if entity == listBuilder.entity %} style="font-weight: bold"{% endif %} href="{{ path(app.request.get('_route'), { 'entity' : entity }) }}">{{ label }}</a>
+            Display:
+            {% for entity, label in entities %}
+                {% set active = entity == listBuilder.entity %}
+                {% if active %}
+                    {% set params = { 'entity' : entity } %}
+                {% else %}
+                    {# so we keep active filters #}
+                    {% set params = app.request.query.all | merge({ 'entity' : entity }) %}
+                {% endif %}
+                <a {% if active %} style="font-weight: bold"{% endif %} href="{{ path(app.request.get('_route'), params) }}">{{ label }}</a>
                 {% if not loop.last%} | {% endif %}
             {% endfor %}
             <form action="{{ path(app.request.get('_route')) }}" method="GET">
@@ -68,8 +76,8 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">Filter by Venue</div>
                         <div class="panel-body">
+                            {{ form_row(form.location.geoname) }}
                             {{ form_row(form.location.type) }}
-                            {{ form_row(form.location.country) }}
                         </div>
                     </div>
                 </div>

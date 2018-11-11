@@ -93,23 +93,44 @@ extends CrudController
         return $types;
     }
 
-    // TODO: share with ExhibitionController
-    protected function buildVenueCountries()
+    /**
+     * Get all countries and places
+     */
+    protected function buildVenueGeonames()
     {
+        $geonames = [];
+
         $qb = $this->getDoctrine()
                 ->getManager()
                 ->createQueryBuilder();
 
         $qb->select([
-                'P.countryCode',
+                'PL.countryCode',
+                'C.name AS country',
+                'PL.tgn',
+                'COALESCE(PL.alternateName,PL.name) AS name'
             ])
             ->distinct()
             ->from('AppBundle:Location', 'L')
-            ->leftJoin('L.place', 'P')
-            ->where('L.status <> -1 AND 0 = BIT_AND(L.flags, 256) AND P.countryCode IS NOT NULL')
+            ->leftJoin('L.place', 'PL')
+            ->leftJoin('PL.country', 'C')
+            ->where('L.status <> -1 AND 0 = BIT_AND(L.flags, 256) AND PL.countryCode IS NOT NULL')
+            ->orderBy('country, name')
             ;
 
-        return $this->buildActiveCountries($qb);
+        $lastCountryCode = '';
+
+        foreach ($qb->getQuery()->getResult() as $result) {
+            if ($lastCountryCode != $result['countryCode']) {
+                $key = 'cc:' . $result['countryCode'];
+                $geonames[$key] = $result['country'];
+            }
+
+            $key = 'tgn:' . $result['tgn'];
+            $geonames[$key] = "\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0" . $result['name'];
+        }
+
+        return $geonames;
     }
 
     /**
@@ -171,7 +192,7 @@ extends CrudController
         $this->form = $this->createForm(\AppBundle\Form\Type\SearchFilterType::class, [
             'choices' => [
                 'nationality' => array_flip($this->buildPersonNationalities()),
-                'location_country' => array_flip($this->buildVenueCountries()),
+                'location_geoname' => array_flip($this->buildVenueGeonames()),
                 'location_type' => array_combine($venueTypes, $venueTypes),
                 'exhibition_type' => array_combine($exhibitionTypes, $exhibitionTypes),
                 'organizer_type' => array_combine($organizerTypes, $organizerTypes),
@@ -289,7 +310,9 @@ extends ListBuilder
                 }
 
                 if (is_array($val)) {
-                    return empty($val);
+                    $keys = array_keys($val);
+                    // $form->getData() gets 'choices' of subforms we don't care about
+                    return empty($val) || (count($keys) == 1 && 'choices' == $keys[0]);
                 }
                 else if (is_string($val)) {
                     return '' === trim($val);
@@ -487,12 +510,26 @@ extends ListBuilder
 
         if (array_key_exists('location', $this->queryFilters)) {
             $locationFilters = & $this->queryFilters['location'];
-            foreach ([ 'type' => 'L.type', 'country' => 'PL.country_code' ] as $key => $field) {
+            foreach ([ 'type' => 'L.type' ] as $key => $field) {
                 if (!empty($locationFilters[$key])) {
                     $queryBuilder->andWhere(sprintf('%s = %s',
                                                     $field, ':' . $key))
                         ->setParameter($key, $locationFilters[$key]);
                 }
+            }
+
+            // geoname can be cc:XY or tgn:12345
+            if (!empty($locationFilters[$key = 'geoname'])) {
+                $typeValue = explode(':', $locationFilters[$key], 2);
+                if ('cc' == $typeValue[0]) {
+                    $field = 'PL.country_code';
+                }
+                else {
+                    $field = 'L.place_tgn';
+                }
+                $queryBuilder->andWhere(sprintf('%s = %s',
+                                                $field, ':' . $key))
+                    ->setParameter($key, $typeValue[1]);
             }
         }
 
@@ -1486,6 +1523,7 @@ extends SearchListBuilder
                                 'E.id=IE.id_exhibition AND (IE.title IS NOT NULL OR IE.id_item IS NULL)');
 
         if (array_key_exists('person', $this->queryFilters)) {
+            var_dump($this->queryFilters['person']);
             // so we can filter on P.*
             $queryBuilder->join('IE',
                                     'Person', 'P',
