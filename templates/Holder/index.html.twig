@@ -154,11 +154,15 @@
 
                 // add true to the filter array
                 var currIdArray = $('#holder_filter_id').val() ? $('#holder_filter_id').val() : [];
-                currIdArray.push('true');
                 // currIdArray = jQuery.unique('true');
-                $('#holder_filter_id').val( currIdArray );
+
+                console.log('currIdArray', currIdArray);
+                if(!currIdArray === []){
+                    currIdArray.push('true');
+                    $('#holder_filter_id').val( currIdArray );
+                    $( ".exhibitionFilterForm" ).submit();
+                }
                 // submit form
-                $('.exhibitionFilterForm').submit();
             });
 
             $('.exhibition-ids-filter-remove').on('click', function(){

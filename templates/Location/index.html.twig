@@ -234,11 +234,13 @@
 
                 // add true to the filter array
                 var currIdArray = $('#location_filter_id').val() ? $('#location_filter_id').val() : [];
-                currIdArray.push('true');
+                if(!currIdArray === []){
+                    currIdArray.push('true');
+                    $('#location_filter_id').val( currIdArray );
+                    $( ".exhibitionFilterForm" ).submit();
+                }
                 // currIdArray = jQuery.unique('true');
-                $('#location_filter_id').val( currIdArray );
                 // submit form
-                $( ".exhibitionFilterForm" ).submit();
             });
 
             $('.exhibition-ids-filter-remove').on('click', function(){
