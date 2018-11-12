@@ -265,7 +265,7 @@ extends CrudController
                               UserInterface $user = null)
     {
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, true);
-        if (!in_array($entity = $listBuilder->getEntity(), [ 'Venue', 'Person'])) {
+        if (!in_array($entity = $listBuilder->getEntity(), [ 'Exhibition', 'Venue', 'Person'])) {
             $routeParams = [
                 'entity' => $listBuilder->getEntity(),
                 'filter' => $listBuilder->getQueryFilters(),
@@ -372,7 +372,7 @@ extends CrudController
             }
         }
         else {
-            // Venue
+            // Exhibition / Venue
             $values = [];
             $values_country = [];
             while ($row = $stmt->fetch()) {
@@ -411,22 +411,20 @@ extends CrudController
                                 htmlspecialchars($row['location'])
                         );
                 }
-                /*
-                else if ('place-map' != $route) {
+                else if ('Exhibition' == $entity) {
                     $values[$key]['exhibitions'][] =
                         sprintf('<a href="%s">%s</a> at <a href="%s">%s</a> (%s)',
                                 htmlspecialchars($this->generateUrl('exhibition', [
                                     'id' => $row['exhibition_id'],
                                 ])),
-                                htmlspecialchars($row['title']),
+                                htmlspecialchars($row['exhibition']),
                                 htmlspecialchars($this->generateUrl('location', [
                                     'id' => $row['location_id'],
                                 ])),
-                                htmlspecialchars($row['location_name']),
+                                htmlspecialchars($row['location']),
                                 $this->buildDisplayDate($row)
                         );
                 }
-                */
             }
 
             $values_final = [];
@@ -1628,6 +1626,8 @@ extends SearchListBuilder
             'L.place_tgn AS place_tgn',
             'L.name AS location',
             'L.id AS location_id',
+            'L.place_geo',
+            'PL.latitude', 'PL.longitude',
             'E.status AS status',
             'COUNT(DISTINCT IE.id) AS count_itemexhibition',
             'COUNT(DISTINCT IE.id_person) AS count_person',
