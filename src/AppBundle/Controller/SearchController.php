@@ -1278,7 +1278,7 @@ extends SearchListBuilder
         };
 
         $this->rowDescr['exhibition']['buildValue'] = function (&$row, $val, $listBuilder, $key, $format) {
-            return $listBuilder->buildLinkedValue($val, 'exhibition', [ 'id' => $row['id'] ], $format);
+            return $listBuilder->buildLinkedValue($val, 'exhibition', [ 'id' => $row['exhibition_id'] ], $format);
         };
 
         $this->rowDescr['location']['buildValue'] = function (&$row, $val, $listBuilder, $key, $format) {
