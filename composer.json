@@ -69,6 +69,7 @@
 
         "ddeboer/data-import": "0.20.*",
         "phpoffice/phpexcel": "1.8.*",
+        "box/spout": "^2.7",
 
         "cocur/background-process": "0.7.*",
 
