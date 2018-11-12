@@ -981,7 +981,7 @@ extends CrudController
 
         // create an array without any year gaps inbetween
         for ($i = $min; $i <= $max; $i++) {
-            $arrayWithoutGaps[(string)$i] = ($exhibitionYear[(string)$i] > 0 ? $exhibitionYear[(string)$i] : 0);
+            $arrayWithoutGaps[] = array_key_exists($i, $exhibitionYear) ? $exhibitionYear[$i] : 0;
             //array_push( $arrayWithoutGaps, (string)$i => 'test');
         }
 
