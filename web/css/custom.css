@@ -75,9 +75,65 @@
 .advanced-filters-startDateRangeExhibition, .advanced-filters-birthDateRangeArtist, .advanced-filters-deathDateRangeArtist {
     min-width: 300px;
     width: 100%;
-    margin-left: 4rem;
+    margin-left: 4rem!important;
 
 }
+
+.advanced-filters-title {
+    margin-top: 5px;
+}
+
+.filters-heading select {
+    font-weight: normal;
+    margin-left: 0;
+}
+
+.advanced-filters-selection{
+    margin-right: 15px;
+    margin-left: -15px;
+}
+
+
+
+.advanced-filters-startDateRangeExhibition-startdate-year, .advanced-filters-startDateRangeExhibition-enddate-year,
+.advanced-filters-birthDateRangeArtist-start-year, .advanced-filters-birthDateRangeArtist-end-year,
+.advanced-filters-deathDateRangeArtist-start-year, .advanced-filters-deathDateRangeArtist-end-year {
+    display: none;
+}
+
+/* mobile style */
+
+@media (max-width: 767px){
+    .filters-heading {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .advanced-ftilers-container {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .advanced-filters-selection {
+        margin-right: 0px;
+        margin-left: 0px;
+    }
+
+    .advanced-filters-title {
+        margin-top: 5px;
+        margin-bottom: 10px;
+        text-align: left;
+    }
+
+    .advanced-filters-startDateRangeExhibition, .advanced-filters-birthDateRangeArtist, .advanced-filters-deathDateRangeArtist {
+        min-width: 200px;
+        width: 100%;
+        margin-left: 0px!important;
+    }
+}
+
+
 
 /* ADVANCED SEARCH */
 .advanced-search-settings{

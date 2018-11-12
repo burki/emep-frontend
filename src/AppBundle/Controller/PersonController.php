@@ -592,7 +592,7 @@ extends CrudController
 
             $innerArray = [];
 
-            array_push($innerArray, $exhibition->getStartdate(), $exhibition->getTitle(), $exhibition->location->getPlaceLabel(), count($catalogueEntries[$exhibition->getId()]), $exhibition->getOrganizerType() );
+            array_push($innerArray, $exhibition->getStartdate(), $exhibition->getTitle(), /*$exhibition->getLocation()->getPlaceLabel(),*/ count($catalogueEntries[$exhibition->getId()]), $exhibition->getOrganizerType() );
 
             array_push($csvResult, $innerArray);
         }

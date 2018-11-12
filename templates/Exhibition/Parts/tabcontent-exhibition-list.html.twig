@@ -23,7 +23,7 @@
             <table id="exhibitionsList" class="table table-striped table-bordered dataTable listviewcontainer">
                 <thead>
                 <tr class="listviewheading">
-                    <th class="{{ (sortField == 'dateSort') ? 'activeSort' : '' }}">{{ helper.pagination_sortable(pagination, 'Date', 'dateSort') }}</th>
+                    <th class="{{ (sortField == 'dateSort') ? 'activeSort' : '' }}">{{ helper.pagination_sortable(pagination, 'Start Date', 'dateSort') }}</th>
                     <th><span>Title</span></th>
                     <th class="{{ (sortField == 'placeSort') ? 'activeSort' : '' }}">{{ helper.pagination_sortable(pagination, 'City', 'placeSort') }}</th>
                     <th><span>Venue</span></th>
@@ -64,11 +64,11 @@
                         <td class="date checkbox-list">
 
                             <span class="checkmark {% if exhibition.id in ids %} checked {% endif %}" data-id="{{ exhibition.id }}"></span>
-                            <b>{{ helper.exhibition_period(exhibition) }}</b>
+                            <b>{{ exhibition.startDate|date('y-m-d') }}</b>
                         </td>
 
                         <td class="title"><a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
-                                <b>{{ exhibition.title }}</b> {{ exhibition.titleAppend }}</a>
+                                <b>{{ exhibition.titleAppend ? exhibition.titleAppend : exhibition.title }}</b></a>
                         </td>
 
                         <td class="normal">
