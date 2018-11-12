@@ -126,7 +126,6 @@ class Builder
             ]);
         }
 
-
         $menu->addChild('Info', [ 'route' => 'project' ]); // maybe create a view for view data
         $menu['Info']->addChild('Our Project', [
             'route' => 'project',
@@ -135,6 +134,7 @@ class Builder
             'route' => 'using',
         ]);
 
+        $menu->addChild('Search', [ 'route' => 'search' ]);
 
         /*
          * the following didn't work and is now handled

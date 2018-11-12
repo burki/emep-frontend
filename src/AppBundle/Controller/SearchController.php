@@ -447,13 +447,13 @@ extends CrudController
         }
 
         return $this->render('Search/map.html.twig', [
-            'pageTitle' => 'Advanced Search',
+            'pageTitle' => 'General Search',
             'subTitle' => 'Birth and Death Places',
             'data' => json_encode($values_final),
             'disableClusteringAtZoom' => 'Person' == $entity ? 7 : 5,
             'maxCount' => isset($max_count) ? $max_count : null,
             'showHeatMap' => 'Person' == $entity,
-            'markerStyle' => 'Person' == $entity ? 'pie' : 'circle', // 'circle' is other option
+            'markerStyle' => 'Person' == $entity ? 'pie' : 'circle',
             'bounds' => [
                 [ 60, -120 ],
                 [ -15, 120 ],
@@ -552,7 +552,7 @@ extends CrudController
         $pager->setCurrentPage(intval($listPage['offset'] / $listPage['limit']) + 1);
 
         return $this->render('Search/base.html.twig', [
-            'pageTitle' => $this->get('translator')->trans('Advanced Search'),
+            'pageTitle' => $this->get('translator')->trans('General Search'),
             'pager' => $pager,
 
             'listBuilder' => $listBuilder,

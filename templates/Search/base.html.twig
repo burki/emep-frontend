@@ -31,9 +31,8 @@
 {% endblock %}
 
 {% block body %}
-    <h1>{{ pageTitle }}</h1>
-    <div class="row">
-        <div class="col-sm-12">
+    <div class="w-container">
+        <h1 class="heading">{{ pageTitle }}</h1>
             {% set entities =
                 {
                     'ItemExhibition' : 'Catalogue Entries',
@@ -77,6 +76,8 @@
                 {{ form_widget(form.submit) }}
 
                 {% block filters %}
+                <div class="filter-combination-container">
+
                 {% form_theme form 'bootstrap_3_horizontal_layout.html.twig' %}
                 <div id="filter-panel-catentry" class="collapse filter-panel">
                     <div class="panel panel-default">
@@ -119,7 +120,7 @@
                     </div>
                 </div>
 
-                <div>
+                <div class="filters-heading">
                     Filter by:
 
                     <button type="button" class="btn" data-toggle="collapse" data-target="#filter-panel-catentry">
@@ -138,20 +139,28 @@
                         <span class="glyphicon glyphicon-cog"></span> Artist
                     </button>
                 </div>
+                </div>
                 {% endblock %}
             </form>
-            <div>
+            <div class="tabsymbols">
                 {% if 'search-map' == app.request.get('_route') %}
-                <a href="{{ path('search', app.request.query.all) }}">Show List</a> |
+                <div class="advanced-search-settings"><a href="{{ path('search', app.request.query.all) }}"><span class="checkbox-filter-button">Show List</a></span></a></div>
                 {% elseif 'Exhibition' == listBuilder.entity or 'Venue' == listBuilder.entity or 'Person' == listBuilder.entity  %}
-                <a href="{{ path('search-map', app.request.query.all) }}">Show Map</a> |
+                <div class="advanced-search-settings"><a href="{{ path('search-map', app.request.query.all) }}"><span class="checkbox-filter-button">Show Map</span></a></div>
                 {% endif %}
-                <a href="{{ path('search-export', app.request.query.all) }}">Export Excel</a>
-            </div>
+                <div class="icontab download-csv"><a title="Download as Excel-File" href="{{ path('search-export', app.request.query.all) }}"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage"></a></div>
+            </div><!-- .tabsymbols -->
+    </div><!-- .w-container -->
 
-            {% block content %}
+    <div class="contentcontainer w-container">
+        <div class="listviewrow">
+        {% block content %}
             {% if pager.currentPageResults is not empty %}
+            <div style="width: 100%; text-align: right;">
+            <div class="count">
                 {{ pager.currentPageOffsetStart }} - {{ pager.currentPageOffsetEnd }} of {{ pager.getNbResults() }}
+            </div>
+            </div>
             <table class="table table-striped">
                 <thead>
                     <tr>
@@ -183,7 +192,7 @@
             {% else %}
                 No matching entry. Please adjust your search.
             {% endif %}
-            {% endblock %}
+        {% endblock %}
         </div>
-    </div><!-- .row -->
+    </div>
 {% endblock %}
