@@ -282,6 +282,8 @@ extends CrudController
         $stmt = $query->execute();
 
         if ('Person' == $entity) {
+            $subTitle = 'Birth and Death Places';
+
             $values = [];
             while ($row = $stmt->fetch()) {
                 foreach ([ 'birth', 'death'] as $type) {
@@ -375,6 +377,8 @@ extends CrudController
             // Exhibition / Venue
             $values = [];
             $values_country = [];
+            $subTitle = 'Exhibition' == $entity ? 'Exhibitions' : 'Venues';
+
             while ($row = $stmt->fetch()) {
                 if (empty($row['location_geo']) && $row['longitude'] == 0 && $row['latitude'] == 0) {
                     continue;
@@ -448,7 +452,7 @@ extends CrudController
 
         return $this->render('Search/map.html.twig', [
             'pageTitle' => 'General Search',
-            'subTitle' => 'Birth and Death Places',
+            'subTitle' => $subTitle,
             'data' => json_encode($values_final),
             'disableClusteringAtZoom' => 'Person' == $entity ? 7 : 5,
             'maxCount' => isset($max_count) ? $max_count : null,
