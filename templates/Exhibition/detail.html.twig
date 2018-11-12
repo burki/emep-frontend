@@ -101,9 +101,9 @@
     <div class="contentcontainer nopadding w-container">
         <div class="lefthalf">
             <div class="subheader">exhibition</div>
-            <h1 class="heading">{{ exhibition.title }}</h1>
+            <h1 class="heading">{{ exhibition.titleAppend ? exhibition.titleAppend : exhibition.title }}</h1>
             {% if exhibition.titleAppend is not empty %}
-                <h2 style="margin-top: -0.8rem"><span class="small">{{ exhibition.titleAppend }}</span></h2>
+                <h2 style="margin-top: -0.8rem"><span class="small">{{ exhibition.title }}</span></h2>
             {% endif %}
 
             <div class="artist-information-text" style="width: 100%; margin-bottom: 2rem;">{{ exhibition.subtitle }}</div>

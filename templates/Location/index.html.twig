@@ -129,6 +129,10 @@
 
     <script>
         $(document).ready(function() {
+
+            $('.searchbarinputcontainer input[type=text]').attr("placeholder", "search venue title");
+
+
             $('.countryAbbr').on('click', function () {
                 var currSelection = $('#location_filter_country').val();
                 var currCountry = $(this).data('country');
@@ -234,7 +238,7 @@
 
                 // add true to the filter array
                 var currIdArray = $('#location_filter_id').val() ? $('#location_filter_id').val() : [];
-                if(!currIdArray === []){
+                if( currIdArray.length !== 0 ){
                     currIdArray.push('true');
                     $('#location_filter_id').val( currIdArray );
                     $( ".exhibitionFilterForm" ).submit();

@@ -256,6 +256,7 @@
     <script>
         $(document).ready(function() {
 
+            $('.searchbarinputcontainer input[type=text]').attr("placeholder", "search exhibition title");
 
             // ADVANED SEARCH FILTERS
 
@@ -527,10 +528,12 @@
 
             $('.checkbox-filter-button').on('click', function(){
 
+
                 // add true to the filter array
                 var currIdArray = $('#exhibition_filter_id').val() ? $('#exhibition_filter_id').val() : [];
+
                 // currIdArray = jQuery.unique('true');
-                if(!currIdArray === []){
+                if( currIdArray.length !== 0 ){
                     currIdArray.push('true');
                     $('#exhibition_filter_id').val( currIdArray );
                     $( ".indexForm" ).submit();

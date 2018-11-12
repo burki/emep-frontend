@@ -256,6 +256,7 @@
 
     <script>
         $(document).ready(function() {
+            $('.searchbarinputcontainer input[type=text]').attr("placeholder", "search artist name");
 
 
             // ADVANED SEARCH FILTERS
@@ -616,7 +617,7 @@
                 var currIdArray = $('#person_filter_id').val() ? $('#person_filter_id').val() : [];
                 // currIdArray = jQuery.unique('true');
 
-                if(!currIdArray === []){
+                if( currIdArray.length !== 0 ){
                     currIdArray.push('true');
                     $('#person_filter_id').val( currIdArray );
                     $( ".exhibitionFilterForm" ).submit();

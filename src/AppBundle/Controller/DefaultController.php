@@ -21,6 +21,24 @@ class DefaultController extends Controller
     }
 
     /**
+     * @Route("/project", name="project")
+     */
+
+    public function infoAction()
+    {
+        return $this->render('Default/project.html.twig');
+    }
+
+    /**
+     * @Route("/using", name="using")
+     */
+
+    public function usinfAction()
+    {
+        return $this->render('Default/using.html.twig');
+    }
+
+    /**
      * @Route("/rulerz", name="rulerz")
      */
     public function rulerzAction()

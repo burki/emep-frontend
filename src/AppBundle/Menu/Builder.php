@@ -79,6 +79,7 @@ class Builder
 
         $menu->addChild('Home', [ 'route' => 'home' ]); // maybe create a view for view data
 
+
         $menu->addChild('View Data', [ 'route' => 'data' ]); // maybe create a view for view data
         $menu['View Data']->addChild('Exhibitions', [
             'route' => 'exhibition',
@@ -120,6 +121,15 @@ class Builder
                 'route' => 'item-by-person',
             ]);
         }
+
+
+        $menu->addChild('Info', [ 'route' => 'project' ]); // maybe create a view for view data
+        $menu['Info']->addChild('Our Project', [
+            'route' => 'project',
+        ]);
+        $menu['Info']->addChild('Using the Database', [
+            'route' => 'using',
+        ]);
 
 
         /*

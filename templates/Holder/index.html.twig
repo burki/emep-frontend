@@ -72,11 +72,36 @@
                 </div>
             {% endfor %}
 
+            {% if "true" in ids %}
+                <div class="filter-row">
+                    <div class="div-block-5">
+                        <div class="first-filter-term">
+                            <div>Checkbox Filter</div>
+                        </div>
+                        <div class="is_equal_to">
+                            <div>is</div>
+                        </div>
+                        <div class="first-filter-term">
+                            {# find country to text method #}
+                            <div>active</div>
+                        </div>
+                    </div>
+                    <div class="subfilter-buttons-container">
+                        <div class="subfilter-remove exhibition-ids-filter-remove" data-organizer="{{ organizer }}">
+                            <div>remove</div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
         </div>
     </div>
 
     <script>
         $(document).ready(function() {
+            $('.searchbarinputcontainer input[type=text]').attr("placeholder", "search holding institution title");
+
+
             $('.countryAbbr').on('click', function () {
                 var currSelection = $('#holder_filter_country').val();
                 var currCountry = $(this).data('country');
@@ -157,7 +182,7 @@
                 // currIdArray = jQuery.unique('true');
 
                 console.log('currIdArray', currIdArray);
-                if(!currIdArray === []){
+                if( currIdArray.length !== 0 ){
                     currIdArray.push('true');
                     $('#holder_filter_id').val( currIdArray );
                     $( ".exhibitionFilterForm" ).submit();
@@ -171,7 +196,7 @@
                 var index = currIdArray.indexOf('true');
                 if (index !== -1) currIdArray.splice(index, 1);
 
-                $('#exhibition_filter_id').val( currIdArray );
+                $('#holder_filter_id').val( currIdArray );
                 // submit form
                 $('.exhibitionFilterForm').submit();
             });
