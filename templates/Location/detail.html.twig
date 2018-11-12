@@ -56,8 +56,15 @@
                 <div class="tab-content">
                     {% set exhibitionArray = location.exhibitions %}
 
+                    {% if location.exhibitions|length > 0 %}
                     {% embed "Location/Parts/tabcontent-exhibitions.html.twig" %}
                     {% endembed %}
+                    {% endif %}
+
+                    {% if location.getOrganizerOf()|length > 0 %}
+                    {% embed "Location/Parts/tabcontent-organizer.html.twig" %}
+                    {% endembed %}
+                    {% endif %}
 
                     {% set artistsArray = artists %}
 
@@ -70,9 +77,6 @@
 
                     {% embed "Location/Parts/tabcontent-statistics.html.twig" %}
                     {% endembed %}
-
-
-
                 </div><!-- .tab-content -->
         </div>
     </div>

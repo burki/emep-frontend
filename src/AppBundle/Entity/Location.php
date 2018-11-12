@@ -536,15 +536,22 @@ implements \JsonSerializable, JsonLdSerializable
      * Gets organized exhibitions.
      *
      */
-    public function getOrganizerOf()
+    public function getOrganizerOf($filterDuplicateWithExhibitions = false)
     {
         if (is_null($this->organizerOf)) {
             return null;
         }
 
+        $skip = [];
+        if ($filterDuplicateWithExhibitions && !is_null($this->exhibitions)) {
+            foreach ($this->exhibitions as $exhibition) {
+                $skip[] = $exhibition->getId();
+            }
+        }
+
         return $this->organizerOf->filter(
-            function ($entity) {
-               return -1 != $entity->getStatus();
+            function ($entity) use ($skip) {
+                return -1 != $entity->getStatus() && !in_array($entity->getId(), $skip);
             }
         );
     }

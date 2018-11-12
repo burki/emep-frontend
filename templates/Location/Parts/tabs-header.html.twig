@@ -7,10 +7,16 @@
 
         </div>
         <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 1em">
-            <li role="presentation" class="active exhibitions-tab"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">{{ 'Exhibitions'|trans }}</a></li>
-            {# co-appearnces #}
+            {% set active = true %}
+            {% if location.exhibitions|length > 0 %}
+                <li role="presentation" class="exhibitions-tab{% if active %} active{% set active = false %}{% endif %}"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">{{ 'Exhibitions'|trans }}</a></li>
+            {% endif %}
+            {% if location.getOrganizerOf(true)|length > 0 %}
+                <li role="presentation" class="organizer-tab{% if active %} active{% set active = false %}{% endif %}"><a href="#organizer-tab" aria-controls="home" role="tab" data-toggle="tab">{{ 'Organizer'|trans }}</a></li>
+            {% endif %}
+            {# co-appearances #}
             {% if artists|length > 0 %}
-                <li role="presentation" class="artists-tab"><a href="#artists" aria-controls="similar" role="tab" data-toggle="tab">{{ 'Artists'|trans }}</a></li>
+                <li role="presentation" class="artists-tab{% if active %} active{% set active = false %}{% endif %}"><a href="#artists" aria-controls="similar" role="tab" data-toggle="tab">{{ 'Artists'|trans }}</a></li>
             {% endif %}
             {# authority files #}
             {% if location.gnd is not empty or location.ulan is not empty %}

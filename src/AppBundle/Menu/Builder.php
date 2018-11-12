@@ -89,6 +89,10 @@ class Builder
             'route' => 'location',
         ]);
 
+        $menu['View Data']->addChild('Organizers', [
+            'route' => 'organizer',
+        ]);
+
         $menu['View Data']->addChild('Artists', [
             'route' => 'person',
         ]);
