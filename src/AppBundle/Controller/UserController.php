@@ -13,6 +13,8 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Security\Core\User\UserInterface;
+
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
@@ -22,6 +24,68 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 class UserController
 extends Controller
 {
+
+    /**
+     * @Route("/my-data", name="my-data")
+     */
+    public function myDataAction(Request $request, UserInterface $user = null){
+        if(is_null($user)){
+        //if ($this->isUserLogged()) {
+
+            return $this->redirectToRoute('login');
+        }
+
+
+        $queries = $this->lookupAllSearches($user);
+
+
+
+        return $this->render('User/mydata.html.twig', [
+            'pageTitle' => 'My Data',
+            'queries' => $queries,
+            /*'pagination' => $pagination,
+            'countryArray' => $this->buildCountries(),
+            'countries' => $countries,
+            'stringPart' => $stringQuery,
+            'ids' => $ids,
+            'form' => $form->createView(),
+            'requestURI' =>  $requestURI,
+            'searches' => $this->lookupSearches($user, 'exhibition')*/
+        ]);
+    }
+
+
+    protected function lookupAllSearches($user)
+    {
+        if (is_null($user)) {
+            return [];
+        }
+
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb->select('UA')
+            ->from('AppBundle:UserAction', 'UA')
+            ->andWhere("UA.user = :user")
+            ->orderBy("UA.createdAt", "DESC")
+            ->setParameter('user', $user)
+        ;
+
+        $searches = [];
+
+        foreach ($qb->getQuery()->getResult() as $userAction) {
+                $searches[$userAction->getId()] = [ $userAction->getName(),
+                    $userAction->getRoute(),
+                    $userAction->getRoute() . "/?" . http_build_query( $userAction->getRouteParams() )
+                ];
+
+        }
+
+        return $searches;
+    }
+
+
     /**
      * @Route("/login", name="login")
      */

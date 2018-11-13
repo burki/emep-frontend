@@ -29,6 +29,6 @@ security:
         
     access_control:
         - { path: ^/work, roles: ROLE_USER }
-        - { path: ^/search/save, roles: ROLE_USER }
+        - { path: ^/my-data, roles: ROLE_USER }
         # everything else is free
         - { path: ^/, roles: IS_AUTHENTICATED_ANONYMOUSLY }

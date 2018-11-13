@@ -17,7 +17,27 @@ class DefaultController extends Controller
 
     public function indexAction()
     {
-        return $this->render('Default/index.html.twig');
+
+        $em = $this->getDoctrine()->getEntityManager();
+        $dbconn = $em->getConnection();
+
+        $numberOfExhibitionStr = "SELECT Count(*) as numberOfExhibitions FROM Exhibition";
+        $numberOfArtistStr = "SELECT Count(*) as numberOfArtist FROM Person";
+
+        // TODO VENUES AND ORG BODIES
+
+        $stmtExhibition = $dbconn->query($numberOfExhibitionStr);
+        $numberOfExhibition = $stmtExhibition->fetch()['numberOfExhibitions'];
+
+        $stmtArtist = $dbconn->query($numberOfArtistStr);
+        $numberOfArtist = $stmtArtist->fetch()['numberOfArtist'];
+
+
+
+        return $this->render('Default/index.html.twig', [
+            'numberOfExhibitions' => $numberOfExhibition,
+            'numberOfArtist' => $numberOfArtist
+        ]);
     }
 
     /**

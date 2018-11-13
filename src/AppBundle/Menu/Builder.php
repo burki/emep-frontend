@@ -97,6 +97,10 @@ class Builder
             'route' => 'person',
         ]);
 
+
+        $menu->addChild('General Search', [ 'route' => 'search' ]);
+
+
         /* $menu['View Data']->addChild('Places', [
             'route' => 'place',
         ]); */
@@ -133,8 +137,6 @@ class Builder
         $menu['Info']->addChild('Using the Database', [
             'route' => 'using',
         ]);
-
-        $menu->addChild('General Search', [ 'route' => 'search' ]);
 
         $menu->addChild('My Data', [ 'route' => 'my-data' ]);
 

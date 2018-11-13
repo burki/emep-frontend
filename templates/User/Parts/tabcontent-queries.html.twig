@@ -1,0 +1,55 @@
+<script src="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.js"></script>
+<script src="{{ app.request.basepath }}/js/datatables-mobile.min.js"></script>
+
+<script>
+    $( document ).ready(function() {
+        $('#theList').DataTable({
+            responsive: true,
+            paging: false,
+            searching: false,
+            info: true,
+            ordering: false,
+            "columns": [
+                { "orderSequence": [ "desc", "asc" ] },
+                { "orderSequence": [ "desc", "asc" ] },
+                { "orderSequence": [ "desc", "asc" ] },
+                { "orderSequence": [ "desc", "asc" ] },
+                { "orderSequence": [ "desc", "asc" ] }
+            ]
+        });
+    })
+</script>
+
+<div role="tabpanel" class="tab-pane active" id="queries">
+    {% if queries|length > 0 %}
+
+        <table id="theList" class="table table-striped table-bordered dataTable listviewcontainer">
+            <thead>
+            <tr class="listviewheading">
+                <th class="desktop">Query Title</th>
+                <th class="desktop">type</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            {% for query in queries %}
+
+                <tr class="listviewrow">
+                    <td class="title">
+                        <a href="{{ query[2] }}">{{ query[0] }}</a>
+                    </td>
+
+                    <td class="date">
+                        {{ query[1] }}
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+            </tbody>
+        </table>
+
+    {% else %}
+        No queries found
+    {% endif %}
+</div>

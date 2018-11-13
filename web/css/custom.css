@@ -742,3 +742,7 @@ td.normal a, .listviewrow, .artist-text{
 #saveQuery{
     margin-left: 10px;
 }
+
+.homepage-main-button-containers, .homepage-main-button-containers{
+    min-height: 150px;
+}

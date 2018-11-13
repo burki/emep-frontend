@@ -6,22 +6,64 @@
         <h2 class="heading small">Exhibitions of Modern European Painting 1905-1915</h2>
     </div>
 
-    <div class="w-container">
-        <div class="home-menu-container">
-            <a href="{{ path('exhibition-index') }}" class="link-block w-inline-block" style="background-image: linear-gradient(rgba(255, 255, 255, 0.73), rgba(255, 255, 255, 0.73)), url({{ app.request.basepath }}/img/exhibition.jpg);">
-                <div class="home-menu-item-text">exhibitions</div>
-            </a>
-
-            <a href="{{ path('location-index') }}" class="link-block w-inline-block" style="background-image: linear-gradient(rgba(255, 255, 255, 0.73), rgba(255, 255, 255, 0.73)), url({{ app.request.basepath }}/img/venue.jpg);">
-                <div class="home-menu-item-text">venues</div>
-            </a>
-
-            <a href="{{ path('person-index') }}" class="link-block w-inline-block" style="background-image: linear-gradient(rgba(255, 255, 255, 0.73), rgba(255, 255, 255, 0.73)), url({{ app.request.basepath }}/img/artists.jpg);">
-                <div class="home-menu-item-text">artists</div>
-            </a>
+    <div class="container-6 w-container">
+        <div class="main-stats-container">
+            <div class="main-stats-single-container">
+                <div class="main-stat-number">{{ numberOfExhibitions }}</div>
+                <div class="text-block-3">total number of exhibitions</div>
+            </div>
+            <div class="main-stats-single-container">
+                <div class="main-stat-number">{{ numberOfArtist }}</div>
+                <div class="text-block-3">total number of <br>artists</div>
+            </div>
+            <div class="main-stats-single-container">
+                <div class="main-stat-number">__</div>
+                <div class="text-block-3">total number of organizing bodies</div>
+            </div>
+            <div class="main-stats-single-container">
+                <div class="main-stat-number">__</div>
+                <div class="text-block-3">total number of venues</div>
+            </div>
         </div>
     </div>
-    <div class="contentcontainer w-container">
-        <p class="artist-text">Within just a few years, before World War I, the design, and indeed the very notion of (Western) painting, changed radically. The history of early 20th century European modern art has often been written as the development of new forms and “isms”. Conversely, little systematic research has been done about how those forms and “isms” were presented to and received by the public, and whether and how painters used specific strategies to gain an audience. In the 19th century, exhibitions had become the primary place to initiate discussions about advances in art and this seems also to be the case after 1900.The project aims to study the history of a crucial moment of modern European painting from the perspective of exhibitions. In order to manage an exhaustive research we will focus on a period of 11 years, from 1905 to 1915. This time frame covers a particular density of avant-garde movements such as Fauvism (the term originates 1905 at the Salon d’Automne in Paris), Expressionism, Cubism, Futurism, Rayonism, Orphism, Suprematism (springing up in the December 1915 exhibition 0,10 in St. Petersburg, already in the middle of a World War).The first step of the project is the creation of a database of exhibitions performed in this period, where modern European painters participated. The database will be as exhaustive as possible and open access. Within the time frame it will serve to outline: 1. the geography and networks of modern painting, 2. the chronology and geography of exhibiting new forms and propagating “isms”, and 3. the exhibition strategies of modern painters.</p>
+
+
+    <div class="w-container">
+        <div class="home-menu-container">
+            <div class="homepage-main-button-containers">
+                <a href="{{ path('search') }}" class="link-block w-inline-block" style="background-image: linear-gradient(rgba(255, 255, 255, 0.73), rgba(255, 255, 255, 0.73)), url({{ app.request.basepath }}/img/search.jpg); background-position: center center; background-size: cover;">
+                    <div class="home-menu-item-text">General Search</div>
+                </a>
+                <div class="homepage-main-button-description">general view to search all data</div>
+            </div>
+            <div class="homepage-main-button-containers">
+                <a href="{{ path('person-index') }}" class="link-block w-inline-block"style="background-image: linear-gradient(rgba(255, 255, 255, 0.73), rgba(255, 255, 255, 0.73)), url({{ app.request.basepath }}/img/artists.jpg); background-size: cover;">
+                    <div class="home-menu-item-text">Artists</div>
+                </a>
+                <div class="homepage-main-button-description">detailed view of artists</div>
+            </div>
+        </div>
+        <div class="home-menu-container">
+            <div class="homepage-main-button-containers">
+                <a href="{{ path('exhibition-index') }}" class="link-block w-inline-block" style="background-image: linear-gradient(rgba(255, 255, 255, 0.73), rgba(255, 255, 255, 0.73)), url({{ app.request.basepath }}/img/exhibition.jpg); background-size: cover;">
+                    <div class="home-menu-item-text">Exhibitions</div>
+                </a>
+                <div class="homepage-main-button-description">detailed view of exhibitions</div>
+            </div>
+            <div class="homepage-main-button-containers">
+                <a href="{{ path('location-index') }}" class="link-block w-inline-block" style="background-image: linear-gradient(rgba(255, 255, 255, 0.73), rgba(255, 255, 255, 0.73)), url({{ app.request.basepath }}/img/venue.jpg); background-size: cover;">
+                    <div class="home-menu-item-text">Venues</div>
+                </a>
+                <div class="homepage-main-button-description">detailed view of venues</div>
+            </div>
+            <div class="homepage-main-button-containers">
+                <a href="{{ path('organizer-index') }}" class="link-block w-inline-block" style="background-image: linear-gradient(rgba(255, 255, 255, 0.73), rgba(255, 255, 255, 0.73)), url({{ app.request.basepath }}/img/organ.jpg); background-size: cover;">
+                    <div class="home-menu-item-text">Organizing Bodies</div>
+                </a>
+                <div class="homepage-main-button-description">detailed view of organizing bodies</div>
+            </div>
+        </div>
     </div>
+
+
 {% endblock %}
