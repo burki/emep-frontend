@@ -53,9 +53,18 @@ class DefaultController extends Controller
      * @Route("/using", name="using")
      */
 
-    public function usinfAction()
+    public function usingAction()
     {
         return $this->render('Default/using.html.twig');
+    }
+
+    /**
+     * @Route("/cooperating-institutions", name="cooperating")
+     */
+
+    public function cooperatingAction()
+    {
+        return $this->render('Default/cooperating_institutions.html.twig');
     }
 
     /**

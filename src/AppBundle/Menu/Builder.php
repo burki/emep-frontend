@@ -98,6 +98,7 @@ class Builder
         ]);
 
 
+
         $menu->addChild('General Search', [ 'route' => 'search' ]);
 
 
@@ -137,6 +138,11 @@ class Builder
         $menu['Info']->addChild('Using the Database', [
             'route' => 'using',
         ]);
+
+        $menu['Info']->addChild('Cooperating Institutions', [
+            'route' => 'cooperating',
+        ]);
+
 
         $menu->addChild('My Data', [ 'route' => 'my-data' ]);
 
