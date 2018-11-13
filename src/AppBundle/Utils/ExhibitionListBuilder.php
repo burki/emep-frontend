@@ -26,9 +26,9 @@ extends SearchListBuilder
         'type' => [
             'label' => 'Type',
         ],
-		'organizers' => [
-			'label' => 'Org. Body',
-		],
+        'organizers' => [
+            'label' => 'Org. Body',
+        ],
         'count_itemexhibition' => [
             'label' => 'Number of Cat. Entries',
         ],
@@ -176,9 +176,9 @@ extends SearchListBuilder
                 'type' => [
                     'label' => 'Type',
                 ],
-				'organizers' => [
-					'label' => 'Org. Body',
-				],
+                'organizers' => [
+                    'label' => 'Org. Body',
+                ],
                 'count_itemexhibition' => [
                     'label' => 'Number of Cat. Entries',
                 ],
@@ -239,7 +239,7 @@ extends SearchListBuilder
             'L.place_geo',
             'PL.latitude', 'PL.longitude',
             'E.status AS status',
-			"GROUP_CONCAT(DISTINCT(O.name) ORDER BY EL.ord SEPARATOR '; ') AS organizers",
+            "GROUP_CONCAT(DISTINCT(O.name) ORDER BY EL.ord SEPARATOR '; ') AS organizers",
             'COUNT(DISTINCT IE.id) AS count_itemexhibition',
             'COUNT(DISTINCT IE.id_person) AS count_person',
         ]);
@@ -277,8 +277,8 @@ extends SearchListBuilder
         if (array_key_exists('person', $this->queryFilters)) {
             // so we can filter on P.*
             $queryBuilder->join('IE',
-								'Person', 'P',
-								'P.id=IE.id_person AND P.status <> -1');
+                                'Person', 'P',
+                                'P.id=IE.id_person AND P.status <> -1');
         }
 
         return $this;

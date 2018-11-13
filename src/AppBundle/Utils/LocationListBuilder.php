@@ -11,7 +11,7 @@ abstract class LocationListBuilder
 extends SearchListBuilder
 {
     protected $entity = 'Location';
-	protected $alias = 'L';
+    protected $alias = 'L';
 
     var $rowDescr = [
         'location' => [
@@ -167,11 +167,11 @@ extends SearchListBuilder
         };
     }
 
-	protected function buildSelectExhibitionCount()
-	{
-		return '(SELECT COUNT(*) FROM Exhibition EC WHERE EC.id_location='
-			. $this->alias . '.id AND EC.status <> -1) AS count_exhibition';
-	}
+    protected function buildSelectExhibitionCount()
+    {
+        return '(SELECT COUNT(*) FROM Exhibition EC WHERE EC.id_location='
+            . $this->alias . '.id AND EC.status <> -1) AS count_exhibition';
+    }
 
     protected function setSelect($queryBuilder)
     {
@@ -185,14 +185,14 @@ extends SearchListBuilder
             'DATE(' . $this->alias . '.foundingdate) AS foundingdate',
             'DATE(' . $this->alias . '.dissolutiondate) AS dissolutiondate',
             $this->alias . '.gnd AS gnd',
-			$this->alias . '.ulan AS ulan',
+            $this->alias . '.ulan AS ulan',
             $this->alias . '.type AS type',
             $this->alias . '.status AS status',
             $this->alias . '.place_geo',
             'P' . $this->alias . '.latitude',
-			'P' . $this->alias . '.longitude',
+            'P' . $this->alias . '.longitude',
             'COUNT(DISTINCT IE.id) AS count_itemexhibition',
-			$this->buildSelectExhibitionCount()
+            $this->buildSelectExhibitionCount()
         ]);
 
         return $this;
@@ -205,12 +205,12 @@ extends SearchListBuilder
         return $this;
     }
 
-	protected function setExhibitionJoin($queryBuilder)
-	{
+    protected function setExhibitionJoin($queryBuilder)
+    {
         $queryBuilder->leftJoin($this->alias,
                                 'Exhibition', 'E',
                                 'E.id_location=' . $this->alias . '.id AND E.status <> -1');
-	}
+    }
 
     protected function setJoin($queryBuilder)
     {
@@ -220,7 +220,7 @@ extends SearchListBuilder
                                 'Geoname', 'P' . $this->alias,
                                 'P' . $this->alias . '.tgn=' . $this->alias.'.place_tgn');
 
-		$this->setExhibitionJoin($queryBuilder);
+        $this->setExhibitionJoin($queryBuilder);
 
         $queryBuilder->leftJoin('E',
                                 'ItemExhibition', 'IE',
@@ -229,8 +229,8 @@ extends SearchListBuilder
         if (array_key_exists('person', $this->queryFilters)) {
             // so we can filter on P.*
             $queryBuilder->join('IE',
-								'Person', 'P',
-								'P.id=IE.id_person AND P.status <> -1');
+                                'Person', 'P',
+                                'P.id=IE.id_person AND P.status <> -1');
         }
 
         return $this;

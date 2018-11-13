@@ -325,7 +325,7 @@ extends SearchListBuilder
             "E.type AS exhibition_type",
             'L.name AS location',
             'L.id AS location_id',
-			'L.type AS location_type',
+            'L.type AS location_type',
             'L.place AS place',
             'L.place_tgn AS place_tgn',
             'E.organizer_type AS organizer_type',

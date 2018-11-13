@@ -327,9 +327,9 @@ extends SearchListBuilder
                                 'IE.id_person=P.id AND (IE.title IS NOT NULL OR IE.id_item IS NULL)');
 
         if (array_key_exists('exhibition', $this->queryFilters)
-			|| array_key_exists('location', $this->queryFilters)
-			|| array_key_exists('organizer', $this->queryFilters))
-		{
+            || array_key_exists('location', $this->queryFilters)
+            || array_key_exists('organizer', $this->queryFilters))
+        {
             // so we can filter on E.*
             $queryBuilder->leftJoin('IE',
                                     'Exhibition', 'E',
@@ -347,14 +347,14 @@ extends SearchListBuilder
 
             if (array_key_exists('organizer', $this->queryFilters)) {
                 // so we can filter on O.*
-				$queryBuilder->innerJoin('E',
-										'ExhibitionLocation', 'EL',
-										'EL.id_exhibition=E.id AND E.status <> -1');
-				$queryBuilder->innerJoin('EL',
-										'Location', 'O',
-										'EL.id_location=O.id AND EL.role = 0');
+                $queryBuilder->innerJoin('E',
+                                        'ExhibitionLocation', 'EL',
+                                        'EL.id_exhibition=E.id AND E.status <> -1');
+                $queryBuilder->innerJoin('EL',
+                                        'Location', 'O',
+                                        'EL.id_location=O.id AND EL.role = 0');
 
-				/*
+                /*
                 $queryBuilder->leftJoin('O',
                                         'Geoname', 'PO',
                                         'L.place_tgn=P=.tgn');

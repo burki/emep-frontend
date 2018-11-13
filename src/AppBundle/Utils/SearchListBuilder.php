@@ -72,9 +72,9 @@ extends ListBuilder
         $this->setQueryFilters($queryFilters);
     }
 
-	protected function baseQuery()
-	{
-    	$queryBuilder = $this->getQueryBuilder();
+    protected function baseQuery()
+    {
+        $queryBuilder = $this->getQueryBuilder();
 
         $this
             ->setSelect($queryBuilder)
@@ -84,7 +84,7 @@ extends ListBuilder
             ->setOrder($queryBuilder);
 
         return $queryBuilder;
-	}
+    }
 
     protected function determineSortOrder()
     {
