@@ -6,7 +6,9 @@
             <div class="icontab advanced-search active"><img src="{{ app.request.basepath }}/img/setttings_icon_blue.svg" class="iconimage"></div>
             <div class="icontab download-csv"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage"></div>
 
-            <form id="saveQuery" action="/location/save?entity={{  requestURI|url_encode }}" method="POST">
+            {% if app.user  %}
+
+            <form id="saveQuery" action="{{ path('location-save') }}?entity={{  requestURI|url_encode }}" method="POST">
                 {% if searches is not empty %}
                     <select name="useraction" id="saved-searches" class="w-input select-queries">
                         <option value="">- Select Saved Query -</option>
@@ -17,7 +19,11 @@
                 {% endif %}
             </form>
 
+
             <div class="icontab save-query"><img src="{{ app.request.basepath }}/img/save_icon.svg" class="iconimage"></div>
+
+            {% endif %}
+
 
         </div>
         <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 1em">

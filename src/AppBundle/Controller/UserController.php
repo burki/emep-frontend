@@ -203,7 +203,7 @@ extends Controller
             return $this->redirectToRoute('login');
         }
 
-        return $this->render('user/register.html.twig', [
+        return $this->render('User/register.html.twig', [
             'form' => $form->createView(),
         ]);
     }
