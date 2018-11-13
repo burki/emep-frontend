@@ -109,6 +109,8 @@ class Builder
 
         $menu->addChild('Holding Institutions', [ 'route' => 'holder' ]);
 
+        /*
+
         if ($showWorks) {
             $menu->addChild('Works', [ 'route' => 'item' ]);
             $menu['Works']->addChild('List by Artist', [
@@ -129,7 +131,7 @@ class Builder
             $menu['Works']->addChild('Stats by Artist', [
                 'route' => 'item-by-person',
             ]);
-        }
+        } */
 
         $menu->addChild('Info', [ 'route' => 'project' ]); // maybe create a view for view data
         $menu['Info']->addChild('Our Project', [

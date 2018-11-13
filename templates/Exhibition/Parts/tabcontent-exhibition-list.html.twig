@@ -23,13 +23,13 @@
             <table id="exhibitionsList" class="table table-striped table-bordered dataTable listviewcontainer">
                 <thead>
                 <tr class="listviewheading">
-                    <th style="min-width: 85px;" class="{{ (sortField == 'dateSort') ? 'activeSort' : '' }} desktop">{{ helper.pagination_sortable(pagination, "Startdate    ", 'dateSort') }}</th>
-                    <th {{ (sortField == 'placeSort') ? 'activeSort' : '' }}><span>Title</span></th>
-                    <th class="{{ (sortField == 'placeSort') ? 'activeSort' : '' }} desktop">{{ helper.pagination_sortable(pagination, 'City', 'placeSort') }}</th>
-                    <th class="{{ (sortField == 'neueSort') ? 'activeSort' : '' }} desktop">{{ helper.pagination_sortable(pagination, 'Venue', 'venueSort') }}</th>
-                    <th class="{{ (sortField == 'numCatEntrySort') ? 'activeSort' : '' }}">{{ helper.pagination_sortable(pagination, 'Number of Cat. Entries', 'numCatEntrySort', 'desc') }}</th>
-                    <th class="{{ (sortField == 'placeSort') ? 'activeSort' : '' }}  desktop"><span>type of organising body</span></th>
-                    <th class="desktop"><span>organising body</span></th>
+                    <th style="min-width: 85px;" class="{{ (sortField == 'dateSort') ? 'activeSort' : '' }} ">{{ helper.pagination_sortable(pagination, "Startdate    ", 'dateSort') }}</th>
+                    <th class="" {{ (sortField == 'placeSort') ? 'activeSort' : '' }}><span>Title</span></th>
+                    <th class="{{ (sortField == 'placeSort') ? 'activeSort' : '' }} ">{{ helper.pagination_sortable(pagination, 'City', 'placeSort') }}</th>
+                    <th class="{{ (sortField == 'neueSort') ? 'activeSort' : '' }} ">{{ helper.pagination_sortable(pagination, 'Venue', 'venueSort') }}</th>
+                    <th class="{{ (sortField == 'numCatEntrySort') ? 'activeSort' : '' }} ">{{ helper.pagination_sortable(pagination, 'Number of Cat. Entries', 'numCatEntrySort', 'desc') }}</th>
+                    <th class="{{ (sortField == 'placeSort') ? 'activeSort' : '' }} "><span>type of organising body</span></th>
+                    <th class=""><span>organising body</span></th>
 
                 </tr>
                 </thead>
