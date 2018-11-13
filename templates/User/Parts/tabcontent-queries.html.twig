@@ -36,11 +36,11 @@
 
                 <tr class="listviewrow">
                     <td class="title">
-                        <a href="{{ query[2] }}">{{ query[0] }}</a>
+                        <a href="{{ query[2] }}">{{ query[0]   }}</a>
                     </td>
 
                     <td class="date">
-                        {{ query[1] }}
+                        {{ query[1] == 'search' ? 'Advanced Search' : query[1]|capitalize }}
                     </td>
 
                 </tr>

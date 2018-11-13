@@ -259,6 +259,13 @@
 
             // IMPLEMENT SAVE QUERY FUNCTIONALITY
 
+            $('.w-input').keypress(function (e) {
+                if (e.which == 13) {
+                    $('.indexForm').submit();
+                    return false;    //<---- Add this line
+                }
+            });
+
             function saveQuery() {
                 // change action for saving current query
                 $form = $('#saveQuery');

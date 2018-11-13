@@ -256,6 +256,13 @@
     <script>
         $(document).ready(function() {
 
+            $('.w-input').keypress(function (e) {
+                if (e.which == 13) {
+                    $('.indexForm').submit();
+                    return false;    //<---- Add this line
+                }
+            });
+
             // IMPLEMENT SAVE QUERY FUNCTIONALITY
 
             function saveQuery() {
