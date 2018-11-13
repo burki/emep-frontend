@@ -80,7 +80,7 @@ class Builder
         $menu->addChild('Home', [ 'route' => 'home' ]); // maybe create a view for view data
 
 
-        $menu->addChild('Basic Search', [ 'route' => 'data' ]); // maybe create a view for view data
+        $menu->addChild('Basic Search', [ 'route' => 'exhibition' ]); // maybe create a view for view data
         $menu['Basic Search']->addChild('Exhibitions', [
             'route' => 'exhibition',
         ]);
