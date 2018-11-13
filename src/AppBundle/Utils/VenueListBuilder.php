@@ -22,6 +22,10 @@ extends LocationListBuilder
     {
         parent::setFilter($queryBuilder);
 
+        // don't show organizer-only
+        $queryBuilder->andWhere(sprintf('0 = (%s.flags & 256)',
+                                        $this->alias));
+
         if (array_key_exists('organizer', $this->queryFilters)) {
             // so we can filter on O.*
             $queryBuilder->innerJoin('E',

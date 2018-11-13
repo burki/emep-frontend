@@ -238,6 +238,8 @@ extends SearchListBuilder
 
     protected function setFilter($queryBuilder)
     {
+        $queryBuilder->andWhere($this->alias . '.status <> -1');
+
         $this->addSearchFilters($queryBuilder, [
             $this->alias . '.name',
             $this->alias . '.name_translit',
