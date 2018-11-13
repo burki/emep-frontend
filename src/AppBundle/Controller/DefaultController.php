@@ -2,41 +2,58 @@
 
 namespace AppBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+
+use AppBundle\Utils\SearchListPagination;
 
 /**
  *
  */
-class DefaultController extends Controller
+class DefaultController
+extends Controller
 {
     /**
      * @Route("/", name="home")
      * @Route("/data", name="data")
      */
 
-    public function indexAction()
+    public function indexAction(Request $request, UrlGeneratorInterface $urlGenerator)
     {
+        $connection = $this->getDoctrine()->getEntityManager()->getConnection();
 
-        $em = $this->getDoctrine()->getEntityManager();
-        $dbconn = $em->getConnection();
+        $counts = [];
+        foreach ([ 'Exhibition', 'Venue', 'Organizer', 'Person' ] as $entity) {
+            switch ($entity) {
+                case 'Exhibition':
+                    $listBuilder = new \AppBundle\Utils\ExhibitionListBuilder($connection, $request, $urlGenerator, []);
+                    break;
 
-        $numberOfExhibitionStr = "SELECT Count(*) as numberOfExhibitions FROM Exhibition";
-        $numberOfArtistStr = "SELECT Count(*) as numberOfArtist FROM Person";
+                case 'Venue':
+                    $listBuilder = new \AppBundle\Utils\VenueListBuilder($connection, $request, $urlGenerator, []);
+                    break;
 
-        // TODO VENUES AND ORG BODIES
+                case 'Organizer':
+                    $listBuilder = new \AppBundle\Utils\OrganizerListBuilder($connection, $request, $urlGenerator, []);
+                    break;
 
-        $stmtExhibition = $dbconn->query($numberOfExhibitionStr);
-        $numberOfExhibition = $stmtExhibition->fetch()['numberOfExhibitions'];
+                case 'Person':
+                    $listBuilder = new \AppBundle\Utils\PersonListBuilder($connection, $request, $urlGenerator, []);
+                    break;
+            }
 
-        $stmtArtist = $dbconn->query($numberOfArtistStr);
-        $numberOfArtist = $stmtArtist->fetch()['numberOfArtist'];
+            // TODO: build a separate count method, for now just a single entry to access total
+            $listPagination = new SearchListPagination($listBuilder);
+            $listPage = $listPagination->get(1);
 
-
+            $counts[$entity] = $listPage['total'];
+        }
 
         return $this->render('Default/index.html.twig', [
-            'numberOfExhibitions' => $numberOfExhibition,
-            'numberOfArtist' => $numberOfArtist
+            'counts' => $counts,
         ]);
     }
 
