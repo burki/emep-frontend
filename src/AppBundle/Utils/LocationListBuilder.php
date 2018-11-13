@@ -2,8 +2,6 @@
 
 namespace AppBundle\Utils;
 
-namespace AppBundle\Utils;
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
