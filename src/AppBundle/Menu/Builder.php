@@ -80,26 +80,26 @@ class Builder
         $menu->addChild('Home', [ 'route' => 'home' ]); // maybe create a view for view data
 
 
-        $menu->addChild('View Data', [ 'route' => 'data' ]); // maybe create a view for view data
-        $menu['View Data']->addChild('Exhibitions', [
+        $menu->addChild('Basic Search', [ 'route' => 'data' ]); // maybe create a view for view data
+        $menu['Basic Search']->addChild('Exhibitions', [
             'route' => 'exhibition',
         ]);
 
-        $menu['View Data']->addChild('Venues', [
+        $menu['Basic Search']->addChild('Venues', [
             'route' => 'location',
         ]);
 
-        $menu['View Data']->addChild('Organizers', [
+        $menu['Basic Search']->addChild('Organizers', [
             'route' => 'organizer',
         ]);
 
-        $menu['View Data']->addChild('Artists', [
+        $menu['Basic Search']->addChild('Artists', [
             'route' => 'person',
         ]);
 
 
 
-        $menu->addChild('General Search', [ 'route' => 'search' ]);
+        $menu->addChild('Advanced Search', [ 'route' => 'search' ]);
 
 
         /* $menu['View Data']->addChild('Places', [

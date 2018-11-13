@@ -2,68 +2,71 @@
 
 {% block body %}
 
-    <div class="w-container">
-        <h2 class="heading small">Exhibitions of Modern European Painting 1905-1915</h2>
-    </div>
 
     <div class="container-6 w-container">
         <div class="main-stats-container">
             <div class="main-stats-single-container">
                 <div class="main-stat-number"><a href="{{ path('exhibition-index') }}">{{ counts['Exhibition'] }}</a></div>
-                <div class="text-block-3">total number of exhibitions</div>
+                <div class="text-block-3">Total number of exhibitions</div>
             </div>
             <div class="main-stats-single-container">
                 <div class="main-stat-number"><a href="{{ path('location-index') }}">{{ counts['Venue'] }}</a></div>
-                <div class="text-block-3">total number of venues</div>
+                <div class="text-block-3">Total number of venues</div>
             </div>
             <div class="main-stats-single-container">
                 <div class="main-stat-number"><a href="{{ path('organizer-index') }}">{{ counts['Organizer'] }}</a></div>
-                <div class="text-block-3">total number of organizing bodies</div>
+                <div class="text-block-3">Total number of organizing bodies</div>
             </div>
             <div class="main-stats-single-container">
                 <div class="main-stat-number"><a href="{{ path('person-index') }}">{{ counts['Person'] }}</a></div>
-                <div class="text-block-3">total number of <br>artists</div>
+                <div class="text-block-3">Total number of <br>artists</div>
             </div>
         </div>
     </div>
 
 
     <div class="w-container">
+
+
         <div class="home-menu-container">
+
             <div class="homepage-main-button-containers">
-                <a href="{{ path('exhibition-index') }}" class="link-block w-inline-block" style="background-image: linear-gradient(rgba(255, 255, 255, 0.73), rgba(255, 255, 255, 0.73)), url({{ app.request.basepath }}/img/exhibition.jpg); background-size: cover;">
-                    <div class="home-menu-item-text">Exhibitions</div>
+                <div class="general-search-sub-container" style="display: none;">
+                    <a href="{{ path('person-index') }}" class="sub-genera-search-link even w-inline-block">
+                        <div class="home-menu-item-text">Artists</div>
+                    </a>
+                    <a href="{{ path('exhibition-index') }}" class="sub-genera-search-link odd w-inline-block">
+                        <div class="home-menu-item-text">Exhibitions</div>
+                    </a>
+                    <a href="{{ path('location-index') }}" class="sub-genera-search-link even w-inline-block">
+                        <div class="home-menu-item-text">Venues</div>
+                    </a>
+                    <a href="{{ path('organizer-index') }}" class="sub-genera-search-link odd w-inline-block">
+                        <div class="home-menu-item-text">Organising Bodies</div>
+                    </a>
+                </div>
+                <a href="#" class="link-block w-inline-block basic-search-home" style="max-height: 150px; min-hight: 150px; height: 150px; background-image: linear-gradient(rgba(255, 255, 255, 0.73), rgba(255, 255, 255, 0.73)), url({{ app.request.basepath }}/img/organ.jpg); background-size: cover;">
+                    <div class="home-menu-item-text">Basic Search</div>
                 </a>
-                <div class="homepage-main-button-description">detailed view of exhibitions</div>
+                <div class="homepage-main-button-description">View and search lists of Exhibitions, Artists, Venues or Organising Bodies.</div>
             </div>
+
+
             <div class="homepage-main-button-containers">
-                <a href="{{ path('location-index') }}" class="link-block w-inline-block" style="background-image: linear-gradient(rgba(255, 255, 255, 0.73), rgba(255, 255, 255, 0.73)), url({{ app.request.basepath }}/img/venue.jpg); background-size: cover;">
-                    <div class="home-menu-item-text">Venues</div>
+                <a href="{{ path('search') }}" class="link-block w-inline-block" style="max-height: 150px; min-hight: 150px; height: 150px; background-image: linear-gradient(rgba(255, 255, 255, 0.73), rgba(255, 255, 255, 0.73)), url({{ app.request.basepath }}/img/search.jpg); background-position: center center; background-size: cover;">
+                    <div class="home-menu-item-text">Advanced Search</div>
                 </a>
-                <div class="homepage-main-button-description">detailed view of venues</div>
-            </div>
-            <div class="homepage-main-button-containers">
-                <a href="{{ path('organizer-index') }}" class="link-block w-inline-block" style="background-image: linear-gradient(rgba(255, 255, 255, 0.73), rgba(255, 255, 255, 0.73)), url({{ app.request.basepath }}/img/organ.jpg); background-size: cover;">
-                    <div class="home-menu-item-text">Organizing Bodies</div>
-                </a>
-                <div class="homepage-main-button-description">detailed view of organizing bodies</div>
-            </div>
-        </div>
-        <div class="home-menu-container">
-            <div class="homepage-main-button-containers">
-                <a href="{{ path('person-index') }}" class="link-block w-inline-block"style="background-image: linear-gradient(rgba(255, 255, 255, 0.73), rgba(255, 255, 255, 0.73)), url({{ app.request.basepath }}/img/artists.jpg); background-size: cover;">
-                    <div class="home-menu-item-text">Artists</div>
-                </a>
-                <div class="homepage-main-button-description">detailed view of artists</div>
-            </div>
-            <div class="homepage-main-button-containers">
-                <a href="{{ path('search') }}" class="link-block w-inline-block" style="background-image: linear-gradient(rgba(255, 255, 255, 0.73), rgba(255, 255, 255, 0.73)), url({{ app.request.basepath }}/img/search.jpg); background-position: center center; background-size: cover;">
-                    <div class="home-menu-item-text">General Search</div>
-                </a>
-                <div class="homepage-main-button-description">general view to search all data</div>
+                <div class="homepage-main-button-description">The description for the Advanced Search can be - search all data together with advanced search filters and tools</div>
             </div>
         </div>
     </div>
+
+    <script>
+        $('.basic-search-home').on('click', function(){
+           $(this).slideToggle();
+           $('.general-search-sub-container').slideToggle();
+        });
+    </script>
 
 
 {% endblock %}

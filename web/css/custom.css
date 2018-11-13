@@ -746,3 +746,7 @@ td.normal a, .listviewrow, .artist-text{
 .homepage-main-button-containers, .homepage-main-button-containers{
     min-height: 150px;
 }
+
+.brand {
+    font-size: 1.6rem;
+}
