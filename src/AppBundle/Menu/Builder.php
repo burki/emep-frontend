@@ -134,9 +134,13 @@ class Builder
             'route' => 'using',
         ]);
 
-        $menu->addChild('Search', [ 'route' => 'search' ]);
+        $menu->addChild('General Search', [ 'route' => 'search' ]);
+
+        $menu->addChild('My Data', [ 'route' => 'my-data' ]);
+
 
         /*
+         *
          * the following didn't work and is now handled
          * by the RequestVoter registered in services, see
          * https://gist.github.com/nateevans/9958390

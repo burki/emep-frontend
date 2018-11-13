@@ -9,6 +9,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use AppBundle\Utils\CsvResponse;
+use Symfony\Component\Security\Core\User\UserInterface;
+
 
 /**
  *
@@ -140,12 +142,159 @@ extends CrudController
         return $response;
     }
 
+
     /**
-     * @Route("/location", name="location-index")
      * @Route("/organizer", name="organizer-index")
      */
-    public function indexAction(Request $request)
+    public function indexActionOrganizer(Request $request, UserInterface $user = null)
     {
+
+        // redirect to saved query
+        if ('POST' == $request->getMethod() && !is_null($user)) {
+            // check a useraction was requested
+            $userActionId = $request->request->get('useraction');
+            if (!empty($userActionId)) {
+                $userAction = $this->getDoctrine()
+                    ->getManager()
+                    ->getRepository('AppBundle:UserAction')
+                    ->findOneBy([
+                        'id' => $userActionId,
+                        'user' => $user,
+                        'route' => 'organizer',
+                    ]);
+
+                if (!is_null($userAction)) {
+                    return $this->redirectToRoute($userAction->getRoute(),
+                        $userAction->getRouteParams());
+                }
+            }
+        }
+
+        $requestURI =  $request->getRequestUri();
+
+        $route = $request->get('_route');
+
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb->select([
+            'L',
+            "CONCAT(COALESCE(C.name, P.countryCode), COALESCE(P.alternateName,P.name),L.name) HIDDEN countryPlaceNameSort",
+            "L.name HIDDEN nameSort",
+            'COUNT(DISTINCT E.id) AS numExhibitionSort',
+            'COUNT(DISTINCT IE.id) AS numCatEntrySort',
+            "P.name HIDDEN placeSort",
+            "L.type HIDDEN typeSort"
+        ])
+            ->from('AppBundle:Location', 'L')
+            ->leftJoin('L.place', 'P')
+            ->leftJoin('P.country', 'C')
+        ;
+
+        if ('organizer-index' == $route) {
+            $qb
+                ->innerJoin('AppBundle:Exhibition', 'E',
+                    \Doctrine\ORM\Query\Expr\Join::WITH,
+                    'L MEMBER OF E.organizers AND E.status <> -1')
+                ->where('L.status <> -1')
+            ;
+        }
+        else {
+            $qb
+                ->leftJoin('AppBundle:Exhibition', 'E',
+                    \Doctrine\ORM\Query\Expr\Join::WITH,
+                    'E.location = L AND E.status <> -1')
+                ->where('L.status <> -1 AND 0 = BIT_AND(L.flags, 256)')
+            ;
+        }
+
+        $qb
+            ->leftJoin('AppBundle:ItemExhibition', 'IE',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE.exhibition = E AND IE.title IS NOT NULL')
+            ->groupBy('L.id')
+            ->orderBy('countryPlaceNameSort')
+        ;
+
+        $types = $this->buildVenueTypes();
+        $form = $this->get('form.factory')->create(\AppBundle\Filter\LocationFilterType::class, [
+            'country_choices' => array_flip($this->buildCountries()),
+            'location_type_choices' => array_combine($types, $types),
+            'ids' => range(0, 9999)
+        ]);
+
+        if ($request->query->has($form->getName())) {
+            // manually bind values from the request
+            $form->submit($request->query->get($form->getName()));
+            // build the query from the given form object
+            $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($form, $qb);
+        }
+
+        $pagination = $this->buildPagination($request, $qb->getQuery(), [
+            // the following leads to wrong display in combination with our
+            // helper.pagination_sortable()
+            // 'defaultSortFieldName' => 'countryPlaceNameSort', 'defaultSortDirection' => 'asc',
+        ]);
+
+        $locations = $qb->getQuery()->getResult();
+
+        $countries = $form->get('country')->getData();
+        $locationType = $form->get('location_type')->getData();
+        $stringQuery = $form->get('search')->getData();
+        $ids = $form->get('id')->getData();
+
+        $indexDataNumberVenueType = $this->indexDataNumberVenueType($locations);
+        $indexDataNumberCountries = $this->indexDataNumberCountries($locations);
+
+        return $this->render('Location/index.html.twig', [
+            'pageTitle' => $this->get('translator')->trans('organizer-index' == $route ? 'Organizing Bodies' : 'Venues'),
+            'pagination' => $pagination,
+            'form' => $form->createView(),
+            'countryArray' => $this->buildCountries(),
+            'organizerTypesArray' => $types,
+            'countries' => $countries,
+            'ids' => $ids,
+            'locationType' => $locationType,
+            'stringPart' => $stringQuery,
+            'locations' => $locations,
+            'indexDataNumberVenueType' => $indexDataNumberVenueType,
+            'indexDataNumberCountries' => $indexDataNumberCountries,
+            'requestURI' =>  $requestURI,
+            'searches' => $this->lookupSearchesOrganizer($user)
+        ]);
+    }
+
+
+    /**
+     * @Route("/location", name="location-index")
+     */
+    public function indexAction(Request $request, UserInterface $user = null)
+    {
+
+        // redirect to saved query
+        if ('POST' == $request->getMethod() && !is_null($user)) {
+            // check a useraction was requested
+            $userActionId = $request->request->get('useraction');
+            if (!empty($userActionId)) {
+                $userAction = $this->getDoctrine()
+                    ->getManager()
+                    ->getRepository('AppBundle:UserAction')
+                    ->findOneBy([
+                        'id' => $userActionId,
+                        'user' => $user,
+                        'route' => 'location',
+                    ]);
+
+                if (!is_null($userAction)) {
+                    return $this->redirectToRoute($userAction->getRoute(),
+                        $userAction->getRouteParams());
+                }
+            }
+        }
+
+        $requestURI =  $request->getRequestUri();
+
         $route = $request->get('_route');
 
         $qb = $this->getDoctrine()
@@ -221,7 +370,7 @@ extends CrudController
         $indexDataNumberVenueType = $this->indexDataNumberVenueType($locations);
         $indexDataNumberCountries = $this->indexDataNumberCountries($locations);
 
-        return $this->render('Location/index.html.twig', [
+        return $this->render('Organizer/index.html.twig', [
             'pageTitle' => $this->get('translator')->trans('organizer-index' == $route ? 'Organizing Bodies' : 'Venues'),
             'pagination' => $pagination,
             'form' => $form->createView(),
@@ -233,7 +382,160 @@ extends CrudController
             'stringPart' => $stringQuery,
             'locations' => $locations,
             'indexDataNumberVenueType' => $indexDataNumberVenueType,
-            'indexDataNumberCountries' => $indexDataNumberCountries
+            'indexDataNumberCountries' => $indexDataNumberCountries,
+            'requestURI' =>  $requestURI,
+            'searches' => $this->lookupSearches($user)
+        ]);
+    }
+
+
+    // TODO MOVE TO SHARED
+    protected function lookupSearchesOrganizer($user)
+    {
+        if (is_null($user)) {
+            return [];
+        }
+
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb->select('UA')
+            ->from('AppBundle:UserAction', 'UA')
+            ->where("UA.route = 'organizer'")
+            ->andWhere("UA.user = :user")
+            ->orderBy("UA.createdAt", "DESC")
+            ->setParameter('user', $user)
+        ;
+
+        $searches = [];
+
+        foreach ($qb->getQuery()->getResult() as $userAction) {
+            $searches[$userAction->getId()] = $userAction->getName();
+        }
+
+        return $searches;
+    }
+
+    // TODO MOVE TO SHARED
+    protected function lookupSearches($user)
+    {
+        if (is_null($user)) {
+            return [];
+        }
+
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb->select('UA')
+            ->from('AppBundle:UserAction', 'UA')
+            ->where("UA.route = 'location'")
+            ->andWhere("UA.user = :user")
+            ->orderBy("UA.createdAt", "DESC")
+            ->setParameter('user', $user)
+        ;
+
+        $searches = [];
+
+        foreach ($qb->getQuery()->getResult() as $userAction) {
+            $searches[$userAction->getId()] = $userAction->getName();
+        }
+
+        return $searches;
+    }
+
+    /**
+     * @Route("/location/save", name="location-save")
+     */
+    public function saveSearchActionLocation(Request $request,
+                                           UserInterface $user)
+    {
+
+        $parametersAsString = $request->get('entity');
+        $parametersAsString = str_replace("/location?", "", $parametersAsString);
+
+
+        parse_str($parametersAsString, $parameters);
+
+
+        $form = $this->createForm(\AppBundle\Form\Type\SaveSearchType::class);
+
+        //$form->get
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+
+            $userAction = new \AppBundle\Entity\UserAction();
+
+            $userAction->setUser($user);
+            $userAction->setRoute($route = 'location');
+            $userAction->setRouteParams($parameters);
+
+            $userAction->setName($data['name']);
+
+            $em = $this->getDoctrine()
+                ->getManager();
+
+            $em->persist($userAction);
+            $em->flush();
+
+            return $this->redirectToRoute($route, $parameters);
+        }
+
+        return $this->render('Search/save.html.twig', [
+            'pageTitle' => $this->get('translator')->trans('Save your query'),
+            'form' => $form->createView(),
+        ]);
+    }
+
+
+
+    /**
+     * @Route("/organizer/save", name="organizer-save")
+     */
+    public function saveSearchActionOrganizer(Request $request,
+                                             UserInterface $user)
+    {
+
+        $parametersAsString = $request->get('entity');
+        $parametersAsString = str_replace("/organizer?", "", $parametersAsString);
+
+
+        parse_str($parametersAsString, $parameters);
+
+
+        $form = $this->createForm(\AppBundle\Form\Type\SaveSearchType::class);
+
+        //$form->get
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+
+            $userAction = new \AppBundle\Entity\UserAction();
+
+            $userAction->setUser($user);
+            $userAction->setRoute($route = 'organizer');
+            $userAction->setRouteParams($parameters);
+
+            $userAction->setName($data['name']);
+
+            $em = $this->getDoctrine()
+                ->getManager();
+
+            $em->persist($userAction);
+            $em->flush();
+
+            return $this->redirectToRoute($route, $parameters);
+        }
+
+        return $this->render('Search/save.html.twig', [
+            'pageTitle' => $this->get('translator')->trans('Save your query'),
+            'form' => $form->createView(),
         ]);
     }
 

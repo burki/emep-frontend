@@ -719,7 +719,7 @@ table a {
 
 
 .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th{
-    line-height: 1;
+    line-height: 1.2;
 }
 
 td.normal a, .listviewrow, .artist-text{
@@ -732,5 +732,13 @@ td.normal a, .listviewrow, .artist-text{
 }
 
 .home-menu-item-text{
-    text-transform: uppercase;
+    text-transform: capitalize;
+}
+
+.select-queries{
+    margin-bottom: 0px;
+}
+
+#saveQuery{
+    margin-left: 10px;
 }

@@ -27,55 +27,10 @@
                 paging: true,
                 searching: false,
                 info: true,
-                "columnDefs": [
-                    { "visible": false, "targets": groupColumn }
-                ],
-                "order": [[ groupColumn, 'asc' ]],
-                "displayLength": 25,
-                "drawCallback": function ( settings ) {
-                    var api = this.api();
-                    var rows = api.rows( {page:'current'} ).nodes();
-                    var last=null;
-
-                    api.column(groupColumn, {page:'current'} ).data().each( function ( group, i ) {
-                        if ( last !== group ) {
-
-                            splitGroup = group;
-
-
-                            $(rows).eq( i ).before(
-                                '<tr class="group groupHeader" data-name="' + splitGroup + '" ><td colspan="5"><span class="minus-collapse">-</span> '+group+'</td></tr>'
-                            );
-
-                            last = group;
-                        }
-                    } );
-                }
             } );
 
 
 
-
-            // Order by the grouping
-            $('#entrytable tbody').on( 'click', 'tr.group', function () {
-                var currentOrder = table.order()[0];
-                /* if ( currentOrder[0] === groupColumn && currentOrder[1] === 'asc' ) {
-                    table.order( [ groupColumn, 'desc' ] ).draw();
-                }
-                else {
-                    table.order( [ groupColumn, 'asc' ] ).draw();
-                }*/
-
-
-                var splitGroup = $(this).data('name');
-
-                // console.log('.collapseRow[data-rowname="' + splitGroup + '"]');
-
-                $('.collapseRow[data-rowname="' + splitGroup + '"]').toggleClass('collapsed');
-
-
-                // console.log($(this).data('name'));
-            } );
         } );
 
 
@@ -95,6 +50,7 @@
             <tbody>
             {% for row in bibitems %}
                 {% set bibitem = row[0] %}
+                {{ dump(bibitem) }}
                 <tr class="listviewrow">
                     <td class="title">{{ bibitem.renderCitationAsHtml(citeProc, false)|raw }}</td>
                     <td class="normal">{% if row.signature is not empty %}

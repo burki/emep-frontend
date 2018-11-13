@@ -1,0 +1,132 @@
+{% extends 'Base/base.html.twig' %}
+
+{% import 'Shared/helper.html.twig' as helper %}
+{% import 'Shared/map-leaflet.html.twig' as map %}
+
+{% block head %}
+    {{ map.head() }}
+    <script src="{{ app.request.basepath }}/js/seealso.js"></script>
+    <script>
+        var service = new SeeAlsoCollection();
+        service.services = {
+            'gndaks' : new SeeAlsoService('https://beacon.findbuch.de/seemore/gnd-aks/-dewp@wd')
+        };
+        service.views = {
+            'seealso-ul' : new SeeAlsoUL({
+                linkTarget: '_blank',
+                maxItems: 100
+            })
+        };
+        service.replaceTagsOnLoad();
+    </script>
+
+    <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.css">
+    <script src="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.js"></script>
+
+{% endblock %}
+
+{% block body %}
+
+    <div class="contentcontainer nopadding w-container">
+        <div class="lefthalf">
+            <div class="subheader">venue</div>
+            <h1 class="heading">{{ location.name }}</h1>
+            <div class="artist_information">
+                {# load helper part#}
+                {% embed "Organizer/Parts/location-base-information.html.twig" %}
+                {% endembed %}
+            </div>
+        </div>
+        <div class="maphalf">
+            {% embed "Organizer/Parts/locationMap.html.twig" %}
+            {% endembed %}
+        </div>
+    </div>
+
+
+    <div class="contentcontainer w-container">
+
+
+        <div class="listviewrow">
+
+                {# tabs headers #}
+                {% embed "Organizer/Parts/tabs-header.html.twig" %}
+                {% endembed %}
+
+                <div class="tab-content">
+                    {% set exhibitionArray = location.exhibitions %}
+
+                    {% if location.exhibitions|length > 0 %}
+                    {% embed "Organizer/Parts/tabcontent-exhibitions.html.twig" %}
+                    {% endembed %}
+                    {% endif %}
+
+                    {% if location.getOrganizerOf()|length > 0 %}
+                    {% embed "Organizer/Parts/tabcontent-organizer.html.twig" %}
+                    {% endembed %}
+                    {% endif %}
+
+                    {% set artistsArray = artists %}
+
+                    {% embed "Organizer/Parts/tabcontent-artists.html.twig" %}
+                    {% endembed %}
+
+
+                    {% embed "Organizer/Parts/tabcontent-authority.html.twig" %}
+                    {% endembed %}
+
+                    {% embed "Organizer/Parts/tabcontent-statistics.html.twig" %}
+                    {% endembed %}
+                </div><!-- .tab-content -->
+        </div>
+    </div>
+
+
+    {# location.nameAppend #}
+
+    {#
+    <div class="row">
+        <div class="col-sm-8">
+            <dl class="dl-horizontal">
+            {% if location.place is not null %}
+                <dt>{{ 'Place'|trans }}:</dt>
+                <dd>
+                    {{ helper.place_linked(location.place) }}
+                    {% set addresses = location.addressesSeparated %}
+                    {% for address in addresses %}
+                        <br />{{ address['info']|replace({ "\n" : ", " }) }}
+                    {% endfor %}
+                </dd>
+            {% endif %}
+            {% if location.url is not empty %}
+                <dt>{{ 'Homepage'|trans }}:</dt>
+                <dd>
+                    <a href="{{ location.url }}" target="_blank">{{ location.url|prettifyurl }}</a>
+                </dd>
+            {% endif %}
+            {% if location.foundingDate is not empty %}
+                <dt>{{ 'Founding Date'|trans }}:</dt>
+                <dd>
+                    {{ location.foundingDate|dateincomplete }}
+                </dd>
+            {% endif %}
+            {% if location.dissolutionDate is not empty %}
+                <dt>{{ 'Dissolution Date'|trans }}:</dt>
+                <dd>
+                    {{ location.dissolutionDate|dateincomplete }}
+                </dd>
+            {% endif %}
+            {% if location.description is not empty %}
+                <dt>{{ 'Note'|trans }}:</dt>
+                <dd>
+                    {{ location.description|nl2br }}
+                </dd>
+            {% endif %}
+            </dl>
+
+        </div>
+        #}
+
+
+    </div><!-- .row -->
+{% endblock %}

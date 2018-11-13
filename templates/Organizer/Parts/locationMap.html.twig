@@ -1,0 +1,39 @@
+{% block map %}
+
+    {% if location.geo is not empty %}
+        {% set geo = location.geo %}
+    {% elseif location.place.geo is not empty %}
+        {% set geo = location.place.geo %}
+    {% elseif altPlace.latitude is not empty %}
+        {% set geo = "#{altPlace.latitude}, #{altPlace.longitude}" %}
+    {% endif %}
+    {% if geo is not empty %}
+        <div id="map" class="col-sm-12" style="width: 100%; min-height: 320px;"></div>
+
+
+    {% else %}
+        <div class="no_data_block">
+            <div>no map data available</div>
+        </div>
+    {% endif %}
+
+    <script>
+        function adjustMapSize() {
+            /*
+            $('#map').height(function(index, height) {
+                return window.innerHeight - $(this).offset().top;
+            });
+            */
+        }
+
+        $( window ).resize(adjustMapSize);
+        adjustMapSize();
+
+        var map = L.map('map');
+
+        map.setView([{{ geo }}], 10);
+        L.marker([ {{ geo }} ]).addTo(map);
+
+        {{ map.addTileLayer() }}
+    </script>
+{% endblock %}

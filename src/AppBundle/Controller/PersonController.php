@@ -10,6 +10,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use AppBundle\Utils\CsvResponse;
+use Symfony\Component\Security\Core\User\UserInterface;
+
 
 /**
  *
@@ -149,9 +151,32 @@ extends CrudController
      * @Route("/person", name="person-index")
      * @Route("/person-by-nationality", name="person-nationality")
      */
-    public function indexAction(Request $request)
+    public function indexAction(Request $request, UserInterface $user = null)
     {
-        $route = $request->get('_route');
+
+        // redirect to saved query
+        if ('POST' == $request->getMethod() && !is_null($user)) {
+            // check a useraction was requested
+            $userActionId = $request->request->get('useraction');
+            if (!empty($userActionId)) {
+                $userAction = $this->getDoctrine()
+                    ->getManager()
+                    ->getRepository('AppBundle:UserAction')
+                    ->findOneBy([
+                        'id' => $userActionId,
+                        'user' => $user,
+                        'route' => 'person',
+                    ]);
+
+                if (!is_null($userAction)) {
+                    return $this->redirectToRoute($userAction->getRoute(),
+                        $userAction->getRouteParams());
+                }
+            }
+        }
+
+        $requestURI =  $request->getRequestUri();
+
 
         $qb = $this->getDoctrine()
                 ->getManager()
@@ -246,7 +271,83 @@ extends CrudController
             'exhibitionCountries' => $exhibitionCountries,
             'organizerTypesQuery' => $organizerTypesQuery,
             'indexDataNumberCountries' => $indexDataNumberCountries,
-            'artists' => $artists
+            'artists' => $artists,
+            'requestURI' =>  $requestURI,
+            'searches' => $this->lookupSearches($user, 'exhibition')
+        ]);
+    }
+
+    // TODO MOVE TO SHARED
+    protected function lookupSearches($user)
+    {
+        if (is_null($user)) {
+            return [];
+        }
+
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb->select('UA')
+            ->from('AppBundle:UserAction', 'UA')
+            ->where("UA.route = 'person'")
+            ->andWhere("UA.user = :user")
+            ->orderBy("UA.createdAt", "DESC")
+            ->setParameter('user', $user)
+        ;
+
+        $searches = [];
+
+        foreach ($qb->getQuery()->getResult() as $userAction) {
+            $searches[$userAction->getId()] = $userAction->getName();
+        }
+
+        return $searches;
+    }
+
+    /**
+     * @Route("/person/save", name="person-save")
+     */
+    public function saveSearchActionPerson(Request $request,
+                                               UserInterface $user)
+    {
+
+        $parametersAsString = $request->get('entity');
+        $parametersAsString = str_replace("/person?", "", $parametersAsString);
+
+
+        parse_str($parametersAsString, $parameters);
+
+
+        $form = $this->createForm(\AppBundle\Form\Type\SaveSearchType::class);
+
+        //$form->get
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+
+            $userAction = new \AppBundle\Entity\UserAction();
+
+            $userAction->setUser($user);
+            $userAction->setRoute($route = 'person');
+            $userAction->setRouteParams($parameters);
+
+            $userAction->setName($data['name']);
+
+            $em = $this->getDoctrine()
+                ->getManager();
+
+            $em->persist($userAction);
+            $em->flush();
+
+            return $this->redirectToRoute($route, $parameters);
+        }
+
+        return $this->render('Search/save.html.twig', [
+            'pageTitle' => $this->get('translator')->trans('Save your query'),
+            'form' => $form->createView(),
         ]);
     }
 
@@ -831,7 +932,9 @@ extends CrudController
 
             $numberOfExhibitions = $valuesOnly[$i] ;
 
-            $finalDataJson .= "{ name: '${place}', y: ${numberOfExhibitions} } ";
+            $currPlace = $place == '' ? 'unknown' : $place;
+
+            $finalDataJson .= "{ name: '${currPlace}', y: ${numberOfExhibitions} } ";
             $i += 1;
         }
         $finalDataJson .= ']';
@@ -891,7 +994,7 @@ extends CrudController
 
 
 
-        $returnArray = [$finalDataJson, $sumOfAllExhibitions];
+        $returnArray = [$finalDataJson, $sumOfAllExhibitions, $i];
 
 
         return $returnArray;
@@ -945,7 +1048,7 @@ extends CrudController
 
 
 
-        $returnArray = [$finalDataJson, $sumOfAllExhibitions];
+        $returnArray = [$finalDataJson, $sumOfAllExhibitions, $i];
 
 
         return $returnArray;

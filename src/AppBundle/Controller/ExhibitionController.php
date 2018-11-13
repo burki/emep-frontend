@@ -10,6 +10,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use AppBundle\Utils\CsvResponse;
 
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+
+
+
+
 
 /**
  *
@@ -36,6 +42,53 @@ extends CrudController
             ;
 
         return $this->buildActiveCountries($qb);
+    }
+
+    /**
+     * @Route("/exhibition/save", name="exhibition-save")
+     */
+    public function saveSearchActionExhibition(Request $request,
+                                     UrlGeneratorInterface $urlGenerator,
+                                     UserInterface $user)
+    {
+
+        $parametersAsString = $request->get('entity');
+        $parametersAsString = str_replace("/exhibition?", "", $parametersAsString);
+
+
+        parse_str($parametersAsString, $parameters);
+
+
+        $form = $this->createForm(\AppBundle\Form\Type\SaveSearchType::class);
+
+        //$form->get
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+
+            $userAction = new \AppBundle\Entity\UserAction();
+
+            $userAction->setUser($user);
+            $userAction->setRoute($route = 'exhibition');
+            $userAction->setRouteParams($parameters);
+
+            $userAction->setName($data['name']);
+
+            $em = $this->getDoctrine()
+                ->getManager();
+
+            $em->persist($userAction);
+            $em->flush();
+
+            return $this->redirectToRoute($route, $parameters);
+        }
+
+        return $this->render('Search/save.html.twig', [
+            'pageTitle' => $this->get('translator')->trans('Save your query'),
+            'form' => $form->createView(),
+        ]);
     }
 
 
@@ -159,9 +212,35 @@ extends CrudController
     /**
      * @Route("/exhibition", name="exhibition-index")
      */
-    public function indexAction(Request $request)
+    public function indexAction(Request $request, UserInterface $user = null)
     {
+
+
+        // redirect to saved query
+        if ('POST' == $request->getMethod() && !is_null($user)) {
+            // check a useraction was requested
+            $userActionId = $request->request->get('useraction');
+            if (!empty($userActionId)) {
+                $userAction = $this->getDoctrine()
+                    ->getManager()
+                    ->getRepository('AppBundle:UserAction')
+                    ->findOneBy([
+                        'id' => $userActionId,
+                        'user' => $user,
+                        'route' => 'exhibition',
+                    ]);
+
+                if (!is_null($userAction)) {
+                    return $this->redirectToRoute($userAction->getRoute(),
+                        $userAction->getRouteParams());
+                }
+            }
+        }
+
+
         $route = $request->get('_route');
+
+        // print_r( $request );
 
         $qb = $this->getDoctrine()
                 ->getManager()
@@ -226,6 +305,8 @@ extends CrudController
         $exhibitionStartDate = $form->get('startdate')->getData();
 
 
+
+
         $pagination = $this->buildPagination($request, $qb->getQuery(), [
             // the following leads to wrong display in combination with our
             // helper.pagination_sortable()
@@ -235,6 +316,8 @@ extends CrudController
 
         $result = $qb->getQuery()->execute();
 
+
+        $requestURI =  $request->getRequestUri();
 
          return $this->render('Exhibition/index.html.twig', [
              'pageTitle' => $this->get('translator')->trans('Exhibitions'),
@@ -252,8 +335,39 @@ extends CrudController
              'maxStartYear' => $rightYear,
              'artistGender' => $artistGender,
             'artistNationalities' => $artistNationalities,
-            'exhibitionStartDate' => $exhibitionStartDate
+            'exhibitionStartDate' => $exhibitionStartDate,
+             'requestURI' => $requestURI,
+             'searches' => $this->lookupSearches($user, 'exhibition')
         ]);
+    }
+
+
+    // TODO MOVE TO SHARED
+    protected function lookupSearches($user)
+    {
+        if (is_null($user)) {
+            return [];
+        }
+
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb->select('UA')
+            ->from('AppBundle:UserAction', 'UA')
+            ->where("UA.route = 'exhibition'")
+            ->andWhere("UA.user = :user")
+            ->orderBy("UA.createdAt", "DESC")
+            ->setParameter('user', $user)
+        ;
+
+        $searches = [];
+
+        foreach ($qb->getQuery()->getResult() as $userAction) {
+            $searches[$userAction->getId()] = $userAction->getName();
+        }
+
+        return $searches;
     }
 
     /**

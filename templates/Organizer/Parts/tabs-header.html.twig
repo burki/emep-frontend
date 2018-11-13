@@ -1,0 +1,64 @@
+{% block tabsHeader %}
+    <!-- Nav tabs -->
+    <div>
+        <div class="tabsymbols">
+            <div class="icontab download-csv-exhibitions" style="display: none;"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage"></div>
+            <div class="icontab download-csv-artists" style="display: none;"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage"></div>
+
+        </div>
+        <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 1em">
+            {% set active = true %}
+            {% if location.exhibitions|length > 0 %}
+                <li role="presentation" class="exhibitions-tab{% if active %} active{% set active = false %}{% endif %}"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">{{ 'Exhibitions'|trans }}</a></li>
+            {% endif %}
+            {% if location.getOrganizerOf(true)|length > 0 %}
+                <li role="presentation" class="organizer-tab{% if active %} active{% set active = false %}{% endif %}"><a href="#organizer-tab" aria-controls="home" role="tab" data-toggle="tab">{{ 'Organizer'|trans }}</a></li>
+            {% endif %}
+            {# co-appearances #}
+            {% if artists|length > 0 %}
+                <li role="presentation" class="artists-tab{% if active %} active{% set active = false %}{% endif %}"><a href="#artists" aria-controls="similar" role="tab" data-toggle="tab">{{ 'Artists'|trans }}</a></li>
+            {% endif %}
+            {# authority files #}
+            {% if location.gnd is not empty or location.ulan is not empty %}
+                <li role="presentation"><a href="#authority" aria-controls="authority" role="tab" data-toggle="tab">{{ 'Integrated Authority File'|trans }}</a></li>
+            {% endif %}
+
+            <li role="presentation"><a href="#statistics" aria-controls="authority" role="tab" data-toggle="tab">{{ 'Statistics'|trans }}</a></li>
+
+        </ul>
+
+    </div>
+
+    <script>
+
+        $('.download-csv-exhibitions').on('click', function(){
+            window.location.href =  "{{ path('location-exhibitions-csv', { id: location.getId() }) }}";
+        });
+
+        $('.download-csv-artists').on('click', function(){
+            window.location.href =  "{{ path('location-artists-csv', { id: location.getId() }) }}";
+        });
+
+        // make the right export button visible
+        $( document ).ready(function() {
+            //hide all export buttons
+            hideAll();
+
+            setInterval(function(){
+                if( $('.exhibitions-tab').hasClass('active') ){ hideAll(); $('.download-csv-exhibitions').show(); }
+                else if( $('.artists-tab').hasClass('active') ){ hideAll(); $('.download-csv-artists').show(); }
+                else {
+                    hideAll();
+                }
+            }, 250);
+        });
+
+        function hideAll(){
+            $('.download-csv-exhibitions').hide();
+            $('.download-csv-artists').hide();
+        }
+
+
+    </script>
+
+{% endblock %}

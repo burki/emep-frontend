@@ -4,7 +4,6 @@
     <include_path>
       <path value="$PROJECT_DIR$/vendor/composer" />
       <path value="$PROJECT_DIR$/vendor/leafo/scssphp" />
-      <path value="$PROJECT_DIR$/vendor/kphoen/rulerz" />
       <path value="$PROJECT_DIR$/vendor/doctrine/orm" />
       <path value="$PROJECT_DIR$/vendor/psr/container" />
       <path value="$PROJECT_DIR$/vendor/psr/cache" />
@@ -12,20 +11,6 @@
       <path value="$PROJECT_DIR$/vendor/psr/log" />
       <path value="$PROJECT_DIR$/vendor/psr/simple-cache" />
       <path value="$PROJECT_DIR$/vendor/symfony/var-dumper" />
-      <path value="$PROJECT_DIR$/vendor/hoa/exception" />
-      <path value="$PROJECT_DIR$/vendor/hoa/ustring" />
-      <path value="$PROJECT_DIR$/vendor/hoa/zformat" />
-      <path value="$PROJECT_DIR$/vendor/hoa/ruler" />
-      <path value="$PROJECT_DIR$/vendor/hoa/consistency" />
-      <path value="$PROJECT_DIR$/vendor/hoa/protocol" />
-      <path value="$PROJECT_DIR$/vendor/hoa/regex" />
-      <path value="$PROJECT_DIR$/vendor/hoa/iterator" />
-      <path value="$PROJECT_DIR$/vendor/hoa/file" />
-      <path value="$PROJECT_DIR$/vendor/hoa/stream" />
-      <path value="$PROJECT_DIR$/vendor/hoa/math" />
-      <path value="$PROJECT_DIR$/vendor/hoa/visitor" />
-      <path value="$PROJECT_DIR$/vendor/hoa/event" />
-      <path value="$PROJECT_DIR$/vendor/hoa/compiler" />
       <path value="$PROJECT_DIR$/vendor/easyrdf/easyrdf" />
       <path value="$PROJECT_DIR$/vendor/fale/isbn" />
       <path value="$PROJECT_DIR$/vendor/egulias/email-validator" />
@@ -69,7 +54,6 @@
       <path value="$PROJECT_DIR$/vendor/symfony/twig-bridge" />
       <path value="$PROJECT_DIR$/vendor/symfony/finder" />
       <path value="$PROJECT_DIR$/vendor/semsol/arc2" />
-      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php70" />
       <path value="$PROJECT_DIR$/vendor/symfony/form" />
       <path value="$PROJECT_DIR$/vendor/symfony/translation" />
       <path value="$PROJECT_DIR$/vendor/symfony/inflector" />
@@ -97,7 +81,6 @@
       <path value="$PROJECT_DIR$/vendor/doctrine/inflector" />
       <path value="$PROJECT_DIR$/vendor/doctrine/persistence" />
       <path value="$PROJECT_DIR$/vendor/seboettg/citeproc-php" />
-      <path value="$PROJECT_DIR$/vendor/paragonie/random_compat" />
       <path value="$PROJECT_DIR$/vendor/phpoffice/phpexcel" />
       <path value="$PROJECT_DIR$/vendor/shapecode/hidden-entity-type-bundle" />
       <path value="$PROJECT_DIR$/vendor/swiftmailer/swiftmailer" />
@@ -106,6 +89,13 @@
       <path value="$PROJECT_DIR$/vendor/kriswallsmith/assetic" />
       <path value="$PROJECT_DIR$/vendor/gedmo/doctrine-extensions" />
       <path value="$PROJECT_DIR$/vendor/sensio/framework-extra-bundle" />
+      <path value="$PROJECT_DIR$/vendor/joshcam/mysqli-database-class" />
+      <path value="$PROJECT_DIR$/vendor/cocur/background-process" />
+      <path value="$PROJECT_DIR$/vendor/ifedko/php-doctrine-dbal-pagination" />
+      <path value="$PROJECT_DIR$/vendor/box/spout" />
+      <path value="$PROJECT_DIR$/vendor/pagerfanta/pagerfanta" />
+      <path value="$PROJECT_DIR$/vendor/wikimedia/utfnormal" />
+      <path value="$PROJECT_DIR$/vendor/white-october/pagerfanta-bundle" />
     </include_path>
   </component>
 </project>

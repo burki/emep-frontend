@@ -1,0 +1,57 @@
+
+{% if location.place is not null %}
+    <div class="artist-information-container">
+        <div class="artist-information-label">{{ 'Place:'|trans }}</div>
+        <div class="artist-information-text">
+            {{ helper.place_linked(location.place) }}
+            {% set addresses = location.addressesSeparated %}
+            {% for address in addresses %}
+                <br />{{ address['info']|replace({ "\n" : ", " }) }}
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+{# birthplace #}
+{% if location.placeLabel is not null %}
+    <div class="artist-information-container">
+        <div class="artist-information-label">{{ 'Place:'|trans }}</div>
+        <div class="artist-information-text">{{ location.placeLabel }}
+        </div>
+    </div>
+{% endif %}
+
+
+{# birthplace #}
+{% if location.type is not null %}
+    <div class="artist-information-container">
+        <div class="artist-information-label">{{ 'type:'|trans }}</div>
+        <div class="artist-information-text">{{ location.type }}
+        </div>
+    </div>
+{% endif %}
+
+
+{% if location.url is not null %}
+    <div class="artist-information-container">
+        <div class="artist-information-label">{{ 'URL:'|trans }}</div>
+        <div class="artist-information-text"><a href="{{ location.url }}">{{ location.url }} website</a>
+        </div>
+    </div>
+{% endif %}
+
+{% if location.foundingDate is not empty %}
+    <div class="artist-information-container">
+        <div class="artist-information-label">{{ 'Founding Date:'|trans }}</div>
+        <div class="artist-information-text">{{ location.foundingDate|dateincomplete }}</div>
+    </div>
+{% endif %}
+
+
+
+{% if location.dissolutionDate is not empty %}
+    <div class="artist-information-container">
+        <div class="artist-information-label">{{ 'Dissolution Date:'|trans }}</div>
+        <div class="artist-information-text">{{ location.dissolutionDate|dateincomplete }}</div>
+    </div>
+{% endif %}

@@ -548,6 +548,7 @@ extends CrudController
         return $searches;
     }
 
+
     protected function renderResult($listPage, $listBuilder, UserInterface $user = null)
     {
         $adapter = new SearchListAdapter($listPage);

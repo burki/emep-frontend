@@ -127,4 +127,5 @@ class UserAction
     {
         $this->routeParams = $routeParams;
     }
+
 }

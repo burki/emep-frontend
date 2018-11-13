@@ -7,6 +7,8 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/academicpuma/styles" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/beberlei/DoctrineExtensions" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/behat/transliterator" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/box/spout" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/cocur/background-process" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/cocur/slugify" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/ddeboer/data-import" />
@@ -28,32 +30,19 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/egulias/email-validator" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/fale/isbn" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/gedmo/doctrine-extensions" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/hoa/compiler" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/hoa/consistency" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/hoa/event" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/hoa/exception" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/hoa/file" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/hoa/iterator" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/hoa/math" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/hoa/protocol" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/hoa/regex" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/hoa/ruler" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/hoa/stream" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/hoa/ustring" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/hoa/visitor" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/hoa/zformat" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/ifedko/php-doctrine-dbal-pagination" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/jdorn/sql-formatter" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/joshcam/mysqli-database-class" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/knplabs/knp-components" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/knplabs/knp-menu" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/knplabs/knp-menu-bundle" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/knplabs/knp-paginator-bundle" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/kphoen/rulerz" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/kriswallsmith/assetic" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/leafo/scssphp" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/lexik/form-filter-bundle" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/liip/url-auto-converter-bundle" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/monolog/monolog" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/paragonie/random_compat" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pagerfanta/pagerfanta" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/phpoffice/phpexcel" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/cache" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/container" />
@@ -89,7 +78,6 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-ctype" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-intl-icu" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-mbstring" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-php70" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-php72" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/process" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/property-access" />
@@ -107,6 +95,8 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/yaml" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/twig/extensions" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/twig/twig" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/white-october/pagerfanta-bundle" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/wikimedia/utfnormal" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
