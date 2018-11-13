@@ -750,3 +750,19 @@ td.normal a, .listviewrow, .artist-text{
 .brand {
     font-size: 1.6rem;
 }
+
+.dataTables_info{
+    float: right;
+}
+
+.tooltip {
+    display:none;
+    position:absolute;
+    border:1px solid #333;
+    background-color:#161616;
+    border-radius:5px;
+    padding:10px;
+    color:#fff;
+    font-size:12px;
+    z-index: 99;
+}

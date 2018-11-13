@@ -4,6 +4,8 @@
 
     <script src="{{ app.request.basepath }}/vendor/highcharts/highcharts.js"></script>
     <script src="{{ app.request.basepath }}/vendor/highcharts/modules/exporting.js"></script>
+    <script src="{{ app.request.basepath }}/vendor/highcharts/modules/export-data.js"></script>
+
     <script src="{{ app.request.basepath }}/vendor/highcharts/modules/heatmap.js"></script>
     <script src="{{ app.request.basepath }}/js/highchart_custom_theme.js"></script>
 
@@ -34,6 +36,8 @@
 
     {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::exhibitionNationalityIndex', { countriesQuery: countriesQuery, organizerTypeQuery: organizerTypeQuery, stringQuery: stringQuery, currIds: ids, artistGender:artistGender, artistNationalities:artistNationalities, exhibitionStartDateLeft:exhibitionStartDateLeft, exhibitionStartDateRight: exhibitionStartDateRight }), {'default': 'Loading... <br/>'}) }}
     {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::exhibitionByMonthIndex', {countriesQuery: countriesQuery, organizerTypeQuery: organizerTypeQuery, stringQuery: stringQuery, currIds: ids, artistGender:artistGender, artistNationalities:artistNationalities, exhibitionStartDateLeft:exhibitionStartDateLeft, exhibitionStartDateRight: exhibitionStartDateRight }), {'default': 'Loading... <br/>'}) }}
+
+
 
 
 </div>

@@ -20,10 +20,11 @@
                     <div class="artist-information-label information-tab">Catalogue</div>
                     <div class="artist-information-text">
                         {% for bibitem in catalogue %}
-                            {{ bibitem.renderCitationAsHtml(citeProc, false)|raw }}
+                            {{ bibitem.renderCitationAsHtml(citeProc, false)|raw }} (Status: {{ catalogueStatus[bibitem.status] }})<br/>
                         {% endfor %}
                     </div>
             {% endif %}
+
 
             {% if exhibition.cataloguePrice is not empty %}
                     <div class="artist-information-label information-tab">Catalogue Price</div>

@@ -4,8 +4,8 @@
         <div class="tabsymbols">
             <!--<div class="icontab"><img src="{{ app.request.basepath }}/img/setttings_icon_blue.svg" class="iconimage"></div>-->
             <div class="advanced-search-settings"><span class="checkbox-filter-button">apply checkbox filter</span></div>
-            <div class="icontab advanced-search active"><img src="{{ app.request.basepath }}/img/setttings_icon_blue.svg" class="iconimage"></div>
-            <div class="icontab download-csv"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage"></div>
+            <div class="icontab advanced-search active"><img src="{{ app.request.basepath }}/img/setttings_icon_blue.svg" class="iconimage" title="show/hide checkbox filter"></div>
+            <div class="icontab download-csv"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage" title="download current data as csv"></div>
 
             {% if app.user  %}
 
@@ -20,7 +20,7 @@
                 {% endif %}
             </form>
 
-            <div class="icontab save-query"><img src="{{ app.request.basepath }}/img/save_icon.svg" class="iconimage"></div>
+            <div class="icontab save-query"><img src="{{ app.request.basepath }}/img/save_icon.svg" class="iconimage" title="save your current query"></div>
 
             {% endif %}
         </div>

@@ -247,7 +247,7 @@ extends CrudController
         $indexDataNumberVenueType = $this->indexDataNumberVenueType($locations);
         $indexDataNumberCountries = $this->indexDataNumberCountries($locations);
 
-        return $this->render('Location/index.html.twig', [
+        return $this->render('Organizer/index.html.twig', [
             'pageTitle' => $this->get('translator')->trans('organizer-index' == $route ? 'Organizing Bodies' : 'Venues'),
             'pagination' => $pagination,
             'form' => $form->createView(),
@@ -370,7 +370,7 @@ extends CrudController
         $indexDataNumberVenueType = $this->indexDataNumberVenueType($locations);
         $indexDataNumberCountries = $this->indexDataNumberCountries($locations);
 
-        return $this->render('Organizer/index.html.twig', [
+        return $this->render('Location/index.html.twig', [
             'pageTitle' => $this->get('translator')->trans('organizer-index' == $route ? 'Organizing Bodies' : 'Venues'),
             'pagination' => $pagination,
             'form' => $form->createView(),
@@ -1041,7 +1041,7 @@ extends CrudController
 
 
 
-        $returnArray = [$finalDataJson, $sumOfAllNationalities];
+        $returnArray = [$finalDataJson, $sumOfAllNationalities, $i];
 
 
         return $returnArray;

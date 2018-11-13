@@ -1,0 +1,57 @@
+@import url('https://fonts.googleapis.com/css?family=Source+Code+Pro');
+
+/*
+Tipr 4.0.1
+Copyright (c) 2018 Tipue
+Tipr is released under the MIT License
+http://www.tipue.com/tipr
+
+Normal theme
+*/
+
+.tipr_content
+{
+     font: 11px 'Source Code Pro', monospace;
+	color: #777;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+     background-color: #f1f1f1;
+     padding: 7px 14px 8px 14px;
+     border-radius: 3px;
+}
+
+.tipr_container_above, .tipr_container_below
+{
+     display: none;
+     position: absolute;
+     z-index: 1000;
+}
+.tipr_point_above, .tipr_point_below
+{
+     position: relative;
+	background: #f1f1f1;
+	border: 1px solid #f1f1f1;
+	border-radius: 3px;
+}
+.tipr_point_above:after, .tipr_point_below:after
+{
+	position: absolute;
+	pointer-events: none;
+	border: solid transparent;
+	content: "";
+	height: 0;
+	width: 0;
+	border-width: 7px;
+	left: 50%;
+	margin-left: -7px;
+}
+.tipr_point_above:after
+{
+	top: 100%;
+	border-top-color: #f1f1f1;
+}
+.tipr_point_below:after
+{
+	bottom: 100%;
+	border-bottom-color: #f1f1f1;
+}

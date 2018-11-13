@@ -24,6 +24,7 @@
         $(document).ready(function() {
             var groupColumn = 1;
             var table = $('#entrytable').DataTable({
+                "dom": 'ilrtp',
                 paging: true,
                 searching: false,
                 info: true,
@@ -50,7 +51,6 @@
             <tbody>
             {% for row in bibitems %}
                 {% set bibitem = row[0] %}
-                {{ dump(bibitem) }}
                 <tr class="listviewrow">
                     <td class="title">{{ bibitem.renderCitationAsHtml(citeProc, false)|raw }}</td>
                     <td class="normal">{% if row.signature is not empty %}

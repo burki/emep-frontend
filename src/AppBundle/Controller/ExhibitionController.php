@@ -13,7 +13,7 @@ use AppBundle\Utils\CsvResponse;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-
+use AppBundle\Utils\SearchListBuilder;
 
 
 
@@ -251,7 +251,7 @@ extends CrudController
                 // 'COUNT(DISTINCT A.id) AS numArtistSort',
                 'COUNT(DISTINCT IE.id) AS numCatEntrySort',
                 "E.startdate HIDDEN dateSort",
-                "CONCAT(COALESCE(P.alternateName, P.name), E.startdate) HIDDEN placeSort, L.name HIDDEN venueSort, E.title HIDDEN titleSort"
+                "CONCAT(COALESCE(P.alternateName, P.name), E.startdate) HIDDEN placeSort, L.name HIDDEN venueSort, E.title HIDDEN titleSort, E.organizerType HIDDEN sortOrgType"
             ])
             ->from('AppBundle:Exhibition', 'E')
             ->leftJoin('E.location', 'L')
@@ -743,6 +743,10 @@ extends CrudController
             }
         }
 
+
+
+        $catalogueStatus = SearchListBuilder::$STATUS_LABELS;
+
         //print_r($catalogueEntries);
 
 
@@ -756,6 +760,7 @@ extends CrudController
             'showWorks' => !empty($_SESSION['user']),
             'similar' => $this->findSimilar($exhibition),
             'currentPageId' => $id,
+            'catalogueStatus' => $catalogueStatus,
             'pageMeta' => [
                 /*
                 'jsonLd' => $exhibition->jsonLdSerialize($locale),

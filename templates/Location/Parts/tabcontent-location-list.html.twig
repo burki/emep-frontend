@@ -4,10 +4,18 @@
     <script>
         $( document ).ready(function() {
             $("#venuesLists").DataTable({
+                "dom": 'ilrtp',
                 ordering: false,
-                responsive: true,
+                responsive: [
+                    { name: 'desktop',  width: Infinity },
+                    { name: 'tablet-l', width: 1024 },
+                    { name: 'tablet-p', width: 768 },
+                    { name: 'mobile-l', width: 480 },
+                    { name: 'mobile-p', width: 320 }
+                ],
                 paging: false,
                 searching: false,
+                ordering: false,
                 info: false
             });
         })
@@ -16,25 +24,17 @@
     {% if pagination.getTotalItemCount > 0 %}
         {# helper.pagination_count(pagination) #}
 
-        <!--<div class="sort-control">
-            {% set sortField = app.request.get('sort') %}
-            Sort by:
-            {{ helper.pagination_sortable(pagination, 'Place', 'countryPlaceNameSort') }}
-            {{ helper.pagination_sortable(pagination, 'Name', 'nameSort') }}
-            {{ helper.pagination_sortable(pagination, '# Exhibitions', 'numExhibitionSort', 'desc') }}
-            {{ helper.pagination_sortable(pagination, '# Cat. Entries', 'numCatEntrySort', 'desc') }}
-        </div> -->
 
         <div style="width: 100%; text-align: right;">{{ helper.pagination_count(pagination) }}</div>
 
         <table id="venuesLists" class="table table-striped table-bordered dataTable listviewcontainer">
             <thead>
             <tr class="listviewheading">
-                <th class="desktop">{{ helper.pagination_sortable(pagination, 'Name', 'nameSort') }}</th>
-                <th class="desktop">{{ helper.pagination_sortable(pagination, 'Place', 'placeSort') }}</th>
-                <th class="desktop">{{ helper.pagination_sortable(pagination, 'Type', 'typeSort') }}</th>
-                <th class="desktop">{{ helper.pagination_sortable(pagination, 'Number of Exhibitions', 'numExhibitionSort', 'desc') }}</th>
-                <th class="desktop">{{ helper.pagination_sortable(pagination, 'Number of Cat. Entries', 'numCatEntrySort', 'desc') }}</th>
+                <th class="">{{ helper.pagination_sortable(pagination, 'Name', 'nameSort') }}</th>
+                <th class="">{{ helper.pagination_sortable(pagination, 'Place', 'placeSort') }}</th>
+                <th class="">{{ helper.pagination_sortable(pagination, 'Type', 'typeSort') }}</th>
+                <th class="">{{ helper.pagination_sortable(pagination, 'Number of Exhibitions', 'numExhibitionSort', 'desc') }}</th>
+                <th class="">{{ helper.pagination_sortable(pagination, 'Number of Cat. Entries', 'numCatEntrySort', 'desc') }}</th>
             </tr>
             </thead>
             <tbody>

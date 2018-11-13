@@ -558,7 +558,7 @@ extends CrudController
         $pager->setCurrentPage(intval($listPage['offset'] / $listPage['limit']) + 1);
 
         return $this->render('Search/base.html.twig', [
-            'pageTitle' => $this->get('translator')->trans('General Search'),
+            'pageTitle' => $this->get('translator')->trans('Advanced Search'),
             'pager' => $pager,
 
             'listBuilder' => $listBuilder,

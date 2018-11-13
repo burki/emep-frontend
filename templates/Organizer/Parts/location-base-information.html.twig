@@ -55,3 +55,13 @@
         <div class="artist-information-text">{{ location.dissolutionDate|dateincomplete }}</div>
     </div>
 {% endif %}
+
+<div class="artist-information-container-qucikstat">
+    <div class="artist-information-label">Quickstats</div>
+    <div class="statcontainer">
+        <div class="artist-information-text-stats">works: {{ detailDataNumberItemTypes[1] }}</div>
+        <div class="artist-information-text-stats">artists: {{ dataNumberOfArtistsPerCountry[1] }}</div>
+        <div class="artist-information-text-stats">nationalities: {{ dataNumberOfArtistsPerCountry[2] }}</div>
+
+    </div>
+</div>

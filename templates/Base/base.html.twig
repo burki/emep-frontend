@@ -56,6 +56,7 @@
         <link rel="stylesheet" href="{{ app.request.basepath }}/css/nouislider.css">
         <link rel="stylesheet" href="{{ app.request.basepath }}/css/webflow.css">
         <link rel="stylesheet" href="{{ app.request.basepath }}/css/fwf.webflow.css">
+        <link rel="stylesheet" href="{{ app.request.basepath }}/css/tipr.css">
         <link rel="stylesheet" href="{{ app.request.basepath }}/css/custom.css">
         <link rel="stylesheet" href="{{ app.request.basepath }}/css/datatables-responsive.min.css">
 
@@ -164,8 +165,13 @@
         </footer>
 
     </body>
+    <script src="{{ app.request.basepath }}/vendor/highcharts/modules/export-data.js"></script>
+    <script src="{{ app.request.basepath }}/js/tipr.min.js"></script>
+
 
     <script>
+
+
         $.fn.dataTable.Responsive.breakpoints = [
             { name: 'desktop', width: Infinity },
             { name: 'tablet',  width: 1024 },
