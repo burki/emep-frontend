@@ -34,28 +34,49 @@
     <div class="w-container">
         <h1 class="heading">{{ pageTitle }}</h1>
 
-            <form action="{{ path(app.request.get('_route'), { 'entity' : entity }) }}" method="POST">
-            Query:  {% if searches is not empty %}
-                    <select name="useraction" id="saved-searches" onchange="this.form.submit()">
-                        <option value="">- Select Saved Query -</option>
-                        {% for id, label in searches %}
-                        <option value="{{ id }}">{{ label }}</option>
-                        {% endfor %}
-                    </select>
-                   {% endif %}
 
-                    <button type="button" class="btn" onclick="saveQuery()">
-                        <span class="glyphicon glyphicon-floppy-disk"></span> Save Query
-                    </button>
-            </form>
 
-            <form id="search" action="{{ path(app.request.get('_route')) }}" method="GET">
+            <form id="search" class="" action="{{ path(app.request.get('_route')) }}" method="GET">
                 <input type="hidden" name="entity" value="{{ listBuilder.entity }}" />
                 {% set filter = listBuilder.queryFilters %}
-                <input type="text" name="filter[search]" value="{{ filter.search }}" />
-                {{ form_widget(form.submit) }}
+
+                <div class="searchbarcontainer" style="max-width: 850px">
+
+                    <div class="searchbarinputcontainer">
+                        <input class="text-field-class w-input search-input input-text-search" type="text" name="filter[search]" value="{{ filter.search }}" placeholder="search" />
+                    </div>
+                    {# {{ form_widget(form.submit) }} #}
+                    <div class="searchbuttoncontainer">
+                        <button type="submit" id="filter_submit" name="filter[submit]" class="submit-button w-button submit-filter-visible">Search</button>
+                    </div>
+                </div>
 
                 {% block filters %}
+
+                    <div class="filters-heading" style="margin-top: 25px;">
+                        <span style="margin-right: 20px; margin-top: 7px">Filter by:</span>
+
+                        <button type="button" class="btn" data-toggle="collapse" data-target="#filter-panel-catentry">
+                            <span class="glyphicon glyphicon-cog"></span> Cat. Entry
+                        </button>
+
+                        <button type="button" class="btn" data-toggle="collapse" data-target="#filter-panel-exhibition">
+                            <span class="glyphicon glyphicon-cog"></span> Exhibition
+                        </button>
+
+                        <button type="button" class="btn" data-toggle="collapse" data-target="#filter-panel-venue">
+                            <span class="glyphicon glyphicon-cog"></span> Venue
+                        </button>
+
+                        <button type="button" class="btn" data-toggle="collapse" data-target="#filter-panel-organizer">
+                            <span class="glyphicon glyphicon-cog"></span> Org. Body
+                        </button>
+
+                        <button type="button" class="btn" data-toggle="collapse" data-target="#filter-panel-person">
+                            <span class="glyphicon glyphicon-cog"></span> Artist
+                        </button>
+                    </div>
+
                 <div class="filter-combination-container">
 
                 {% form_theme form 'bootstrap_3_horizontal_layout.html.twig' %}
@@ -109,35 +130,15 @@
                     </div>
                 </div>
 
-                <div class="filters-heading">
-                    Filter by:
 
-                    <button type="button" class="btn" data-toggle="collapse" data-target="#filter-panel-catentry">
-                        <span class="glyphicon glyphicon-cog"></span> Cat. Entry
-                    </button>
-
-                    <button type="button" class="btn" data-toggle="collapse" data-target="#filter-panel-exhibition">
-                        <span class="glyphicon glyphicon-cog"></span> Exhibition
-                    </button>
-
-                    <button type="button" class="btn" data-toggle="collapse" data-target="#filter-panel-venue">
-                        <span class="glyphicon glyphicon-cog"></span> Venue
-                    </button>
-
-                    <button type="button" class="btn" data-toggle="collapse" data-target="#filter-panel-organizer">
-                        <span class="glyphicon glyphicon-cog"></span> Org. Body
-                    </button>
-
-                    <button type="button" class="btn" data-toggle="collapse" data-target="#filter-panel-person">
-                        <span class="glyphicon glyphicon-cog"></span> Artist
-                    </button>
-                </div>
                 </div>
                 {% endblock %}
             </form>
     </div><!-- .w-container -->
 
     <div class="contentcontainer w-container">
+        <div class="listviewrow">
+
         {% set entities =
                 {
                     'ItemExhibition' : 'Catalogue Entries',
@@ -147,27 +148,50 @@
                     'Person' : 'Artists',
                 }
         %}
-        <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 1em">
-            {% for entity, label in entities %}
-                {% set active = entity == listBuilder.entity %}
-                {% if active %}
-                    {% set params = { 'entity' : entity } %}
-                {% else %}
-                    {# so we keep active filters #}
-                    {% set params = app.request.query.all | merge({ 'entity' : entity, 'page' : 1 }) %}
-                {% endif %}
-                <li role="presentation" class="{% if active %}active {% endif %}entries-tab" ><a href="{{ path(app.request.get('_route'), params) }}" aria-controls="entries">{{ label|trans }}</a></li>
-                <a {% if active %} style="font-weight: bold"{% endif %} href=""></a>
-            {% endfor %}
-        </ul>
+        <div>
             <div class="tabsymbols">
                 {% if 'search-map' == app.request.get('_route') %}
-                <div class="advanced-search-settings"><a href="{{ path('search', app.request.query.all) }}"><span class="checkbox-filter-button">Show List</a></span></a></div>
+                    <div class="advanced-search-settings"><a href="{{ path('search', app.request.query.all) }}"><span class="checkbox-filter-button">Show List</a></span></a></div>
                 {% elseif 'Exhibition' == listBuilder.entity or 'Venue' == listBuilder.entity or 'Person' == listBuilder.entity  %}
-                <div class="advanced-search-settings"><a href="{{ path('search-map', app.request.query.all) }}"><span class="checkbox-filter-button">Show Map</span></a></div>
+                    <div class="advanced-search-settings"><a href="{{ path('search-map', app.request.query.all) }}"><span class="checkbox-filter-button">Show Map</span></a></div>
                 {% endif %}
                 <div class="icontab download-csv"><a title="Download as Excel-File" href="{{ path('search-export', app.request.query.all) }}"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage"></a></div>
+
+                {% if app.user  %}
+
+                    <form action="{{ path(app.request.get('_route'), { 'entity' : entity }) }}" method="POST" style="margin-left: 10px">
+                        {% if searches is not empty %}
+                            <select name="useraction" id="saved-searches" class="w-input select-queries" onchange="this.form.submit()">
+                                <option value="" >- Select Saved Query -</option>
+                                {% for id, label in searches %}
+                                    <option value="{{ id }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        {% endif %}
+                    </form>
+                    <div class="icontab save-query" onclick="saveQuery()"><img src="{{ app.request.basepath }}/img/save_icon.svg" class="iconimage" title="save your current query"></div>
+
+
+                {% endif %}
+
             </div><!-- .tabsymbols -->
+
+
+            <ul class="nav nav-tabs" role="tablist" >
+                {% for entity, label in entities %}
+                    {% set active = entity == listBuilder.entity %}
+                    {% if active %}
+                        {% set params = { 'entity' : entity } %}
+                    {% else %}
+                        {# so we keep active filters #}
+                        {% set params = app.request.query.all | merge({ 'entity' : entity, 'page' : 1 }) %}
+                    {% endif %}
+                    <li role="presentation" class="{% if active %}active {% endif %}entries-tab" ><a href="{{ path(app.request.get('_route'), params) }}" aria-controls="entries">{{ label|trans }}</a></li>
+                    <a {% if active %} style="font-weight: bold"{% endif %} href=""></a>
+                {% endfor %}
+            </ul>
+
+        </div>
 
 
         <div class="listviewrow">
@@ -210,6 +234,7 @@
                 No matching entry. Please adjust your search.
             {% endif %}
         {% endblock %}
+        </div>
         </div>
     </div>
 {% endblock %}
