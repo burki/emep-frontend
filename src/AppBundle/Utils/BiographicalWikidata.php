@@ -54,7 +54,7 @@ WHERE
     BIND("{$value}" as ?queryby)
 
     ?item wdt:P31 wd:Q5;
-  	wdt:P{$property} ?queryby;
+    wdt:P{$property} ?queryby;
         wdt:P27/wdt:P297 ?citizenship.
 
     OPTIONAL {

@@ -88,6 +88,15 @@
                         </div>
                     </div>
                 </div>
+                <div id="filter-panel-organizer" class="collapse filter-panel">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Filter by Organizing Body</div>
+                        <div class="panel-body">
+                            {#{ form_row(form.organizer.geoname) }#}
+                            {{ form_row(form.organizer.type) }}
+                        </div>
+                    </div>
+                </div>
                 <div id="filter-panel-person" class="collapse filter-panel">
                     <div class="panel panel-default">
                         <div class="panel-heading">Filter by Artist</div>
@@ -115,6 +124,10 @@
                         <span class="glyphicon glyphicon-cog"></span> Venue
                     </button>
 
+                    <button type="button" class="btn" data-toggle="collapse" data-target="#filter-panel-organizer">
+                        <span class="glyphicon glyphicon-cog"></span> Org. Body
+                    </button>
+
                     <button type="button" class="btn" data-toggle="collapse" data-target="#filter-panel-person">
                         <span class="glyphicon glyphicon-cog"></span> Artist
                     </button>
@@ -130,6 +143,7 @@
                     'ItemExhibition' : 'Catalogue Entries',
                     'Exhibition' : 'Exhibitions',
                     'Venue' : 'Venues',
+                    'Organizer' : 'Organizing Bodies',
                     'Person' : 'Artists',
                 }
         %}

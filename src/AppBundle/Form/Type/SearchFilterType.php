@@ -21,6 +21,7 @@ extends AbstractType
         $builder->add('catentry', ItemExhibitionFilterType::class, $options);
         $builder->add('exhibition', ExhibitionFilterType::class, $options);
         $builder->add('location', LocationFilterType::class, $options);
+        $builder->add('organizer', OrganizerFilterType::class, $options);
         $builder->add('person', PersonFilterType::class, $options);
 
         // submit

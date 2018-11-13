@@ -29,6 +29,7 @@ extends CrudController
         'ItemExhibition',
         'Exhibition',
         'Venue',
+        'Organizer',
         'Person',
     ];
 
@@ -267,7 +268,7 @@ extends CrudController
                               UserInterface $user = null)
     {
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, true);
-        if (!in_array($entity = $listBuilder->getEntity(), [ 'Exhibition', 'Venue', 'Person'])) {
+        if (!in_array($entity = $listBuilder->getEntity(), [ 'Exhibition', 'Venue', 'Organizer', 'Person'])) {
             $routeParams = [
                 'entity' => $listBuilder->getEntity(),
                 'filter' => $listBuilder->getQueryFilters(),
@@ -408,7 +409,7 @@ extends CrudController
                     ];
                 }
 
-                if ('Venue' == $entity) {
+                if (in_array($entity, [ 'Venue', 'Organizer' ])) {
                     $values[$key]['exhibitions'][] =
                         sprintf('<a href="%s">%s</a>',
                                 htmlspecialchars($this->generateUrl('location', [
@@ -453,7 +454,7 @@ extends CrudController
         }
 
         return $this->render('Search/map.html.twig', [
-            'pageTitle' => 'General Search',
+            'pageTitle' => $this->get('translator')->trans('Advanced Search'),
             'subTitle' => $subTitle,
             'data' => json_encode($values_final),
             'disableClusteringAtZoom' => 'Person' == $entity ? 7 : 5,
@@ -469,7 +470,6 @@ extends CrudController
             'form' => $this->form->createView(),
             'searches' => $this->lookupSearches($user),
         ]);
-
     }
 
     protected function instantiateListBuilder(Request $request,
@@ -485,15 +485,17 @@ extends CrudController
 
         $venueTypes = $this->buildVenueTypes();
         $exhibitionTypes = [ 'group', 'solo', 'auction' ];
-        $organizerTypes = $this->buildOrganizerTypes();
+        $exhibitionOrganizerTypes = $this->buildOrganizerTypes();
 
         $this->form = $this->createForm(\AppBundle\Form\Type\SearchFilterType::class, [
             'choices' => [
                 'nationality' => array_flip($this->buildPersonNationalities()),
                 'location_geoname' => array_flip($this->buildVenueGeonames()),
                 'location_type' => array_combine($venueTypes, $venueTypes),
+                'organizer_geoname' => [],
+                'organizer_type' => array_combine($venueTypes, $venueTypes),
                 'exhibition_type' => array_combine($exhibitionTypes, $exhibitionTypes),
-                'organizer_type' => array_combine($organizerTypes, $organizerTypes),
+                'exhibition_organizer_type' => array_combine($exhibitionOrganizerTypes, $exhibitionOrganizerTypes),
                 'itemexhibition_type' => array_flip($this->buildItemExhibitionTypes()),
             ],
         ]);
@@ -511,6 +513,10 @@ extends CrudController
 
             case 'Venue':
                 return new \AppBundle\Utils\VenueListBuilder($connection, $request, $urlGenerator, $filters, $extended);
+                break;
+
+            case 'Organizer':
+                return new \AppBundle\Utils\OrganizerListBuilder($connection, $request, $urlGenerator, $filters, $extended);
                 break;
 
             case 'Person':

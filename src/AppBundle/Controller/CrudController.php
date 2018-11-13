@@ -41,6 +41,7 @@ extends Controller
         return array_column($result, 'type');
     }
 
+    /* TODO: should be renamed to buildExhibitionOrganizerTypes */
     protected function buildOrganizerTypes()
     {
         $em = $this->getDoctrine()

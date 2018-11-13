@@ -2,8 +2,6 @@
 
 namespace AppBundle\Utils;
 
-namespace AppBundle\Utils;
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -11,6 +9,7 @@ abstract class LocationListBuilder
 extends SearchListBuilder
 {
     protected $entity = 'Location';
+    protected $alias = 'L';
 
     var $rowDescr = [
         'location' => [
@@ -166,24 +165,32 @@ extends SearchListBuilder
         };
     }
 
+    protected function buildSelectExhibitionCount()
+    {
+        return '(SELECT COUNT(*) FROM Exhibition EC WHERE EC.id_location='
+            . $this->alias . '.id AND EC.status <> -1) AS count_exhibition';
+    }
+
     protected function setSelect($queryBuilder)
     {
         $queryBuilder->select([
-            'SQL_CALC_FOUND_ROWS L.id',
-            'L.id AS location_id',
-            'L.name AS location',
-            'L.place AS place',
-            'L.place_tgn AS place_tgn',
-            'PL.country_code AS country_code',
-            'DATE(L.foundingdate) AS foundingdate',
-            'DATE(L.dissolutiondate) AS dissolutiondate',
-            'L.gnd AS gnd', 'L.ulan AS ulan',
-            'L.type AS type',
-            'L.status AS status',
-            'L.place_geo',
-            'PL.latitude', 'PL.longitude',
+            'SQL_CALC_FOUND_ROWS ' . $this->alias . '.id',
+            $this->alias . '.id AS location_id',
+            $this->alias . '.name AS location',
+            $this->alias . '.place AS place',
+            $this->alias . '.place_tgn AS place_tgn',
+            'P' . $this->alias . '.country_code AS country_code',
+            'DATE(' . $this->alias . '.foundingdate) AS foundingdate',
+            'DATE(' . $this->alias . '.dissolutiondate) AS dissolutiondate',
+            $this->alias . '.gnd AS gnd',
+            $this->alias . '.ulan AS ulan',
+            $this->alias . '.type AS type',
+            $this->alias . '.status AS status',
+            $this->alias . '.place_geo',
+            'P' . $this->alias . '.latitude',
+            'P' . $this->alias . '.longitude',
             'COUNT(DISTINCT IE.id) AS count_itemexhibition',
-            '(SELECT COUNT(*) FROM Exhibition EC WHERE EC.id_location=L.id AND EC.status <> -1) AS count_exhibition',
+            $this->buildSelectExhibitionCount()
         ]);
 
         return $this;
@@ -191,22 +198,27 @@ extends SearchListBuilder
 
     protected function setFrom($queryBuilder)
     {
-        $queryBuilder->from('Location', 'L');
+        $queryBuilder->from('Location', $this->alias);
 
         return $this;
     }
 
+    protected function setExhibitionJoin($queryBuilder)
+    {
+        $queryBuilder->leftJoin($this->alias,
+                                'Exhibition', 'E',
+                                'E.id_location=' . $this->alias . '.id AND E.status <> -1');
+    }
+
     protected function setJoin($queryBuilder)
     {
-        $queryBuilder->groupBy('L.id');
+        $queryBuilder->groupBy($this->alias . '.id');
 
-        $queryBuilder->leftJoin('L',
-                                'Geoname', 'PL',
-                                'PL.tgn=L.place_tgn');
+        $queryBuilder->leftJoin($this->alias,
+                                'Geoname', 'P' . $this->alias,
+                                'P' . $this->alias . '.tgn=' . $this->alias.'.place_tgn');
 
-        $queryBuilder->leftJoin('L',
-                                'Exhibition', 'E',
-                                'E.id_location=L.id AND E.status <> -1');
+        $this->setExhibitionJoin($queryBuilder);
 
         $queryBuilder->leftJoin('E',
                                 'ItemExhibition', 'IE',
@@ -215,8 +227,8 @@ extends SearchListBuilder
         if (array_key_exists('person', $this->queryFilters)) {
             // so we can filter on P.*
             $queryBuilder->join('IE',
-                                    'Person', 'P',
-                                    'P.id=IE.id_person AND P.status <> -1');
+                                'Person', 'P',
+                                'P.id=IE.id_person AND P.status <> -1');
         }
 
         return $this;
@@ -224,16 +236,15 @@ extends SearchListBuilder
 
     protected function setFilter($queryBuilder)
     {
-        // don't show organizer-only
-        $queryBuilder->andWhere('L.status <> -1 AND 0 = (L.flags & 256)');
+        $queryBuilder->andWhere($this->alias . '.status <> -1');
 
         $this->addSearchFilters($queryBuilder, [
-            'L.name',
-            'L.name_translit',
-            'L.name_alternate',
-            'L.gnd',
-            'L.ulan',
-            'L.place',
+            $this->alias . '.name',
+            $this->alias . '.name_translit',
+            $this->alias . '.name_alternate',
+            $this->alias . '.gnd',
+            $this->alias . '.ulan',
+            $this->alias . '.place',
         ]);
 
         $this->addQueryFilters($queryBuilder);

@@ -72,9 +72,9 @@ extends ListBuilder
         $this->setQueryFilters($queryFilters);
     }
 
-	protected function baseQuery()
-	{
-    	$queryBuilder = $this->getQueryBuilder();
+    protected function baseQuery()
+    {
+        $queryBuilder = $this->getQueryBuilder();
 
         $this
             ->setSelect($queryBuilder)
@@ -84,7 +84,7 @@ extends ListBuilder
             ->setOrder($queryBuilder);
 
         return $queryBuilder;
-	}
+    }
 
     protected function determineSortOrder()
     {
@@ -308,6 +308,31 @@ extends ListBuilder
                 }
                 else {
                     $field = 'L.place_tgn';
+                }
+                $queryBuilder->andWhere(sprintf('%s = %s',
+                                                $field, ':' . $key))
+                    ->setParameter($key, $typeValue[1]);
+            }
+        }
+
+        if (array_key_exists('organizer', $this->queryFilters)) {
+            $organizerFilters = & $this->queryFilters['organizer'];
+            foreach ([ 'type' => 'O.type' ] as $key => $field) {
+                if (!empty($organizerFilters[$key])) {
+                    $queryBuilder->andWhere(sprintf('%s = %s',
+                                                    $field, ':' . $key))
+                        ->setParameter($key, $organizerFilters[$key]);
+                }
+            }
+
+            // geoname can be cc:XY or tgn:12345
+            if (!empty($organizerFilters[$key = 'geoname'])) {
+                $typeValue = explode(':', $organizerFilters[$key], 2);
+                if ('cc' == $typeValue[0]) {
+                    $field = 'OPL.country_code';
+                }
+                else {
+                    $field = 'O.place_tgn';
                 }
                 $queryBuilder->andWhere(sprintf('%s = %s',
                                                 $field, ':' . $key))

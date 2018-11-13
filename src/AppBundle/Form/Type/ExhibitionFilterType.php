@@ -32,7 +32,7 @@ extends AbstractType
         $builder->add('organizer_type', ChoiceType::class, [
             'label' => 'Type of Organizing Body',
             // 'multiple' => true,
-            'choices' => [ '- all - ' => '' ] + $options['data']['choices']['organizer_type'],
+            'choices' => [ '- all - ' => '' ] + $options['data']['choices']['exhibition_organizer_type'],
             /*
             'attr' => [
                 'data-placeholder' => '- all - ',
