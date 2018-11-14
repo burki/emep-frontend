@@ -25,7 +25,7 @@ extends CrudController
         $em = $this->getDoctrine()->getEntityManager();
         $dbconn = $em->getConnection();
 
-        print 'here';
+        // print 'here';
 
 
         $exhibitionCountryQuery = StatisticsController::getStringQueryForLocationInArtist($exhibitionCountries, 'country', 'long');
@@ -91,7 +91,7 @@ extends CrudController
 
         // $andWhere .= "AND Location.country IN('BE') ";
 
-        print $andWhere;
+        // print $andWhere;
 
         //$andWhere .= StatisticsController::getStringQueryForLocationInArtist($exhibitionCountries, 'country', 'long');
 
@@ -110,7 +110,7 @@ extends CrudController
         $queryTemplate .= $andWhere;
 
 
-        print '\n';
+        // print '\n';
 
         $unionParts = [];
 
@@ -127,7 +127,7 @@ extends CrudController
         ;
 
 
-        print $querystr;
+        // print $querystr;
 
 
 
@@ -759,7 +759,7 @@ extends CrudController
             $andWhere .= StatisticsController::getStringQueryForExhibitionIds($currIds, 'long');
         }
 
-        print $andWhere;
+        //print $andWhere;
 
         $querystr
             .= " WHERE"
