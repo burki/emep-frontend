@@ -251,7 +251,8 @@ extends CrudController
                 // 'COUNT(DISTINCT A.id) AS numArtistSort',
                 'COUNT(DISTINCT IE.id) AS numCatEntrySort',
                 "E.startdate HIDDEN dateSort",
-                "CONCAT(COALESCE(P.alternateName, P.name), E.startdate) HIDDEN placeSort, L.name HIDDEN venueSort, E.title HIDDEN titleSort, E.organizerType HIDDEN sortOrgType"
+                // "CONCAT(COALESCE(P.alternateName, P.name), E.startdate) HIDDEN placeSort, L.name HIDDEN venueSort, E.title HIDDEN titleSort, E.organizerType HIDDEN sortOrgType"
+                "CONCAT(COALESCE(P.alternateName, P.name), E.startdate) HIDDEN placeSort, L.name HIDDEN venueSort, CASE WHEN E.titleExtended IS NULL THEN E.title ELSE E.titleExtended END HIDDEN titleSort, E.organizerType HIDDEN sortOrgType"
             ])
             ->from('AppBundle:Exhibition', 'E')
             ->leftJoin('E.location', 'L')

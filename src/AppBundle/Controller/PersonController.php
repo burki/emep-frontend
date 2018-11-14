@@ -860,9 +860,13 @@ extends CrudController
 
         $yearsArray = array_keys($worksTotalPerYear);
 
-
-        $min = $yearsArray[0];
-        $max = max(array_keys($worksTotalPerYear));
+        if(!empty($yearsArray)) {
+            $min = $yearsArray[0];
+            $max = max(array_keys($worksTotalPerYear));
+        }else{
+            $min = 0;
+            $max = 0;
+        }
 
         $arrayWithoutGaps = [];
 
@@ -1075,9 +1079,14 @@ extends CrudController
 
         $yearsArray = array_keys($exhibitionYear);
 
+        if(!empty($yearsArray)){
+            $min = $yearsArray[0];
+            $max = $yearsArray[ (count($exhibitionYear)-1) ];
+        }else{
+            $min = 0;
+            $max = 0;
+        }
 
-        $min = $yearsArray[0];
-        $max = $yearsArray[ (count($exhibitionYear)-1) ];
 
         $arrayWithoutGaps = [];
 
