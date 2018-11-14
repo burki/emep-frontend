@@ -164,20 +164,29 @@
             </div>
         </footer>
 
+        <script src="{{ app.request.basepath }}/vendor/highcharts/modules/export-data.js"></script>
+        <script src="{{ app.request.basepath }}/vendor/highcharts/modules/heatmap.js"></script>
+        <script src="{{ app.request.basepath }}/js/tipr.min.js"></script>
+
+        <script>
+            $.fn.dataTable.Responsive.breakpoints = [
+                { name: 'desktop', width: Infinity },
+                { name: 'tablet',  width: 1024 },
+                { name: 'fablet',  width: 768 },
+                { name: 'phone',   width: 480 }
+            ];
+        </script>
+
+        {% if gaTracking is not empty %}
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-122763666-1"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', '{{ gaTracking }}', { 'anonymize_ip': true });
+        </script>
+        {% endif %}
     </body>
-    <script src="{{ app.request.basepath }}/vendor/highcharts/modules/export-data.js"></script>
-    <script src="{{ app.request.basepath }}/vendor/highcharts/modules/heatmap.js"></script>
-    <script src="{{ app.request.basepath }}/js/tipr.min.js"></script>
-
-
-    <script>
-
-
-        $.fn.dataTable.Responsive.breakpoints = [
-            { name: 'desktop', width: Infinity },
-            { name: 'tablet',  width: 1024 },
-            { name: 'fablet',  width: 768 },
-            { name: 'phone',   width: 480 }
-        ];
-    </script>
 </html>

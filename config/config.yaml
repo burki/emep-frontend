@@ -29,6 +29,7 @@ twig:
         siteName: "Exhibitions of Modern European Painting 1905-1915"
         slugify: "@cocur_slugify"
         webDir: "%kernel.project_dir%/web"
+        gaTracking: '%ga.site_id%'
     paths:
         '%kernel.project_dir%/templates': __main__
     form_themes:
@@ -74,7 +75,7 @@ doctrine:
         # TODO: set a cache, see http://www.craftitonline.com/2015/04/doctrine-file-system-caching-with-doctrine-cache-bundle/
         connection: default        
         auto_generate_proxy_classes: '%kernel.debug%'
-        auto_mapping: true 
+        auto_mapping: true
         dql:
             string_functions:
                 FIELD: DoctrineExtensions\Query\Mysql\Field
@@ -84,13 +85,16 @@ doctrine:
             numeric_functions:
                 MATCH: DoctrineExtensions\Query\Mysql\MatchAgainst
                 RAND: DoctrineExtensions\Query\Mysql\Rand
-        #metadata_cache_driver: apcu
+        metadata_cache_driver: '%database.cache_driver%'
+        result_cache_driver: '%database.cache_driver%'
+        query_cache_driver: '%database.cache_driver%'
+        #metadata_cache_driver:
         #    type: service
         #    id: doctrine_cache.providers.vendor_filesystem_metadata_cache
-        #result_cache_driver: apcu
+        #result_cache_driver:
         #    type: service
         #    id: doctrine_cache.providers.vendor_filesystem_result_cache
-        #query_cache_driver: apcu
+        #query_cache_driver:
         #    type: service
         #    id: doctrine_cache.providers.vendor_filesystem_query_cache
         second_level_cache:
