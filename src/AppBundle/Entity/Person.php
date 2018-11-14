@@ -1058,15 +1058,15 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
     }
 
     /* filter removed exhibitions */
-    public function getExhibitions($minStatus = 0)
+    public function getExhibitions($ignoreStatus = 0)
     {
         if (is_null($this->exhibitions)) {
             return $this->exhibitions;
         }
 
         return $this->exhibitions->filter(
-            function ($entity) use ($minStatus) {
-               return $entity->getStatus() >= $minStatus;
+            function ($entity) use ($ignoreStatus) {
+               return is_null($ignoreStatus) || $entity->getStatus() <> $ignoreStatus;
             }
         );
     }
