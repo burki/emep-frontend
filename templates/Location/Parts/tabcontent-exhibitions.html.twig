@@ -10,7 +10,7 @@
                 order: [[ 1, "asc" ]],
                 "dom": 'ilrtp',
                 "columns": [
-                    { "orderable": false},
+                    { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "desc", "asc" ] },
                     { "orderSequence": [ "desc", "asc" ] },
@@ -46,7 +46,7 @@
                 {% set exhPlace = exhibition.location.place %}
 
                 <tr class="listviewrow">
-                    <td class="date"><b>{{ helper.exhibition_period(exhibition) }}</b></td>
+                    <td class="date" data-order="{{ exhibition.startdate }}"><b>{{ helper.exhibition_period(exhibition) }}</b></td>
                     <td class="title"><a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
                             <b>{{ exhibition.title }}</b> {{ exhibition.titleAppend }}</a></td>
                     <td class="normal">
