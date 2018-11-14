@@ -26,8 +26,12 @@ extends Controller
         $connection = $this->getDoctrine()->getEntityManager()->getConnection();
 
         $counts = [];
-        foreach ([ 'Exhibition', 'Venue', 'Organizer', 'Person' ] as $entity) {
+        foreach ([ 'ItemExhibition', 'Exhibition', 'Venue', 'Organizer', 'Person' ] as $entity) {
             switch ($entity) {
+                case 'ItemExhibition':
+                    $listBuilder = new \AppBundle\Utils\ItemExhibitionListBuilder($connection, $request, $urlGenerator, []);
+                    break;
+
                 case 'Exhibition':
                     $listBuilder = new \AppBundle\Utils\ExhibitionListBuilder($connection, $request, $urlGenerator, []);
                     break;
@@ -45,11 +49,9 @@ extends Controller
                     break;
             }
 
-            // TODO: build a separate count method, for now just a single entry to access total
             $listPagination = new SearchListPagination($listBuilder);
-            $listPage = $listPagination->get(1);
 
-            $counts[$entity] = $listPage['total'];
+            $counts[$entity] = $listPagination->getTotal();
         }
 
         return $this->render('Default/index.html.twig', [
