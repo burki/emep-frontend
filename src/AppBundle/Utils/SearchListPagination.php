@@ -62,6 +62,27 @@ class SearchListPagination
         ];
     }
 
+	public function getTotal()
+	{
+		// TODO: build a separate count method without all the joins
+		// for now just a single entry without order to access total
+        $query = $this->listQueryBuilder->query();
+		$query->setMaxResults(1)->setFirstResult(0);
+
+		// dirty hack to remove order
+		$query->orderBy('', 'ASC');
+        $sql = $query->getSQL();
+		$sql = preg_replace('/ORDER BY \s*ASC\s* (LIMIT 1)/', '\1', $sql);
+
+        $conn = $query->getConnection();
+        $conn->query($sql)->fetchAll();
+
+        $stmt = $conn->query("SELECT FOUND_ROWS() AS found_rows");
+        $totalResult = $stmt->fetchAll();
+
+		return $totalResult[0]['found_rows'];
+	}
+
     public function definePageItemsMapCallback($callback)
     {
         $this->pageItemsMapCallback = $callback;
