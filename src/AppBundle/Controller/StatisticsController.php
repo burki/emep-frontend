@@ -296,19 +296,19 @@ extends Controller
             $nationalitySubquery .= " ) ";
         }
 
-        $querystr = "SELECT YEAR(startdate) AS start_year, MONTH(startdate) AS start_month, COUNT(DISTINCT EArtist.exhId) AS how_many 
+        $querystr = "SELECT YEAR(startdate) AS start_year, MONTH(startdate) AS start_month, COUNT(DISTINCT EArtist.exhId) AS how_many
                         FROM (
-                            Select Exhibition.id as exhId, Exhibition.id_location as id_location, Exhibition.status as status, Exhibition.startdate as startdate 
+                            Select Exhibition.id as exhId, Exhibition.id_location as id_location, Exhibition.status as status, Exhibition.startdate as startdate
                             FROM Exhibition
-                            LEFT JOIN ItemExhibition ON ItemExhibition.id_exhibition = Exhibition.id 
-                            LEFT JOIN Person ON Person.id = ItemExhibition.id_person 
+                            LEFT JOIN ItemExhibition ON ItemExhibition.id_exhibition = Exhibition.id
+                            LEFT JOIN Person ON Person.id = ItemExhibition.id_person
                             " . $nationalitySubquery . "
                             GROUP BY Exhibition.id
-                            ORDER BY Exhibition.id, Person.id 
-                                ) as EArtist 
-                        
-                        WHERE EArtist.status <> -1 AND MONTH(startdate) <> 0 
-                        GROUP BY start_year, MONTH(startdate) 
+                            ORDER BY Exhibition.id, Person.id
+                                ) as EArtist
+
+                        WHERE EArtist.status <> -1 AND MONTH(startdate) <> 0
+                        GROUP BY start_year, MONTH(startdate)
                         ORDER BY start_year, start_month";
 
 
@@ -841,7 +841,7 @@ FROM
 FROM Exhibition
 INNER JOIN ItemExhibition ON ItemExhibition.id_exhibition=Exhibition.id
 INNER JOIN Person ON ItemExhibition.id_person=Person.id AND Person.birthdate IS NOT NULL
-LEFT JOIN Location ON Location.id = Exhibition.id_location 
+LEFT JOIN Location ON Location.id = Exhibition.id_location
 $where
 GROUP BY Exhibition.id, Person.id) AS EB
 GROUP BY age, state
@@ -1310,7 +1310,7 @@ EOT;
     {
         $em = $this->getDoctrine()->getEntityManager();
 
-        $lang = in_array($request->get('lang'), ['en', 'de', 'fr'])
+        $lang = in_array($request->get('lang'), [ 'en', 'de', 'fr' ])
             ? $request->get('lang') : 'en';
 
         $qb = $this->getDoctrine()
@@ -1339,13 +1339,13 @@ EOT;
             if (array_key_exists('wikistats', $additional)
                 && array_key_exists($lang, $additional['wikistats']))
             {
-                $single_data = array(
+                $single_data = [
                     'name' => $person->getFullname(), // person
                     'num' => (int)$how_many,
                     'id' => $person->getId(),
                     'x' => (int)$how_many + 0.3 * rand(-1, 1), // num-reports
                     'y' => (int)$additional['wikistats'][$lang], // num hits
-                );
+                ];
                 $data[] = $single_data;
             }
         }
@@ -1427,24 +1427,20 @@ EOT;
             if (array_key_exists('wikistats', $additional)
                 && array_key_exists($lang, $additional['wikistats']))
             {
-                $single_data = array(
+                $single_data = [
                     'name' => $person->getFullname(), // person
                     //'num' => (int)$how_many,
                     'id' => $person->getId(),
                     'x' => (int)$how_many + 0.3 * rand(-1, 1), // num-reports
                     'y' => (int)$additional['wikistats'][$lang], // num hits
-                );
+                ];
                 $data[] = $single_data;
             }
         }
 
-
-
-
         usort($data, function($a, $b) {
             return $a['y'] == $b['y'] ? 0 : ($a['y'] > $b['y'] ? -1 : 1);
         });
-
 
         return $this->render('Statistics/person-wikipedia-index.html.twig', [
             'lang' => $lang,

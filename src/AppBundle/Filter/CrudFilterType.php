@@ -16,9 +16,9 @@ extends AbstractType
     {
         $builder->add('search', Filters\TextFilterType::class, [
             'label' => false,
-            'attr' => array(
+            'attr' => [
                 'placeholder' => 'Search',
-            ),
+            ],
             'apply_filter' => function (QueryInterface $filterQuery, $field, $values) use ($searchFields, $useFulltext)
             {
                 if (empty($values['value'])) {

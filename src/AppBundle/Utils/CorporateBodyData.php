@@ -47,8 +47,10 @@ class CorporateBodyData extends DnbData
                 /*
                 else if ('bnode' == $triple['o_type']) {
                     $nameRecord = $index[$triple['o']];
-                    $this->preferredName = array($nameRecord['http://d-nb.info/standards/elementset/gnd#surname'][0]['value'],
-                                                $nameRecord['http://d-nb.info/standards/elementset/gnd#forename'][0]['value']);
+                    $this->preferredName = [
+                        $nameRecord['http://d-nb.info/standards/elementset/gnd#surname'][0]['value'],
+                        $nameRecord['http://d-nb.info/standards/elementset/gnd#forename'][0]['value'],
+                    ];
                     // var_dump($index[$triple['o']]);
                 }
                 */

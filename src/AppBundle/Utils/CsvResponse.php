@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 {
     protected $data;
     protected $filename = 'export.csv';
-    public function __construct($data = array(), $status = 200, $headers = array())
+    public function __construct($data = [], $status = 200, $headers = [])
     {
         parent::__construct('', $status, $headers);
         $this->setData($data);
@@ -52,7 +52,7 @@ class CsvResponse extends Response
 {
     protected $data;
     protected $filename = 'export.csv';
-    public function __construct($data = array(), $status = 200, $headers = array())
+    public function __construct($data = [], $status = 200, $headers = [])
     {
         // parent::__construct('', $status, $headers);
         $this->setData($data);
@@ -90,5 +90,3 @@ class CsvResponse extends Response
         return $this->setContent($this->data);
     }
 }
-
-

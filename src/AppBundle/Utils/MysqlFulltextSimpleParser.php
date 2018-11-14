@@ -190,8 +190,8 @@ class MysqlFulltextSimpleParser
             if ($this->_regex == null) {
                 for ($i = 0; $i < count($this->_patterns); $i++) {
                     $this->_patterns[$i] = '(' . str_replace(
-                            array('/', '(', ')'),
-                            array('\/', '\(', '\)'),
+                            [ '/', '(', ')' ],
+                            [ '\/', '\(', '\)' ],
                             $this->_patterns[$i]) . ')';
                 }
                 $this->_regex = "/" . implode("|", $this->_patterns) . "/" . $this->_getPerlMatchingFlags();
@@ -223,7 +223,7 @@ class MysqlFulltextSimpleParser
          *    @access public
          */
         function __construct($start) {
-            $this->_stack = array($start);
+            $this->_stack = [ $start ];
         }
 
         function SimpleStateStack($start) {
@@ -531,7 +531,7 @@ class MysqlFulltextSimpleParser
                 $unparsed_character_count = strpos($raw, $match);
                 $unparsed = substr($raw, 0, $unparsed_character_count);
                 $raw = substr($raw, $unparsed_character_count + strlen($match));
-                return array($unparsed, $match, $action);
+                return [ $unparsed, $match, $action ];
             }
             return true;
         }
@@ -601,8 +601,8 @@ class MysqlFulltextSimpleParser
          *    @access private
          */
         function _getParsedTags() {
-            return array('a', 'title', 'form', 'input', 'textarea', 'select',
-                    'option', 'frameset', 'frame');
+            return [ 'a', 'title', 'form', 'input', 'textarea', 'select',
+                    'option', 'frameset', 'frame' ];
         }
 
         /**

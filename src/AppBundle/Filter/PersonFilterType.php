@@ -68,16 +68,14 @@ extends CrudFilterType
 
 
         $builder->add('birthDate', Filters\DateRangeFilterType::class, [
-                'left_date_options'  => array('years' => range($options['data']['birthyears'][0], $options['data']['birthyears'][1])),
-                'right_date_options' => array('years' => range($options['data']['birthyears'][0], $options['data']['birthyears'][1]))
-            ]
-        );
+            'left_date_options'  => [ 'years' => range($options['data']['birthyears'][0], $options['data']['birthyears'][1]) ],
+            'right_date_options' => [ 'years' => range($options['data']['birthyears'][0], $options['data']['birthyears'][1]) ],
+        ]);
 
         $builder->add('deathDate', Filters\DateRangeFilterType::class, [
-                'left_date_options'  => array('years' => range($options['data']['deathyears'][0], $options['data']['deathyears'][1])),
-                'right_date_options' => array('years' => range($options['data']['deathyears'][0], $options['data']['deathyears'][1]))
-            ]
-        );
+            'left_date_options'  => [ 'years' => range($options['data']['deathyears'][0], $options['data']['deathyears'][1]) ],
+            'right_date_options' => [ 'years' => range($options['data']['deathyears'][0], $options['data']['deathyears'][1]) ],
+        ]);
 
 
         $builder->add('organizer_type', Filters\ChoiceFilterType::class, [

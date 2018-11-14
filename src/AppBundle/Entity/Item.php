@@ -623,8 +623,10 @@ class Item
             $personRef = null;
             if (isset($item_id)) {
                 $personRef = $em->getRepository('ItemPerson')
-                    ->findOneBy(array('person' => $person,
-                                      'item' => $this));
+                    ->findOneBy([
+                        'person' => $person,
+                        'item' => $this,
+                    ]);
             }
             if (!isset($personRef)) {
                 $personRef = new ItemPerson();

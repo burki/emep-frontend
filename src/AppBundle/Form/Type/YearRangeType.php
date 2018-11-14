@@ -40,7 +40,7 @@ extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver)
     {
-         $resolver->setDefaults(array(
+        $resolver->setDefaults([
             /*
             'hours'          => range(0, 256),
             'minutes'        => range(0, 59),
@@ -48,7 +48,7 @@ extends AbstractType
             'error_bubbling' => false,
             'compound'       => true,
             'required'       => false
-        ));
+        ]);
     }
 
     public function getParent()

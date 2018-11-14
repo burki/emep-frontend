@@ -4,7 +4,8 @@ namespace AppBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-// use Gedmo\Mapping\Annotation as Gedmo; // alias for Gedmo extensions annotations
+
+use Gedmo\Mapping\Annotation as Gedmo; // alias for Gedmo extensions annotations
 
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -108,14 +109,11 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
      */
     protected $id;
 
-
-
     /**
      * @var integer
      *
      * @ORM\Column(type="integer", nullable=false)
      */
-
     protected $status = 0;
 
     /**
@@ -248,11 +246,10 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
      */
     protected $url;
 
-
     /**
      * @var \DateTime
      *
-     * *Gedmo\Timestampable(on="create")
+     * @Gedmo\Timestampable(on="create")
      * @ORM\Column(name="created", type="datetime")
      */
     protected $createdAt;
@@ -260,7 +257,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
     /**
      * @var \DateTime
      *
-     * *Gedmo\Timestampable(on="update")
+     * @Gedmo\Timestampable(on="update")
      * @ORM\Column(name="changed", type="datetime")
      */
     protected $changedAt;

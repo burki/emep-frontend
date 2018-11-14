@@ -59,7 +59,7 @@ trait SharingBuilderTrait
             $locale_full = $this->buildOgLocale($request, $app, $locale);
             if ($locale_full != $og['og:locale']) {
                 if (!isset($og['og:locale:alternate'])) {
-                    $og['og:locale:alternate'] = array();
+                    $og['og:locale:alternate'] = [];
                 }
                 $og['og:locale:alternate'][] = $locale_full;
             }

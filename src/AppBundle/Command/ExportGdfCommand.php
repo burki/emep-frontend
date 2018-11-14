@@ -99,8 +99,8 @@ extends ContainerAwareCommand
             for ($j = $i + 1; $j < $count_shared_ids; $j++) {
                 $target_id = $shared_ids[$j];
                 $src_target = $src_id < $target_id
-                    ? array($src_id, $target_id)
-                    : array($target_id, $src_id);
+                    ? [ $src_id, $target_id ]
+                    : [ $target_id, $src_id ];
                 $edge_key = join(',', $src_target);
                 if (!array_key_exists($edge_key, $edges)) {
                     $edges[$edge_key] = 0;

@@ -37,7 +37,7 @@ class AppExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('countryName', array($this, 'getCountryName')),
+            new \Twig_SimpleFunction('countryName', [ $this, 'getCountryName' ]),
             new \Twig_SimpleFunction('file_exists', 'file_exists'),
             new \Twig_SimpleFunction('daterangeincomplete', [ $this, 'daterangeincompleteFunction' ]),
         ];
