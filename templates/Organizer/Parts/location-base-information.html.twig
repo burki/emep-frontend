@@ -1,7 +1,6 @@
-
 {% if location.place is not null %}
     <div class="artist-information-container">
-        <div class="artist-information-label">{{ 'Place:'|trans }}</div>
+        <div class="artist-information-label">{{ 'City'|trans }}:</div>
         <div class="artist-information-text">
             {{ helper.place_linked(location.place) }}
             {% set addresses = location.addressesSeparated %}
@@ -12,20 +11,9 @@
     </div>
 {% endif %}
 
-{# birthplace #}
-{% if location.placeLabel is not null %}
-    <div class="artist-information-container">
-        <div class="artist-information-label">{{ 'Place:'|trans }}</div>
-        <div class="artist-information-text">{{ location.placeLabel }}
-        </div>
-    </div>
-{% endif %}
-
-
-{# birthplace #}
 {% if location.type is not null %}
     <div class="artist-information-container">
-        <div class="artist-information-label">{{ 'type:'|trans }}</div>
+        <div class="artist-information-label">{{ 'Type'|trans }}:</div>
         <div class="artist-information-text">{{ location.type }}
         </div>
     </div>
@@ -34,7 +22,7 @@
 
 {% if location.url is not null %}
     <div class="artist-information-container">
-        <div class="artist-information-label">{{ 'URL:'|trans }}</div>
+        <div class="artist-information-label">{{ 'URL'|trans }}:</div>
         <div class="artist-information-text"><a href="{{ location.url }}">{{ location.url }} website</a>
         </div>
     </div>
@@ -42,7 +30,7 @@
 
 {% if location.foundingDate is not empty %}
     <div class="artist-information-container">
-        <div class="artist-information-label">{{ 'Founding Date:'|trans }}</div>
+        <div class="artist-information-label">{{ 'Founding Date'|trans }}:</div>
         <div class="artist-information-text">{{ location.foundingDate|dateincomplete }}</div>
     </div>
 {% endif %}
@@ -51,7 +39,7 @@
 
 {% if location.dissolutionDate is not empty %}
     <div class="artist-information-container">
-        <div class="artist-information-label">{{ 'Dissolution Date:'|trans }}</div>
+        <div class="artist-information-label">{{ 'Dissolution Date'|trans }}:</div>
         <div class="artist-information-text">{{ location.dissolutionDate|dateincomplete }}</div>
     </div>
 {% endif %}
@@ -59,9 +47,9 @@
 <div class="artist-information-container-qucikstat">
     <div class="artist-information-label">Quickstats</div>
     <div class="statcontainer">
-        <div class="artist-information-text-stats">works: {{ detailDataNumberItemTypes[1] }}</div>
-        <div class="artist-information-text-stats">artists: {{ dataNumberOfArtistsPerCountry[1] }}</div>
-        <div class="artist-information-text-stats">nationalities: {{ dataNumberOfArtistsPerCountry[2] }}</div>
+        <div class="artist-information-text-stats">Works: {{ detailDataNumberItemTypes[1] }}</div>
+        <div class="artist-information-text-stats">Artists: {{ dataNumberOfArtistsPerCountry[1] }}</div>
+        <div class="artist-information-text-stats">Nationalities: {{ dataNumberOfArtistsPerCountry[2] }}</div>
 
     </div>
 </div>

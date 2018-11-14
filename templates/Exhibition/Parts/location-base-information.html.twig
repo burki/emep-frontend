@@ -1,5 +1,5 @@
 <div class="artist-information-container">
-    <div class="artist-information-label">{{ 'exhibition period:'|trans }}</div>
+    <div class="artist-information-label">{{ 'Exhibition period'|trans }}:</div>
     <div class="artist-information-text">{{ helper.exhibition_period(exhibition) }}</div>
 </div>
 
@@ -7,7 +7,7 @@
 {# birthplace #}
 {% if location.type is not null %}
     <div class="artist-information-container">
-        <div class="artist-information-label">{{ 'type:'|trans }}</div>
+        <div class="artist-information-label">{{ 'Type'|trans }}:</div>
         <div class="artist-information-text">{{ location.type }}</div>
     </div>
 
@@ -25,7 +25,7 @@
 
 {% if location.url is not null %}
     <div class="artist-information-container">
-        <div class="artist-information-label">{{ 'URL:'|trans }}</div>
+        <div class="artist-information-label">{{ 'URL'|trans }}:</div>
         <div class="artist-information-text"><a href="{{ location.url }}">{{ location.url }} website</a>
         </div>
     </div>
@@ -64,11 +64,7 @@
 <div class="artist-information-container-qucikstat">
     <div class="artist-information-label">Quickstats</div>
     <div class="statcontainer">
-        <div class="artist-information-text-stats">catalouge entries: {{ catalogueEntries|length }}</div>
-        <div class="artist-information-text-stats">artists: {{ artists|length }}</div>
+        <div class="artist-information-text-stats">Catalogue Entries: {{ catalogueEntries|length }}</div>
+        <div class="artist-information-text-stats">Artists: {{ artists|length }}</div>
     </div>
 </div>
-
-
-
-

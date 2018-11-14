@@ -37,7 +37,7 @@
         <div class="sort-control">
             {% set sortField = app.request.get('sort') %}
             Sort by:
-            {{ helper.pagination_sortable(pagination, 'Place', 'countryPlaceNameSort') }}
+            {{ helper.pagination_sortable(pagination, 'City', 'countryPlaceNameSort') }}
             {{ helper.pagination_sortable(pagination, 'Name', 'nameSort') }}
             {{ helper.pagination_sortable(pagination, '# Publication', 'numCatEntrySort', 'desc') }}
         </div>

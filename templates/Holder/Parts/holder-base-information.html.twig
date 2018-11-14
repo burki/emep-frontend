@@ -1,14 +1,14 @@
 
 {% if holder.placeLabel is not null %}
     <div class="artist-information-container">
-        <div class="artist-information-label">{{ 'Place:'|trans }}</div>
+        <div class="artist-information-label">{{ 'City'|trans }}:</div>
         <div class="artist-information-text">{{ holder.placeLabel }}</div>
     </div>
 {% endif %}
 
 {% if holder.placeAddress is not null %}
     <div class="artist-information-container">
-        <div class="artist-information-label">{{ 'Address:'|trans }}</div>
+        <div class="artist-information-label">{{ 'Address'|trans }}:</div>
         <div class="artist-information-text">{{ holder.placeAddress }}</div>
     </div>
 {% endif %}
@@ -16,21 +16,21 @@
 
 {% if holder.url is not empty %}
     <div class="artist-information-container">
-        <div class="artist-information-label">{{ 'Homepage:'|trans }}</div>
+        <div class="artist-information-label">{{ 'Homepage'|trans }}:</div>
         <div class="artist-information-text"><a href="{{ holder.url }}" target="_blank">{{ holder.url|prettifyurl }}</a></div>
     </div>
 {% endif %}
 
 {% if holder.foundingDate is not empty %}
     <div class="artist-information-container">
-        <div class="artist-information-label">{{ 'Founding Date:'|trans }}</div>
+        <div class="artist-information-label">{{ 'Founding Date'|trans }}:</div>
         <div class="artist-information-text">{{ holder.foundingDate }}</div>
     </div>
 {% endif %}
 
 {% if holder.description is not empty %}
     <div class="artist-information-container">
-        <div class="artist-information-label">{{ 'Description:'|trans }}</div>
+        <div class="artist-information-label">{{ 'Description'|trans }}:</div>
         <div class="artist-information-text">{{ holder.description }}</div>
     </div>
 {% endif %}
@@ -38,9 +38,7 @@
 <div class="artist-information-container-qucikstat">
     <div class="artist-information-label">Quickstats</div>
     <div class="statcontainer">
-        <div class="artist-information-text-stats">catalogues: {{ bibitems|length }}</div>
+        <div class="artist-information-text-stats">Catalogues: {{ bibitems|length }}</div>
 
     </div>
 </div>
-
-

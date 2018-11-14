@@ -81,52 +81,5 @@
         </div>
     </div>
 
-
-    {# location.nameAppend #}
-
-    {#
-    <div class="row">
-        <div class="col-sm-8">
-            <dl class="dl-horizontal">
-            {% if location.place is not null %}
-                <dt>{{ 'Place'|trans }}:</dt>
-                <dd>
-                    {{ helper.place_linked(location.place) }}
-                    {% set addresses = location.addressesSeparated %}
-                    {% for address in addresses %}
-                        <br />{{ address['info']|replace({ "\n" : ", " }) }}
-                    {% endfor %}
-                </dd>
-            {% endif %}
-            {% if location.url is not empty %}
-                <dt>{{ 'Homepage'|trans }}:</dt>
-                <dd>
-                    <a href="{{ location.url }}" target="_blank">{{ location.url|prettifyurl }}</a>
-                </dd>
-            {% endif %}
-            {% if location.foundingDate is not empty %}
-                <dt>{{ 'Founding Date'|trans }}:</dt>
-                <dd>
-                    {{ location.foundingDate|dateincomplete }}
-                </dd>
-            {% endif %}
-            {% if location.dissolutionDate is not empty %}
-                <dt>{{ 'Dissolution Date'|trans }}:</dt>
-                <dd>
-                    {{ location.dissolutionDate|dateincomplete }}
-                </dd>
-            {% endif %}
-            {% if location.description is not empty %}
-                <dt>{{ 'Note'|trans }}:</dt>
-                <dd>
-                    {{ location.description|nl2br }}
-                </dd>
-            {% endif %}
-            </dl>
-
-        </div>
-        #}
-
-
     </div><!-- .row -->
 {% endblock %}
