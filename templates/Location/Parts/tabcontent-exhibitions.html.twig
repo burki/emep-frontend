@@ -7,13 +7,13 @@
                 paging: true,
                 searching: false,
                 info: true,
-                order: [[ 1, "asc" ]],
+                order: [[ 0, "asc" ]],
                 "dom": 'ilrtp',
                 "columns": [
                     { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "asc", "desc" ] },
-                    { "orderSequence": [ "desc", "asc" ] },
-                    { "orderSequence": [ "desc", "asc" ] },
+                    // { "orderSequence": [ "asc", "desc" ] },
+                    // { "orderSequence": [ "desc", "asc" ] },
                     { "orderSequence": [ "desc", "asc" ] },
                     { "orderSequence": [ "desc", "asc" ] }
                 ]
@@ -32,10 +32,12 @@
             <tr class="listviewheading">
                 <th>Date</th>
                 <th>Title</th>
+                <!--
                 <th>City</th>
                 <th>Venue</th>
+                -->
+                <th>Type of Org. Body</th>
                 <th># of Cat. Entries</th>
-                <th>Type</th>
             </tr>
             </thead>
             <tbody>
@@ -48,6 +50,7 @@
                     <td class="date" data-order="{{ exhibition.startdate }}"><b>{{ helper.exhibition_period(exhibition) }}</b></td>
                     <td class="title"><a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
                             <b>{{ exhibition.title }}</b> {{ exhibition.titleAppend }}</a></td>
+                    <!--
                     <td class="normal">
                         <a href="{% if exhPlace.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : exhPlace.tgn }) }}{% else %}{{ path('place', { 'id' : exhPlace.id }) }}{% endif %}">
                             {{ exhibition.location.placeLabel }}
@@ -58,10 +61,11 @@
                             {{ exhibition.location.name }}
                         </a>
                     </td>
+                    -->
+                    <td>{{ exhibition.organizerType }}</td>
                     <td>
                         {{ exhibitionStats[exhibition.id].numCatEntrySort }}
                     </td>
-                    <td>{{ exhibition.organizerType }}</td>
                 </tr>
             {% endfor %}
             </tbody>
