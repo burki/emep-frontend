@@ -466,6 +466,7 @@ extends CrudController
 
         $querystr = "SELECT DISTINCT id_person, id_exhibition"
                   . " FROM ItemExhibition"
+                  . " INNER JOIN Exhibition ON ItemExhibition.id_exhibition = Exhibition.id AND Exhibition.status <> -1"
                   . " WHERE id_person IN (" . join(', ', $personIds) . ')'
                   . " AND id_exhibition <> " . $entity->getId()
                   . " ORDER BY id_exhibition";
@@ -494,10 +495,10 @@ extends CrudController
                     'title' => $row['title'],
                     'count' => $numShared,
                     'coefficient' =>
-                          1.0
-                          * $numShared // shared
-                          /
-                          ($row['num_artists'] + $numArtists - $numShared),
+                        1.0
+                            * $numShared // shared
+                            /
+                            ($row['num_artists'] + $numArtists - $numShared),
                 ];
             }
 
@@ -641,8 +642,8 @@ extends CrudController
 
         $response = new CSVResponse( $csvResult, 200, explode( ', ', 'Startdate, Enddate, Title, City, Venue, # of Cat. Entries, type' ) );
         $response->setFilename( "data.csv" );
-        return $response;
 
+        return $response;
     }
 
     /**

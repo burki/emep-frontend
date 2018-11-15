@@ -8,6 +8,7 @@
                     paging: true,
                     searching: false,
                     info: true,
+                    order: [[ 1, "desc" ]],
                     "columns": [
                         { "orderSequence": [ "asc", "desc" ] },
                         { "orderSequence": [ "desc", "asc" ] }
@@ -52,9 +53,8 @@
                         <td class="normal">
                             <a href="{{ path('exhibition', { 'id': exhibition_id }) }}">{{  similar[exhibition_id]['title'] }}</a>
                         </td>
-                        <td class="normal">
+                        <td class="normal" data-order="{{ similar[exhibition_id]['count'] }}">
                             <a href="{{ path('person-shared-partial', { 'exhibitions': [ exhibition.id, exhibition_id ]|join(',') }) }}" data-remote="false" data-toggle="modal" data-target="#detailModal">{{ similar[exhibition_id]['count'] }} artists</a>
-                            <a href="{{ path('exhibition-shared-partial', { 'persons': [ person.id, person_id ]|join(',') }) }}" data-remote="false" data-toggle="modal" data-target="#detailModal">{{ similar[person_id]['count'] }}</a>
                         </td>
                     </tr>
                 {% endif %}
