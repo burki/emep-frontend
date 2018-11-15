@@ -73,7 +73,8 @@ trait AddressesTrait
 
             foreach ([ [ 'address', 'place' ],
                        $showCountry ? [ 'street', 'zip', 'country' ] : [ 'street', 'zip' ],
-                       [ 'geo' ] ] as $keys)
+                       // [ 'geo' ],
+                       ] as $keys)
             {
                 $parts = [];
                 foreach ($keys as $key) {
