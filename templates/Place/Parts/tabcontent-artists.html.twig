@@ -1,8 +1,6 @@
-
 {% if artistsArray|length > 0 %}
-
-    <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.css">
-    <script src="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.js"></script>
+    {% import 'Shared/datatables.html.twig' as datatables %}
+    {{ datatables.head() }}
 
     <script>
         $( document ).ready(function() {
@@ -12,9 +10,11 @@
                 searching: false,
                 info: true,
                 "columns": [
+                    { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "desc", "asc" ] },
+                    { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "desc", "asc" ] },
-                    { "orderSequence": [ "desc", "asc" ] }
+                    { "orderSequence": [ "asc", "desc" ] }
                 ]
             });
         })
@@ -26,17 +26,30 @@
             <thead>
             <tr>
                 <th>Name</th>
-                <th>Year of Birth</th>
-                <th>Year of Birth</th>
+                <th>Birth Date</th>
+                <th>Birth Place</th>
+                <th>Death Date</th>
+                <th>Death Place</th>
             </tr>
             </thead>
             <tbody>
             {% for person in artistsArray %}
-                {% set birthPlace = person.birthPlace %}
                 <tr>
-                    <td><b>{{ helper.person_linked(person) }}</b></td>
-                    <td>{{ person.birthDate|dateincomplete -}} </td>
-                    <td>{{ person.deathDate|dateincomplete -}} </td>
+                    <td data-order="{{ person.fullname(false) }}"><b>{{ helper.person_linked(person, true) }}</b></td>
+                    <td data-order="{{ person.birthDate }}">{{ person.birthDate|dateincomplete -}} </td>
+                    <td class="normal">
+                        {% set birthPlace = person.birthPlace %}
+                        {% if birthPlace is not empty %}
+                            {{ helper.place_linked(birthPlace) }}
+                        {% endif %}
+                    </td>
+                    <td data-order="{{ person.deathDate }}">{{ person.deathDate|dateincomplete -}} </td>
+                    <td class="normal">
+                        {% set deathPlace = person.deathPlace %}
+                        {% if deathPlace is not empty %}
+                            {{ helper.place_linked(deathPlace) }}
+                        {% endif %}
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>

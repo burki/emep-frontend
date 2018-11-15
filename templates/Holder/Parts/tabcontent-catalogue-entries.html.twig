@@ -1,26 +1,14 @@
 {% block entries %}
-    <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.css">
-    <script src="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.js"></script>
+    {% import 'Shared/datatables.html.twig' as datatables %}
+    {{ datatables.head() }}
+
     <style>
         .collapsed {
             display: none;
         }
     </style>
-    <script>
-        /*
-        $( document ).ready(function() {
-            $('#entries').DataTable({
-                paging: false,
-                searching: false,
-                info: true,
-                "columns": [
-                    { "orderSequence": [ "desc", "asc" ] },
-                    { "orderSequence": [ "desc", "asc" ] }
-                ]
-            });
-        })
-        */
 
+    <script>
         $(document).ready(function() {
             var groupColumn = 1;
             var table = $('#entrytable').DataTable({
@@ -29,12 +17,7 @@
                 searching: false,
                 info: true,
             } );
-
-
-
         } );
-
-
     </script>
 
 

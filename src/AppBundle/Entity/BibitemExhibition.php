@@ -1,6 +1,5 @@
 <?php
 
-
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -23,16 +22,18 @@ class BibitemExhibition
     private $id;
 
     /**
+     * @var Bibitem
+     *
      * @ORM\ManyToOne(targetEntity="Bibitem")
      * @ORM\JoinColumn(name="id_publication", referencedColumnName="id")
-     * @var Item
      */
     private $bibitem;
 
     /**
+     * @var Exhibition
+     *
      * @ORM\ManyToOne(targetEntity="Exhibition")
      * @ORM\JoinColumn(name="id_exhibition", referencedColumnName="id")
-     * @var Person
      */
     private $exhibition;
 
@@ -64,6 +65,8 @@ class BibitemExhibition
     public function setExhibition($exhibition)
     {
         $this->exhibition = $exhibition;
+
+        return $this;
     }
 
     public function getRole() {
@@ -72,5 +75,7 @@ class BibitemExhibition
 
     public function setRole($role) {
         $this->role = $role;
+
+        return $this;
     }
 }

@@ -167,35 +167,6 @@ extends CrudFilterType
                 return $filterQuery->createCondition($expression, $parameters);
             },
         ]);
-
-
-        //$builder->addEventListener(\AppBundle\Filter\FormEvents::PRE_SET_DATA, function (FormEvent $event) {
-
-        /* $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
-
-            $form = $event->getForm();
-
-
-            $ids = $event->getData();
-            $pos = array_search('true', $ids);
-
-
-
-            if($pos){
-                unset($ids[$pos]);
-            }
-
-            if( count($ids) > 0 ){
-                $form->remove('id');
-                //$form->add('id', ['ids' => $ids]);
-                //$form->add('name', TextType::class);
-            }
-            /* if (CONDITION) {
-                $builder->remove('task');
-                $builder->add('task', TYPE, $NEW_OPTIONS_ARRAY);
-            }*/
-
-        // });
     }
 
     public function getBlockPrefix()

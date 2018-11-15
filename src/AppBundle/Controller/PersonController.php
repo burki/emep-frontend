@@ -313,7 +313,7 @@ extends CrudController
     {
 
         $parametersAsString = $request->get('entity');
-        $parametersAsString = str_replace("/person?", "", $parametersAsString);
+        $parametersAsString = str_replace("/person?", '', $parametersAsString);
 
 
         parse_str($parametersAsString, $parameters);
@@ -384,9 +384,9 @@ extends CrudController
         $i = 0;
         $finalDataJson = '[';
 
-        foreach ($nationalitiesOnly as $place){
+        foreach ($nationalitiesOnly as $place) {
 
-            $i > 0 ? $finalDataJson .= ", " : "";
+            $i > 0 ? $finalDataJson .= ", " : '';
 
             $numberOfNationalities = $valuesOnly[$i] ;
 
@@ -783,22 +783,19 @@ extends CrudController
     }
 
 
-    public function detailDataNumberOfWorksPerType($catalogueEntries){
-
+    public function detailDataNumberOfWorksPerType($catalogueEntries)
+    {
         $works = [];
 
-
-        foreach ($catalogueEntries as $catalogueEntry){
-
+        foreach ($catalogueEntries as $catalogueEntry) {
             $currExhibition = $catalogueEntry[0]->exhibition;
 
-            foreach ($catalogueEntry as $entry){
-                if($entry->type) {
+            foreach ($catalogueEntry as $entry) {
+                if ($entry->type) {
                     $currType = $entry->type->getName();
                     array_push($works, (string)$currType == '0_unknown' ? 'unknown' : $currType);
                 }
             }
-
         }
 
         $worksTotalPerYear = array_count_values ( $works );
@@ -815,9 +812,9 @@ extends CrudController
         $i = 0;
         $finalDataJson = '[';
 
-        foreach ($typesOnly as $type){
+        foreach ($typesOnly as $type) {
 
-            $i > 0 ? $finalDataJson .= ", " : "";
+            $i > 0 ? $finalDataJson .= ", " : '';
 
             $numberOfWorks = $valuesOnly[$i] ;
 
@@ -834,20 +831,18 @@ extends CrudController
         return $returnArray;
     }
 
-    public function detailDataNumberOfWorksPerYear($person, $catalogueEntries){
-
+    public function detailDataNumberOfWorksPerYear($person, $catalogueEntries)
+    {
         $works = [];
 
 
-        foreach ($catalogueEntries as $catalogueEntry){
-
+        foreach ($catalogueEntries as $catalogueEntry) {
             $currExhibition = $catalogueEntry[0]->exhibition;
-
 
             $currExhibitionYear =  (int) date('Y', strtotime($currExhibition->getStartDate())) ;
 
 
-            foreach ($catalogueEntry as $entry){
+            foreach ($catalogueEntry as $entry) {
                 array_push($works, (string) $currExhibitionYear );
             }
 
@@ -855,15 +850,12 @@ extends CrudController
 
         $worksTotalPerYear = array_count_values ( $works );
 
-        //$exhibitionPlacesArray = array_keys($exhibitionPlaces);
-
-
         $yearsArray = array_keys($worksTotalPerYear);
 
-        if(!empty($yearsArray)) {
+        if (!empty($yearsArray)) {
             $min = $yearsArray[0];
             $max = max(array_keys($worksTotalPerYear));
-        }else{
+        } else {
             $min = 0;
             $max = 0;
         }
@@ -876,9 +868,8 @@ extends CrudController
         }
 
 
-
-        $yearsOnly = json_encode( array_keys($arrayWithoutGaps) );
-        $valuesOnly = json_encode ( array_values($arrayWithoutGaps) );
+        $yearsOnly = json_encode(array_keys($arrayWithoutGaps));
+        $valuesOnly = json_encode(array_values($arrayWithoutGaps));
         $sumOfAllExhibitions = array_sum(array_values($arrayWithoutGaps));
         $yearActive = $max - $min > 0 ? $max - $min : 1;
 
@@ -896,30 +887,18 @@ extends CrudController
     }
 
 
-    public function detailDataNumberOfExhibitionsPerOrgBody($person){
-
+    public function detailDataNumberOfExhibitionsPerOrgBody($person)
+    {
         $exhibitionPlaces = [];
 
 
         $exhibitions = $person->exhibitions;
 
-        foreach ($exhibitions as $exhibition){
-
-            // print_r( $exhibition->getLocation()->getPlace()->getCountryCode() );
-
-            //print date('Y', strtotime($exhibition->getStartDate())) ;
-
-
+        foreach ($exhibitions as $exhibition) {
             array_push($exhibitionPlaces, (string) $exhibition->getOrganizerType() );
         }
 
-
-
         $exhibitionPlacesTotal = array_count_values ( $exhibitionPlaces );
-
-        //$exhibitionPlacesArray = array_keys($exhibitionPlaces);
-
-        // print_r($exhibitionPlacesArray);
 
         $placesOnly = ( array_keys($exhibitionPlacesTotal) );
         $valuesOnly =  array_values( $exhibitionPlacesTotal );
@@ -930,9 +909,9 @@ extends CrudController
         $i = 0;
         $finalDataJson = '[';
 
-        foreach ($placesOnly as $place){
+        foreach ($placesOnly as $place) {
 
-            $i > 0 ? $finalDataJson .= ", " : "";
+            $i > 0 ? $finalDataJson .= ", " : '';
 
             $numberOfExhibitions = $valuesOnly[$i] ;
 
@@ -944,21 +923,19 @@ extends CrudController
         $finalDataJson .= ']';
 
 
-
-        $returnArray = [$finalDataJson, $sumOfAllExhibitions];
-
+        $returnArray = [ $finalDataJson, $sumOfAllExhibitions ];
 
         return $returnArray;
     }
 
-    public function detailDataNumberOfExhibitionsPerCountry($person){
-
+    public function detailDataNumberOfExhibitionsPerCountry($person)
+    {
         $exhibitionPlaces = [];
 
 
         $exhibitions = $person->exhibitions;
 
-        foreach ($exhibitions as $exhibition){
+        foreach ($exhibitions as $exhibition) {
 
             // print_r( $exhibition->getLocation()->getPlace()->getCountryCode() );
 
@@ -985,9 +962,9 @@ extends CrudController
         $i = 0;
         $finalDataJson = '[';
 
-        foreach ($placesOnly as $place){
+        foreach ($placesOnly as $place) {
 
-            $i > 0 ? $finalDataJson .= ", " : "";
+            $i > 0 ? $finalDataJson .= ", " : '';
 
             $numberOfExhibitions = $valuesOnly[$i] ;
 
@@ -1005,14 +982,14 @@ extends CrudController
     }
 
 
-    public function detailDataNumberOfExhibitionsPerCity($person){
-
+    public function detailDataNumberOfExhibitionsPerCity($person)
+    {
         $exhibitionPlaces = [];
 
 
         $exhibitions = $person->exhibitions;
 
-        foreach ($exhibitions as $exhibition){
+        foreach ($exhibitions as $exhibition) {
 
             // print_r( $exhibition->getLocation()->getPlaceLabel() );
 
@@ -1039,9 +1016,9 @@ extends CrudController
         $i = 0;
         $finalDataJson = '[';
 
-        foreach ($placesOnly as $place){
+        foreach ($placesOnly as $place) {
 
-            $i > 0 ? $finalDataJson .= ", " : "";
+            $i > 0 ? $finalDataJson .= ", " : '';
 
             $numberOfExhibitions = $valuesOnly[$i] ;
 
@@ -1059,18 +1036,14 @@ extends CrudController
     }
 
 
-    public function detailDataNumberOfExhibitionsPerYear($person){
-
+    public function detailDataNumberOfExhibitionsPerYear($person)
+    {
         $exhibitionYear = [];
 
 
         $exhibitions = $person->exhibitions;
 
-        foreach ($exhibitions as $exhibition){
-
-            //print date('Y', strtotime($exhibition->getStartDate())) ;
-
-
+        foreach ($exhibitions as $exhibition) {
             array_push($exhibitionYear, (int) date('Y', strtotime($exhibition->getStartDate())) );
         }
 
@@ -1079,7 +1052,7 @@ extends CrudController
 
         $yearsArray = array_keys($exhibitionYear);
 
-        if(!empty($yearsArray)){
+        if (!empty($yearsArray)) {
             $min = $yearsArray[0];
             $max = $yearsArray[ (count($exhibitionYear)-1) ];
         }else{

@@ -3,16 +3,14 @@
 {% import 'Shared/helper.html.twig' as helper %}
 
 {% block head %}
-    <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/select2-4.0.3/css/select2.min.css" />
-    <script src="{{ app.request.basepath }}/vendor/select2-4.0.3/js/select2.full.min.js"></script>
-    <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.css">
-    <script src="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.js"></script>
+    {% import 'Shared/select2.html.twig' as select2 %}
+    {{ select2.head() }}
 
+    {% import 'Shared/datatables.html.twig' as datatables %}
+    {{ datatables.head() }}
 {% endblock %}
 
 {% block body %}
-
-
     <div class="w-container">
 
         <h1 class="heading">{{ pageTitle }}</h1>
@@ -117,13 +115,13 @@
                 $form.submit();
             }
 
-            $('.save-query').on('click', function(){
-                console.log('should save query');
+            $('.save-query').on('click', function() {
+                // console.log('should save query');
                 saveQuery();
             });
 
-            $('#saved-searches').on('change', function(){
-                console.log('changed');
+            $('#saved-searches').on('change', function() {
+                // console.log('changed');
                 $form = $('#saveQuery');
                 $form.attr('action', '{{ path(app.request.get('_route')) }}');
                 $form.submit();
@@ -147,11 +145,11 @@
 
 
             $('.exhibitionFilterForm').on('submit', function (e) {
-                console.log('submiting now ....');
+                // console.log('submiting now ....');
 
                 // countries
                 var currSelectionCountries = $('#holder_filter_country').val() !== null ? $('#holder_filter_country').val() : [];
-                console.log('countries');
+                // console.log('countries');
                 var currCountrySelected = $('#countrySelector').val();
                 currSelectionCountries.push(currCountrySelected);
                 currSelectionCountries = jQuery.unique(currSelectionCountries);
@@ -160,17 +158,17 @@
                 $('#holder_filter_country').val(currSelectionCountries);
             });
 
-            $('.submit-filter-visible').on('click', function(){
+            $('.submit-filter-visible').on('click', function() {
                 $( ".exhibitionFilterForm" ).submit();
             });
-            $('.input-text-search').bind('input', function(){
+            $('.input-text-search').bind('input', function() {
                 $('#holder_filter_search').val($(this).val());
                 // console.log('change event:', $(this).val());
             })
 
             // checkmark worker
-            $('.checkmark').on('click', function(){
-                console.log('checkbox checked: ', $(this).data('id'));
+            $('.checkmark').on('click', function() {
+                // console.log('checkbox checked: ', $(this).data('id'));
                 const currId = $(this).data('id').toString();
                 var currIdArray = $('#holder_filter_id').val() ? $('#holder_filter_id').val() : [];
 
@@ -208,13 +206,12 @@
                 $(".advanced-search-settings").toggleClass('active');
             });
 
-            $('.checkbox-filter-button').on('click', function(){
-
+            $('.checkbox-filter-button').on('click', function() {
                 // add true to the filter array
                 var currIdArray = $('#holder_filter_id').val() ? $('#holder_filter_id').val() : [];
                 // currIdArray = jQuery.unique('true');
 
-                console.log('currIdArray', currIdArray);
+                // console.log('currIdArray', currIdArray);
                 if( currIdArray.length !== 0 ){
                     currIdArray.push('true');
                     $('#holder_filter_id').val( currIdArray );
@@ -223,7 +220,7 @@
                 // submit form
             });
 
-            $('.exhibition-ids-filter-remove').on('click', function(){
+            $('.exhibition-ids-filter-remove').on('click', function() {
                 // remove true option from array
                 var currIdArray = $('#holder_filter_id').val() ? $('#holder_filter_id').val() : [];
                 var index = currIdArray.indexOf('true');
@@ -235,9 +232,9 @@
             });
 
 
-            $('.download-csv').on('click', function(){
+            $('.download-csv').on('click', function() {
                 var action = $('.exhibitionFilterForm').attr('action');
-                console.log('first action: ', action);
+                // console.log('first action: ', action);
                 $('.exhibitionFilterForm').attr('action', '{{ path('holder-csv') }}');
                 $('.exhibitionFilterForm').submit();
                 // resetting action to old one
@@ -253,7 +250,7 @@
 
         });
 
-        function setNewPagingURLs(){
+        function setNewPagingURLs() {
             var pages = $(".pagination").find('a');
             for (j = 0; j<pages.length; j++){
 
@@ -261,7 +258,7 @@
 
                 var currPageURL = new URL(decodeURIComponent(pages[j].href));
 
-                console.log(currPageURL.searchParams);
+                // console.log(currPageURL.searchParams);
                 currPageURL.searchParams.forEach(function(param, key){
                     // console.log('param: ', param); console.log('key: ', key);
                     if(key.indexOf("holder_filter[id]") >= 0 ){

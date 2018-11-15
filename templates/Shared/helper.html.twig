@@ -109,8 +109,8 @@
     <a href="{% if place.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : place.tgn }) }}{% else %}{{ path('place', { 'id' : place.id }) }}{% endif %}">{{ place.nameLocalized(app.request.locale) }}</a>
 {%- endmacro %}
 
-{% macro person_linked(person) -%}
-    <a href="{% if person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : person.ulan }) }}{% elseif person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : person.gnd }) }}{% else %}{{ path('person', { 'id' : person.id }) }}{% endif %}">{{ person.fullname }}</a>
+{% macro person_linked(person, givenNameFirst) -%}
+    <a href="{% if person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : person.ulan }) }}{% elseif person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : person.gnd }) }}{% else %}{{ path('person', { 'id' : person.id }) }}{% endif %}">{{ person.fullname(givenNameFirst|default(false)) }}</a>
 {%- endmacro %}
 
 {% macro person_linked_anchor(person) -%}

@@ -3,7 +3,7 @@
 <script>
 
     $(document).on("rerenderMap", function(e){
-        setTimeout(function(){
+        setTimeout(function() {
             map.invalidateSize();
             map.setZoom(2);
         }, 200);
@@ -45,18 +45,16 @@
     #map_filter_location-type {
         min-width: 15em;
     }
-        
+
     </style>
 
-    <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/select2-4.0.3/css/select2.min.css" />
-    <script src="{{ app.request.basepath }}/vendor/select2-4.0.3/js/select2.full.min.js"></script>
+    {% import 'Shared/select2.html.twig' as select2 %}
+    {{ select2.head() }}
+
     <script>
-
-
-            $('#map_filter_location-type').select2({
-                placeholder: 'all'
-            });
-
+        $('#map_filter_location-type').select2({
+            placeholder: 'all'
+        });
     </script>
 
 

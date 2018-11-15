@@ -3,15 +3,17 @@
 {% import 'Shared/helper.html.twig' as helper %}
 
 {% block head %}
-    <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/select2-4.0.3/css/select2.min.css" />
-    <script src="{{ app.request.basepath }}/vendor/select2-4.0.3/js/select2.full.min.js"></script>
-    <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.css">
-    <script src="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.js"></script>
+    {% import 'Shared/select2.html.twig' as select2 %}
+    {{ select2.head() }}
+
     <script>
         $(document).ready(function() {
             $('#exhibition_filter_organizer_type').select2();
         });
     </script>
+
+    {% import 'Shared/datatables.html.twig' as datatables %}
+    {{ datatables.head() }}
 {% endblock %}
 
 {% block body %}
@@ -273,13 +275,13 @@
                 $form.submit();
             }
 
-            $('.save-query').on('click', function(){
-                console.log('should save query');
+            $('.save-query').on('click', function() {
+                // console.log('should save query');
                 saveQuery();
             });
 
-            $('#saved-searches').on('change', function(){
-                console.log('changed');
+            $('#saved-searches').on('change', function() {
+                // console.log('changed');
                 $form = $('#saveQuery');
                 $form.attr('action', '{{ path(app.request.get('_route')) }}');
                 $form.submit();
@@ -336,7 +338,7 @@
             });
 
             rangeSliderExhibitionStartDate.noUiSlider.on('change', function(values){
-                console.log('UI Slider changed value: ', values);
+                // console.log('UI Slider changed value: ', values);
 
                 // set the form elements to value
                 $('.advanced-filters-startDateRangeExhibition-startdate-year').val(Math.round(values[0]));
@@ -345,7 +347,7 @@
             });
 
 
-            $('.advanced-filters-title').on('click', function(){
+            $('.advanced-filters-title').on('click', function() {
                 $('.advanced-ftilers-container').toggle();
 
                 // toggle + / -  sign
@@ -357,37 +359,37 @@
             });
 
 
-            $('#advancedFilterType').on('change', function(){
+            $('#advancedFilterType').on('change', function() {
 
-                console.log('something changed here: ', $(this).val());
-               var currAdvancedFilterSelection = $(this).val();
+                // console.log('something changed here: ', $(this).val());
+                var currAdvancedFilterSelection = $(this).val();
 
-               hideAllAdvancedFilterOptions();
+                hideAllAdvancedFilterOptions();
 
-               if( currAdvancedFilterSelection === "startDateRangeExhibition" ){
-                   $('.advanced-filters-startDateRangeExhibition').show();
-               }else if( currAdvancedFilterSelection === "nationalityArtist" ){
-                   $('.advanced-filters-nationalityArtist').show();
-               }else if( currAdvancedFilterSelection === "genderArtist" ){
-                   $('.advanced-filters-genderArtist').show();
-               }
+                if( currAdvancedFilterSelection === "startDateRangeExhibition" ){
+                    $('.advanced-filters-startDateRangeExhibition').show();
+                }else if( currAdvancedFilterSelection === "nationalityArtist" ){
+                    $('.advanced-filters-nationalityArtist').show();
+                }else if( currAdvancedFilterSelection === "genderArtist" ){
+                    $('.advanced-filters-genderArtist').show();
+                }
             });
 
 
             /* REMOVE FUNCTIONS */
 
-            $('#removeArtistGender').on('click', function(){
+            $('#removeArtistGender').on('click', function() {
                 $('#exhibition_filter_gender').val('');
                 $( ".indexForm" ).submit();
             })
 
-            $('#removeArtistNationality').on('click', function(){
+            $('#removeArtistNationality').on('click', function() {
                 // console.log('this data: ', $(this).attr('data-artistNationality'));
                 removeValueFromMultiSelect($(this).attr('data-artistNationality'), "#exhibition_filter_nationality");
                 $( ".indexForm" ).submit();
             });
 
-            $('#remove-start-date-filter').on('click', function(){
+            $('#remove-start-date-filter').on('click', function() {
                 $('#exhibition_filter_startdate_left_date_year').val('');
                 $('#exhibition_filter_startdate_left_date_month').val('');
                 $('#exhibition_filter_startdate_left_date_day').val('');
@@ -401,17 +403,17 @@
 
             /* END REMOVE FUNCTIONS */
 
-            function hideAllAdvancedFilterOptions(){
+            function hideAllAdvancedFilterOptions() {
                 $('.advanced-filters-startDateRangeExhibition').hide();
                 $('.advanced-filters-nationalityArtist').hide();
                 $('.advanced-filters-genderArtist').hide();
             }
 
-            function setAdvancedCustomFilterValues(){
+            function setAdvancedCustomFilterValues() {
                 // get currently visible filter options
                 const currAdvancedFilterSelection = $('#advancedFilterType').val();
 
-                console.log('current filter: ', currAdvancedFilterSelection);
+                // console.log('current filter: ', currAdvancedFilterSelection);
 
                 if( currAdvancedFilterSelection === "startDateRangeExhibition" ){
                     //set date current start end enddate
@@ -435,7 +437,7 @@
 
                 }else if( currAdvancedFilterSelection === "genderArtist" ){
                     // set gender of artist
-                    console.log('current val of artist: ', $('.advanced-filters-genderArtist-select').val() );
+                    // console.log('current val of artist: ', $('.advanced-filters-genderArtist-select').val() );
                     $('#exhibition_filter_gender').val( $('.advanced-filters-genderArtist-select').val() );
 
                 }
@@ -486,7 +488,7 @@
 
             // submitting form
             $('.exhibitionFilterForm').on('submit', function (e) {
-                console.log('submiting now ....');
+                // console.log('submiting now ....');
 
                 setAdvancedCustomFilterValues();
 
@@ -509,10 +511,10 @@
                 $('#exhibition_filter_organizer_type').val(currSelectionOrganizer);
             });
 
-            $('.submit-filter-visible').on('click', function(){
+            $('.submit-filter-visible').on('click', function() {
                 $( ".indexForm" ).submit();
             });
-            $('.input-text-search').bind('input', function(){
+            $('.input-text-search').bind('input', function() {
                 $('#exhibition_filter_search').val($(this).val());
                 // console.log('change event:', $(this).val());
             })
@@ -520,8 +522,8 @@
 
 
             // checkmark worker
-            $('.checkmark').on('click', function(){
-                console.log('checkbox checked: ', $(this).data('id'));
+            $('.checkmark').on('click', function() {
+                // console.log('checkbox checked: ', $(this).data('id'));
                 const currId = $(this).data('id').toString();
                 var currIdArray = $('#exhibition_filter_id').val() ? $('#exhibition_filter_id').val() : [];
 
@@ -559,9 +561,7 @@
                 $(".advanced-search-settings").toggleClass('active');
             });
 
-            $('.checkbox-filter-button').on('click', function(){
-
-
+            $('.checkbox-filter-button').on('click', function() {
                 // add true to the filter array
                 var currIdArray = $('#exhibition_filter_id').val() ? $('#exhibition_filter_id').val() : [];
 
@@ -575,7 +575,7 @@
 
             });
 
-            $('.exhibition-ids-filter-remove').on('click', function(){
+            $('.exhibition-ids-filter-remove').on('click', function() {
                 // remove true option from array
                 var currIdArray = $('#exhibition_filter_id').val() ? $('#exhibition_filter_id').val() : [];
                 var index = currIdArray.indexOf('true');
@@ -587,9 +587,9 @@
             });
 
 
-            $('.download-csv').on('click', function(){
+            $('.download-csv').on('click', function() {
                 var action = $('.exhibitionFilterForm').attr('action');
-                console.log('first action: ', action);
+                // console.log('first action: ', action);
                 $('.exhibitionFilterForm').attr('action', '{{ path('exhibition-csv') }}');
                 $('.exhibitionFilterForm').submit();
                 // resetting action to old one
@@ -605,7 +605,7 @@
 
         });
 
-        function setNewPagingURLs(){
+        function setNewPagingURLs() {
             var pages = $(".pagination").find('a');
             for (j = 0; j<pages.length; j++){
 
@@ -613,7 +613,7 @@
 
                 var currPageURL = new URL(decodeURIComponent(pages[j].href));
 
-                console.log(currPageURL.searchParams);
+                // console.log(currPageURL.searchParams);
                 currPageURL.searchParams.forEach(function(param, key){
                     // console.log('param: ', param); console.log('key: ', key);
                     if(key.indexOf("exhibition_filter[id]") >= 0 ){

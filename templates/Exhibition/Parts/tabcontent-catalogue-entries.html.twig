@@ -1,6 +1,7 @@
 {% block entries %}
-    <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.css">
-    <script src="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.js"></script>
+    {% import 'Shared/datatables.html.twig' as datatables %}
+    {{ datatables.head() }}
+    
     <style>
         .collapsed {
             display: none;
@@ -74,20 +75,20 @@
             $('.minussign').removeClass('collapsed');
 
 
-            $('.expand-all').on('click', function(){
+            $('.expand-all').on('click', function() {
                 $('.collapseRow').removeClass("collapsed");
                 $('.plussign').addClass('collapsed');
                 $('.minussign').removeClass('collapsed');
             });
 
-            $('.collapse-all').on('click', function(){
+            $('.collapse-all').on('click', function() {
                 $('.collapseRow').addClass("collapsed");
                 $('.plussign').removeClass('collapsed');
                 $('.minussign').addClass('collapsed');
             });
 
 
-            $('.catalogue-view-button').on('click', function(){
+            $('.catalogue-view-button').on('click', function() {
 
                 // hide
                 $('.list-view-button').removeClass('active');
@@ -100,7 +101,7 @@
 
             });
 
-            $('.list-view-button').on('click', function(){
+            $('.list-view-button').on('click', function() {
 
                 // hide
                 $('.list-view-button').addClass('active');
@@ -123,11 +124,11 @@
                     table.order( [ groupColumn, 'asc' ] ).draw();
                 }*/
 
-                console.log('this: ', $(this));
+                // console.log('this: ', $(this));
                 var splitGroup = $(this).data('artist');
 
 
-                console.log('.collapseRow[data-rowname="' + splitGroup + '"]');
+                // console.log('.collapseRow[data-rowname="' + splitGroup + '"]');
 
                 $('.collapseRow[data-rowname="' + splitGroup + '"]').toggleClass('collapsed');
                 $(this).find('.vorzeichen').toggleClass('collapsed');

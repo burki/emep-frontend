@@ -53,7 +53,7 @@ extends CrudController
     {
 
         $parametersAsString = $request->get('entity');
-        $parametersAsString = str_replace("/exhibition?", "", $parametersAsString);
+        $parametersAsString = str_replace("/exhibition?", '', $parametersAsString);
 
 
         parse_str($parametersAsString, $parameters);
@@ -95,7 +95,8 @@ extends CrudController
     /**
      * @Route("/exhibition/csv", name="exhibition-csv")
      */
-    public function indexToCsvAction(Request $request){
+    public function indexToCsvAction(Request $request)
+    {
         $route = $request->get('_route');
 
         $qb = $this->getDoctrine()
@@ -179,7 +180,7 @@ extends CrudController
                 $locationLabel = '';
                 $locationName = '';
 
-                if($location){
+                if ($location) {
                     $locationLabel = $value[0]->location->getPlaceLabel();
                     $locationName = $value[0]->location->getName();
                 }
@@ -631,7 +632,7 @@ extends CrudController
 
         foreach ($result as $key=>$value) {
 
-            if($value['count'] > 1){
+            if ($value['count'] > 1) {
                 $innerArray = [];
 
                 array_push($innerArray, $value['title'], $value['count'] );
@@ -676,9 +677,9 @@ extends CrudController
 
         $artists = [];
 
-        foreach ($catalogueEntries as $entry){
+        foreach ($catalogueEntries as $entry) {
             $currPerson = $entry->person;
-            if(!in_array($currPerson, $artists)){
+            if (!in_array($currPerson, $artists)) {
                 array_push($artists, $currPerson );
             }
         }
@@ -738,14 +739,12 @@ extends CrudController
 
         $artists = [];
 
-        foreach ($catalogueEntries as $entry){
+        foreach ($catalogueEntries as $entry) {
             $currPerson = $entry->person;
-            if(!in_array($currPerson, $artists)){
-                array_push($artists, $currPerson );
+            if (!in_array($currPerson, $artists)) {
+                array_push($artists, $currPerson);
             }
         }
-
-
 
         $catalogueStatus = SearchListBuilder::$STATUS_LABELS;
 

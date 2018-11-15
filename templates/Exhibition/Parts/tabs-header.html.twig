@@ -32,15 +32,15 @@
 
     <script>
 
-        $('.download-csv-catalogue').on('click', function(){
+        $('.download-csv-catalogue').on('click', function() {
             window.location.href =  "{{ path('exhibition-catalogue-csv', { 'id': exhibition.getId() }) }}";
         });
 
-        $('.download-csv-artists').on('click', function(){
+        $('.download-csv-artists').on('click', function() {
             window.location.href =  "{{ path('exhibition-artists-csv', { 'id': exhibition.getId() }) }}";
         });
 
-        $('.download-csv-similars').on('click', function(){
+        $('.download-csv-similars').on('click', function() {
             window.location.href =  "{{ path('exhibition-similars-csv', { 'id': exhibition.getId() }) }}";
         });
 
@@ -51,7 +51,7 @@
             //hide all export buttons
             hideAll();
 
-            setInterval(function(){
+            setInterval(function() {
                 if( $('.artists-tab').hasClass('active') ){ hideAll(); $('.download-csv-artists').show(); }
                 else if( $('.similars-tab').hasClass('active') ){ hideAll(); $('.download-csv-similars').show(); }
                 else if( $('.cat-entries-tab').hasClass('active') ){ hideAll(); $('.download-csv-catalogue').show(); }
@@ -61,7 +61,7 @@
             }, 250);
         });
 
-        function hideAll(){
+        function hideAll() {
             $('.download-csv-artists').hide();
             $('.download-csv-similars').hide();
             $('.download-csv-catalogue').hide();

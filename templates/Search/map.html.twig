@@ -49,8 +49,9 @@
     </style>
     <script src="{{ app.request.basepath }}/vendor/leaflet.minichart-0.2.5/leaflet.minichart.min.js"></script>
 
-    <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/select2-4.0.3/css/select2.min.css" />
-    <script src="{{ app.request.basepath }}/vendor/select2-4.0.3/js/select2.full.min.js"></script>
+    {% import 'Shared/select2.html.twig' as select2 %}
+    {{ select2.head() }}
+
     <script>
         $(document).ready(function() {
             $('#map_filter_location-type').select2({

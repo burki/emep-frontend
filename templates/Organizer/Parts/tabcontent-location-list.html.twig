@@ -14,17 +14,6 @@
     </script>
 
     {% if pagination.getTotalItemCount > 0 %}
-        {# helper.pagination_count(pagination) #}
-
-        <!--<div class="sort-control">
-            {% set sortField = app.request.get('sort') %}
-            Sort by:
-            {{ helper.pagination_sortable(pagination, 'Place', 'countryPlaceNameSort') }}
-            {{ helper.pagination_sortable(pagination, 'Name', 'nameSort') }}
-            {{ helper.pagination_sortable(pagination, '# Exhibitions', 'numExhibitionSort', 'desc') }}
-            {{ helper.pagination_sortable(pagination, '# Cat. Entries', 'numCatEntrySort', 'desc') }}
-        </div> -->
-
         <div style="width: 100%; text-align: right;">{{ helper.pagination_count(pagination) }}</div>
 
         <table id="venuesLists" class="table table-striped table-bordered dataTable listviewcontainer">
@@ -37,19 +26,16 @@
                 <th class="min-tablet-l">{{ helper.pagination_sortable(pagination, '# Cat. Entries', 'numCatEntrySort', 'desc') }}</th>
             </tr>
             </thead>
-            <tbody>
 
+            <tbody>
             {% set last_initial = '' %}
             {% set last_countryCode = '' %}
 
             {% for row in pagination %}
-
-
                 {% set location = row[0] %}
 
-
                 {% set place = location.place %}
-                {# <ul class="list-unstyled"> #}
+
                 {% if 'nameSort' == sortField %}
                     {# ignore #}
                 {% elseif 'numExhibitionSort' == sortField %}
@@ -62,44 +48,23 @@
                         {% set initial = location.placeLabel %}
                     {% endif %}
                 {% endif %}
+
                 {% if initial != last_initial %}
                     {% if last_initial != null %}
-                        {# </ul> #}
                     {% endif %}
                     {% if 'countryPlaceNameSort' == sortField and last_countryCode != place.countryCode %}
-                        {#
-                            <h3>
-                                {%  if place.countryCode == '' %}
-                                    No Country
-                                {% else %}
-                                    {{ countryName(place.countryCode) }}
-                                {% endif %}
-                            </h3>
-                        #}
                         {% set last_countryCode = place.countryCode %}
                     {% endif %}
-                    {#
-                        <h4>
-                            {% if 'countryPlaceNameSort' == sortField %}
-                                {% if place is not null %}
-                                    {{ helper.place_linked(place) }}
-                                {% endif %}
-                            {% else %}
-                                {{ initial }}
-                            {% endif %}
-                        </h4>
-                    #}
 
                     {% set last_initial = initial %}
-                    {# <ul class="list-group"> #}
                 {% endif %}
+
                 <tr class="listviewrow">
                     <td class="title"><span class="checkmark {% if location.id in ids %} checked {% endif %}" data-id="{{ location.id }}"></span>
                         <a href="{{ path('location', { 'id' : location.id }) }}"><b>{{ location.name }}</b></a>
                     </td>
 
                     <td class="normal">
-
                         {{ helper.place_linked(place) }}
                     </td>
 
@@ -116,18 +81,15 @@
                     <td class="normal">
                         {{ countEntries }}
                     </td>
-
                 </tr>
-
             {% endfor %}
             </tbody>
         </table>
-        {# </ul> #}
-        {# display navigation #}
+
         <div class="navigation">
             {{ knp_pagination_render(pagination) }}
         </div>
     {% else %}
-        No Venues found
+        No Organizing Bodies found
     {% endif %}
 </div>

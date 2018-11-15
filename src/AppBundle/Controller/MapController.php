@@ -15,18 +15,16 @@ extends CrudController
     /**
      * @Route("/person/by-place", name="person-by-place")
      */
-
-    public function birthDeathPlacesIndex($countriesQuery, $genderQuery, $stringQuery, $currIds = [], $exhibitionCountries = [], $organizerTypesQuery = [], $artistBirthDateLeft = 'any' , $artistBirthDateRight= 'any', $artistDeathDateLeft = 'any' , $artistDeathDateRight =  'any')
+    public function birthDeathPlacesIndex($countriesQuery, $genderQuery, $stringQuery,
+                                          $currIds = [], $exhibitionCountries = [],
+                                          $organizerTypesQuery = [],
+                                          $artistBirthDateLeft = 'any' , $artistBirthDateRight = 'any',
+                                          $artistDeathDateLeft = 'any' , $artistDeathDateRight =  'any')
     {
         $maxDisplay = 15;
 
-        // $route = $request->get('_route');
-
         $em = $this->getDoctrine()->getEntityManager();
         $dbconn = $em->getConnection();
-
-        // print 'here';
-
 
         $exhibitionCountryQuery = StatisticsController::getStringQueryForLocationInArtist($exhibitionCountries, 'country', 'long');
 
@@ -38,85 +36,43 @@ extends CrudController
             . " LEFT JOIN Exhibition ON Exhibition.id = ItemExhibition.id_exhibition "
             . " LEFT JOIN Location ON Location.id = Exhibition.id_location "
             . " WHERE Person.status <> -1"
-            . " ".$exhibitionCountryQuery;
+            . " " . $exhibitionCountryQuery;
 
-        /*
-        $qb->select([
-            'P',
-            'COUNT(DISTINCT E.id) AS numExhibitionSort',
-            'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-            "P.sortName HIDDEN nameSort"
-        ])
-            ->from('AppBundle:Person', 'P')
-            ->leftJoin('P.exhibitions', 'E')
-
-            ->leftJoin('E.location', 'L')
-            ->leftJoin('L.place', 'Pl')
-
-            ->leftJoin('P.catalogueEntries', 'IE')
-            ->where('P.status <> -1')
-            ->groupBy('P.id') // for Count
-            ->orderBy('nameSort')
-        ;*/
-
-
-
-        $andWhere = '';
-
-
-        // getStringQueryForExhibitionsInArtist($queryArray, $querySubject, $shortOrLongQuery)
-        // getStringQueryArtistsBirthAndDeathDate($startdate, $enddate, $birthOrDeath, $shortOrLongQuery)
-
-        $andWhere = " AND ". StatisticsController::getArrayQueryString('Person', 'country', $countriesQuery, 'Person.status <> -1');
-        $andWhere .= " AND ". StatisticsController::getArrayQueryString('Person', 'sex', $genderQuery, 'Person.status <> -1');
+        $andWhere = " AND " . StatisticsController::getArrayQueryString('Person', 'country', $countriesQuery, 'Person.status <> -1');
+        $andWhere .= " AND " . StatisticsController::getArrayQueryString('Person', 'sex', $genderQuery, 'Person.status <> -1');
 
         $stringQueryPart = " " . StatisticsController::getStringQueryForArtists($stringQuery, 'fullname');
 
 
-
-        if($artistBirthDateLeft !== 'any' && $artistBirthDateRight !== 'any'){
+        if ($artistBirthDateLeft !== 'any' && $artistBirthDateRight !== 'any') {
             $andWhere .= StatisticsController::getStringQueryArtistsBirthAndDeathDate($artistBirthDateLeft, $artistBirthDateRight, 'birthdate', 'long');
         }
 
-        if($artistDeathDateLeft !== 'any' && $artistDeathDateRight !== 'any'){
+        if ($artistDeathDateLeft !== 'any' && $artistDeathDateRight !== 'any') {
             $andWhere .= StatisticsController::getStringQueryArtistsBirthAndDeathDate($artistDeathDateLeft, $artistDeathDateRight, 'deathdate', 'long');
         }
 
-        if(!empty($organizerTypesQuery)) {
+        if (!empty($organizerTypesQuery)) {
             $andWhere .= StatisticsController::getStringQueryForExhibitionsInArtist($organizerTypesQuery, 'organizer_type', 'long');
         }
 
-
         // $andWhere .= StatisticsController::getStringQueryForLocationInArtist($exhibitionCountries, 'country', 'long');
 
-        // $andWhere .= "AND Location.country IN('BE') ";
-
-        // print $andWhere;
-
-        //$andWhere .= StatisticsController::getStringQueryForLocationInArtist($exhibitionCountries, 'country', 'long');
-
-
-
         if (in_array("true", $currIds)) {
-        // remove true statement from ids
+            // remove true statement from ids
             $pos = array_search('true', $currIds);
             unset($currIds[$pos]);
             $andWhere .= StatisticsController::getStringQueryForPersonIds($currIds, 'long');
         }
 
 
-
-        // echo $testQuery;
         $queryTemplate .= $andWhere;
-
-
-        // print '\n';
 
         $unionParts = [];
 
         foreach ([ 'birth', 'death' ] as $key) {
             $unionParts[] = sprintf($queryTemplate,
-                $key, $key);
+                                    $key, $key);
         }
 
         $unionParts[0] .= $stringQueryPart;
@@ -126,20 +82,12 @@ extends CrudController
             . " ORDER BY lastname, firstname, person_id"
         ;
 
-
-        // print $querystr;
-
-
-
-        // $querystr .= " WHERE " . $testQuery;
-
         $stmt = $dbconn->query($querystr);
         $values = [];
         while ($row = $stmt->fetch()) {
             if ($row['longitude'] == 0 && $row['latitude'] == 0) {
                 continue;
             }
-
 
             $key = $row['latitude'] . ':' . $row['longitude'];
 
@@ -178,15 +126,18 @@ extends CrudController
                 $entry_list = implode('<br />', $value['persons']);
             }
             else {
-                $entry_list = implode('<br />', array_slice($value['persons'], 0, $maxDisplay - 1))
-                    . sprintf('<br />... (%d more)', $count_entries - $maxDisplay);
+                $entry_list = implode('<br />',
+                                      array_slice($value['persons'], 0, $maxDisplay - 1))
+                    . sprintf('<br />... (%d more)',
+                              $count_entries - $maxDisplay);
             }
 
             $values_final[] = [
                 $value['latitude'], $value['longitude'],
                 $value['place'],
                 $entry_list,
-                $count = count($value['person_ids']['birth']) + count($value['person_ids']['death']),
+                $count = count($value['person_ids']['birth'])
+                    + count($value['person_ids']['death']),
             ];
 
             if ($count > $max_count) {
@@ -207,7 +158,6 @@ extends CrudController
                 [ -15, 120 ],
             ],
         ]);
-
     }
 
     public function birthDeathPlaces(Request $request)
@@ -229,8 +179,8 @@ extends CrudController
         foreach ([ 'birth', 'death' ] as $key) {
             $unionParts[] = sprintf($queryTemplate,
                                     $key, $key);
-
         }
+
         $querystr = join(' UNION ', $unionParts)
                   . " ORDER BY lastname, firstname, person_id"
                   ;
@@ -241,7 +191,6 @@ extends CrudController
             if ($row['longitude'] == 0 && $row['latitude'] == 0) {
                 continue;
             }
-
 
             $key = $row['latitude'] . ':' . $row['longitude'];
 
@@ -288,7 +237,8 @@ extends CrudController
                 $value['latitude'], $value['longitude'],
                 $value['place'],
                 $entry_list,
-                $count = count($value['person_ids']['birth']) + count($value['person_ids']['death']),
+                $count = count($value['person_ids']['birth'])
+                    + count($value['person_ids']['death']),
             ];
 
             if ($count > $max_count) {
@@ -319,7 +269,6 @@ extends CrudController
      */
     public function exhibitionByPlace(Request $request)
     {
-
         $em = $this->getDoctrine()->getEntityManager();
         $dbconn = $em->getConnection();
 
@@ -336,6 +285,7 @@ extends CrudController
             $types = 'exhibition-by-place' == $route
                 ? $this->buildOrganizerTypes()
                 : $this->buildVenueTypes();
+
             $form = $this->get('form.factory')->create(\AppBundle\Filter\MapFilterType::class, [
                 'type_choices' => array_combine($types, $types),
                 'type_label' => 'exhibition-by-place' == $route
@@ -355,7 +305,9 @@ extends CrudController
             $maxDisplay = 15;
 
             $andWhere = '';
-            if (array_key_exists('location-type', $filterData) && !empty($filterData['location-type'])) {
+            if (array_key_exists('location-type', $filterData)
+                && !empty($filterData['location-type']))
+            {
                 $andWhere .= ' AND Location.type IN(?)';
                 $parameters[] = $filterData['location-type'];
                 $parametersTypes[] = \Doctrine\DBAL\Connection::PARAM_STR_ARRAY;
@@ -408,11 +360,14 @@ extends CrudController
                     ->innerJoin('I.exhibitions', 'E')
                     ->where('I.status <> -1')
                     ->orderBy('P.familyName');
+
                 $persons = $qbPerson->getQuery()->getResult();
             }
 
             $andWhere = '';
-            if (array_key_exists('location-type', $filterData) && !empty($filterData['location-type'])) {
+            if (array_key_exists('location-type', $filterData)
+                && !empty($filterData['location-type']))
+            {
                 $andWhere .= ' AND Exhibition.organizer_type IN(?)';
                 $parameters[] = $filterData['location-type'];
                 $parametersTypes[] = \Doctrine\DBAL\Connection::PARAM_STR_ARRAY;
@@ -515,10 +470,9 @@ extends CrudController
         ]);
     }
 
-    public function exhibitionByPlacePart($countriesQuery, $locationTypeQuery, $stringQuery, $currIds = [])
+    public function locationByPlacePart($entity,
+                                        $countriesQuery, $locationTypeQuery, $stringQuery,                                        $currIds = [])
     {
-
-
         $em = $this->getDoctrine()->getEntityManager();
         $dbconn = $em->getConnection();
 
@@ -530,66 +484,33 @@ extends CrudController
         $parameters = [];
         $parametersTypes = [];
 
-
-
-
-        /*if (in_array($route, [ 'location-by-place', 'exhibition-by-place' ])) {
-            $types = 'exhibition-by-place' == $route
-                ? $this->buildOrganizerTypes()
-                : $this->buildVenueTypes();
-            $form = $this->get('form.factory')->create(\AppBundle\Filter\MapFilterType::class, [
-                'type_choices' => array_combine($types, $types),
-                'type_label' => 'exhibition-by-place' == $route
-                    ? 'Type of Organizing Body' : 'Type of Venue',
-            ]);
-
-
-        }*/
-
-        $querystr = "SELECT DISTINCT Exhibition.id AS exhibition_id, Exhibition.title, startdate, enddate, Exhibition.displaydate AS displaydate, Location.id AS location_id, Location.name AS location_name, COALESCE(Geoname.name_variant, Geoname.name) AS place, Geoname.tgn, Geoname.latitude, Geoname.longitude"
-            . " FROM Exhibition"
-            . " INNER JOIN Location ON Location.id=Exhibition.id_location"
-            . " INNER JOIN Geoname ON Geoname.tgn=Location.place_tgn";
-
-        /*if ('item-by-place' == $route) {
-            $querystr .= ' INNER JOIN ItemExhibition ON ItemExhibition.id_exhibition=Exhibition.id'
-                . ' INNER JOIN Item ON ItemExhibition.id_item=Item.id AND Item.status <> -1'
-            ;
-
-            // $person = $request->get('person');
-            if (!empty($person) && intval($person) > 0) {
-                $querystr .= ' INNER JOIN ItemPerson ON Item.id=ItemPerson.id_item'
-                    . sprintf(' AND ItemPerson.id_person=%d', intval($person));
-            }
-
-            $qbPerson = $this->getDoctrine()
-                ->getManager()
-                ->createQueryBuilder();
-
-            $qbPerson->select('P')
-                ->distinct()
-                ->from('AppBundle:Person', 'P')
-                ->innerJoin('AppBundle:ItemPerson', 'IP', 'WITH', 'IP.person=P')
-                ->innerJoin('AppBundle:Item', 'I', 'WITH', 'IP.item=I')
-                ->innerJoin('I.exhibitions', 'E')
-                ->where('I.status <> -1')
-                ->orderBy('P.familyName');
-            $persons = $qbPerson->getQuery()->getResult();
-        }*/
+        $querystr = "SELECT DISTINCT Location.id AS location_id, Location.name AS location_name, Location.place_geo AS location_geo, COALESCE(Geoname.name_variant, Geoname.name) AS place, Geoname.tgn, Geoname.latitude, Geoname.longitude"
+                      . " FROM Location"
+                      . " INNER JOIN Geoname ON Geoname.tgn=Location.place_tgn"
+                      ;
 
         $andWhere = '';
-        if (array_key_exists('location-type', $filterData) && !empty($filterData['location-type'])) {
-            $andWhere .= ' AND Exhibition.organizer_type IN(?)';
-            $parameters[] = $filterData['location-type'];
+        if ('Venue' == $entity) {
+            $andWhere = ' AND 0 = (Location.flags & 256)';
+        }
+        else if ('Organizer' == $entity) {
+            $querystr .= ' INNER JOIN ExhibitionLocation'
+                . ' ON ExhibitionLocation.id_location=Location.id AND ExhibitionLocation.role=0'
+                . ' INNER JOIN Exhibition ON ExhibitionLocation.id_exhibition=Exhibition.id';
+        }
+
+        if (is_array($locationTypeQuery) && !empty($locationTypeQuery)) {
+            $andWhere .= ' AND Location.type IN(?)';
+            $parameters[] = $locationTypeQuery;
             $parametersTypes[] = \Doctrine\DBAL\Connection::PARAM_STR_ARRAY;
         }
 
-        if($countriesQuery !== '' and $countriesQuery !== null){
-            $andWhere .= " AND ". StatisticsController::getCountryQueryString('Location', 'Exhibition', 'country', $countriesQuery);
+        if ($countriesQuery !== '' and $countriesQuery !== null) {
+            $andWhere .= " AND " . StatisticsController::getCountryQueryString('Geoname', 'Location', 'country_code', $countriesQuery);
         }
 
-        $andWhere .= " AND ". StatisticsController::getArrayQueryString('Location', 'type', $locationTypeQuery, 'Exhibition.status <> -1');
-        $andWhere .= StatisticsController::getStringQueryForExhibitions($stringQuery, 'long');
+        $andWhere .= StatisticsController::getStringQueryForLocations($stringQuery, 'long');
+
 
         if (in_array("true", $currIds)) {
             // remove true statement from ids
@@ -598,21 +519,12 @@ extends CrudController
             $andWhere .= StatisticsController::getStringQueryForLocationIds($currIds, 'long');
         }
 
-
-        /* if($countriesQuery !== '' and $countriesQuery !== null){
-            $andWhere .= " AND ". StatisticsController::getArrayQueryString('Exhibition', 'organizer_type', $locationTypeQuery, 'Exhibition.status <> -1');
-        }*/
-
-
-
         $querystr
             .= " WHERE"
-            . " Exhibition.status <> -1"
-            . $andWhere
-            . " ORDER BY tgn, Exhibition.startdate, location_name, Exhibition.title"
-        ;
-
-
+             . " Location.status <> -1"
+             . $andWhere
+             . " ORDER BY tgn, Location.name"
+             ;
 
         $stmt = $dbconn->executeQuery($querystr, $parameters, $parametersTypes);
         $values = [];
@@ -645,20 +557,13 @@ extends CrudController
                 ];
             }
 
-
-            $values[$key]['exhibitions'][] =
-                sprintf('<a href="%s">%s</a> at <a href="%s">%s</a> (%s)',
-                    htmlspecialchars($this->generateUrl('exhibition', [
-                        'id' => $row['exhibition_id'],
-                    ])),
-                    htmlspecialchars($row['title']),
-                    htmlspecialchars($this->generateUrl('location', [
-                        'id' => $row['location_id'],
-                    ])),
-                    htmlspecialchars($row['location_name']),
-                    $displayhelper->buildDisplayDate($row)
-                );
-
+                $values[$key]['exhibitions'][] =
+                    sprintf('<a href="%s">%s</a>',
+                            htmlspecialchars($this->generateUrl('location', [
+                                'id' => $row['location_id'],
+                            ])),
+                            htmlspecialchars($row['location_name'])
+                    );
         }
 
         $values_final = [];
@@ -671,6 +576,7 @@ extends CrudController
                 $entry_list = implode('<br />', array_slice($value['exhibitions'], 0, $maxDisplay - 1))
                     . sprintf('<br />... (%d more)', $count_entries - $maxDisplay);
             }
+
             $values_final[] = [
                 $value['latitude'], $value['longitude'],
                 $value['place'],
@@ -693,7 +599,7 @@ extends CrudController
         ]);
     }
 
-    public function exhibitionByPlaceIndexPart($countriesQuery, $organizerTypeQuery, $stringQuery, $currIds = [], $artistGender = "", $artistNationalities = [], $exhibitionStartDateLeft = 'any', $exhibitionStartDateRight = 'any')
+    public function exhibitionByPlaceIndexPart($countriesQuery, $organizerTypeQuery, $stringQuery, $currIds = [], $artistGender = '', $artistNationalities = [], $exhibitionStartDateLeft = 'any', $exhibitionStartDateRight = 'any')
     {
         $em = $this->getDoctrine()->getEntityManager();
         $dbconn = $em->getConnection();
@@ -707,32 +613,13 @@ extends CrudController
         $parameters = [];
         $parametersTypes = [];
 
-        /* if (in_array($route, [ 'location-by-place', 'exhibition-by-place' ])) {
-            $types = 'exhibition-by-place' == $route
-                ? $this->buildOrganizerTypes()
-                : $this->buildVenueTypes();
-            $form = $this->get('form.factory')->create(\AppBundle\Filter\MapFilterType::class, [
-                'type_choices' => array_combine($types, $types),
-                'type_label' => 'exhibition-by-place' == $route
-                    ? 'Type of Organizing Body' : 'Type of Venue',
-            ]);
-
-            if ($request->getMethod() == 'POST') {
-                $form->handleRequest($request);
-                if ($form->isSubmitted() && $form->isValid()) {
-                    $filterData = $form->getData();
-                }
-            }
-        } */
-
-
         $querystr = "SELECT DISTINCT Exhibition.id AS exhibition_id, Exhibition.title, startdate, enddate, Exhibition.displaydate AS displaydate, Location.id AS location_id, Location.name AS location_name, COALESCE(Geoname.name_variant, Geoname.name) AS place, Geoname.tgn, Geoname.latitude, Geoname.longitude"
             . " FROM Exhibition"
             . " INNER JOIN Location ON Location.id=Exhibition.id_location"
             . " INNER JOIN Geoname ON Geoname.tgn=Location.place_tgn"
             . " LEFT JOIN ItemExhibition ON ItemExhibition.id_exhibition = Exhibition.id AND ItemExhibition.title IS NOT NULL"
-            . " LEFT JOIN Person ON Person.id = ItemExhibition.id_person ";
-
+            . " LEFT JOIN Person ON Person.id = ItemExhibition.id_person "
+            ;
 
 
         $andWhere  = " AND " .  StatisticsController::getCountryQueryString('Location', 'Exhibition', 'country', $countriesQuery);
@@ -742,14 +629,13 @@ extends CrudController
         $andWhere .= StatisticsController::getStringQueryForPersonsInExhibitions($artistNationalities, 'country', 'long');
 
 
-        if(!empty($artistGender)){
+        if (!empty($artistGender)) {
             $andWhere .= StatisticsController::getStringQueryForPersonsInExhibitions($artistGender, 'sex', 'long');
         }
 
-        if($exhibitionStartDateLeft !== 'any' && $exhibitionStartDateRight !== 'any'){
+        if ($exhibitionStartDateLeft !== 'any' && $exhibitionStartDateRight !== 'any') {
             $andWhere .= StatisticsController::getStringQueryExhibitionsStartdate($exhibitionStartDateLeft, $exhibitionStartDateRight, 'long');
         }
-
 
 
         if (in_array("true", $currIds)) {
@@ -759,15 +645,12 @@ extends CrudController
             $andWhere .= StatisticsController::getStringQueryForExhibitionIds($currIds, 'long');
         }
 
-        //print $andWhere;
-
         $querystr
             .= " WHERE"
             . " Exhibition.status <> -1"
             . $andWhere
             . " ORDER BY tgn, Exhibition.startdate, location_name, Exhibition.title"
-        ;
-
+            ;
 
         $stmt = $dbconn->executeQuery($querystr, $parameters, $parametersTypes);
         $values = [];
@@ -777,6 +660,7 @@ extends CrudController
             if (empty($row['location_geo']) && $row['longitude'] == 0 && $row['latitude'] == 0) {
                 continue;
             }
+
             $key = $row['latitude'] . ':' . $row['longitude'];
             if (!empty($row['location_geo'])) {
                 list($latitude, $longitude) = preg_split('/\s*,\s*/', $row['location_geo'], 2);
@@ -848,7 +732,6 @@ extends CrudController
         ]);
     }
 
-
     // refactor this big time
     public function exhibitionByPlaceIndex(Request $request, $thisOptional, $form)
     {
@@ -861,24 +744,6 @@ extends CrudController
         $filterData = [];
         $parameters = [];
         $parametersTypes = [];
-
-        /*
-        $dbconn = $em->getConnection();
-        $querystr = "SELECT DISTINCT Exhibition.id AS exhibition_id, Exhibition.title, startdate, enddate, Exhibition.displaydate AS displaydate, Location.id AS location_id, Location.name AS location_name, COALESCE(Geoname.name_variant, Geoname.name) AS place, Geoname.tgn, Geoname.latitude, Geoname.longitude"
-            . " FROM Exhibition"
-            . " INNER JOIN Location ON Location.id=Exhibition.id_location"
-            . " INNER JOIN Geoname ON Geoname.tgn=Location.place_tgn";
-
-        $andWhere = '';
-
-        $querystr
-            .= " WHERE"
-            . " Exhibition.status <> -1"
-            . $andWhere
-            . " ORDER BY tgn, Exhibition.startdate, location_name, Exhibition.title"
-        ;
-        $stmt = $dbconn->executeQuery($querystr, $parameters, $parametersTypes);
-        */
 
         $qb = $thisOptional->getDoctrine()
             ->getManager()
@@ -924,6 +789,7 @@ extends CrudController
             if (empty($row['location_geo']) && $row['longitude'] == 0 && $row['latitude'] == 0) {
                 continue;
             }
+
             $key = $row['latitude'] . ':' . $row['longitude'];
             if (!empty($row['location_geo'])) {
                 list($latitude, $longitude) = preg_split('/\s*,\s*/', $row['location_geo'], 2);
@@ -976,6 +842,7 @@ extends CrudController
                 $entry_list = implode('<br />', array_slice($value['exhibitions'], 0, $maxDisplay - 1))
                     . sprintf('<br />... (%d more)', $count_entries - $maxDisplay);
             }
+
             $values_final[] = [
                 $value['latitude'], $value['longitude'],
                 $value['place'],

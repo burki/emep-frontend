@@ -274,13 +274,13 @@
                 $form.submit();
             }
 
-            $('.save-query').on('click', function(){
-                console.log('should save query');
+            $('.save-query').on('click', function() {
+                // console.log('should save query');
                 saveQuery();
             });
 
-            $('#saved-searches').on('change', function(){
-                console.log('changed');
+            $('#saved-searches').on('change', function() {
+                // console.log('changed');
                 $form = $('#saveQuery');
                 $form.attr('action', '{{ path(app.request.get('_route')) }}');
                 $form.submit();
@@ -379,7 +379,7 @@
             });
 
             rangeSliderBirthDateArtist.noUiSlider.on('change', function(values){
-                console.log('UI Slider changed value: ', values);
+                // console.log('UI Slider changed value: ', values);
 
                 // set the form elements to value
                 $('.advanced-filters-birthDateRangeArtist-start-year').val(Math.round(values[0]));
@@ -388,7 +388,7 @@
             });
 
             rangeSliderDeathDateArtist.noUiSlider.on('change', function(values){
-                console.log('UI Slider changed value: ', values);
+                // console.log('UI Slider changed value: ', values);
 
                 // set the form elements to value
                 $('.advanced-filters-deathDateRangeArtist-start-year').val(Math.round(values[0]));
@@ -399,20 +399,20 @@
 
             /* REMOVING ACTIONS */
 
-            $('#removeExhibitionOrgBody').on('click', function(){
-                console.log('this data: ', $(this).attr('data-orgBody'));
+            $('#removeExhibitionOrgBody').on('click', function() {
+                // console.log('this data: ', $(this).attr('data-orgBody'));
                 removeValueFromMultiSelect($(this).attr('data-orgBody'), "#person_filter_organizer_type");
                 $( ".indexForm" ).submit();
             });
 
-            $('#removeExhibitionCountry').on('click', function(){
-                console.log('this data: ', $(this).attr('data-exhibitionCountry'));
+            $('#removeExhibitionCountry').on('click', function() {
+                // console.log('this data: ', $(this).attr('data-exhibitionCountry'));
                 removeValueFromMultiSelect($(this).attr('data-exhibitionCountry'), "#person_filter_country");
                 $( ".indexForm" ).submit();
             });
 
 
-            $('#remove-death-date-filter').on('click', function(){
+            $('#remove-death-date-filter').on('click', function() {
                 $('#person_filter_deathDate_left_date_year').val('');
                 $('#person_filter_deathDate_left_date_month').val('');
                 $('#person_filter_deathDate_left_date_day').val('');
@@ -425,7 +425,7 @@
             });
 
 
-            $('#remove-birth-date-filter').on('click', function(){
+            $('#remove-birth-date-filter').on('click', function() {
                 $('#person_filter_birthDate_left_date_year').val('');
                 $('#person_filter_birthDate_left_date_month').val('');
                 $('#person_filter_birthDate_left_date_day').val('');
@@ -452,7 +452,7 @@
             /* END REMOVE ACTIONS */
 
 
-            $('.advanced-filters-title').on('click', function(){
+            $('.advanced-filters-title').on('click', function() {
                 $('.advanced-ftilers-container').toggle();
 
                 // toggle + / -  sign
@@ -464,9 +464,8 @@
             });
 
 
-            $('#advancedFilterType').on('change', function(){
-
-                console.log('something changed here: ', $(this).val());
+            $('#advancedFilterType').on('change', function() {
+                // console.log('something changed here: ', $(this).val());
                 var currAdvancedFilterSelection = $(this).val();
 
                 hideAllAdvancedFilterOptions();
@@ -483,7 +482,7 @@
             });
 
 
-            function hideAllAdvancedFilterOptions(){
+            function hideAllAdvancedFilterOptions() {
                 $('.advanced-filters-birthDateRangeArtist').hide();
                 $('.advanced-filters-deathDateRangeArtist').hide();
                 $('.advanced-filters-exhibitingCountries').hide();
@@ -491,20 +490,19 @@
             }
 
 
-            function setAdvancedCustomFilterValues(){
+            function setAdvancedCustomFilterValues() {
                 // get currently visible filter options
                 const currAdvancedFilterSelection = $('#advancedFilterType').val();
 
-                console.log('current filter: ', currAdvancedFilterSelection);
-
+                // console.log('current filter: ', currAdvancedFilterSelection);
 
                 if( currAdvancedFilterSelection === "birthYearArtist" ){
                     const startyear = $('.advanced-filters-birthDateRangeArtist-start-year').val();
                     const endyear = $('.advanced-filters-birthDateRangeArtist-end-year').val();
 
+                    // console.log('startyear: ', startyear);
+                    // console.log('endyear: ', endyear);
 
-                    console.log('startyear: ', startyear);
-                    console.log('endyear: ', endyear);
                     // check if set
                     if(startyear && endyear){
                         $('#person_filter_birthDate_left_date_year').val(startyear-1);
@@ -576,7 +574,7 @@
 
 
             $('.exhibitionFilterForm').on('submit', function (e) {
-                console.log('submiting now ....');
+                // console.log('submiting now ....');
 
                 setAdvancedCustomFilterValues();
 
@@ -587,7 +585,7 @@
                 currSelectionCountries = jQuery.unique(currSelectionCountries);
 
                 currSelectionCountries = currSelectionCountries.filter(Boolean)  //filters all non-true values ---> especially empty strings
-                console.log('countries; ', currSelectionCountries);
+                // console.log('countries; ', currSelectionCountries);
                 $('#person_filter_nationality').val(currSelectionCountries);
 
 
@@ -597,16 +595,16 @@
                 $('#person_filter_gender').val(currGender);
             });
 
-            $('.submit-filter-visible').on('click', function(){
+            $('.submit-filter-visible').on('click', function() {
                 $( ".exhibitionFilterForm" ).submit();
             });
-            $('.input-text-search').bind('input', function(){
+            $('.input-text-search').bind('input', function() {
                 $('#person_filter_search').val($(this).val());
                 // console.log('change event:', $(this).val());
             })
             // checkmark worker
-            $('.checkmark').on('click', function(){
-                console.log('checkbox checked: ', $(this).data('id'));
+            $('.checkmark').on('click', function() {
+                // console.log('checkbox checked: ', $(this).data('id'));
                 const currId = $(this).data('id').toString();
                 var currIdArray = $('#person_filter_id').val() ? $('#person_filter_id').val() : [];
 
@@ -644,7 +642,7 @@
                 $(".advanced-search-settings").toggleClass('active');
             });
 
-            $('.checkbox-filter-button').on('click', function(){
+            $('.checkbox-filter-button').on('click', function() {
 
                 // add true to the filter array
                 var currIdArray = $('#person_filter_id').val() ? $('#person_filter_id').val() : [];
@@ -658,7 +656,7 @@
                 // submit form
             });
 
-            $('.exhibition-ids-filter-remove').on('click', function(){
+            $('.exhibition-ids-filter-remove').on('click', function() {
                 // remove true option from array
                 var currIdArray = $('#person_filter_id').val() ? $('#person_filter_id').val() : [];
                 var index = currIdArray.indexOf('true');
@@ -670,9 +668,9 @@
             });
 
 
-            $('.download-csv').on('click', function(){
+            $('.download-csv').on('click', function() {
                 var action = $('.exhibitionFilterForm').attr('action');
-                console.log('first action: ', action);
+                // console.log('first action: ', action);
                 $('.exhibitionFilterForm').attr('action', '{{ path('person-csv') }}');
                 $('.exhibitionFilterForm').submit();
                 // resetting action to old one
@@ -688,7 +686,7 @@
 
         });
 
-        function setNewPagingURLs(){
+        function setNewPagingURLs() {
             var pages = $(".pagination").find('a');
             for (j = 0; j<pages.length; j++){
 
@@ -696,7 +694,7 @@
 
                 var currPageURL = new URL(decodeURIComponent(pages[j].href));
 
-                console.log(currPageURL.searchParams);
+                // console.log(currPageURL.searchParams);
                 currPageURL.searchParams.forEach(function(param, key){
                     // console.log('param: ', param); console.log('key: ', key);
                     if(key.indexOf("person_filter[id]") >= 0 ){

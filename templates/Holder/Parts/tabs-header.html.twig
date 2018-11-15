@@ -20,7 +20,7 @@
 
     <script>
 
-        $('.download-csv-catalogues').on('click', function(){
+        $('.download-csv-catalogues').on('click', function() {
             window.location.href =  "{{ path('holder-catalogue-csv', { 'id': holder.getId() }) }}";
         });
 
@@ -29,7 +29,7 @@
             //hide all export buttons
             hideAll();
 
-            setInterval(function(){
+            setInterval(function() {
                 if( $('.entries-tab').hasClass('active') ){ hideAll(); $('.download-csv-catalogues').show(); }
                 else {
                     hideAll();
@@ -37,7 +37,7 @@
             }, 250);
         });
 
-        function hideAll(){
+        function hideAll() {
             $('.download-csv-catalogues').hide();
         }
 

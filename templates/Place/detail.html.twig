@@ -1,23 +1,21 @@
 {% extends 'Base/base.html.twig' %}
 
-
 {% import 'Shared/map-leaflet.html.twig' as map %}
 {% import 'Shared/helper.html.twig' as helper %}
 
 {% block head %}
-
     {{ map.head() }}
 {% endblock %}
 
 {% block body %}
     {% set path = place.path(em) %}
+
     {% if path is not empty %}
-
-
     <div class="contentcontainer nopadding w-container">
         <div class="lefthalf">
             <div class="subheader">{% for child in path %}
-                    {{ helper.place_linked(child) }}
+                    {#{ helper.place_linked(child) }#}
+                    {{ child.nameLocalized(app.request.locale) }}
                     {% if not loop.last %} &gt; {% endif %}
                 {% endfor %}</div>
             <h1 class="heading">{{ place.nameLocalized(app.request.locale) }}</h1>
@@ -28,13 +26,9 @@
             {% endembed %}
         </div>
     </div>
-
-
     {% endif %}
 
     <div class="contentcontainer w-container">
-
-
         <div class="listviewrow">
 
             {# tabs headers #}
@@ -42,11 +36,8 @@
             {% endembed %}
 
             <div class="tab-content">
-
-                {#
-                 {% embed "Shared/Parts/tabcontent-exhibitions.html.twig" %}
-                {% endembed %}
-#}
+                {#{% embed "Shared/Parts/tabcontent-exhibitions.html.twig" %}
+                {% endembed %}#}
 
                 {% set artistsArray = persons %}
                 {% embed "Place/Parts/tabcontent-artists.html.twig" %}
@@ -54,36 +45,25 @@
 
                 {% embed "Place/Parts/tabcontent-venues.html.twig" %}
                 {% endembed %}
-
-
-
-
-
-
             </div><!-- .tab-content -->
         </div>
     </div>
 
-
-
-        {#
-        <div class="col-sm-4 sidebar">
-            <div class="container-fluid box">
-                <div class="row box-color-title">
-                    <div class="col-sm-12">
-                        <h4>
-                            {% if place.tgn is not empty %}
-                            {{ 'Getty Thesaurus of Geographic Names'|trans }}
-                            <br /><a href="http://vocab.getty.edu/page/tgn/{{ place.tgn }}" target="_blank">{{ place.tgn }}</a>
-                            {% else %}
-                            {{ 'Additional Information'|trans }}
-                            {% endif %}
-                        </h4>
-                    </div>
+    {#
+    <div class="col-sm-4 sidebar">
+        <div class="container-fluid box">
+            <div class="row box-color-title">
+                <div class="col-sm-12">
+                    <h4>
+                        {% if place.tgn is not empty %}
+                        {{ 'Getty Thesaurus of Geographic Names'|trans }}
+                        <br /><a href="http://vocab.getty.edu/page/tgn/{{ place.tgn }}" target="_blank">{{ place.tgn }}</a>
+                        {% else %}
+                        {{ 'Additional Information'|trans }}
+                        {% endif %}
+                    </h4>
                 </div>
-
-
-        </div>
-        #}
-
+            </div>
+    </div>
+    #}
 {% endblock %}

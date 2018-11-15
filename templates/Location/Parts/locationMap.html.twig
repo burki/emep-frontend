@@ -7,10 +7,9 @@
     {% elseif altPlace.latitude is not empty %}
         {% set geo = "#{altPlace.latitude}, #{altPlace.longitude}" %}
     {% endif %}
+
     {% if geo is not empty %}
         <div id="map" class="col-sm-12" style="width: 100%; min-height: 320px;"></div>
-
-
     {% else %}
         <div class="no_data_block">
             <div>no map data available</div>

@@ -28,32 +28,19 @@ extends Controller
     /**
      * @Route("/my-data", name="my-data")
      */
-    public function myDataAction(Request $request, UserInterface $user = null){
-        if(is_null($user)){
-        //if ($this->isUserLogged()) {
-
+    public function myDataAction(Request $request, UserInterface $user = null)
+    {
+        if (is_null($user)) {
             return $this->redirectToRoute('login');
         }
 
-
         $queries = $this->lookupAllSearches($user);
-
-
 
         return $this->render('User/mydata.html.twig', [
             'pageTitle' => 'My Data',
             'queries' => $queries,
-            /*'pagination' => $pagination,
-            'countryArray' => $this->buildCountries(),
-            'countries' => $countries,
-            'stringPart' => $stringQuery,
-            'ids' => $ids,
-            'form' => $form->createView(),
-            'requestURI' =>  $requestURI,
-            'searches' => $this->lookupSearches($user, 'exhibition')*/
         ]);
     }
-
 
     protected function lookupAllSearches($user)
     {

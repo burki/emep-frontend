@@ -112,7 +112,7 @@ extends CrudController
             $locationLabel = '';
             $locationName = '';
 
-            if($location){
+            if ($location) {
                 $locationLabel = $value[0]->getPlaceLabel();
                 $locationName = $value[0]->getName();
             }
@@ -453,7 +453,7 @@ extends CrudController
     {
 
         $parametersAsString = $request->get('entity');
-        $parametersAsString = str_replace("/location?", "", $parametersAsString);
+        $parametersAsString = str_replace("/location?", '', $parametersAsString);
 
 
         parse_str($parametersAsString, $parameters);
@@ -501,7 +501,7 @@ extends CrudController
     {
 
         $parametersAsString = $request->get('entity');
-        $parametersAsString = str_replace("/organizer?", "", $parametersAsString);
+        $parametersAsString = str_replace("/organizer?", '', $parametersAsString);
 
 
         parse_str($parametersAsString, $parameters);
@@ -572,9 +572,8 @@ extends CrudController
         $i = 0;
         $finalDataJson = '[';
 
-        foreach ($typesOnly as $place){
-
-            $i > 0 ? $finalDataJson .= ", " : "";
+        foreach ($typesOnly as $place) {
+            $i > 0 ? $finalDataJson .= ", " : '';
 
             $numberOfExhibitions = $valuesOnly[$i] ;
 
@@ -624,9 +623,9 @@ extends CrudController
         $i = 0;
         $finalDataJson = '[';
 
-        foreach ($typesOnly as $place){
+        foreach ($typesOnly as $place) {
 
-            $i > 0 ? $finalDataJson .= ", " : "";
+            $i > 0 ? $finalDataJson .= ", " : '';
 
             $numberOfExhibitions = $valuesOnly[$i] ;
 
@@ -916,7 +915,7 @@ extends CrudController
         $place = ($qbAlt->getQuery()->execute());
 
         $dataNumberOfArtistsPerCountry = $this->detailDataNumberOfArtistsPerCountry($artists);
-        
+
         $detailDataNumberItemTypes = $this->detailDataNumberItemTypes($location);
 
         return $this->render('Location/detail.html.twig', [
@@ -946,26 +945,18 @@ extends CrudController
         foreach ($exhibitions as $exhibition) {
             $entries = $exhibition->catalogueEntries;
 
-            //print count($entries);
-            //print '   ';
-            foreach ($entries as $entry){
-                if($entry->type){
-                    //print_r($entry->type->getName());
+            foreach ($entries as $entry) {
+                if ($entry->type) {
                     $currType = $entry->type->getName();
-                    array_push($types, (string) $currType == '0_unknown' ? 'unknown' : $currType );
+                    array_push($types, (string)$currType == '0_unknown' ? 'unknown' : $currType );
                 }
-                //print_r($entry);
             };
         }
 
-        $typesTotal = array_count_values ( $types );
+        $typesTotal = array_count_values($types);
 
-        //$exhibitionPlacesArray = array_keys($exhibitionPlaces);
-
-        // print_r($exhibitionPlacesArray);
-
-        $typesOnly = ( array_keys($typesTotal) );
-        $valuesOnly =  array_values( $typesTotal );
+        $typesOnly = array_keys($typesTotal);
+        $valuesOnly = array_values($typesTotal);
 
 
         $sumOfAllTypes= array_sum(array_values($typesTotal));
@@ -973,9 +964,8 @@ extends CrudController
         $i = 0;
         $finalDataJson = '[';
 
-        foreach ($typesOnly as $place){
-
-            $i > 0 ? $finalDataJson .= ", " : "";
+        foreach ($typesOnly as $place) {
+            $i > 0 ? $finalDataJson .= ", " : '';
 
             $numberOfExhibitions = $valuesOnly[$i] ;
 
@@ -985,8 +975,7 @@ extends CrudController
         $finalDataJson .= ']';
 
 
-
-        $returnArray = [$finalDataJson, $sumOfAllTypes];
+        $returnArray = [ $finalDataJson, $sumOfAllTypes ];
 
 
         return $returnArray;
@@ -995,32 +984,18 @@ extends CrudController
 
 
 
-    public function detailDataNumberOfArtistsPerCountry($artists){
-
+    public function detailDataNumberOfArtistsPerCountry($artists)
+    {
         $artistNationalities = [];
 
-
-
-        foreach ($artists as $artist){
-
-            // print_r( $exhibition->getLocation()->getPlace()->getCountryCode() );
-
-            //print date('Y', strtotime($exhibition->getStartDate())) ;
-
-
+        foreach ($artists as $artist) {
             array_push($artistNationalities, (string) $artist[0]->getNationality() );
         }
 
+        $artistNationalitiesTotal = array_count_values($artistNationalities);
 
-
-        $artistNationalitiesTotal = array_count_values ( $artistNationalities );
-
-        //$exhibitionPlacesArray = array_keys($exhibitionPlaces);
-
-        // print_r($exhibitionPlacesArray);
-
-        $nationalitiesOnly = ( array_keys($artistNationalitiesTotal) );
-        $valuesOnly =  array_values( $artistNationalitiesTotal );
+        $nationalitiesOnly = array_keys($artistNationalitiesTotal);
+        $valuesOnly = array_values($artistNationalitiesTotal);
 
 
         $sumOfAllNationalities = array_sum(array_values($artistNationalitiesTotal));
@@ -1028,9 +1003,9 @@ extends CrudController
         $i = 0;
         $finalDataJson = '[';
 
-        foreach ($nationalitiesOnly as $place){
+        foreach ($nationalitiesOnly as $place) {
 
-            $i > 0 ? $finalDataJson .= ", " : "";
+            $i > 0 ? $finalDataJson .= ", " : '';
 
             $numberOfExhibitions = $valuesOnly[$i] ;
 
@@ -1040,9 +1015,7 @@ extends CrudController
         $finalDataJson .= ']';
 
 
-
-        $returnArray = [$finalDataJson, $sumOfAllNationalities, $i];
-
+        $returnArray = [ $finalDataJson, $sumOfAllNationalities, $i ];
 
         return $returnArray;
     }

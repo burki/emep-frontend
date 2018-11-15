@@ -70,9 +70,6 @@ extends CrudFilterType
             'choices' => [ 'select ids' => 'true'] + $options['data']['ids'],
             'multiple' => true,
             'apply_filter' => function (QueryInterface $filterQuery, $field, $values) {
-
-
-
                 if (empty($values['value'])) {
                     return null;
                 }
@@ -95,12 +92,8 @@ extends CrudFilterType
 
                 // returns empty array if it shouldn't be filtered yet ---> for paging
                 return [];
-
             },
         ]);
-
-
-
     }
 
     public function getBlockPrefix()

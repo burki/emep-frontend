@@ -22,11 +22,11 @@
     </div>
 
     <script>
-        $('.download-csv-exhibition').on('click', function(){
+        $('.download-csv-exhibition').on('click', function() {
             window.location.href =  "{{ path('person-exhibition-csv', { id: person.getId() }) }}";
         });
 
-        $('.download-csv-coappearances').on('click', function(){
+        $('.download-csv-coappearances').on('click', function() {
             window.location.href =  "{{ path('person-coappearances-csv', { id: person.getId() }) }}";
         });
 
@@ -35,7 +35,7 @@
             //hide all export buttons
             hideAll();
 
-            setInterval(function(){
+            setInterval(function() {
                 if( $('.exhibitions-tab').hasClass('active') ){ hideAll(); $('.download-csv-exhibition').show(); }
                 else if( $('.similars-tab').hasClass('active') ){ hideAll(); $('.download-csv-coappearances').show(); }
                 else {
@@ -44,7 +44,7 @@
             }, 250);
         });
 
-        function hideAll(){
+        function hideAll() {
             $('.download-csv-exhibition').hide();
             $('.download-csv-coappearances').hide();
         }

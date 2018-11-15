@@ -528,9 +528,10 @@ class Item
     public $exhibitions;
 
     /**
+     * @var Keywords[]
+     *
      * @ORM\OneToMany(targetEntity="ItemKeyword", mappedBy="idItem", fetch="EAGER")
      * @ORM\OrderBy({"type" = "ASC", "ord" = "ASC"})
-     * @var Keywords[]
      */
     private $keywords;
 

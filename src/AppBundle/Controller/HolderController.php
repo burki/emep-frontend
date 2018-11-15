@@ -233,7 +233,7 @@ extends CrudController
     {
 
         $parametersAsString = $request->get('entity');
-        $parametersAsString = str_replace("/holder?", "", $parametersAsString);
+        $parametersAsString = str_replace("/holder?", '', $parametersAsString);
 
 
         parse_str($parametersAsString, $parameters);
@@ -380,29 +380,15 @@ extends CrudController
         ]);
     }
 
-    public function detailDataNumberOfItemType($bibitems){
-
+    public function detailDataNumberOfItemType($bibitems)
+    {
         $exhibitionPlaces = [];
-        // publicationLocation
 
-
-        foreach ($bibitems as $bibi){
-
-            // print_r( $exhibition->getLocation()->getPlace()->getCountryCode() );
-
-            //print date('Y', strtotime($exhibition->getStartDate())) ;
-
-
-            array_push($exhibitionPlaces, (string) $bibi[0]->getItemType() );
+        foreach ($bibitems as $bibitem) {
+            array_push($exhibitionPlaces, (string)$bibitem[0]->getItemType() );
         }
 
-
-
         $exhibitionPlacesTotal = array_count_values ( $exhibitionPlaces );
-
-        //$exhibitionPlacesArray = array_keys($exhibitionPlaces);
-
-        // print_r($exhibitionPlacesArray);
 
         $placesOnly = ( array_keys($exhibitionPlacesTotal) );
         $valuesOnly =  array_values( $exhibitionPlacesTotal );
@@ -413,9 +399,8 @@ extends CrudController
         $i = 0;
         $finalDataJson = '[';
 
-        foreach ($placesOnly as $place){
-
-            $i > 0 ? $finalDataJson .= ", " : "";
+        foreach ($placesOnly as $place) {
+            $i > 0 ? $finalDataJson .= ", " : '';
 
             $numberOfExhibitions = $valuesOnly[$i] ;
 

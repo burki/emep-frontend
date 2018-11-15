@@ -15,83 +15,95 @@ extends Controller
 {
     static $countryMap = [ 'UA' => 'RU' ]; // don't count Ukrania seperately
 
-    // . " INNER JOIN ExhibitionLocation ON ExhibitionLocation.id_exhibition=Exhibition.id_location"
-
-
-    public function getStringQueryForExhibitions($query, $shortOrLongQuery){
-        if ($query !== 'any'){
-            if($shortOrLongQuery === 'long'){
+    public function getStringQueryForExhibitions($query, $shortOrLongQuery)
+    {
+        if ($query !== 'any') {
+            if ($shortOrLongQuery === 'long') {
                 return " AND (Exhibition.title LIKE '%" . $query . "%' OR Location.name LIKE '%" . $query . "%' OR Location.place LIKE '%" . $query . "%')";
-            } else {
-                return " AND (E.title LIKE '%" . $query . "%' OR L.name LIKE '%" . $query . "%' OR L.placeLabel LIKE '%" . $query . "%')";
             }
-        }else{
-            if($shortOrLongQuery === 'long'){
-                return " AND Exhibition.status <> -1 ";
-            } else {
-                return " AND E.status <> -1";
-            }
+
+            return " AND (E.title LIKE '%" . $query . "%' OR L.name LIKE '%" . $query . "%' OR L.placeLabel LIKE '%" . $query . "%')";
         }
 
-        return " ";
+        if ($shortOrLongQuery === 'long') {
+            return " AND Exhibition.status <> -1 ";
+        }
+
+        return " AND E.status <> -1";
     }
 
-    public function getStringQueryForPersonsInExhibitions($queryArray, $querySubject, $shortOrLongQuery){
-        if (!empty($queryArray)){
-            if($shortOrLongQuery === 'long'){
+    public function getStringQueryForLocations($query, $shortOrLongQuery)
+    {
+        if ($query !== 'any') {
+            if ($shortOrLongQuery === 'long') {
+                return " AND (Location.name LIKE '%" . $query . "%' OR Location.place LIKE '%" . $query . "%')";
+            }
+
+            return " AND (L.name LIKE '%" . $query . "%' OR L.place LIKE '%" . $query . "%')";
+        }
+
+        if ($shortOrLongQuery === 'long') {
+            return " AND L.status <> -1 ";
+        }
+
+        return " AND L.status <> -1";
+    }
+
+    public function getStringQueryForPersonsInExhibitions($queryArray, $querySubject, $shortOrLongQuery)
+    {
+        if (!empty($queryArray)) {
+            if ($shortOrLongQuery === 'long') {
                 $query = $query = "Person." . $querySubject. " = '" . join("' OR Person." . $querySubject. " = '", $queryArray) . "'";
-                return " AND ( " . $query . " )";
-            } else {
-                $query = $query = "P." . $querySubject. " = '" . join("' OR P." . $querySubject. " = '", $queryArray) . "'";
+
                 return " AND ( " . $query . " )";
             }
-        }else{
-            if($shortOrLongQuery === 'long'){
-                return " ";
-            } else {
-                return " ";
-            }
+
+            $query = $query = "P." . $querySubject. " = '" . join("' OR P." . $querySubject. " = '", $queryArray) . "'";
+
+            return " AND ( " . $query . " )";
+        }
+
+        if ($shortOrLongQuery === 'long') {
+            return " ";
         }
 
         return " ";
     }
 
-    public function getStringQueryForExhibitionsInArtist($queryArray, $querySubject, $shortOrLongQuery){
-        if (!empty($queryArray)){
-            if($shortOrLongQuery === 'long'){
+    public function getStringQueryForExhibitionsInArtist($queryArray, $querySubject, $shortOrLongQuery)
+    {
+        if (!empty($queryArray)) {
+            if ($shortOrLongQuery === 'long') {
                 $query = $query = "Exhibition." . $querySubject. " = '" . join("' OR Exhibition." . $querySubject. " = '", $queryArray) . "'";
                 return " AND ( " . $query . " )";
-            } else {
-                $query = $query = "E." . $querySubject. " = '" . join("' OR E." . $querySubject. " = '", $queryArray) . "'";
-                return " AND ( " . $query . " )";
             }
-        }else{
-            if($shortOrLongQuery === 'long'){
-                return " ";
-            } else {
-                return " ";
-            }
+
+            $query = $query = "E." . $querySubject. " = '" . join("' OR E." . $querySubject. " = '", $queryArray) . "'";
+            return " AND ( " . $query . " )";
+        }
+
+        if ($shortOrLongQuery === 'long') {
+            return " ";
         }
 
         return " ";
     }
 
 
-    public function getStringQueryForLocationInArtist($queryArray, $querySubject, $shortOrLongQuery){
-        if (!empty($queryArray)){
-            if($shortOrLongQuery === 'long'){
+    public function getStringQueryForLocationInArtist($queryArray, $querySubject, $shortOrLongQuery)
+    {
+        if (!empty($queryArray)) {
+            if ($shortOrLongQuery === 'long') {
                 $query = $query = "Location." . $querySubject. " = '" . join("' OR Location." . $querySubject. " = '", $queryArray) . "'";
                 return " AND ( " . $query . " )";
-            } else {
-                $query = $query = "L." . $querySubject. " = '" . join("' OR L." . $querySubject. " = '", $queryArray) . "'";
-                return " AND ( " . $query . " )";
             }
-        }else{
-            if($shortOrLongQuery === 'long'){
-                return " ";
-            } else {
-                return " ";
-            }
+
+            $query = $query = "L." . $querySubject. " = '" . join("' OR L." . $querySubject. " = '", $queryArray) . "'";
+            return " AND ( " . $query . " )";
+        }
+
+        if ($shortOrLongQuery === 'long') {
+            return " ";
         }
 
         return " ";
@@ -100,7 +112,7 @@ extends Controller
 
     public function getStringQueryExhibitionsStartdate($startdate, $enddate, $shortOrLongQuery)
     {
-        if($shortOrLongQuery === 'long') {
+        if ($shortOrLongQuery === 'long') {
             return " AND Exhibition.startdate BETWEEN '". $startdate . "' AND '". $enddate . "' ";
         }
 
@@ -109,121 +121,101 @@ extends Controller
 
     public function getStringQueryArtistsBirthAndDeathDate($startdate, $enddate, $birthOrDeath, $shortOrLongQuery)
     {
-        if($shortOrLongQuery === 'long') {
+        if ($shortOrLongQuery === 'long') {
             return " AND Person.". $birthOrDeath ." BETWEEN '". $startdate . "' AND '". $enddate . "' ";
         }
 
         return " AND P.". $birthOrDeath ." BETWEEN '". $startdate . "' AND '". $enddate . "' ";
     }
 
-
-
-    public function getStringQueryForPersonIds($queryArray, $shortOrLongQuery){
-        if ($queryArray !== 'any'){
-            if($shortOrLongQuery === 'long'){
+    public function getStringQueryForPersonIds($queryArray, $shortOrLongQuery)
+    {
+        if ($queryArray !== 'any') {
+            if ($shortOrLongQuery === 'long') {
 
                 $query = "Person.id = " . join(" OR Person.id = ", $queryArray);
                 // print $query;
 
                 return " AND ( " . $query . " )";
-            } else {
-
-                $query = "P.id = " . join(" OR P.id = ", $queryArray);
-                // print $query;
-
-                return " AND (" . $query . ")";
             }
-        }else{
-            if($shortOrLongQuery === 'long'){
-                return " AND Person.status <> -1 ";
-            } else {
-                return " AND P.status <> -1";
-            }
+
+            $query = "P.id = " . join(" OR P.id = ", $queryArray);
+
+            return " AND (" . $query . ")";
         }
 
-        return " ";
+        if ($shortOrLongQuery === 'long') {
+            return " AND Person.status <> -1 ";
+        }
+
+        return " AND P.status <> -1";
     }
 
-    public function getStringQueryForLocationIds($queryArray, $shortOrLongQuery){
-        if ($queryArray !== 'any'){
-            if($shortOrLongQuery === 'long'){
-
+    public function getStringQueryForLocationIds($queryArray, $shortOrLongQuery)
+    {
+        if ($queryArray !== 'any') {
+            if ($shortOrLongQuery === 'long') {
                 $query = "Location.id = " . join(" OR Location.id = ", $queryArray);
-                // print $query;
 
                 return " AND ( " . $query . " )";
-            } else {
-
-                $query = "L.id = " . join(" OR L.id = ", $queryArray);
-                // print $query;
-
-                return " AND (" . $query . ")";
             }
-        }else{
-            if($shortOrLongQuery === 'long'){
-                return " AND Location.status <> -1 ";
-            } else {
-                return " AND L.status <> -1";
-            }
+
+            $query = "L.id = " . join(" OR L.id = ", $queryArray);
+            return " AND (" . $query . ")";
         }
 
-        return " ";
+        if ($shortOrLongQuery === 'long') {
+            return " AND Location.status <> -1 ";
+        }
+
+        return " AND L.status <> -1";
     }
 
-    public function getStringQueryForExhibitionIds($queryArray, $shortOrLongQuery){
-        if ($queryArray !== 'any'){
-            if($shortOrLongQuery === 'long'){
-
+    public function getStringQueryForExhibitionIds($queryArray, $shortOrLongQuery)
+    {
+        if ($queryArray !== 'any') {
+            if ($shortOrLongQuery === 'long') {
                 $query = "Exhibition.id = " . join(" OR Exhibition.id = ", $queryArray);
-                // print $query;
 
                 return " AND ( " . $query . " )";
-            } else {
-
-                $query = "E.id = " . join(" OR E.id = ", $queryArray);
-                // print $query;
-
-                return " AND (" . $query . ")";
             }
-        }else{
-            if($shortOrLongQuery === 'long'){
-                return " AND Exhibition.status <> -1 ";
-            } else {
-                return " AND E.status <> -1";
-            }
+
+            $query = "E.id = " . join(" OR E.id = ", $queryArray);
+
+            return " AND (" . $query . ")";
         }
 
-        return " ";
+        if ($shortOrLongQuery === 'long') {
+            return " AND Exhibition.status <> -1 ";
+        }
+
+        return " AND E.status <> -1";
     }
 
-    public function getStringQueryForArtists($query, $shortOrLongQuery){
-        if ($query !== 'any'){
-            if($shortOrLongQuery === 'long'){
+    public function getStringQueryForArtists($query, $shortOrLongQuery)
+    {
+        if ($query !== 'any') {
+            if ($shortOrLongQuery === 'long') {
                 // return " AND (Person.lastname LIKE '%" . $query . "%' OR Person.firstname LIKE '%" . $query . "%' )";
                 return " AND ( CONCAT(Person.name_variant, ' ', Person.firstname, ' ', Person.lastname)  LIKE '%" . $query . "%' OR CONCAT(Person.name_variant, ' ', Person.lastname, ' ', Person.firstname)  LIKE '%" . $query . "%' OR  CONCAT(Person.lastname, '', Person.firstname) LIKE '%" . $query . "%' OR CONCAT(Person.firstname, '', Person.lastname) LIKE '%" . $query . "%' )";
+            }
 
-            } else if ($shortOrLongQuery === 'fullname') {
+            if ($shortOrLongQuery === 'fullname') {
                 // return " AND THEfullname LIKE '%" . $query . "%' ";
                 return " AND ( CONCAT(Person.name_variant, ' ', Person.firstname, ' ', Person.lastname)  LIKE '%" . $query . "%' OR CONCAT(Person.name_variant, ' ', Person.lastname, ' ', Person.firstname)  LIKE '%" . $query . "%' OR  CONCAT(Person.lastname, ' ', Person.firstname) LIKE '%" . $query . "%'  OR CONCAT(Person.firstname, ' ', Person.lastname) LIKE '%" . $query . "%'   )";
-                //, CONCAT(Person.lastname, ' ', Person.firstname) AS THEfullname
-            } else {
-                return " AND ( CONCAT(P.variantName, ' ', P.familyName, ' ', P.sortName) LIKE '%" . $query . "%' OR CONCAT(P.variantName, ' ', P.sortName, ' ', P.familyName) LIKE '%" . $query . "%' OR CONCAT(P.familyName, '', P.sortName) LIKE '%" . $query . "%' OR CONCAT(P.sortName, '', P.familyName) LIKE '%" . $query . "%' )";
             }
+
+            return " AND ( CONCAT(P.variantName, ' ', P.familyName, ' ', P.sortName) LIKE '%" . $query . "%' OR CONCAT(P.variantName, ' ', P.sortName, ' ', P.familyName) LIKE '%" . $query . "%' OR CONCAT(P.familyName, '', P.sortName) LIKE '%" . $query . "%' OR CONCAT(P.sortName, '', P.familyName) LIKE '%" . $query . "%' )";
         }
 
         return " ";
     }
 
-
-
-
-
-
-    public function exhibitionByMonthIndex($countriesQuery, $organizerTypeQuery, $stringQuery, $currIds = [], $artistGender = "", $artistNationalities = [], $exhibitionStartDateLeft = 'any', $exhibitionStartDateRight = 'any'){
-
+    public function exhibitionByMonthIndex($countriesQuery, $organizerTypeQuery, $stringQuery, $currIds = [], $artistGender = '', $artistNationalities = [], $exhibitionStartDateLeft = 'any', $exhibitionStartDateRight = 'any')
+    {
         $em = $this->getDoctrine()->getEntityManager();
 
-        $countryQueryString = "";
+        $countryQueryString = '';
 
 
         // search in geoname and in location, apparently location.country is sometimes not set...
@@ -236,14 +228,9 @@ extends Controller
         $artistNationalitiesQueryString = StatisticsController::getStringQueryForPersonsInExhibitions($artistNationalities, 'country', 'long');
 
 
-        /*if(!empty($artistGender)){
+        /*if (!empty($artistGender)) {
             $countryQueryString .= StatisticsController::getStringQueryForPersonsInExhibitions($artistGender, 'sex', 'long');
         }*/
-
-        /*if($exhibitionStartDateLeft !== 'any' && $exhibitionStartDateRight !== 'any'){
-            $countryQueryString .= StatisticsController::getStringQueryExhibitionsStartdate($exhibitionStartDateLeft, $exhibitionStartDateRight, 'long');
-        }*/
-
 
         if (in_array("true", $currIds)) {
             // remove true statement from ids
@@ -254,22 +241,11 @@ extends Controller
 
         $dbconn = $em->getConnection();
 
-        /* $querystr = " SELECT YEAR(startdate) AS start_year, MONTH(startdate) AS start_month, COUNT(*) AS how_many"
-        . " FROM Exhibition  LEFT JOIN Location  ON Exhibition.id_location = Location.id"
-        . " LEFT JOIN Geoname  ON Location.place_tgn = Geoname.tgn"
-        . " LEFT JOIN ItemExhibition ON (ItemExhibition.id_exhibition = Exhibition.id AND ItemExhibition.title IS NOT NULL)"
-        . " WHERE Exhibition.status <> -1 AND MONTH(startdate) <> 0"
-        // . " AND ${countryQueryString}" // FILTERING THE LOCATIONS
-        . " GROUP BY YEAR(startdate), MONTH(startdate)"
-        . " ORDER BY start_year, start_month"; */
-
         $querystr = "SELECT YEAR(startdate) AS start_year, MONTH(startdate) AS start_month"
             . ", COUNT(DISTINCT Exhibition.id) AS how_many FROM Exhibition "
             . " LEFT JOIN Location ON Exhibition.id_location = Location.id"
             . " LEFT JOIN ItemExhibition ON ItemExhibition.id_exhibition = Exhibition.id "
             . " LEFT JOIN Person ON Person.id = ItemExhibition.id_person " . $artistNationalitiesQueryString
-            //->from('AppBundle:Location', 'L')
-            // ->leftJoin('L.place', 'Pl')
             . " WHERE Exhibition.status <> -1 AND MONTH(startdate) <> 0"
             // . " ". $countryQueryString
             . " GROUP BY start_year, MONTH(startdate)"
@@ -279,12 +255,12 @@ extends Controller
 
         $nationalitySubquery = " ";
 
-        if(!empty($artistNationalities)){
+        if (!empty($artistNationalities)) {
 
             $nationalitySubquery = " WHERE ( ";
             $count = 0;
-            foreach($artistNationalities as $nationality){
-                if($count !== 0){
+            foreach($artistNationalities as $nationality) {
+                if ($count !== 0) {
                     $nationalitySubquery .= " OR ";
                 }
                 $nationalitySubquery .= " Person.country = '". $nationality ."' ";
@@ -560,16 +536,16 @@ extends Controller
         $andWhere .= $this->getStringQueryForArtists($stringQuery, 'fullname');
 
 
-        if($artistBirthDateLeft !== 'any' && $artistBirthDateRight !== 'any'){
+        if ($artistBirthDateLeft !== 'any' && $artistBirthDateRight !== 'any') {
             $andWhere .= StatisticsController::getStringQueryArtistsBirthAndDeathDate($artistBirthDateLeft, $artistBirthDateRight, 'birthdate', 'long');
         }
 
-        if($artistDeathDateLeft !== 'any' && $artistDeathDateRight !== 'any'){
+        if ($artistDeathDateLeft !== 'any' && $artistDeathDateRight !== 'any') {
             $andWhere .= StatisticsController::getStringQueryArtistsBirthAndDeathDate($artistDeathDateLeft, $artistDeathDateRight, 'deathdate', 'long');
         }
 
-        $organizerQuery = "";
-        if(!empty($organizerTypesQuery)) {
+        $organizerQuery = '';
+        if (!empty($organizerTypesQuery)) {
             $organizerQuery = " " . StatisticsController::getStringQueryForExhibitionsInArtist($organizerTypesQuery, 'organizer_type', 'long');
         }
 
@@ -789,14 +765,15 @@ EOT;
         $where = '';
 
         // build where query for exhibitionID
-        if (!is_null($exhibitionId)){
-            $where = sprintf('WHERE Exhibition.id=%d', intval($exhibitionId));
+        if (!is_null($exhibitionId)) {
+            $where = sprintf('WHERE Exhibition.id=%d',
+                             intval($exhibitionId));
             $conditionCounter++;
         }
 
         // build where query for nationality
-        if (!is_null($countryQuery) and $countryQuery !== 'any' ){
-            if ($conditionCounter === 0){
+        if (!is_null($countryQuery) and $countryQuery !== 'any') {
+            if ($conditionCounter === 0) {
                 $where = 'WHERE ';
             } else {
                 $where .= ' AND ';
@@ -806,16 +783,16 @@ EOT;
             $where .= " AND ". StatisticsController::getArrayQueryString('Person', 'sex', $gender, 'Person.status <> -1 ');
             $where .= StatisticsController::getStringQueryForArtists($stringQuery, 'fullname');
 
-            if($artistBirthDateLeft !== 'any' && $artistBirthDateRight !== 'any'){
+            if ($artistBirthDateLeft !== 'any' && $artistBirthDateRight !== 'any') {
                 $where .= StatisticsController::getStringQueryArtistsBirthAndDeathDate($artistBirthDateLeft, $artistBirthDateRight, 'birthdate', 'long');
             }
 
-            if($artistDeathDateLeft !== 'any' && $artistDeathDateRight !== 'any'){
+            if ($artistDeathDateLeft !== 'any' && $artistDeathDateRight !== 'any') {
                 $where .= StatisticsController::getStringQueryArtistsBirthAndDeathDate($artistDeathDateLeft, $artistDeathDateRight, 'deathdate', 'long');
             }
 
 
-            if(!empty($organizerTypesQuery)) {
+            if (!empty($organizerTypesQuery)) {
                 $where .= StatisticsController::getStringQueryForExhibitionsInArtist($organizerTypesQuery, 'organizer_type', 'long');
             }
 
@@ -1219,15 +1196,15 @@ EOT;
         $where .= StatisticsController::getStringQueryForArtists($stringQuery, 'fullname');
 
 
-        if($artistBirthDateLeft !== 'any' && $artistBirthDateRight !== 'any'){
+        if ($artistBirthDateLeft !== 'any' && $artistBirthDateRight !== 'any') {
             $where .= StatisticsController::getStringQueryArtistsBirthAndDeathDate($artistBirthDateLeft, $artistBirthDateRight, 'birthdate', 'long');
         }
 
-        if($artistDeathDateLeft !== 'any' && $artistDeathDateRight !== 'any'){
+        if ($artistDeathDateLeft !== 'any' && $artistDeathDateRight !== 'any') {
             $where .= StatisticsController::getStringQueryArtistsBirthAndDeathDate($artistDeathDateLeft, $artistDeathDateRight, 'deathdate', 'long');
         }
 
-        if(!empty($organizerTypesQuery)) {
+        if (!empty($organizerTypesQuery)) {
             $where .= StatisticsController::getStringQueryForExhibitionsInArtist($organizerTypesQuery, 'organizer_type', 'long');
         }
 
@@ -1375,15 +1352,15 @@ EOT;
         $where .= " AND ". StatisticsController::getArrayQueryString('P', 'gender', $genderQuery, 'P.status <> -1 ');
         $where .= StatisticsController::getStringQueryForArtists($stringQuery, 'short');
 
-        if($artistBirthDateLeft !== 'any' && $artistBirthDateRight !== 'any'){
+        if ($artistBirthDateLeft !== 'any' && $artistBirthDateRight !== 'any') {
             $where .= StatisticsController::getStringQueryArtistsBirthAndDeathDate($artistBirthDateLeft, $artistBirthDateRight, 'birthDate', 'short');
         }
 
-        if($artistDeathDateLeft !== 'any' && $artistDeathDateRight !== 'any'){
+        if ($artistDeathDateLeft !== 'any' && $artistDeathDateRight !== 'any') {
             $where .= StatisticsController::getStringQueryArtistsBirthAndDeathDate($artistDeathDateLeft, $artistDeathDateRight, 'deathDate', 'short');
         }
 
-        if(!empty($organizerTypesQuery)) {
+        if (!empty($organizerTypesQuery)) {
             $where .= StatisticsController::getStringQueryForExhibitionsInArtist($organizerTypesQuery, 'organizerType', 'short');
         }
 
@@ -1744,26 +1721,27 @@ EOT;
         ]);
     }
 
-    function getCountryQueryString($countryModelString, $fallbackModel, $countryCode, $countriesQuery){
+    function getCountryQueryString($countryModelString, $fallbackModel, $countryCode, $countriesQuery)
+    {
         $countryQueryString = '';
         $counterCountry = 0;
 
-        if (is_array($countriesQuery)){
-            foreach($countriesQuery as $country){
-                if($counterCountry > 0){
+        if (is_array($countriesQuery)) {
+            foreach($countriesQuery as $country) {
+                if ($counterCountry > 0) {
                     $countryQueryString .= ", ";
                 }
-                $countryQueryString .= "'" . $country . "'";
+                $countryQueryString .= "'" . addslashes($country) . "'";
                 $counterCountry++;
             }
         }else {
             $countryQueryString = "'". $countriesQuery ."'";
         }
 
-        if($countriesQuery === 'any'){
+        if ($countriesQuery === 'any') {
             $countryQueryString = $fallbackModel. ".status <> -1";
         }else{
-            $countryQueryString = $countryModelString . ".".$countryCode." IN(" . $countryQueryString . ")";
+            $countryQueryString = $countryModelString . "." . $countryCode . " IN(" . $countryQueryString . ")";
         }
 
         return $countryQueryString;
@@ -1771,23 +1749,24 @@ EOT;
 
 
 
-    function getArrayQueryString($modelString, $modelSubcode, $queryArray, $fallbackString ){
+    function getArrayQueryString($modelString, $modelSubcode, $queryArray, $fallbackString)
+    {
         $modelQueryString = '';
         $counterQueryArray = 0;
 
 
-        if ($queryArray === '' or $queryArray === 'any'){
+        if ($queryArray === '' or $queryArray === 'any') {
             $modelQueryString = $fallbackString;
         } else {
-            if(is_array($queryArray)){
-                foreach ($queryArray as $queryElement){
-                    if($counterQueryArray > 0){
+            if (is_array($queryArray)) {
+                foreach ($queryArray as $queryElement) {
+                    if ($counterQueryArray > 0) {
                         $modelQueryString .= ", ";
                     }
                     $modelQueryString .= "'" . $queryElement . "'";
                     $counterQueryArray++;
                 }
-            }else {
+            } else {
                 $modelQueryString = "'" . $queryArray . "'";
             }
 
@@ -1799,12 +1778,12 @@ EOT;
     }
 
     // creates additonal query for filter actions
-    function getPersonQueryString($personModelString, $fallbackString, $nationalityCode , $nationalityArray){
+    function getPersonQueryString($personModelString, $fallbackString, $nationalityCode , $nationalityArray)
+    {
         $personQueryString = '';
         $counterNationalityArray = 0;
 
-
-        if ( $nationalityArray === '' or $nationalityArray === 'any' ){
+        if ($nationalityArray === '' or $nationalityArray === 'any') {
             $personQueryString = $fallbackString;
         } else {
             // if nationality is set check if larger than one or only on value
@@ -1842,9 +1821,8 @@ EOT;
      * @param string $exhibitionStartDateRight
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    function exhibitionNationalityIndex($countriesQuery, $organizerTypeQuery, $stringQuery, $currIds = [], $artistGender = "", $artistNationalities = [], $exhibitionStartDateLeft = 'any', $exhibitionStartDateRight = 'any'){
-
-
+    function exhibitionNationalityIndex($countriesQuery, $organizerTypeQuery, $stringQuery, $currIds = [], $artistGender = '', $artistNationalities = [], $exhibitionStartDateLeft = 'any', $exhibitionStartDateRight = 'any')
+    {
         $countryQueryString = $this->getCountryQueryString('Pl', 'L', 'countryCode', $countriesQuery);
         $countryQueryString .= " AND ". $this->getArrayQueryString('E', 'organizerType', $organizerTypeQuery, 'L.status <> -1');
         $countryQueryString .= $this->getStringQueryForExhibitions($stringQuery, 'short');
@@ -1853,11 +1831,11 @@ EOT;
         // $queryStringArtistCountry = $this->getStringQueryForPersonsInExhibitions($artistNationalities, 'nationality', 'short');
 
 
-        if(!empty($artistGender)){
+        if (!empty($artistGender)) {
             $countryQueryString .= $this->getStringQueryForPersonsInExhibitions($artistGender, 'gender', 'short');
         }
 
-        if($exhibitionStartDateLeft !== 'any' && $exhibitionStartDateRight !== 'any'){
+        if ($exhibitionStartDateLeft !== 'any' && $exhibitionStartDateRight !== 'any') {
             $countryQueryString .= $this->getStringQueryExhibitionsStartdate($exhibitionStartDateLeft, $exhibitionStartDateRight, 'short');
         }
 
@@ -2026,29 +2004,22 @@ EOT;
         $valuesFinal = [];
         $y = 0;
         foreach ($statsByCountry as $cc => $stats) {
-
-
-            //print_r($stats['countByNationality']);
-
             $doAnyOfTheArtistCountriesExist = 1; // if 0 --> this dataset will be jumped
 
-
-
             // checking if any of the nationalites exist
-
-            if(!empty($artistNationalities)){
+            if (!empty($artistNationalities)) {
 
                 // reseting the filtering
                 $doAnyOfTheArtistCountriesExist = 0;
-                foreach($artistNationalities as $nationality){
-
-                    in_array($nationality, array_keys($stats['countByNationality']) ) ? $doAnyOfTheArtistCountriesExist = 1 : '';
+                foreach ($artistNationalities as $nationality) {
+                    // assignment missing?
+                    in_array($nationality, array_keys($stats['countByNationality']) )
+                        ? $doAnyOfTheArtistCountriesExist = 1 : '';
                 }
             }
 
 
-            if($doAnyOfTheArtistCountriesExist)
-            {
+            if ($doAnyOfTheArtistCountriesExist) {
                 $values = [];
                 foreach ($stats['countByNationality'] as $nationality => $counts) {
                     $x = array_search('XX' === $nationality ? 'unknown' : $nationality, $xCategories);
@@ -2064,35 +2035,11 @@ EOT;
                             'total' => $counts[$key],
                         ];
                     }
-                    // $values[$nationality] = $counts[$key];
                 }
-                /*
-                arsort($values);
-
-                $valuesFinal[$cc] = array_map(function ($idx) use ($values) {
-                                            return [
-                                                'name' => $idx,
-                                                'y' => $values[$idx],
-                                            ];
-                                         },
-                                         array_keys($values));
-                */
 
                 $y++;
             }
-
-
-
-
         }
-        // var_dump($valuesFinal);
-
-
-        /*return $this->render('Statistics/test.html.twig', [
-            'countries' => $countries,
-            'nationalities' => $xCategories,
-            'data' => $valuesFinal,
-        ]);*/
 
         return $this->render('Statistics/exhibition-nationality-index.html.twig', [
             'countries' => $countries,
@@ -2104,8 +2051,6 @@ EOT;
     /**
      * @Route("/exhibition/nationality", name="exhibition-nationality")
      */
-
-
     function exhibitionNationalityAction(Request $request)
     {
         $qb = $this->getDoctrine()
@@ -2223,7 +2168,6 @@ EOT;
             $xCategories = array_merge(array_slice($xCategories, 0, $maxNationality - 1 ),
                                        [ 'unknown', 'other' ]);
         }
-        // exit;
 
         $valuesFinal = [];
         $y = 0;
@@ -2245,20 +2189,9 @@ EOT;
                 }
                 // $values[$nationality] = $counts[$key];
             }
-            /*
-            arsort($values);
 
-            $valuesFinal[$cc] = array_map(function ($idx) use ($values) {
-                                        return [
-                                            'name' => $idx,
-                                            'y' => $values[$idx],
-                                        ];
-                                     },
-                                     array_keys($values));
-            */
             $y++;
         }
-        // var_dump($valuesFinal);
 
         return $this->render('Statistics/exhibition-nationality.html.twig', [
             'countries' => $countries,

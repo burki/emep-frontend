@@ -1,19 +1,16 @@
 <div role="tabpanel" class="tab-pane mappane" id="map">
-
     {% import 'Shared/map-leaflet.html.twig' as map %}
 
     {{ map.head() }}
     {{ map.head_markercluster() }}
     {{ map.head_heatmap() }}
 
-    <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/select2-4.0.3/css/select2.min.css" />
-    <script src="{{ app.request.basepath }}/vendor/select2-4.0.3/js/select2.full.min.js"></script>
+    {% import 'Shared/select2.html.twig' as select2 %}
+    {{ select2.head() }}
 
     {%  set countriesQuery = '' %}
     {%  set locationTypeQuery = 'any' %}
     {%  set stringQuery = 'any' %}
-
-
 
     {% if countries|length %}
         {% set countriesQuery = countries %}
@@ -27,6 +24,5 @@
         {% set stringQuery = stringPart %}
     {% endif %}
 
-
-    {{ render_hinclude(controller('AppBundle\\Controller\\MapController::exhibitionByPlacePart', {countriesQuery: countriesQuery, locationTypeQuery: locationTypeQuery, stringQuery: stringQuery, currIds: ids}), {'default': 'Loading...'}) }}
+    {{ render_hinclude(controller('AppBundle\\Controller\\MapController::locationByPlacePart', { entity: 'Venue', countriesQuery: countriesQuery, locationTypeQuery: locationTypeQuery, stringQuery: stringQuery, currIds: ids }), {'default': 'Loading...'}) }}
 </div>

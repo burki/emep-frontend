@@ -3,8 +3,9 @@
 {% import 'Shared/helper.html.twig' as helper %}
 
 {% block head %}
-    <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/select2-4.0.3/css/select2.min.css" />
-    <script src="{{ app.request.basepath }}/vendor/select2-4.0.3/js/select2.full.min.js"></script>
+    {% import 'Shared/select2.html.twig' as select2 %}
+    {{ select2.head() }}
+
     <script>
         $(document).ready(function() {
             $('#location_filter_location_type').select2();
@@ -13,7 +14,6 @@
 {% endblock %}
 
 {% block body %}
-
     <div class="w-container">
 
         <h1 class="heading">{{ pageTitle }}</h1>
@@ -147,13 +147,13 @@
                 $form.submit();
             }
 
-            $('.save-query').on('click', function(){
-                console.log('should save query');
+            $('.save-query').on('click', function() {
+                // console.log('should save query');
                 saveQuery();
             });
 
-            $('#saved-searches').on('change', function(){
-                console.log('changed');
+            $('#saved-searches').on('change', function() {
+                // console.log('changed');
                 $form = $('#saveQuery');
                 $form.attr('action', '{{ path(app.request.get('_route')) }}');
                 $form.submit();
@@ -186,7 +186,7 @@
             });
 
             $('.exhibitionFilterForm').on('submit', function (e) {
-                console.log('submiting now ....');
+                // console.log('submiting now ....');
 
                 // countries
                 var currSelectionCountries = $('#location_filter_country').val() !== null ? $('#location_filter_country').val() : [];
@@ -212,10 +212,10 @@
                 $('#location_filter_location_type').val(currSelectionOrganizer);
             });
 
-            $('.submit-filter-visible').on('click', function(){
+            $('.submit-filter-visible').on('click', function() {
                 $( ".exhibitionFilterForm" ).submit();
             });
-            $('.input-text-search').bind('input', function(){
+            $('.input-text-search').bind('input', function() {
                 $('#location_filter_search').val($(this).val());
                 // console.log('change event:', $(this).val());
             })
@@ -224,8 +224,8 @@
             // advanced search
 
             // checkmark worker
-            $('.checkmark').on('click', function(){
-                console.log('checkbox checked: ', $(this).data('id'));
+            $('.checkmark').on('click', function() {
+                // console.log('checkbox checked: ', $(this).data('id'));
                 const currId = $(this).data('id').toString();
                 var currIdArray = $('#location_filter_id').val() ? $('#location_filter_id').val() : [];
 
@@ -243,10 +243,10 @@
 
                 currIdArray = jQuery.unique(currIdArray);
 
-                console.log( 'should be unique: ', currIdArray );
+                // console.log( 'should be unique: ', currIdArray );
                 $('#location_filter_id').val( currIdArray );
 
-                console.log('exh val 2:', $('#location_filter_id').val());
+                // console.log('exh val 2:', $('#location_filter_id').val());
 
                 // rebuild paging urls
                 setNewPagingURLs();
@@ -265,7 +265,7 @@
                 $(".advanced-search-settings").toggleClass('active');
             });
 
-            $('.checkbox-filter-button').on('click', function(){
+            $('.checkbox-filter-button').on('click', function() {
 
                 // add true to the filter array
                 var currIdArray = $('#location_filter_id').val() ? $('#location_filter_id').val() : [];
@@ -278,7 +278,7 @@
                 // submit form
             });
 
-            $('.exhibition-ids-filter-remove').on('click', function(){
+            $('.exhibition-ids-filter-remove').on('click', function() {
                 // remove true option from array
                 var currIdArray = $('#location_filter_id').val() ? $('#location_filter_id').val() : [];
                 var index = currIdArray.indexOf('true');
@@ -290,9 +290,9 @@
             });
 
 
-            $('.download-csv').on('click', function(){
+            $('.download-csv').on('click', function() {
                 var action = $('.exhibitionFilterForm').attr('action');
-                console.log('first action: ', action);
+                // console.log('first action: ', action);
                 $('.exhibitionFilterForm').attr('action', '{{ path('location-csv') }}');
                 $('.exhibitionFilterForm').submit();
                 // resetting action to old one
@@ -305,7 +305,7 @@
             {% endif %}
         });
 
-        function setNewPagingURLs(){
+        function setNewPagingURLs() {
             var pages = $(".pagination").find('a');
             for (j = 0; j<pages.length; j++){
 
@@ -313,11 +313,11 @@
 
                 var currPageURL = new URL(decodeURIComponent(pages[j].href));
 
-                console.log(currPageURL.searchParams);
+                // console.log(currPageURL.searchParams);
                 currPageURL.searchParams.forEach(function(param, key){
                     // console.log('param: ', param); console.log('key: ', key);
                     if(key.indexOf("location_filter[id]") >= 0 ){
-                        console.log('key: ', key);
+                        // console.log('key: ', key);
                         componentsToDelete.push(key);
                     }else{
                         // creating url

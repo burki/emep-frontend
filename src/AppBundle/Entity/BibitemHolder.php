@@ -1,6 +1,5 @@
 <?php
 
-
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -23,9 +22,10 @@ class BibitemHolder
     private $id;
 
     /**
+     * @var Bibitem
+     *
      * @ORM\ManyToOne(targetEntity="Bibitem")
      * @ORM\JoinColumn(name="id_publication", referencedColumnName="id")
-     * @var Item
      */
     private $bibitem;
 
@@ -72,6 +72,8 @@ class BibitemHolder
     public function setHolder($holder)
     {
         $this->holder = $holder;
+
+        return $this;
     }
 
     public function getSignature() {
@@ -80,6 +82,8 @@ class BibitemHolder
 
     public function setSignature($signature) {
         $this->signature = $signature;
+
+        return $this;
     }
 
     public function getUrl() {
@@ -88,5 +92,7 @@ class BibitemHolder
 
     public function setUrl($url) {
         $this->url = $url;
+
+        return $this;
     }
 }
