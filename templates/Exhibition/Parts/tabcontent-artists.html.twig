@@ -9,7 +9,7 @@
                 searching: false,
                 info: true,
                 "columns": [
-                    { "orderSequence": [ "desc", "asc" ] },
+                    { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "desc", "asc" ] },
                     { "orderSequence": [ "desc", "asc" ] }
                 ]
@@ -36,7 +36,7 @@
 
             {% for person in artists %}
                 <tr class="listviewrow">
-                    <td class="title">
+                    <td class="title" data-order="{{ person.fullname(false) }}>
                         <a href="{{ path('person', { 'id' : person.id }) }}">{{ person.fullname(true) }}</a>
                     </td>
 
