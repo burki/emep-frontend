@@ -31,7 +31,7 @@
                 {% endfor %}
             </select>
             <select id="organizerSelectore" class="text-field-class w-select end-selector">
-                <option value>select type of organization body</option>
+                <option value>select type of organizing body</option>
                 {% for organizer in organizerTypesArray %}
                     <option value="{{ organizer }}">{{ organizer }}</option>
                 {% endfor %}
@@ -184,7 +184,7 @@
                 <div class="filter-row">
                     <div class="div-block-5">
                         <div class="first-filter-term">
-                            <div>Artist Nationality</div>
+                            <div>Artists' Nationality</div>
                         </div>
                         <div class="is_equal_to">
                             <div>is equal to</div>
@@ -382,7 +382,7 @@
             })
 
             $('#removeArtistNationality').on('click', function(){
-                console.log('this data: ', $(this).attr('data-artistNationality'));
+                // console.log('this data: ', $(this).attr('data-artistNationality'));
                 removeValueFromMultiSelect($(this).attr('data-artistNationality'), "#exhibition_filter_nationality");
                 $( ".indexForm" ).submit();
             });

@@ -30,7 +30,7 @@
                     {% endfor %}
                 </select>
                 <select id="organizerSelectore" class="text-field-class w-select end-selector">
-                    <option value>select type of organization body</option>
+                    <option value>select type of organizing body</option>
                     {% for organizer in organizerTypesArray %}
                         <option value="{{ organizer }}">{{ organizer }}</option>
                     {% endfor %}
@@ -161,7 +161,7 @@
 
             // END SAVE QUERY FUNCTIONALITY
 
-            $('.searchbarinputcontainer input[type=text]').attr("placeholder", "search venue title");
+            $('.searchbarinputcontainer input[type=text]').attr("placeholder", "search name of venue");
 
 
             $('.countryAbbr').on('click', function () {
