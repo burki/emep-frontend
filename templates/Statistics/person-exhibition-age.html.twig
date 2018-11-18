@@ -3,12 +3,9 @@
 {% import 'Shared/helper.html.twig' as helper %}
 
 {% block head %}
-    <script src="{{ app.request.basepath }}/vendor/highcharts/highcharts.js"></script>
-    <script src="{{ app.request.basepath }}/vendor/highcharts/modules/exporting.js"></script>
+    {% import 'Shared/highcharts.html.twig' as highcharts %}
+    {{ highcharts.head() }}
 
-    <!--
-    <script src="{{ app.request.basepath }}/vendor/highcharts/themes/sand-signika.js"></script>
-    -->
     <script type="text/javascript">
         $(document).ready(function() {
             {{ chart|raw }}

@@ -1,12 +1,9 @@
 {% extends 'Base/base.html.twig' %}
 
 {% block head %}
-    <script src="{{ app.request.basepath }}/vendor/highcharts/highcharts.js"></script>
-    <script src="{{ app.request.basepath }}/vendor/highcharts/modules/exporting.js"></script>
+    {% import 'Shared/highcharts.html.twig' as highcharts %}
+    {{ highcharts.head() }}
 
-    <!--
-    <script src="{{ app.request.basepath }}/vendor/highcharts/themes/sand-signika.js"></script>
-    -->
     <script type="text/javascript">
     var chart;
 
@@ -43,7 +40,6 @@
                 // headerFormat: '{point.key}',
                 pointFormat: '{point.y} Exhibitions'
             },
-
             series: [
                 {
                     type: 'column',

@@ -1,10 +1,8 @@
 {% extends 'Base/base.html.twig' %}
 {% block head %}
-    <script src="{{ app.request.basepath }}/vendor/highcharts/highcharts.js"></script>
-    <script src="{{ app.request.basepath }}/vendor/highcharts/modules/exporting.js"></script>
-    <!--
-    <script src="{{ app.request.basepath }}/vendor/highcharts/themes/sand-signika.js"></script>
-    -->
+    {% import 'Shared/highcharts.html.twig' as highcharts %}
+    {{ highcharts.head() }}
+
     <script type="text/javascript">
         var chart, chart2;
 

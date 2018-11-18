@@ -112,7 +112,7 @@
 
 
             {# refactor as macro #}
-            {% for countryAbbriviation in nationalities %}
+            {% for countryAbbreviation in nationalities %}
                 <div class="filter-row">
                     <div class="div-block-5">
                         <div class="first-filter-term">
@@ -123,11 +123,11 @@
                         </div>
                         <div class="first-filter-term">
                             {# find country to text method #}
-                            <div>{{ countryArray[countryAbbriviation]|capitalize }}</div>
+                            <div>{{ countryArray[countryAbbreviation]|capitalize }}</div>
                         </div>
                     </div>
                     <div class="subfilter-buttons-container">
-                        <div class="subfilter-remove countryAbbr" data-country="{{ countryAbbriviation }}">
+                        <div class="subfilter-remove countryAbbr" data-country="{{ countryAbbreviation }}">
                             <div>remove</div>
                         </div>
                     </div>

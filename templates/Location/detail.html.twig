@@ -5,6 +5,7 @@
 
 {% block head %}
     {{ map.head() }}
+    
     <script src="{{ app.request.basepath }}/js/seealso.js"></script>
     <script>
         var service = new SeeAlsoCollection();
@@ -25,10 +26,12 @@
 {% endblock %}
 
 {% block body %}
+    {% set numExhibitions = location.exhibitions|length %}
+    {% set numOrganizerOf = location.getOrganizerOf()|length %}
 
     <div class="contentcontainer nopadding w-container">
         <div class="lefthalf">
-            <div class="subheader">venue</div>
+            <div class="subheader">{% if numExhibitions > 0 %}venue{% endif %}{% if numExhibitions > 0 and numOrganizerOf > 0 %} / {% endif %}{% if numOrganizerOf > 0 %}organizer{% endif %}</div>
             <h1 class="heading">{{ location.name }}</h1>
             <div class="artist_information">
                 {# load helper part#}
@@ -42,43 +45,36 @@
         </div>
     </div>
 
-
     <div class="contentcontainer w-container">
-
-
         <div class="listviewrow">
+            {# tabs headers #}
+            {% embed "Location/Parts/tabs-header.html.twig" %}
+            {% endembed %}
 
-                {# tabs headers #}
-                {% embed "Location/Parts/tabs-header.html.twig" %}
-                {% endembed %}
+            <div class="tab-content">
+                {% set exhibitionArray = location.exhibitions %}
 
-                <div class="tab-content">
-                    {% set exhibitionArray = location.exhibitions %}
-
-                    {% if location.exhibitions|length > 0 %}
+                {% if location.exhibitions|length > 0 %}
                     {% embed "Location/Parts/tabcontent-exhibitions.html.twig" %}
                     {% endembed %}
-                    {% endif %}
+                {% endif %}
 
-                    {% if location.getOrganizerOf()|length > 0 %}
+                {% if location.getOrganizerOf()|length > 0 %}
                     {% embed "Location/Parts/tabcontent-organizer.html.twig" %}
                     {% endembed %}
-                    {% endif %}
+                {% endif %}
 
-                    {% set artistsArray = artists %}
+                {% set artistsArray = artists %}
 
-                    {% embed "Location/Parts/tabcontent-artists.html.twig" %}
-                    {% endembed %}
+                {% embed "Location/Parts/tabcontent-artists.html.twig" %}
+                {% endembed %}
 
+                {% embed "Location/Parts/tabcontent-authority.html.twig" %}
+                {% endembed %}
 
-                    {% embed "Location/Parts/tabcontent-authority.html.twig" %}
-                    {% endembed %}
-
-                    {% embed "Location/Parts/tabcontent-statistics.html.twig" %}
-                    {% endembed %}
-                </div><!-- .tab-content -->
-        </div>
-    </div>
-
-    </div><!-- .row -->
+                {% embed "Location/Parts/tabcontent-statistics.html.twig" %}
+                {% endembed %}
+            </div><!-- .tab-content -->
+        </div><!-- .listviewrow -->
+    </div><!-- .contentcontainer -->
 {% endblock %}

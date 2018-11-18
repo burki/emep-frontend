@@ -32,8 +32,8 @@
                     <th>Death Date</th>
                 </tr>
             </thead>
-            <tbody>
 
+            <tbody>
             {% for person in artists %}
                 <tr class="listviewrow">
                     <td class="title" data-order="{{ person.fullname(false) }}>
@@ -51,7 +51,5 @@
             {% endfor %}
             </tbody>
         </table>
-
-
     </div><!-- .tab-pane -->
 {% endblock %}

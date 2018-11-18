@@ -16,33 +16,20 @@
 
 
 <div role="tabpanel" class="tab-pane active" id="exhibitions">
-
     {# helper.pagination_count(pagination) #}
     <div style="width: 100%; text-align: right;">{{ helper.pagination_count(pagination) }}</div>
 
     {% set sortField = app.request.get('sort') %}
-    <table id="holderTable" class="table table-striped table-bordered dataTable listviewcontainer">
+    {% if pagination.getTotalItemCount > 0 %}
+        <table id="holderTable" class="table table-striped table-bordered dataTable listviewcontainer">
         <thead>
-        <tr class="listviewheading">
-            <th class="desktop">{{ helper.pagination_sortable(pagination, 'Name', 'nameSort') }}</th>
-            <th class="desktop">{{ helper.pagination_sortable(pagination, 'no. of catalogues', 'numBibitemSort', 'desc') }}</th>
-        </tr>
+            <tr class="listviewheading">
+                <th class="desktop">{{ helper.pagination_sortable(pagination, 'Name', 'nameSort') }}</th>
+                <th class="desktop">{{ helper.pagination_sortable(pagination, '# of Catalogues', 'numBibitemSort', 'desc') }}</th>
+            </tr>
         </thead>
+
         <tbody>
-
-
-        {% if pagination.getTotalItemCount > 0 %}
-
-        {#
-        <div class="sort-control">
-            {% set sortField = app.request.get('sort') %}
-            Sort by:
-            {{ helper.pagination_sortable(pagination, 'City', 'countryPlaceNameSort') }}
-            {{ helper.pagination_sortable(pagination, 'Name', 'nameSort') }}
-            {{ helper.pagination_sortable(pagination, '# Publication', 'numCatEntrySort', 'desc') }}
-        </div>
-        #}
-
         {% set last_initial = '' %}
         {% set last_countryCode = '' %}
 
@@ -75,7 +62,6 @@
                 {# <ul class="list-group"> #}
             {% endif %}
             <tr class="listviewrow">
-
                 <td class="title"><span class="checkmark {% if holder.id in ids %} checked {% endif %}" data-id="{{ holder.id }}"></span>
                     <a href="{{ path('holder', { 'id' : holder.id }) }}">
                         <b>{{ holder.name }}</b></a>
@@ -86,15 +72,12 @@
 
             </tr>
         {% endfor %}
-        {# </ul> #}
-        {# display navigation #}
         </tbody>
-    </table>
-    <div class="navigation">
-        {{ knp_pagination_render(pagination) }}
-    </div>
-{% else %}
-    No Holding Institutions found
+        </table>
+        <div class="navigation">
+            {{ knp_pagination_render(pagination) }}
+        </div>
+    {% else %}
+        No Holding Institutions found
     {% endif %}
-
 </div>

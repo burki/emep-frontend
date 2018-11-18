@@ -7,7 +7,6 @@
             <div class="icontab download-csv"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage" title="download current data as csv"></div>
 
             {% if app.user  %}
-
             <form id="saveQuery" action="{{ path('holder-save') }}?entity={{  requestURI|url_encode }}" method="POST">
                 {% if searches is not empty %}
                     <select name="useraction" id="saved-searches" class="w-input select-queries">
@@ -21,15 +20,12 @@
 
 
             <div class="icontab save-query"><img src="{{ app.request.basepath }}/img/save_icon.svg" class="iconimage" title="save your current query"></div>
-
             {% endif %}
-
-
         </div>
+
         <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 1em">
             <li role="presentation" class="active"><a href="#exhibitions" aria-controls="entries" role="tab" data-toggle="tab">{{ 'Holding Institutions'|trans }}</a></li>
         </ul>
-
     </div>
 
     <script>
@@ -37,5 +33,4 @@
             $(document).trigger("rerenderMap");
         }
     </script>
-
 {% endblock %}

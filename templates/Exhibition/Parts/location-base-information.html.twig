@@ -3,33 +3,26 @@
     <div class="artist-information-text">{{ helper.exhibition_period(exhibition) }}</div>
 </div>
 
-
-{# birthplace #}
 {% if location.type is not null %}
     <div class="artist-information-container">
         <div class="artist-information-label">{{ 'Type'|trans }}:</div>
         <div class="artist-information-text">{{ location.type }}</div>
     </div>
-
 {% endif %}
-
 
 {% if exhibition.location is not null %}
     {% set location = exhibition.location %}
     <div class="artist-information-container">
         <div class="artist-information-label">{{ helper.place_linked(location.place) }}:</div>
-        <div class="artist-information-text"><a href="{{ path('location', { 'id' : location.id }) }}">{{ location.name }}</a>
-        </div>
+        <div class="artist-information-text"><a href="{{ path('location', { 'id' : location.id }) }}">{{ location.name }}</a></div>
     </div>
 {% endif %}
 
 {% if location.url is not null %}
     <div class="artist-information-container">
         <div class="artist-information-label">{{ 'URL'|trans }}:</div>
-        <div class="artist-information-text"><a href="{{ location.url }}">{{ location.url }} website</a>
-        </div>
+        <div class="artist-information-text"><a href="{{ location.url }}">{{ location.url }} website</a></div>
     </div>
-
 {% endif %}
 
 
@@ -57,9 +50,6 @@
         </div>
     </div>
 {% endif %}
-
-
-
 
 <div class="artist-information-container-qucikstat">
     <div class="artist-information-label">Quickstats</div>

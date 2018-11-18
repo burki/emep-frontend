@@ -7,7 +7,7 @@
                 searching: false,
                 info: true,
                 "columns": [
-                    null,
+                    { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "desc", "asc" ] },
                     { "orderSequence": [ "desc", "asc" ] }
                 ]
@@ -24,11 +24,14 @@
                 <th># of Cat. Entries</th>
             </tr>
             </thead>
+
             <tbody>
             {% for row in artistsArray %}
                 {% set person = row[0] %}
                 <tr>
-                    <td><b>{{ helper.person_linked(person) }}</b></td>
+                    <td class="title" data-order="{{ person.fullname(false) }}">
+                        <a href="{{ path('person', { 'id' : person.id }) }}">{{ person.fullname(true) }}</a>
+                    </td>
                     <td>{{ row['numExhibitionSort'] }}</td>
                     <td>{{ row['numCatEntrySort'] }}</td>
                 </tr>
@@ -37,5 +40,3 @@
         </table>
     </div><!-- .tab-pane -->
 {% endif %}
-
-

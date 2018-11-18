@@ -1,16 +1,10 @@
 {% extends 'Base/base.html.twig' %}
 
 {% block body %}
-
     <div class="w-container">
-
         <div class="home-menu-container">
-
             <div class="homepage-main-button-containers" >
                 <div class="general-search-sub-container" style="display:none;">
-                    <a href="{{ path('person-index') }}" class="sub-genera-search-link w-inline-block">
-                        <div class="home-menu-item-text">Artists</div>
-                    </a>
                     <a href="{{ path('exhibition-index') }}" class="sub-genera-search-link w-inline-block">
                         <div class="home-menu-item-text">Exhibitions</div>
                     </a>
@@ -18,7 +12,10 @@
                         <div class="home-menu-item-text">Venues</div>
                     </a>
                     <a href="{{ path('organizer-index') }}" class="sub-genera-search-link w-inline-block">
-                        <div class="home-menu-item-text">Organising Bodies</div>
+                        <div class="home-menu-item-text">Organizing Bodies</div>
+                    </a>
+                    <a href="{{ path('person-index') }}" class="sub-genera-search-link w-inline-block">
+                        <div class="home-menu-item-text">Artists</div>
                     </a>
                 </div>
                 <a href="#" class="link-block w-inline-block basic-search-home" style="background-image: linear-gradient(rgba(24, 105, 163, 0.6), rgba(24, 105, 163, 0.6)), url({{ app.request.basepath }}/img/composition-iv-1911-p-500.jpeg); background-size: cover;">
@@ -26,8 +23,6 @@
                     <div class="home-menu-item-text-description">View and search lists of Exhibitions, Artists, Venues or Organizing Bodies.</div>
                 </a>
             </div>
-
-
 
             <div class="homepage-main-button-containers">
                 <a href="{{ path('search') }}" class="link-block w-inline-block basic-search-home" style="background-image: linear-gradient(rgba(24, 105, 163, 0.6), rgba(24, 105, 163, 0.6)), url({{ app.request.basepath }}/img/composition-iv-1911-p-500.jpeg); background-size: cover;">
@@ -37,7 +32,6 @@
             </div>
         </div>
     </div>
-
 
     <div class="container-6 w-container">
         <div class="main-stats-container">
@@ -70,6 +64,4 @@
            $('.general-search-sub-container').slideToggle();
         });
     </script>
-
-
 {% endblock %}

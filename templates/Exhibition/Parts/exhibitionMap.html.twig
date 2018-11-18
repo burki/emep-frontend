@@ -1,52 +1,34 @@
 {% block map %}
-    {% set place = exhibition.location.place %}
-    {% if place.geo is not empty %}
+    {% if exhibition.location.geo is not empty %}
+        {% set geo = exhibition.location.geo %}
+    {% elseif exhibition.location.place.geo is not empty %}
+        {% set geo = exhibition.location.place.geo %}
+    {% endif %}
+
+    {% if geo is not empty %}
         <div id="map" class="col-sm-12" style="width: 100%; min-height: 320px;"></div>
+        <script>
+            function adjustMapSize() {
+                /*
+                $('#map').height(function(index, height) {
+                    return window.innerHeight - $(this).offset().top;
+                });
+                */
+            }
 
+            $( window ).resize(adjustMapSize);
+            adjustMapSize();
 
+            var map = L.map('map');
+
+            map.setView([{{ geo }}], 10);
+            L.marker([ {{ geo }} ]).addTo(map);
+
+            {{ map.addTileLayer() }}
+        </script>
     {% else %}
         <div class="no_data_block">
             <div>no map data available</div>
         </div>
     {% endif %}
-
-    <script>
-        function adjustMapSize() {
-            /*
-            $('#map').height(function(index, height) {
-                return window.innerHeight - $(this).offset().top;
-            });
-            */
-        }
-
-        $( window ).resize(adjustMapSize);
-        adjustMapSize();
-
-        var map = L.map('map');
-
-        var bounds = null;
-        {% if place.additional.bounds is not empty %}
-        bounds = {{ place.additional.bounds|json_encode|raw }};
-        {% elseif place.geo is not null %}
-        {% if place.showCenterMarker(em) %}
-        L.marker([ {{ place.geo }} ]).addTo(map);
-        map.setView([{{ place.geo }}], {{ place.defaultZoomlevel }});
-        {% else %}
-        map.setView([{{ place.geo }}], 3);
-        {% endif %}
-        {% endif %}
-
-        {{ map.addTileLayer() }}
-
-        {% if place.additional.boundary is not empty %}
-        var boundary = {{ place.additional.boundary|json_encode|raw }};
-        var geojsonLayer = L.geoJSON(boundary).addTo(map);
-        if (bounds == null) {
-            bounds = geojsonLayer.getBounds();
-        }
-        {% endif %}
-        if (bounds != null) {
-            map.fitBounds(bounds);
-        }
-    </script>
 {% endblock %}

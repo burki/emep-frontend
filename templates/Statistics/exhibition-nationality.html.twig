@@ -1,110 +1,76 @@
 {% extends 'Base/base.html.twig' %}
 
 {% block head %}
-    <script src="{{ app.request.basepath }}/vendor/highcharts/highcharts.js"></script>
-    <script src="{{ app.request.basepath }}/vendor/highcharts/modules/exporting.js"></script>
+    {% import 'Shared/highcharts.html.twig' as highcharts %}
+    {{ highcharts.head() }}
 
-    <!--
-    <script src="{{ app.request.basepath }}/vendor/highcharts/themes/sand-signika.js"></script>
-    -->
     <script type="text/javascript">
     var chart;
 
     $(document).ready(function() {
-Highcharts.chart('container', {
+        Highcharts.chart('container', {
 
-    chart: {
-        type: 'heatmap',
-        marginTop: 40,
-        marginBottom: 80,
-        plotBorderWidth: 1
-    },
-
-
-    title: {
-        text: "Artists’ Nationality by Exhibiting Country"
-    },
-
-    xAxis: {
-        categories: {{ nationalities|json_encode|raw }}
-    },
-
-    yAxis: {
-        categories: {{ countries|json_encode|raw }},
-        title: null
-    },
-
-    colorAxis: {
-        min: 0,
-        minColor: '#FFFFFF',
-        maxColor: Highcharts.getOptions().colors[0]
-    },
-
-    legend: {
-        align: 'right',
-        layout: 'vertical',
-        margin: 0,
-        verticalAlign: 'top',
-        y: 25,
-        symbolHeight: 280
-    },
-
-    tooltip: {
-        formatter: function () {
-            return  'In exhibitions in ' + this.series.yAxis.categories[this.point.y]
-                + ', ' + this.point.total + ' catalogue entries (' + Highcharts.numberFormat(this.point.value, 1) + '%)  '
-                + ' are from ' + this.series.xAxis.categories[this.point.x] + '-artists';
-        }
-    },
-
-    series: [{
-        name: 'Sales per employee',
-        borderWidth: 1,
-        data: {{ data|json_encode|raw }},
-        dataLabels: {
-            format: '{point.value:.1f}',
-            enabled: true,
-            color: '#000000'
-        }
-    }]
-
-});
-        {#% for cc, seriesData in data %}
-        $('#container-{{ cc }}').highcharts({
             chart: {
-                // renderTo: 'container',
-                type: 'pie'
-            },
-            title: {
-                text: '{{ cc }} Exhibitions'
-            },
-            tooltip: {
-                headerFormat: '', // '<b>{series.name}</b><br />',
-                pointFormat: '{point.y} catalogue entries from {point.name}-artists ({point.percentage:.1f} %)'
+                type: 'heatmap',
+                marginTop: 40,
+                marginBottom: 80,
+                plotBorderWidth: 1
             },
 
-            series: [
-            {
-                data: {{ seriesData|json_encode|raw }}
-            }
-            ]
+
+            title: {
+                text: "Artists’ Nationality by Exhibiting Country"
+            },
+
+            xAxis: {
+                categories: {{ nationalities|json_encode|raw }}
+            },
+
+            yAxis: {
+                categories: {{ countries|json_encode|raw }},
+                title: null
+            },
+
+            colorAxis: {
+                min: 0,
+                minColor: '#FFFFFF',
+                maxColor: Highcharts.getOptions().colors[0]
+            },
+
+            legend: {
+                align: 'right',
+                layout: 'vertical',
+                margin: 0,
+                verticalAlign: 'top',
+                y: 25,
+                symbolHeight: 280
+            },
+
+            tooltip: {
+                formatter: function () {
+                    return  'In exhibitions in ' + this.series.yAxis.categories[this.point.y]
+                        + ', ' + this.point.total + ' catalogue entries (' + Highcharts.numberFormat(this.point.value, 1) + '%)  '
+                        + ' are from ' + this.series.xAxis.categories[this.point.x] + '-artists';
+                }
+            },
+
+            series: [{
+                name: 'Sales per employee',
+                borderWidth: 1,
+                data: {{ data|json_encode|raw }},
+                dataLabels: {
+                    format: '{point.value:.1f}',
+                    enabled: true,
+                    color: '#000000'
+                }
+            }]
+
         });
-        {% endfor %#}
     });
     </script>
 {% endblock %}
 
 {% block body %}
-    {#
-    <div class="row">
-        {% for cc, seriesData in data %}
-        <div class="col col-sm-4">
-            <div id="container-{{ cc }}" style="width: 100%;"></div>
-        </div>
-        {% endfor %}
-
-    </div>
-    #}
     <div id="container" style="width: 100%; margin: 0 auto;"></div>
 
 {% endblock %}

@@ -6,20 +6,19 @@
         </div>
         <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 1em">
             <li role="presentation" class="active entries-tab" ><a href="#entries" aria-controls="entries" role="tab" data-toggle="tab">{{ 'Catalogues'|trans }}</a></li>
-            {# co-appearnces #}
             {% if holder.gnd is not empty %}
-            {# authority files #}
+                {# authority file #}
                 <li role="presentation"><a href="#authority" aria-controls="authority" role="tab" data-toggle="tab">{{ 'Integrated Authority File'|trans }}</a></li>
             {% endif %}
 
+            {# currently all types are books, so leave it out
             <li role="presentation"><a href="#statistics" aria-controls="statistics" role="tab" data-toggle="tab">{{ 'Statistics'|trans }}</a></li>
-
+            #}
         </ul>
 
     </div>
 
     <script>
-
         $('.download-csv-catalogues').on('click', function() {
             window.location.href =  "{{ path('holder-catalogue-csv', { 'id': holder.getId() }) }}";
         });
@@ -42,5 +41,4 @@
         }
 
     </script>
-
 {% endblock %}

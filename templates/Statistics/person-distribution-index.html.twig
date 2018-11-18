@@ -1,9 +1,7 @@
 
-    <script src="{{ app.request.basepath }}/vendor/highcharts/highcharts.js"></script>
-    <script src="{{ app.request.basepath }}/vendor/highcharts/modules/exporting.js"></script>
-    <!--
-    <script src="{{ app.request.basepath }}/vendor/highcharts/themes/sand-signika.js"></script>
-    -->
+    {% import 'Shared/highcharts.html.twig' as highcharts %}
+    {{ highcharts.head() }}
+
     <script type="text/javascript">
     var chart;
 
@@ -59,5 +57,3 @@
 
     <h3 class="chart-header" data-collapse="container-distribution"><span class="chartsymbol">+</span>Number of Exhibitions per Person<span class="charttypeTitle">(Bar Chart)</span></h3>
     <div class="collapse" id="container-distribution" style="width: 100%;  height: 400px; margin:auto;"></div>
-
-    <!--<div id="container2" style="min-width: 800px; height: 400px; margin: 0 auto;"></div>-->

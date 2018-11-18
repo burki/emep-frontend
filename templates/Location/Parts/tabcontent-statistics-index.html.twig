@@ -1,13 +1,8 @@
 <div role="tabpanel" class="tab-pane" id="statistics">
+    {% import 'Shared/highcharts.html.twig' as highcharts %}
+    {{ highcharts.head() }}
 
-    <script src="{{ app.request.basepath }}/vendor/highcharts/highcharts.js"></script>
-    <script src="{{ app.request.basepath }}/vendor/highcharts/modules/exporting.js"></script>
-    <script src="{{ app.request.basepath }}/vendor/highcharts/modules/heatmap.js"></script>
     <script src="{{ app.request.basepath }}/js/hinclude.js"></script>
-    <script src="{{ app.request.basepath }}/js/highchart_custom_theme.js"></script>
-
-
-
 
     <script type="text/javascript">
         var chart;
@@ -16,9 +11,9 @@
             $('#container-venues-types').highcharts({
                 chart: {
                     plotBackgroundColor: null,
-                        plotBorderWidth: null,
-                        plotShadow: false,
-                        type: 'pie'
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie'
                 },
                 title: {
                     text: ' '
@@ -66,13 +61,7 @@
                 }]
             });
         });
-
-
-
-
     </script>
-
-
 
     <h3 class="chart-header" data-collapse="container-venues-types"><span class="chartsymbol">+</span>Types of Venues<span class="charttypeTitle">(Pie Chart)</span></h3>
     <div class="collapse" id="container-venues-types" style="width: 100%; height: 400px; margin: 0 auto;"></div>
@@ -81,9 +70,5 @@
     <div class="collapse" id="container-countries" style="width: 100%; height: 400px; margin: 0 auto;"></div>
 
 
-
-
     <script src="{{ app.request.basepath }}/js/collapseChart.js"></script>
-
-
 </div>
