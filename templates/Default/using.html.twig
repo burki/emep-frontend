@@ -1,74 +1,66 @@
 {% extends 'Base/base.html.twig' %}
 
 {% block body %}
-
     <div class="w-container" style="text-align: center">
         <h2 class="heading small">Using the Database</h2>
-        <p class="artist-text">To see an profile example which shows what each category means, where it came from and how it was entered please see the following Examples:)</p>
-        <br/><span><a href="{{ path('exhibition', { 'id' : 1074 }) }}">PROBE EXHIBITION</a></span>
-        </br><span><a href="{{ path('person', { 'id' : 832 }) }}">PROBE ARTIST</a></span>
+        <p class="artist-text">To see an example which shows what each category means, where it came from and how it was entered, please see the following:</p>
+        <br/><span><a href="{{ path('exhibition', { 'id' : 1074 }) }}">EXAMPLE EXHIBITION</a></span>
+        <br><span><a href="{{ path('person', { 'id' : 832 }) }}">EXAMPLE ARTIST</a></span>
     </div>
 
-
     <div class="contentcontainer w-container">
-
-
-            <p class="artist-text">
-                <strong style="font-size: 16px">Info to our Data</strong><br><br>
-                <strong>1. Which catalogues have been entered?</strong><br><br>
-
-        <strong>1.1 Exhibitions in Donald E. Gordon's 'Modern Art Exhibitions 1900-1916'</strong><br>
-
-        Our starting point and foundation was entering all catalogues specified in Donald E. Gordon's 2 volume reference work 'Modern Art Exhibitions 1900-1916' (1974) that fell in our timeframe (1905-1915).
-
-        Gordon selected 426 artists he considered 'modern' and listed their shown works in a total of 851 exhibitions. In contrast to Gordon, we not only included the entries of these 426 but of <em>all</em> the artists who took part in these exhibitions. (e.g. Otto Freundlich - one of the very early painters exhibiting abstract canvases).
-
-
-        <br><br><strong>1.2 Exhibitions of organizing institutions which exhibited modern art</strong><br>
-
-        We systematically included exhibitions in which at least one modern artist participated. We also included exhibitions held in galleries known to show modern tendencies (e.g. Durand-Ruel, Bernheim-Jeune, Paul Cassirer, Der Sturm, etc.) and non-academic artist associations (e.g. the Secessions of Berlin, Munich and Vienna, Hagenbund, etc.). Furthermore we included exhibitions of selected well known modern groups (e.g. Der Moderne Bund, Die Neue Secession Berlin, New English Art Club, etc.) as completely as possible.
-
-                <br><br><strong>2. Which works have been entered?</strong><br>
-        Every work of painting and drawing shown at a chosen exhibition has been entered.
-
-        Not included in the scope of the database are:
-
-            </p>
-        <ul style="color: #697177;">
-            <li>prints</li>
-            <li>applied/decorative art</li>
-            <li>sculpture</li>
-        </ul>
         <p class="artist-text">
+            <strong style="font-size: 16px">Info to our Data</strong><br><br>
+            <strong>1. Which catalogues have been entered?</strong><br><br>
+
+            <strong>1.1 Exhibitions in Donald E. Gordon's 'Modern Art Exhibitions 1900-1916'</strong><br>
+            Our starting point and foundation was entering all catalogues specified in Donald E. Gordon's 2 volume reference work 'Modern Art Exhibitions 1900-1916' (1974) that fell in our timeframe (1905-1915).<br />
+            Gordon selected 426 artists he considered 'modern' and listed their shown works in a total of 851 exhibitions. In contrast to Gordon, we not only included the entries of these 426 but of <em>all</em> the artists who took part in these exhibitions. (e.g. <a href="{{ path('person-by-ulan', { 'ulan': '500030544' }) }}">Otto Freundlich</a> - one of the very early painters exhibiting abstract canvases).
 
 
-                <strong>3. Exhibitions without catalogue entries</strong><br>
+            <br><br><strong>1.2 Exhibitions of organizing institutions which exhibited modern art</strong><br>
 
-        Verifiable exhibitions for which either no catalogue is traceable or for which we were not able to obtain a catalogue as of now are still shown in the database. These will appear in the lists of exhibitions as any other but will not have any information to view. They will also be marked as <italic>Pending</italic>. We are always thankful for information on where to obtain catalogues we are missing and should you have access to or be privy to the location of a catalogue we are missing, please contact us at <a href="mailto:contact.exhibitions@univie.ac.at">contact.exhibitions@univie.ac.at</a>.
+            We systematically included exhibitions in which at least one modern artist participated. We also included exhibitions held in galleries known to show modern tendencies (e.g. <a href="{{ path('location', { 'id': 28 }) }}">Durand-Ruel</a>, <a href="{{ path('location', { 'id': 30 }) }}">Bernheim-Jeune</a>, <a href="{{ path('location', { 'id': 27 }) }}">Paul Cassirer</a>, <a href="{{ path('location', { 'id': 111 }) }}">Der Sturm</a>, etc.) and non-academic artist associations (e.g. the Secessions of <a href="{{ path('location', { 'id': 265 }) }}">Berlin</a>, <a href="{{ path('location', { 'id': 278 }) }}">Munich</a> and <a href="{{ path('location', { 'id': 286 }) }}">Vienna</a>, <a href="{{ path('location', { 'id': 269 }) }}">Hagenbund</a>, etc.). Furthermore we included exhibitions of selected well known modern groups (e.g. <a href="{{ path('location', { 'id': 381 }) }}">Der Moderne Bund</a>, <a href="{{ path('location', { 'id': 313 }) }}">Die Neue Secession Berlin</a>, <a href="{{ path('location', { 'id': 272 }) }}">New English Art Club</a>, etc.) as completely as possible.
+
+            <br><br><strong>2. Which works have been entered?</strong><br>
+            Every work of painting and drawing shown at a chosen exhibition has been entered.
+
+            Not included in the scope of the database are:
+
+        </p>
+            <ul style="color: #697177;">
+                <li>prints</li>
+                <li>applied/decorative art</li>
+                <li>sculpture</li>
+            </ul>
+
+        <p class="artist-text">
+            <strong>3. Exhibitions without catalogue entries</strong><br>
+
+            Verifiable exhibitions for which either no catalogue is traceable or for which we were not able to obtain a catalogue as of now are still shown in the database. These will appear in the lists of exhibitions as any other but will not have any information to view. They will also be marked as <italic>Pending</italic>. We are always thankful for information on where to obtain catalogues we are missing and should you have access to or be privy to the location of a catalogue we are missing, please contact us at <a href="mailto:contact.exhibitions@univie.ac.at">contact.exhibitions@univie.ac.at</a>.
 
 
-        <br><br>
-        <strong>General rules of how information was transferred</strong><br>
+            <br><br>
+            <strong>General rules of how information was transferred</strong><br>
 
-        The database contains three different fields:
+            The database contains three different fields:
 
             <br><strong>1. Fields named "as in catalogue":</strong> Text is an exact transcription from the source material. Added text is shown in square brackets [].
             <br><strong>2. Fields named "according to catalogue":</strong> The information value has been transferred from the source, but standardized in order to make working with the data easier.
             <br><strong>3. Open fields </strong>(e.g. General Notes)<strong>:</strong> Text which is transcribed directly from the source is presented in quotation marks.<br><br>
 
 
-        <strong>Biographical information of artists</strong><br>
+            <strong>Biographical information of artists</strong><br>
 
-        If possible every creator (=artist) is linked to Getty ULAN or the GND database of the German National Library. If no matching artist could be found, a new one has been created. We are now in the process to link all biographical information provided by us to the sources cited.
+            If possible every creator (=artist) is linked to Getty ULAN or the GND database of the German National Library. If no matching artist could be found, a new one has been created. We are now in the process to link all biographical information provided by us to the sources cited.
 
 
             <br><br><strong>Catalogue Reproductions</strong><br>
 
-        Due to questions of copyright, the reproductions in the catalogues are not shown. As this changed in the course of the project, all remarks in the notes of entries or exhibitions concerning the place to see reproductions are to be disregarded.
+            Due to questions of copyright, the reproductions in the catalogues are not shown. As this changed in the course of the project, all remarks in the notes of entries or exhibitions concerning the place to see reproductions are to be disregarded.
 
 
-            <br><br><a href="{{ app.request.basepath }}/pdf/Data_Entry_Guidelines.pdf">Detailed Guidelines to our data entry can be found here</a>
-
+            <br><br><a href="{{ app.request.basepath }}/pdf/Data_Entry_Guidelines.pdf">Detailed Guidelines to our data entry can be found here</a>.
 
         </p>
     </div>
