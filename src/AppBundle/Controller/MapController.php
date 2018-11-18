@@ -511,7 +511,6 @@ extends CrudController
 
         $andWhere .= StatisticsController::getStringQueryForLocations($stringQuery, 'long');
 
-
         if (in_array("true", $currIds)) {
             // remove true statement from ids
             $pos = array_search('true', $currIds);
@@ -557,13 +556,13 @@ extends CrudController
                 ];
             }
 
-                $values[$key]['exhibitions'][] =
-                    sprintf('<a href="%s">%s</a>',
-                            htmlspecialchars($this->generateUrl('location', [
-                                'id' => $row['location_id'],
-                            ])),
-                            htmlspecialchars($row['location_name'])
-                    );
+            $values[$key]['exhibitions'][] =
+                sprintf('<a href="%s">%s</a>',
+                        htmlspecialchars($this->generateUrl('location', [
+                            'id' => $row['location_id'],
+                        ])),
+                        htmlspecialchars($row['location_name'])
+                );
         }
 
         $values_final = [];

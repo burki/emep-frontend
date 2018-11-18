@@ -43,7 +43,7 @@ extends Controller
         }
 
         if ($shortOrLongQuery === 'long') {
-            return " AND L.status <> -1 ";
+            return " AND Location.status <> -1 ";
         }
 
         return " AND L.status <> -1";
@@ -256,18 +256,15 @@ extends Controller
         $nationalitySubquery = " ";
 
         if (!empty($artistNationalities)) {
-
             $nationalitySubquery = " WHERE ( ";
             $count = 0;
-            foreach($artistNationalities as $nationality) {
+            foreach ($artistNationalities as $nationality) {
                 if ($count !== 0) {
                     $nationalitySubquery .= " OR ";
                 }
-                $nationalitySubquery .= " Person.country = '". $nationality ."' ";
+                $nationalitySubquery .= " Person.country = '" . addslashes($nationality) . "' ";
                 $count = $count + 1;
             }
-
-            //$nationalityquery .= " WHERE ( Person.country = 'BE' OR Person.country = 'CZ' ) ";
 
             $nationalitySubquery .= " ) ";
         }
@@ -286,13 +283,6 @@ extends Controller
                         WHERE EArtist.status <> -1 AND MONTH(startdate) <> 0
                         GROUP BY start_year, MONTH(startdate)
                         ORDER BY start_year, start_month";
-
-
-
-
-        //->andWhere("Pl.countryCode IN(${countryQueryString})")
-
-
 
         $stmt = $dbconn->query($querystr);
         $frequency_count = [];
@@ -337,8 +327,8 @@ extends Controller
                 $i = $i + (100 - $i % 100) + 1;
             }
         }
-        $data_avg = round(1.0 * $sum / count($data), 1);
 
+        $data_avg = round(1.0 * $sum / count($data), 1);
 
         return $this->render('Statistics/exhibition-by-month-index.html.twig', [
             'data_avg' => $data_avg,
