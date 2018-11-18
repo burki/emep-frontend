@@ -753,9 +753,11 @@ extends CrudController
 
         $dataNumberOfExhibitionsPerCountry = $this->detailDataNumberOfExhibitionsPerCountry($person);
 
-        $dataNumberOfWorksPerYear = $this->detailDataNumberOfWorksPerYear($person, $this->findCatalogueEntries($person));
+        $catEntries = $this->findCatalogueEntries($person);
 
-        $dataNumberOfWorksPerType = $this->detailDataNumberOfWorksPerType($this->findCatalogueEntries($person));
+        $dataNumberOfWorksPerYear = $this->detailDataNumberOfWorksPerYear($catEntries);
+
+        $dataNumberOfWorksPerType = $this->detailDataNumberOfWorksPerType($catEntries);
 
         $dataNumberOfExhibitionsPerOrgBody = $this->detailDataNumberOfExhibitionsPerOrgBody($person);
 
@@ -831,30 +833,27 @@ extends CrudController
         return $returnArray;
     }
 
-    public function detailDataNumberOfWorksPerYear($person, $catalogueEntries)
+    public function detailDataNumberOfWorksPerYear($catalogueEntriesByExhibition)
     {
         $works = [];
 
+        foreach ($catalogueEntriesByExhibition as $catalogueEntries) {
+            $currExhibition = $catalogueEntries[0]->exhibition;
 
-        foreach ($catalogueEntries as $catalogueEntry) {
-            $currExhibition = $catalogueEntry[0]->exhibition;
+            $currExhibitionYear = date('Y', strtotime($currExhibition->getStartDate())) ;
 
-            $currExhibitionYear =  (int) date('Y', strtotime($currExhibition->getStartDate())) ;
-
-
-            foreach ($catalogueEntry as $entry) {
-                array_push($works, (string) $currExhibitionYear );
+            foreach ($catalogueEntries as $entry) {
+                array_push($works, $currExhibitionYear );
             }
-
         }
 
-        $worksTotalPerYear = array_count_values ( $works );
+        $worksTotalPerYear = array_count_values($works);
 
         $yearsArray = array_keys($worksTotalPerYear);
 
         if (!empty($yearsArray)) {
-            $min = $yearsArray[0];
-            $max = max(array_keys($worksTotalPerYear));
+            $min = min($yearsArray);
+            $max = max($yearsArray);
         } else {
             $min = 0;
             $max = 0;
@@ -867,21 +866,16 @@ extends CrudController
             $arrayWithoutGaps[(string)$i] = array_key_exists($i, $worksTotalPerYear) ? $worksTotalPerYear[$i] : 0;
         }
 
-
         $yearsOnly = json_encode(array_keys($arrayWithoutGaps));
         $valuesOnly = json_encode(array_values($arrayWithoutGaps));
-        $sumOfAllExhibitions = array_sum(array_values($arrayWithoutGaps));
+        $sumOfAllExhibitions = array_sum(array_values($worksTotalPerYear));
         $yearActive = $max - $min > 0 ? $max - $min : 1;
 
 
         $averagePerYear = round( $sumOfAllExhibitions / $yearActive, 1 );
 
-        //return $worksPerYear;
 
-
-
-
-        $returnArray = [$yearsOnly, $valuesOnly, $sumOfAllExhibitions, $yearActive, $averagePerYear];
+        $returnArray = [ $yearsOnly, $valuesOnly, $sumOfAllExhibitions, $yearActive, $averagePerYear];
 
         return $returnArray;
     }
