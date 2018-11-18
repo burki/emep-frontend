@@ -540,54 +540,43 @@ extends CrudController
     }
 
 
-    public function indexDataNumberCountries($locations)
+    public function indexDataNumberCountries($results)
     {
-        //$exhibitions = $location->getExhibitions();
+        $countryCodes = [];
 
-        $venueTypes = [];
+        foreach ($results as $result) {
+            $location = $result[0];
+            $place = $location->getPlace();
+            if (!is_null($place)) {
+                $countryCode = $place->getCountryCode();
+            }
+            else {
+                $countryCode = $location->getCountry();
+            }
 
-        foreach ($locations as $location) {
-
-            //print count($entries);
-            //print '   ';
-
-            $currType = (string) $location[0]->getCountry();
-
-            array_push($venueTypes, (string) $currType );
-
+            array_push($countryCodes, $countryCode);
         }
 
-        $typesTotal = array_count_values ( $venueTypes );
+        $valuesTotal = array_count_values($countryCodes);
 
-        //$exhibitionPlacesArray = array_keys($exhibitionPlaces);
+        $valuesOnly = array_keys($valuesTotal);
+        $countsOnly =  array_values($valuesTotal);
 
-        // print_r($exhibitionPlacesArray);
-
-        $typesOnly = ( array_keys($typesTotal) );
-        $valuesOnly =  array_values( $typesTotal );
-
-
-        $sumOfAllTypes= array_sum(array_values($typesTotal));
 
         $i = 0;
         $finalDataJson = '[';
 
-        foreach ($typesOnly as $place) {
+        foreach ($valuesOnly as $val) {
             $i > 0 ? $finalDataJson .= ", " : '';
 
-            $numberOfExhibitions = $valuesOnly[$i] ;
+            $count = $countsOnly[$i] ;
 
-            $finalDataJson .= '{ name: "' .$place. '", y: '. $numberOfExhibitions . '} ';
+            $finalDataJson .= '{ name: "' . $val . '", y: '. $count . '} ';
             $i += 1;
         }
         $finalDataJson .= ']';
 
-
-
-        $returnArray = [$finalDataJson, $sumOfAllTypes];
-
-
-        return $returnArray;
+        return [ $finalDataJson, array_sum($countsOnly) ];
     }
 
 
