@@ -247,6 +247,13 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
     protected $url;
 
     /**
+     * @var ArrayCollection<BibitemExhibition> The exhibition.
+     *
+     * @ORM\OneToMany(targetEntity="BibitemExhibition", mappedBy="bibitem")
+     */
+    public $exhibitionRefs;
+
+    /**
      * @var \DateTime
      *
      * @Gedmo\Timestampable(on="create")
@@ -1109,8 +1116,9 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
             '@context' => 'http://schema.org',
             '@type' => $type,
         ];
+
         if ($type == 'PublicationIssue') {
-            // issues on't have a name, but might have an issue-number
+            // issues don't have a name, but might have an issue-number
             if (!empty($this->volume)) {
                 $ret['issueNumber'] = $this->volume;
             }
@@ -1121,6 +1129,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
         else {
             $ret['name'] = $this->name;
         }
+
         if ($omitContext) {
             unset($ret['@context']);
         }
@@ -1195,6 +1204,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
                     $ret[$property] = $this->$property;
                 }
             }
+
             if (!empty($this->containerName)) {
                 $parentItemType = null;
                 switch ($type) {

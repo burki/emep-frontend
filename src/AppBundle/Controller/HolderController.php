@@ -12,7 +12,6 @@ use AppBundle\Utils\CsvResponse;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 
-
 /**
  *
  */
@@ -145,12 +144,18 @@ extends CrudController
                 'H',
                 "CONCAT(COALESCE(H.countryCode, ''),H.placeLabel,H.name) HIDDEN countryPlaceNameSort",
                 "H.name HIDDEN nameSort",
-                'COUNT(DISTINCT BH.bibitem) AS numBibitemSort',
+                'COUNT(DISTINCT BE.exhibition) AS numBibitemSort',
             ])
             ->from('AppBundle:Holder', 'H')
             ->leftJoin('AppBundle:BibitemHolder', 'BH',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'BH.holder = H')
+            ->leftJoin('AppBundle:Bibitem', 'B',
+                       \Doctrine\ORM\Query\Expr\Join::WITH,
+                       'BH.bibitem = B')
+            ->leftJoin('AppBundle:BibitemExhibition', 'BE',
+                       \Doctrine\ORM\Query\Expr\Join::WITH,
+                       'BE.bibitem = B AND BE.role = 1') // catalogues only
             ->where('H.status <> -1')
             ->groupBy('H.id')
             ->orderBy('nameSort')
@@ -195,8 +200,6 @@ extends CrudController
         ]);
     }
 
-
-
     // TODO MOVE TO SHARED
     protected function lookupSearches($user)
     {
@@ -214,7 +217,7 @@ extends CrudController
             ->andWhere("UA.user = :user")
             ->orderBy("UA.createdAt", "DESC")
             ->setParameter('user', $user)
-        ;
+            ;
 
         $searches = [];
 
@@ -291,12 +294,11 @@ extends CrudController
             return $this->redirectToRoute('holder-index');
         }
 
-        $result = $holder->findBibitems($this->getDoctrine()->getManager());
+        $result = $holder->findBibitems($this->getDoctrine()->getManager(), true);
 
         $csvResult = [];
 
         foreach ($result as $key => $value) {
-
             $bibitem = $value[0];
 
             $innerArray = [];
@@ -351,17 +353,16 @@ extends CrudController
         ])
             ->from('AppBundle:Holder', 'H')
             ->leftJoin('AppBundle:Place', 'P',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'P.name = H.placeLabel')
+                       \Doctrine\ORM\Query\Expr\Join::WITH,
+                       'P.name = H.placeLabel')
             ->where('H.id = ' . $id)
         ;
 
         $place = ($qb->getQuery()->execute());
 
-        $bibitems = $holder->findBibitems($this->getDoctrine()->getManager());
+        $bibitems = $holder->findBibitems($this->getDoctrine()->getManager(), true);
 
         $dataNumberOfItemType = $this->detailDataNumberOfItemType($bibitems);
-
 
         return $this->render('Holder/detail.html.twig', [
             'place' => $place[0],
@@ -382,41 +383,30 @@ extends CrudController
 
     public function detailDataNumberOfItemType($bibitems)
     {
-        $exhibitionPlaces = [];
+        $itemTypes = [];
 
         foreach ($bibitems as $bibitem) {
-            array_push($exhibitionPlaces, (string)$bibitem[0]->getItemType() );
+            array_push($itemTypes, $bibitem[0]->getItemType());
         }
 
-        $exhibitionPlacesTotal = array_count_values ( $exhibitionPlaces );
+        $valuesTotal = array_count_values($itemTypes);
 
-        $placesOnly = ( array_keys($exhibitionPlacesTotal) );
-        $valuesOnly =  array_values( $exhibitionPlacesTotal );
-
-
-        $sumOfAllExhibitions = array_sum(array_values($exhibitionPlacesTotal));
+        $valuesOnly = array_keys($valuesTotal);
+        $countsOnly =  array_values($valuesTotal);
 
         $i = 0;
         $finalDataJson = '[';
 
-        foreach ($placesOnly as $place) {
+        foreach ($valuesOnly as $val) {
             $i > 0 ? $finalDataJson .= ", " : '';
 
-            $numberOfExhibitions = $valuesOnly[$i] ;
+            $count = $countsOnly[$i] ;
 
-            $finalDataJson .= "{ name: '${place}', y: ${numberOfExhibitions} } ";
+            $finalDataJson .= "{ name: '${val}', y: ${count} } ";
             $i += 1;
         }
         $finalDataJson .= ']';
 
-
-
-        $returnArray = [$finalDataJson, $sumOfAllExhibitions];
-
-
-        return $returnArray;
+        return [ $finalDataJson, array_sum($countsOnly) ];
     }
-
-
-
 }

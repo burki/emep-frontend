@@ -545,7 +545,7 @@ implements \JsonSerializable, JsonLdSerializable
         return $this->gnd;
     }
 
-    public function findBibitems($em)
+    public function findBibitems($em, $catalogueEntriesOnly = false)
     {
         $qb = $em->createQueryBuilder();
         $qb->select([
@@ -560,6 +560,11 @@ implements \JsonSerializable, JsonLdSerializable
             ->where('H = :holder AND B.status <> -1')
             ->orderBy('B.datePublished, creatorSort, B.title');
 
+        if ($catalogueEntriesOnly) {
+            $qb->innerJoin('AppBundle:BibitemExhibition', 'BE',
+                           \Doctrine\ORM\Query\Expr\Join::WITH,
+                           'BE.bibitem = B AND BE.role = 1'); // catalogues only
+        }
 
         $results = $qb->getQuery()
             ->setParameter('holder', $this)
