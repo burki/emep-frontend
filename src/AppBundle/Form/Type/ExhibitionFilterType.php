@@ -18,27 +18,25 @@ extends AbstractType
         ]);
 
         $builder->add('type', ChoiceType::class, [
+            'multiple' => true,
+            'required' => false,
+            'choices' => $options['data']['choices']['exhibition_type'],
             'label' => 'Type',
-            // 'multiple' => true,
-            'choices' => [ '- all - ' => '' ] + $options['data']['choices']['exhibition_type'],
-            /*
             'attr' => [
                 'data-placeholder' => '- all - ',
+                'class' => 'select2',
             ],
-            */
-            'required' => false,
         ]);
 
         $builder->add('organizer_type', ChoiceType::class, [
+            'multiple' => true,
+            'required' => false,
+            'choices' => $options['data']['choices']['exhibition_organizer_type'],
             'label' => 'Type of Organizing Body',
-            // 'multiple' => true,
-            'choices' => [ '- all - ' => '' ] + $options['data']['choices']['exhibition_organizer_type'],
-            /*
             'attr' => [
                 'data-placeholder' => '- all - ',
+                'class' => 'select2',
             ],
-            */
-            'required' => false,
         ]);
     }
 

@@ -251,4 +251,9 @@ extends SearchListBuilder
 
         return $this;
     }
+
+	public function getAlias()
+	{
+		return $this->alias;
+	}
 }

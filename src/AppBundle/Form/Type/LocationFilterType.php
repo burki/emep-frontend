@@ -13,21 +13,25 @@ extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('geoname', ChoiceType::class, [
-            'choices' => [ '- all - ' => '' ] + $options['data']['choices']['location_geoname'],
+            'choices' => $options['data']['choices']['location_geoname'],
+            'multiple' => true,
             'required' => false,
             'label' => 'Country / City',
+            'attr' => [
+                'data-placeholder' => '- all - ',
+                'class' => 'select2',
+            ],
         ]);
 
         $builder->add('type', ChoiceType::class, [
+            'choices' => $options['data']['choices']['location_type'],
+            'multiple' => true,
+            'required' => false,
             'label' => 'Type',
-            // 'multiple' => true,
-            'choices' => [ '- all - ' => '' ] + $options['data']['choices']['location_type'],
-            /*
             'attr' => [
                 'data-placeholder' => '- all - ',
+                'class' => 'select2',
             ],
-            */
-            'required' => false,
         ]);
     }
 

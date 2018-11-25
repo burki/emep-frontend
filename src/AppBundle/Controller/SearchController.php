@@ -138,6 +138,59 @@ extends CrudController
     }
 
     /**
+     * Get all countries and places
+     */
+    protected function buildOrganizerGeonames(Request $request, UrlGeneratorInterface $urlGenerator)
+    {
+        $organizerListBuilder = new \AppBundle\Utils\OrganizerListBuilder($conn = $this->getDoctrine()->getEntityManager()->getConnection(), $request, $urlGenerator);
+        $alias = $organizerListBuilder->getAlias();
+
+        $queryBuilder = $conn->createQueryBuilder();
+
+        $queryBuilder->select([
+                'DISTINCT C.cc AS countryCode',
+                'C.name AS country',
+                'P' . $alias . '.tgn',
+                'COALESCE(P' . $alias . '.name_alternate,P' . $alias . '.name) AS name',
+            ])
+            ->from('Location', $alias)
+            ->innerJoin($alias,
+                                'Geoname', 'P' . $alias,
+                                'P' . $alias . '.tgn=' . $alias.'.place_tgn')
+            ->innerJoin('P' . $alias,
+                                'Country', 'C',
+                                'P' . $alias . '.country_code=' . 'C.cc')
+            ->innerJoin($alias,
+                                'ExhibitionLocation', 'EL',
+                                'EL.id_location=' . $alias . '.id AND EL.role = 0')
+            ->innerJoin('EL',
+                                'Exhibition', 'E',
+                                'EL.id_exhibition=E.id AND E.status <> -1')
+            ->orderBy('country, place')
+            ;
+
+        // die($queryBuilder->getSql());
+
+
+        $geonames = [];
+
+
+        $lastCountryCode = '';
+
+        foreach ($queryBuilder->execute()->fetchAll() as $result) {
+            if ($lastCountryCode != $result['countryCode']) {
+                $key = 'cc:' . $result['countryCode'];
+                $geonames[$key] = $result['country'];
+            }
+
+            $key = 'tgn:' . $result['tgn'];
+            $geonames[$key] = "\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0" . $result['name'];
+        }
+
+        return $geonames;
+    }
+
+    /**
      * @Route("/search", name="search")
      */
     public function searchAction(Request $request,
@@ -492,7 +545,7 @@ extends CrudController
                 'nationality' => array_flip($this->buildPersonNationalities()),
                 'location_geoname' => array_flip($this->buildVenueGeonames()),
                 'location_type' => array_combine($venueTypes, $venueTypes),
-                'organizer_geoname' => [],
+                'organizer_geoname' => array_flip($this->buildOrganizerGeonames($request, $urlGenerator)),
                 'organizer_type' => array_combine($venueTypes, $venueTypes),
                 'exhibition_type' => array_combine($exhibitionTypes, $exhibitionTypes),
                 'exhibition_organizer_type' => array_combine($exhibitionOrganizerTypes, $exhibitionOrganizerTypes),

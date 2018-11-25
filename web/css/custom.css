@@ -440,7 +440,7 @@ div#footer-fwf {
     width: 100%!important;
 }
 
-.select2-selection {
+.searchbarinputcontainer .select2-selection {
     border: none!important;
     padding-top: 14px!important;
 }

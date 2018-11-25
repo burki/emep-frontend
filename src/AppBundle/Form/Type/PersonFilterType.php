@@ -20,11 +20,19 @@ extends AbstractType
                 'male' => 'M',
             ],
             'required' => false,
+            'attr' => [
+                'class' => 'select2',
+            ],
         ]);
 
         $builder->add('nationality', ChoiceType::class, [
-            'choices' => [ '- all - ' => '' ] + $options['data']['choices']['nationality'],
+            'choices' => $options['data']['choices']['nationality'],
+            'multiple' => true,
             'required' => false,
+            'attr' => [
+                'data-placeholder' => '- all - ',
+                'class' => 'select2',
+            ],
         ]);
 
         $builder->add('birthdate', YearRangeType::class, [

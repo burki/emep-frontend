@@ -260,16 +260,76 @@ extends ListBuilder
         }
     }
 
+	protected function addInFilter($queryBuilder, $field, $key, $filterValues)
+	{
+		if (!empty($filterValues)) {
+			if (is_array($filterValues) && 1 == count($filterValues)) {
+				$filterValues = $filterValues[0];
+			}
+
+			if (is_scalar($filterValues)) {
+				$queryBuilder->andWhere(sprintf('%s = %s',
+												$field, ':' . $key))
+					->setParameter($key, $filterValues);
+			}
+			else {
+				$queryBuilder->andWhere(sprintf('%s IN (%s)',
+												$field, ':' . $key))
+					->setParameter($key, $filterValues, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);
+			}
+		}
+	}
+
+	protected function addGeonameFilter($queryBuilder, $fieldMap, $key, $filterValues)
+	{
+		$values = [
+			'cc' => [],
+			'tgn' => [],
+		];
+
+		if (!is_array($filterValues)) {
+			$filterValues = [ $filterValues ];
+		}
+
+		foreach ($filterValues as $filterValue) {
+            // geoname can be cc:XY or tgn:12345
+			$typeValue = explode(':', $filterValue, 2);
+			if (in_array($typeValue[0], [ 'cc', 'tgn' ])) {
+				$values[$typeValue[0]][] = $typeValue[1];
+			}
+		}
+
+		$orParts = [];
+
+		foreach ($values as $type => $active) {
+			if (!empty($active)) {
+				$field = $fieldMap[$type];
+				$parameter = $key . '_' . $type;
+				if (1 == count($active)) {
+					$orParts[] = sprintf('%s = %s',
+										 $field, ':' . $parameter);
+					$queryBuilder->setParameter($parameter, $active[0]);
+				}
+				else {
+					$orParts[] = sprintf('%s IN(%s)',
+										 $field, ':' . $parameter);
+					$queryBuilder->setParameter($parameter, $active, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);
+				}
+			}
+		}
+
+		if (!empty($orParts)) {
+			$queryBuilder->andWhere(join(' OR ', $orParts));
+		}
+	}
+
     protected function addQueryFilters($queryBuilder)
     {
         if (array_key_exists('person', $this->queryFilters)) {
             $personFilters = & $this->queryFilters['person'];
             foreach ([ 'gender' => 'P.sex', 'nationality' => 'P.country' ] as $key => $field) {
-                if (!empty($personFilters[$key])) {
-                    $queryBuilder->andWhere(sprintf('%s = %s',
-                                                    $field, ':' . $key))
-                        ->setParameter($key, $personFilters[$key]);
-                }
+				$this->addInFilter($queryBuilder, $field, $key,
+								   array_key_exists($key,  $personFilters) ? $personFilters[$key] : null);
             }
 
             foreach ([ 'birthdate' => 'P.birthdate', 'deathdate' => 'P.deathdate' ] as $key => $field) {
@@ -293,61 +353,38 @@ extends ListBuilder
         if (array_key_exists('location', $this->queryFilters)) {
             $locationFilters = & $this->queryFilters['location'];
             foreach ([ 'type' => 'L.type' ] as $key => $field) {
-                if (!empty($locationFilters[$key])) {
-                    $queryBuilder->andWhere(sprintf('%s = %s',
-                                                    $field, ':' . $key))
-                        ->setParameter($key, $locationFilters[$key]);
-                }
+				$this->addInFilter($queryBuilder, $field, $key,
+								   array_key_exists($key,  $locationFilters) ? $locationFilters[$key] : null);
             }
 
-            // geoname can be cc:XY or tgn:12345
             if (!empty($locationFilters[$key = 'geoname'])) {
-                $typeValue = explode(':', $locationFilters[$key], 2);
-                if ('cc' == $typeValue[0]) {
-                    $field = 'PL.country_code';
-                }
-                else {
-                    $field = 'L.place_tgn';
-                }
-                $queryBuilder->andWhere(sprintf('%s = %s',
-                                                $field, ':' . $key))
-                    ->setParameter($key, $typeValue[1]);
+				$this->addGeonameFilter($queryBuilder, [
+											'cc' => 'PL.country_code',
+											'tgn' => 'L.place_tgn',
+										], $key, $locationFilters[$key]);
             }
         }
 
         if (array_key_exists('organizer', $this->queryFilters)) {
             $organizerFilters = & $this->queryFilters['organizer'];
             foreach ([ 'type' => 'O.type' ] as $key => $field) {
-                if (!empty($organizerFilters[$key])) {
-                    $queryBuilder->andWhere(sprintf('%s = %s',
-                                                    $field, ':' . $key))
-                        ->setParameter($key, $organizerFilters[$key]);
-                }
+				$this->addInFilter($queryBuilder, $field, $key,
+								   array_key_exists($key,  $organizerFilters) ? $organizerFilters[$key] : null);
             }
 
-            // geoname can be cc:XY or tgn:12345
             if (!empty($organizerFilters[$key = 'geoname'])) {
-                $typeValue = explode(':', $organizerFilters[$key], 2);
-                if ('cc' == $typeValue[0]) {
-                    $field = 'OPL.country_code';
-                }
-                else {
-                    $field = 'O.place_tgn';
-                }
-                $queryBuilder->andWhere(sprintf('%s = %s',
-                                                $field, ':' . $key))
-                    ->setParameter($key, $typeValue[1]);
+				$this->addGeonameFilter($queryBuilder, [
+											'cc' => 'OPL.country_code',
+											'tgn' => 'O.place_tgn',
+										], $key, $organizerFilters[$key]);
             }
         }
 
         if (array_key_exists('exhibition', $this->queryFilters)) {
             $exhibitionFilters = & $this->queryFilters['exhibition'];
             foreach ([ 'type' => 'E.type', 'organizer_type' => 'E.organizer_type'  ] as $key => $field) {
-                if (!empty($exhibitionFilters[$key])) {
-                    $queryBuilder->andWhere(sprintf('%s = %s',
-                                                    $field, ':' . $key))
-                        ->setParameter($key, $exhibitionFilters[$key]);
-                }
+				$this->addInFilter($queryBuilder, $field, $key,
+								   array_key_exists($key,  $exhibitionFilters) ? $exhibitionFilters[$key] : null);
             }
 
             foreach ([ 'date' => 'E.startdate' ] as $key => $field) {
@@ -371,11 +408,8 @@ extends ListBuilder
         if (array_key_exists('catentry', $this->queryFilters)) {
             $itemExhibitionFilters = & $this->queryFilters['catentry'];
             foreach ([ 'type' => 'IE.type', 'forsale' => 'IE.forsale' ] as $key => $field) {
-                if (!empty($itemExhibitionFilters[$key])) {
-                    $queryBuilder->andWhere(sprintf('%s = %s',
-                                                    $field, ':' . $key))
-                        ->setParameter($key, $itemExhibitionFilters[$key]);
-                }
+				$this->addInFilter($queryBuilder, $field, $key,
+								   array_key_exists($key,  $itemExhibitionFilters) ? $itemExhibitionFilters[$key] : null);
             }
 
             if (!empty($itemExhibitionFilters['price_available'])) {

@@ -14,13 +14,14 @@ extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('type', ChoiceType::class, [
-            'label' => 'Type of Work',
-            // 'multiple' => true,
             'choices' => [ '- all - ' => '' ] + $options['data']['choices']['itemexhibition_type'],
+            'multiple' => true,
+            'required' => false,
+            'label' => 'Type of Work',
             'attr' => [
                 'data-placeholder' => '- all - ',
+                'class' => 'select2',
             ],
-            'required' => false,
         ]);
 
         $builder->add('forsale', ChoiceType::class, [

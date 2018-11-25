@@ -3,8 +3,11 @@
 {% import 'Shared/helper.html.twig' as helper %}
 
 {% block head %}
+    {% import 'Shared/select2.html.twig' as select2 %}
+    {{ select2.head() }}
+
     <script>
-    $(document).ready(function($){
+    $(document).ready(function($) {
         // Remove empty fields from GET forms
         // Author: Bill Erickson
         // URL: http://www.billerickson.net/code/hide-empty-fields-get-form/
@@ -18,6 +21,9 @@
 
         // Un-disable form fields when page loads, in case they click back after submission
         $('form').find(':input').prop('disabled', false );
+
+        // initialize select2
+        $('.select2').select2();
     });
 
     function saveQuery() {
