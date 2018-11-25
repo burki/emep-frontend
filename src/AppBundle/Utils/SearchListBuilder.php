@@ -353,7 +353,7 @@ extends ListBuilder
         if (array_key_exists('location', $this->queryFilters)) {
             $locationFilters = & $this->queryFilters['location'];
             foreach ([ 'type' => 'L.type' ] as $key => $field) {
-				$this->addInFilter($queryBuilder, $field, $key,
+				$this->addInFilter($queryBuilder, $field, 'location_' . $key,
 								   array_key_exists($key,  $locationFilters) ? $locationFilters[$key] : null);
             }
 
@@ -368,7 +368,7 @@ extends ListBuilder
         if (array_key_exists('organizer', $this->queryFilters)) {
             $organizerFilters = & $this->queryFilters['organizer'];
             foreach ([ 'type' => 'O.type' ] as $key => $field) {
-				$this->addInFilter($queryBuilder, $field, $key,
+				$this->addInFilter($queryBuilder, $field, 'organizer_' . $key,
 								   array_key_exists($key,  $organizerFilters) ? $organizerFilters[$key] : null);
             }
 
@@ -383,7 +383,7 @@ extends ListBuilder
         if (array_key_exists('exhibition', $this->queryFilters)) {
             $exhibitionFilters = & $this->queryFilters['exhibition'];
             foreach ([ 'type' => 'E.type', 'organizer_type' => 'E.organizer_type'  ] as $key => $field) {
-				$this->addInFilter($queryBuilder, $field, $key,
+				$this->addInFilter($queryBuilder, $field, 'exhibition_' . $key,
 								   array_key_exists($key,  $exhibitionFilters) ? $exhibitionFilters[$key] : null);
             }
 
@@ -408,7 +408,7 @@ extends ListBuilder
         if (array_key_exists('catentry', $this->queryFilters)) {
             $itemExhibitionFilters = & $this->queryFilters['catentry'];
             foreach ([ 'type' => 'IE.type', 'forsale' => 'IE.forsale' ] as $key => $field) {
-				$this->addInFilter($queryBuilder, $field, $key,
+				$this->addInFilter($queryBuilder, $field, 'itemexhibition_' . $key,
 								   array_key_exists($key,  $itemExhibitionFilters) ? $itemExhibitionFilters[$key] : null);
             }
 
