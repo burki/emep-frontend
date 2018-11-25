@@ -472,7 +472,8 @@ class Exhibition
             ->innerJoin('AppBundle:BibitemExhibition', 'BE', 'WITH', 'BE.bibitem=B')
             ->innerJoin('AppBundle:Exhibition', 'E', 'WITH', 'BE.exhibition=E')
             ->where('E = :exhibition AND B.status <> -1')
-            ->orderBy('creatorSort, B.datePublished, B.title');
+            ->orderBy('creatorSort, B.datePublished, B.title')
+            ;
 
         if (!is_null($role)) {
             $qb->andWhere('BE.role = :role')

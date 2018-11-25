@@ -1,9 +1,11 @@
 {% macro exhibition_period(exhibition) %}
+    {% spaceless %}
     {% if exhibition.displaydate is not empty %}
         {{ exhibition.displaydate }}
     {% else %}
         {{ daterangeincomplete(exhibition.startdate, exhibition.enddate) }}
     {% endif %}
+    {% endspaceless %}
 {% endmacro %}
 
 {% macro exhibition_itemexhibition_sort_control(exhibition) %}

@@ -24,7 +24,7 @@ class BibitemExhibition
     /**
      * @var Bibitem
      *
-     * @ORM\ManyToOne(targetEntity="Bibitem")
+     * @ORM\ManyToOne(targetEntity="Bibitem", inversedBy="exhibitionRefs")
      * @ORM\JoinColumn(name="id_publication", referencedColumnName="id")
      */
     private $bibitem;

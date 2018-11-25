@@ -247,11 +247,18 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
     protected $url;
 
     /**
-     * @var ArrayCollection<BibitemExhibition> The exhibition.
+     * @var ArrayCollection<BibitemExhibition> The exhibition reference.
      *
      * @ORM\OneToMany(targetEntity="BibitemExhibition", mappedBy="bibitem")
      */
     public $exhibitionRefs;
+
+    /**
+     * @var ArrayCollection<BibitemHolder> The holder reference.
+     *
+     * @ORM\OneToMany(targetEntity="BibitemHolder", mappedBy="bibitem")
+     */
+    public $holderRefs;
 
     /**
      * @var \DateTime

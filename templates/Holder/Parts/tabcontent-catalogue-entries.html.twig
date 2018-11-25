@@ -16,6 +16,11 @@
                 paging: true,
                 searching: false,
                 info: true,
+                "columns": [
+                    { "orderSequence": [ "asc", "desc" ] },
+                    { "orderSequence": [ "desc", "asc" ] },
+                    { "orderable": false}
+                ]
             } );
         } );
     </script>
@@ -28,6 +33,7 @@
             <tr class="listviewheading">
                 <th>Catalogue</th>
                 <th>Signature / URL</th>
+                <th>Exhibition</th>
             </tr>
             </thead>
 
@@ -42,6 +48,15 @@
                         {% if row.url is not empty %}
                             {{ row.url|converturls }}
                         {% endif %}
+                    </td>
+                    <td>
+                    {% for exhibitionRef in bibitem.exhibitionRefs if exhibitionRef.role == 1 %}
+                        {% set exhibition = exhibitionRef.exhibition %}
+                        <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">{{ helper.exhibition_period(exhibition) }}</a> at
+                        <a href="{{ path('location', { 'id' : exhibition.location.id }) }}">
+                            {{ exhibition.location.name }}
+                        </a>
+                    {% endfor %}
                     </td>
                 </tr>
             {% endfor %}

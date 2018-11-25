@@ -24,7 +24,7 @@ class BibitemHolder
     /**
      * @var Bibitem
      *
-     * @ORM\ManyToOne(targetEntity="Bibitem")
+     * @ORM\ManyToOne(targetEntity="Bibitem", inversedBy="holderRefs")
      * @ORM\JoinColumn(name="id_publication", referencedColumnName="id")
      */
     private $bibitem;
@@ -32,7 +32,7 @@ class BibitemHolder
     /**
      * @var Holder
      *
-     * @ORM\ManyToOne(targetEntity="Holder")
+     * @ORM\ManyToOne(targetEntity="Holder", inversedBy="holderOf")
      * @ORM\JoinColumn(name="id_holder", referencedColumnName="id")
      */
     private $holder;

@@ -131,8 +131,7 @@ implements \JsonSerializable, JsonLdSerializable
     protected $gnd;
 
     /**
-     * @ORM\OneToMany(targetEntity="Bibitem", mappedBy="holder")
-     * @ORM\OrderBy({"dateCreated" = "ASC", "name" = "ASC"})
+     * @ORM\OneToMany(targetEntity="BibitemHolder", mappedBy="holder")
      */
     protected $holderOf;
 
@@ -545,6 +544,34 @@ implements \JsonSerializable, JsonLdSerializable
         return $this->gnd;
     }
 
+    /**
+     * Sets foundingLocation.
+     *
+     * @param Place $foundingLocation
+     *
+     * @return $this
+     */
+    /*
+    public function setFoundingLocation(Place $foundingLocation = null)
+    {
+        $this->foundingLocation = $foundingLocation;
+
+        return $this;
+    }
+    */
+
+    /**
+     * Gets foundingLocation.
+     *
+     * @return Place
+     */
+    /*
+    public function getFoundingLocation()
+    {
+        return $this->foundingLocation;
+    }
+    */
+ 
     public function findBibitems($em, $catalogueEntriesOnly = false)
     {
         $qb = $em->createQueryBuilder();

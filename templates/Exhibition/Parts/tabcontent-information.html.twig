@@ -1,6 +1,5 @@
 {% block information %}
 
-
         <div role="tabpanel" class="tab-pane active" id="information">
 
             {% if exhibition.organizingCommittee is empty and exhibition.hours is empty and catalogue is empty and exhibition.cataloguePrice is empty and exhibition.preface is empty and exhibition.catalogueStructure is empty and exhibition.catalogueStructure is empty and exhibition.note is empty and exhibition.hasInfo == false and exhibition.hasInfo == false %}
@@ -20,7 +19,14 @@
                     <div class="artist-information-label information-tab">Catalogue</div>
                     <div class="artist-information-text">
                         {% for bibitem in catalogue %}
-                            {{ bibitem.renderCitationAsHtml(citeProc, false)|raw }} (Status: {{ catalogueStatus[bibitem.status] }})<br/>
+                            {{ bibitem.renderCitationAsHtml(citeProc, false)|raw }}
+                            {% if bibitem.holderRefs|length > 0 %}
+                                (Holding Institution{% if bibitem.holderRefs|length > 1 %}s{% endif %}:
+                                {% for holderRef in bibitem.holderRefs %}
+                                    {% set holder = holderRef.holder %}
+                                    <a href="{{ path('holder', { 'id': holder.id }) }}">{{ holder.name }}</a>{% if not loop.last %}, {% endif %}{% endfor %})
+                            {% endif %}
+                            <br/>
                         {% endfor %}
                     </div>
             {% endif %}
@@ -55,5 +61,3 @@
 
         </div><!-- .tab-pane -->
 {% endblock %}
-
-

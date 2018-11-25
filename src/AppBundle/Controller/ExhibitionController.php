@@ -748,9 +748,6 @@ extends CrudController
 
         $catalogueStatus = SearchListBuilder::$STATUS_LABELS;
 
-        //print_r($catalogueEntries);
-
-
         return $this->render('Exhibition/detail.html.twig', [
             'artists' => $artists,
             'pageTitle' => $exhibition->title, // TODO: dates in brackets
@@ -990,6 +987,5 @@ extends CrudController
         return $this->render('Exhibition/stats-detail.html.twig', [
             'chart' => implode("\n", $charts),
         ]);
-
     }
 }
