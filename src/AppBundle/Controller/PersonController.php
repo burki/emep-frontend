@@ -926,30 +926,21 @@ extends CrudController
     {
         $exhibitionPlaces = [];
 
+        foreach ($person->getExhibitions() as $exhibition) {
+            $location = $exhibition->getLocation();
+            if (is_null($location)) {
+                continue;
+            }
 
-        $exhibitions = $person->exhibitions;
-
-        foreach ($exhibitions as $exhibition) {
-
-            // print_r( $exhibition->getLocation()->getPlace()->getCountryCode() );
-
-            //print date('Y', strtotime($exhibition->getStartDate())) ;
-
-
-            array_push($exhibitionPlaces, (string) $exhibition->getLocation()->getPlace()->getCountryCode() );
+            array_push($exhibitionPlaces, $location->getPlace()->getCountryCode());
         }
 
 
+        $exhibitionPlacesTotal = array_count_values($exhibitionPlaces);
 
-        $exhibitionPlacesTotal = array_count_values ( $exhibitionPlaces );
 
-        //$exhibitionPlacesArray = array_keys($exhibitionPlaces);
-
-        // print_r($exhibitionPlacesArray);
-
-        $placesOnly = ( array_keys($exhibitionPlacesTotal) );
-        $valuesOnly =  array_values( $exhibitionPlacesTotal );
-
+        $placesOnly = array_keys($exhibitionPlacesTotal);
+        $valuesOnly = array_values($exhibitionPlacesTotal);
 
         $sumOfAllExhibitions = array_sum(array_values($exhibitionPlacesTotal));
 
@@ -968,11 +959,7 @@ extends CrudController
         $finalDataJson .= ']';
 
 
-
-        $returnArray = [$finalDataJson, $sumOfAllExhibitions, $i];
-
-
-        return $returnArray;
+        return [ $finalDataJson, $sumOfAllExhibitions, $i ];
     }
 
 
@@ -980,28 +967,23 @@ extends CrudController
     {
         $exhibitionPlaces = [];
 
+        foreach ($person->getExhibitions() as $exhibition) {
+            $location = $exhibition->getLocation();
+            if (is_null($location)) {
+                continue;
+            }
 
-        $exhibitions = $person->exhibitions;
-
-        foreach ($exhibitions as $exhibition) {
-
-            // print_r( $exhibition->getLocation()->getPlaceLabel() );
-
-            //print date('Y', strtotime($exhibition->getStartDate())) ;
-
-
-            array_push($exhibitionPlaces, (string) $exhibition->getLocation()->getPlaceLabel() );
+            array_push($exhibitionPlaces, $location->getPlaceLabel());
         }
 
 
-
-        $exhibitionPlacesTotal = array_count_values ( $exhibitionPlaces );
+        $exhibitionPlacesTotal = array_count_values($exhibitionPlaces);
 
         //$exhibitionPlacesArray = array_keys($exhibitionPlaces);
 
         // print_r($exhibitionPlacesArray);
 
-        $placesOnly = ( array_keys($exhibitionPlacesTotal) );
+        $placesOnly = array_keys($exhibitionPlacesTotal);
         $valuesOnly =  array_values( $exhibitionPlacesTotal );
 
 
@@ -1023,7 +1005,7 @@ extends CrudController
 
 
 
-        $returnArray = [$finalDataJson, $sumOfAllExhibitions, $i];
+        $returnArray = [ $finalDataJson, $sumOfAllExhibitions, $i ];
 
 
         return $returnArray;
