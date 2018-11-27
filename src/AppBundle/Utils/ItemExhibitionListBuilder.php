@@ -386,7 +386,11 @@ extends SearchListBuilder
             'E.title_short',
             'E.title_translit',
             'E.title_alternate',
+            'E.subtitle',
+            'E.subtitle_alternate',
             'E.organizing_committee',
+            'E.preface',
+            'E.description',
             'L.name',
             'L.place',
         ]);
