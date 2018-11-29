@@ -738,13 +738,31 @@ extends CrudController
         $catalogueEntries = $this->findCatalogueEntries($exhibition, $request->get('sort'));
 
         $artists = [];
+        $genderSplit = ['M' => 0, 'F' => 0]; // first male, second female
+        $artistsCountries = [];
 
         foreach ($catalogueEntries as $entry) {
             $currPerson = $entry->person;
             if (!in_array($currPerson, $artists)) {
+                // add gendersplit
+
+                if( $currPerson->getGender() === 'M' ){
+                    $genderSplit['M'] = $genderSplit['M'] + 1;
+                }else if ( $currPerson->getGender() === 'F' ){
+                    $genderSplit['F'] = $genderSplit['F'] + 1;
+                }
+
+                // add to countries;
+                array_push($artistsCountries, $currPerson->getNationality() );
+                // print ( $currPerson->getGender() );
                 array_push($artists, $currPerson);
             }
         }
+
+
+        $artistsCountries = array_unique($artistsCountries); // remove multiple countries
+
+
 
         $catalogueStatus = SearchListBuilder::$STATUS_LABELS;
 
@@ -759,6 +777,8 @@ extends CrudController
             'similar' => $this->findSimilar($exhibition),
             'currentPageId' => $id,
             'catalogueStatus' => $catalogueStatus,
+            'genderSplit' => $genderSplit,
+            'artistCountries' => $artistsCountries,
             'pageMeta' => [
                 /*
                 'jsonLd' => $exhibition->jsonLdSerialize($locale),

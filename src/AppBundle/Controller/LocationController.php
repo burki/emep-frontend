@@ -557,6 +557,9 @@ extends CrudController
             array_push($countryCodes, $countryCode);
         }
 
+        // replacing null values
+        $countryCodes = array_replace($countryCodes,array_fill_keys(array_keys($countryCodes, null),''));
+
         $valuesTotal = array_count_values($countryCodes);
 
         $valuesOnly = array_keys($valuesTotal);
