@@ -89,7 +89,7 @@ extends LocationListBuilder
         return 'Organizer';
     }
 
-    protected function setExhibitionJoin($queryBuilder)
+    public function setExhibitionJoin($queryBuilder)
     {
         // Organizer joins to Exhibition through ExhibitionLocation
         $queryBuilder->innerJoin($this->alias,

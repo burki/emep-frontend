@@ -7,6 +7,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
+use Tetranz\Select2EntityBundle\Form\Type\Select2EntityType;
+
 class OrganizerFilterType
 extends AbstractType
 {
@@ -32,6 +34,23 @@ extends AbstractType
                 'data-placeholder' => '- all - ',
                 'class' => 'select2',
             ],
+        ]);
+
+        $builder->add('organizer', Select2EntityType::class, [
+            'multiple' => true,
+            'label' => 'Organizer',
+            'remote_route' => 'search-select-organizer',
+            'class' => '\AppBundle\Entity\Location',
+            'primary_key' => 'id',
+            'text_property' => 'name',
+            'minimum_input_length' => 2,
+            'page_limit' => 10,
+            'allow_clear' => false,
+            'delay' => 25,
+            'cache' => true,
+            'cache_timeout' => 60000, // if 'cache' is true
+            'language' => 'en',
+            'placeholder' => '- all -',
         ]);
     }
 

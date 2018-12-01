@@ -14,7 +14,7 @@ extends Kernel
      * Set an Environment Variable in Apache Configuration
      *   SetEnv APP_ENVIRONMENT prod
      * for production setting instead of having www/app.php and www/app_dev.php
-     * This approach is described int
+     * This approach is described in
      *   https://www.pmg.com/blog/symfony-no-app-dev/
      */
     public static function fromEnvironment()
@@ -68,6 +68,9 @@ extends Kernel
             // search / filter / paginate
             new Lexik\Bundle\FormFilterBundle\LexikFormFilterBundle(),
             new Knp\Bundle\PaginatorBundle\KnpPaginatorBundle(),
+
+            // select2 integration
+            new Tetranz\Select2EntityBundle\TetranzSelect2EntityBundle(),
 
             // converturls filter
             new Liip\UrlAutoConverterBundle\LiipUrlAutoConverterBundle(),

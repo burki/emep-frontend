@@ -8,6 +8,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
+use Tetranz\Select2EntityBundle\Form\Type\Select2EntityType;
+
 class ExhibitionFilterType
 extends AbstractType
 {
@@ -34,9 +36,26 @@ extends AbstractType
             'choices' => $options['data']['choices']['exhibition_organizer_type'],
             'label' => 'Type of Organizing Body',
             'attr' => [
-                'data-placeholder' => '- all - ',
+                'data-placeholder' => '- all -',
                 'class' => 'select2',
             ],
+        ]);
+
+        $builder->add('exhibition', Select2EntityType::class, [
+            'multiple' => true,
+            'label' => 'Exhibition',
+            'remote_route' => 'search-select-exhibition',
+            'class' => '\AppBundle\Entity\Exhibition',
+            'primary_key' => 'id',
+            'text_property' => 'title',
+            'minimum_input_length' => 2,
+            'page_limit' => 10,
+            'allow_clear' => false,
+            'delay' => 25,
+            'cache' => true,
+            'cache_timeout' => 60000, // if 'cache' is true
+            'language' => 'en',
+            'placeholder' => '- all -',
         ]);
     }
 

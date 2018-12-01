@@ -3,6 +3,8 @@
 namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
+
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -523,6 +525,121 @@ extends CrudController
             'form' => $this->form->createView(),
             'searches' => $this->lookupSearches($user),
         ]);
+    }
+
+    /**
+     * @Route("/search/select/person", name="search-select-person")
+     * @Route("/search/select/location", name="search-select-location")
+     * @Route("/search/select/organizer", name="search-select-organizer")
+     * @Route("/search/select/exhibition", name="search-select-exhibition")
+     */
+    public function searchSelectAction(Request $request, UrlGeneratorInterface $urlGenerator)
+    {
+        $search = $request->get('q');
+
+        $data = [];
+
+        if (isset($search) && mb_strlen($search, 'UTF-8') >= 2) {
+            $connection = $this->getDoctrine()->getEntityManager()->getConnection();
+
+            switch ($request->get('_route')) {
+                case 'search-select-person':
+                    $listBuilder = new \AppBundle\Utils\PersonListBuilder($connection, $request, $urlGenerator, []);
+                    $fields = [ 'P.lastname', 'P.firstname', 'P.name_variant', 'P.name_variant_ulan' ];
+                    $queryBuilder = $listBuilder->getQueryBuilder();
+
+                    $queryBuilder
+                        ->from('Person', 'P')
+                        ->andWhere('P.status <> -1')
+                        ->select("P.id AS id, COALESCE(CONCAT(P.lastname, ', ', P.firstname), P.lastname) AS text")
+                        ;
+                    break;
+
+                case 'search-select-location':
+                    $listBuilder = new \AppBundle\Utils\VenueListBuilder($connection, $request, $urlGenerator, []);
+                    $fields = [ 'L.name', 'L.name_translit' ];
+                    $queryBuilder = $listBuilder->getQueryBuilder();
+
+                    $queryBuilder
+                        ->from('Location', 'L')
+                        ->andWhere('L.status <> -1 AND 0 = (L.flags & 256)')
+                        ->select("L.id AS id, COALESCE(CONCAT(L.name, ' [', L.name_translit, ']'), L.name) AS text")
+                        ;
+                    break;
+
+                case 'search-select-organizer':
+                    $listBuilder = new \AppBundle\Utils\OrganizerListBuilder($connection, $request, $urlGenerator, []);
+                    $fields = [ 'O.name', 'O.name_translit' ];
+                    $queryBuilder = $listBuilder->getQueryBuilder();
+
+                    $queryBuilder
+                        ->from('Location', 'O')
+                        ->andWhere('O.status <> -1')
+                        ->select("DISTINCT O.id AS id, COALESCE(CONCAT(O.name, ' [', O.name_translit, ']'), O.name) AS text")
+                        ;
+                    $listBuilder->setExhibitionJoin($queryBuilder);
+                    break;
+
+                case 'search-select-exhibition':
+                    $listBuilder = new \AppBundle\Utils\ExhibitionListBuilder($connection, $request, $urlGenerator, []);
+                    $fields = [ 'E.title', 'E.title_short', 'E.title_translit', 'E.title_alternate' ];
+                    $queryBuilder = $listBuilder->getQueryBuilder();
+
+                    $queryBuilder
+                        ->from('Exhibition', 'E')
+                        ->andWhere('E.status <> -1')
+                        ->select("E.id AS id, E.title AS text, E.startdate, E.enddate, E.displaydate")
+                        ;
+                    break;
+            }
+
+
+            $condition = $listBuilder->buildLikeCondition($search, $fields);
+
+            if (!empty($condition)) {
+                foreach ($condition['parameters'] as $name => $value) {
+                    $queryBuilder->setParameter($name, $value);
+                }
+                foreach ($condition['andWhere'] as $andWhere) {
+                    $queryBuilder->andWhere($andWhere);
+                }
+            }
+
+            $queryBuilder
+                ->orderBy('text');
+
+            // TODO: set from $request
+            $queryBuilder
+                ->setFirstResult(0)
+                ->setMaxResults(10);
+
+            $data = $queryBuilder->execute()->fetchAll();
+
+            if ('search-select-exhibition' == $request->get('_route')) {
+                // append date
+                foreach ($data as $i => $row) {
+                    $append = '';
+                    if (!empty($row['displaydate'])) {
+                        $append = $row['displaydate'];
+                    }
+                    else {
+                        $append = \AppBundle\Utils\Formatter::daterangeIncomplete($row['startdate'], $row['enddate']);
+                    }
+
+
+
+                    $data[$i] = [
+                        'id' => $row['id'],
+                        'text' => $row['text']
+                            . (!empty($append) ? ' (' . $append . ')' : ''),
+                    ];
+                }
+            }
+
+        }
+
+
+        return new JsonResponse($data);
     }
 
     protected function instantiateListBuilder(Request $request,

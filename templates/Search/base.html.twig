@@ -34,13 +34,14 @@
         $form.submit();
     }
     </script>
+
+    <!-- most come after generic $('.select2').select2(); call above -->
+    <script src="{{ asset('js/select2entity.js') }}"></script>
 {% endblock %}
 
 {% block body %}
     <div class="w-container">
         <h1 class="heading">{{ pageTitle }}</h1>
-
-
 
             <form id="search" class="" action="{{ path(app.request.get('_route')) }}" method="GET">
                 <input type="hidden" name="entity" value="{{ listBuilder.entity }}" />
@@ -58,7 +59,6 @@
                 </div>
 
                 {% block filters %}
-
                     <div class="filters-heading" style="margin-top: 25px;">
                         <span style="margin-right: 20px; margin-top: 7px">Filter by:</span>
 
@@ -85,7 +85,7 @@
 
                 <div class="filter-combination-container">
 
-                {% form_theme form 'bootstrap_3_horizontal_layout.html.twig' %}
+                {% form_theme form 'Search/bootstrap_3_adjusted.html.twig' %}
                 <div id="filter-panel-catentry" class="collapse filter-panel">
                     <div class="panel panel-default">
                         <div class="panel-heading">Filter by Catalogue Entry</div>
@@ -103,6 +103,7 @@
                             {{ form_row(form.exhibition.date) }}
                             {{ form_row(form.exhibition.type) }}
                             {{ form_row(form.exhibition.organizer_type) }}
+                            {{ form_row(form.exhibition.exhibition) }}
                         </div>
                     </div>
                 </div>
@@ -112,6 +113,7 @@
                         <div class="panel-body">
                             {{ form_row(form.location.geoname) }}
                             {{ form_row(form.location.type) }}
+                            {{ form_row(form.location.location) }}
                         </div>
                     </div>
                 </div>
@@ -121,6 +123,7 @@
                         <div class="panel-body">
                             {#{ form_row(form.organizer.geoname) }#}
                             {{ form_row(form.organizer.type) }}
+                            {{ form_row(form.organizer.organizer) }}
                         </div>
                     </div>
                 </div>
@@ -132,6 +135,7 @@
                             {{ form_row(form.person.nationality) }}
                             {{ form_row(form.person.birthdate) }}
                             {{ form_row(form.person.deathdate) }}
+                            {{ form_row(form.person.person) }}
                         </div>
                     </div>
                 </div>

@@ -33,7 +33,9 @@ twig:
     paths:
         '%kernel.project_dir%/templates': __main__
     form_themes:
-        - LexikFormFilterBundle:Form:form_div_layout.html.twig        
+        - LexikFormFilterBundle:Form:form_div_layout.html.twig
+        - TetranzSelect2EntityBundle:Form:fields.html.twig
+        
     #form:
     #    resources: ['bootstrap_3_horizontal_layout.html.twig']
         

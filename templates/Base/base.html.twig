@@ -74,9 +74,6 @@
         <script src="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.js"></script>
 
 
-
-
-
         {% include 'AppBundle:Shared:stylesheets.html.twig' %}
 
         <script>
@@ -172,12 +169,14 @@
         <script src="{{ app.request.basepath }}/js/tipr.min.js"></script>
 
         <script>
-            $.fn.dataTable.Responsive.breakpoints = [
-                { name: 'desktop', width: Infinity },
-                { name: 'tablet',  width: 1024 },
-                { name: 'fablet',  width: 768 },
-                { name: 'phone',   width: 480 }
-            ];
+            if ('undefined' != typeof $.fn.dataTable.Responsive) {
+                $.fn.dataTable.Responsive.breakpoints = [
+                    { name: 'desktop', width: Infinity },
+                    { name: 'tablet',  width: 1024 },
+                    { name: 'fablet',  width: 768 },
+                    { name: 'phone',   width: 480 }
+                ];
+            }
         </script>
 
         {% if gaTracking is not empty %}
