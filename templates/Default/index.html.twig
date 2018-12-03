@@ -1,67 +1,34 @@
 {% extends 'Base/base.html.twig' %}
 
 {% block body %}
-    <div class="w-container">
-        <div class="home-menu-container">
-            <div class="homepage-main-button-containers" >
-                <div class="general-search-sub-container" style="display:none;">
-                    <a href="{{ path('exhibition-index') }}" class="sub-genera-search-link w-inline-block">
-                        <div class="home-menu-item-text">Exhibitions</div>
-                    </a>
-                    <a href="{{ path('location-index') }}" class="sub-genera-search-link w-inline-block">
-                        <div class="home-menu-item-text">Venues</div>
-                    </a>
-                    <a href="{{ path('organizer-index') }}" class="sub-genera-search-link w-inline-block">
-                        <div class="home-menu-item-text">Organizing Bodies</div>
-                    </a>
-                    <a href="{{ path('person-index') }}" class="sub-genera-search-link w-inline-block">
-                        <div class="home-menu-item-text">Artists</div>
-                    </a>
-                </div>
-                <a href="#" class="link-block w-inline-block basic-search-home" style="background-image: linear-gradient(rgba(24, 105, 163, 0.6), rgba(24, 105, 163, 0.6)), url({{ app.request.basepath }}/img/composition-iv-1911-p-500.jpeg); background-size: cover;">
-                    <div class="home-menu-item-text">Basic Search</div>
-                    <div class="home-menu-item-text-description">View and search lists of Exhibitions, Artists, Venues or Organizing Bodies.</div>
-                </a>
-            </div>
 
-            <div class="homepage-main-button-containers">
-                <a href="{{ path('search') }}" class="link-block w-inline-block basic-search-home" style="background-image: linear-gradient(rgba(24, 105, 163, 0.6), rgba(24, 105, 163, 0.6)), url({{ app.request.basepath }}/img/composition-iv-1911-p-500.jpeg); background-size: cover;">
-                    <div class="home-menu-item-text">Advanced Search</div>
-                    <div class="home-menu-item-text-description">Search all data together with advanced search filters and tools.</div>
-                </a>
-            </div>
-        </div>
-    </div>
 
     <div class="container-6 w-container">
         <div class="main-stats-container">
-            <div class="main-stats-single-container">
-                <div class="main-stat-number"><a href="{{ path('exhibition-index') }}">{{ counts['Exhibition'] }}</a></div>
-                <div class="text-block-3">Total Number of Exhibitions</div>
-            </div>
-            <div class="main-stats-single-container">
-                <div class="main-stat-number"><a href="{{ path('location-index') }}">{{ counts['Venue'] }}</a></div>
-                <div class="text-block-3">Total Number of Venues</div>
-            </div>
-            <div class="main-stats-single-container">
-                <div class="main-stat-number"><a href="{{ path('organizer-index') }}">{{ counts['Organizer'] }}</a></div>
-                <div class="text-block-3">Total Number of Organizing Bodies</div>
-            </div>
-            <div class="main-stats-single-container">
-                <div class="main-stat-number"><a href="{{ path('person-index') }}">{{ counts['Person'] }}</a></div>
-                <div class="text-block-3">Total Number of <br>Artists</div>
-            </div>
-            <div class="main-stats-single-container">
-                <div class="main-stat-number"><a href="{{ path('search') }}">{{ counts['ItemExhibition'] }}</a></div>
-                <div class="text-block-3">Total Number of <br>Catalogue Entries</div>
+            <h1 class="heading-2">Search lists of</h1>
+            <div class="div-block-6">
+                <div class="main-stats-single-container"><a href="{{ path('exhibition-index') }}" class="list-link-menu">Exhibitions</a>
+                    <div class="main-stat-number">{{ counts['Exhibition'] }} Exhibitions</div>
+                </div>
+                <div class="main-stats-single-container"><a href="{{ path('person-index') }}" class="list-link-menu">Artists</a>
+                    <div class="main-stat-number">{{ counts['Person'] }}Artists</div>
+                </div>
+                <div class="main-stats-single-container"><a href="#" class="list-link-menu coming-soon">Art Works</a>
+                    <div class="main-stat-number">coming soon</div>
+                </div>
+                <div class="main-stats-single-container"><a href="#" class="list-link-menu coming-soon">Exhibiting Cities</a>
+                    <div class="main-stat-number">coming soon</div>
+                </div>
+                <div class="main-stats-single-container"><a href="{{ path('location-index') }}" class="list-link-menu">Venues</a>
+                    <div class="main-stat-number">{{ counts['Venue'] }} Venues</div>
+                </div>
+                <div class="main-stats-single-container"><a href="{{ path('organizer-index') }}" class="list-link-menu">Organising Bodies</a>
+                    <div class="main-stat-number">{{ counts['Organizer'] }} Organising Bodies</div>
+                </div>
             </div>
         </div>
+        <div class="advanced-search-header" style="background-image: url('img/composition-iv-1911.jpg')"><a href="v" class="button w-button">ADVANCED SEARCH</a></div>
     </div>
 
-    <script>
-        $('.basic-search-home').on('click', function() {
-           $(this).slideToggle();
-           $('.general-search-sub-container').slideToggle();
-        });
-    </script>
+
 {% endblock %}
