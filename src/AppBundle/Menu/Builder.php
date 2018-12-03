@@ -80,23 +80,28 @@ class Builder
         $menu->addChild('Home', [ 'route' => 'home' ]); // maybe create a view for view data
 
 
-        $menu->addChild('Basic Search', [ 'route' => 'exhibition' ]); // maybe create a view for view data
-        $menu['Basic Search']->addChild('Exhibitions', [
+        $menu->addChild('Search Lists', [ 'route' => 'exhibition' ]); // maybe create a view for view data
+        $menu['Search Lists']->addChild('Exhibitions', [
             'route' => 'exhibition',
         ]);
 
-        $menu['Basic Search']->addChild('Venues', [
-            'route' => 'location',
-        ]);
-
-        $menu['Basic Search']->addChild('Organizers', [
-            'route' => 'organizer',
-        ]);
-
-        $menu['Basic Search']->addChild('Artists', [
+        $menu['Search Lists']->addChild('Artists', [
             'route' => 'person',
         ]);
 
+        $menu['Search Lists']->addChild('Venues', [
+            'route' => 'location',
+        ]);
+
+        $menu['Search Lists']->addChild('Organising Bodies', [
+            'route' => 'organizer',
+        ]);
+
+        $menu['Search Lists']->addChild('Holding Institutions', [
+            'route' => 'holder',
+        ]);
+
+        
 
 
         $menu->addChild('Advanced Search', [ 'route' => 'search' ]);
@@ -107,7 +112,6 @@ class Builder
         ]); */
 
 
-        $menu->addChild('Holding Institutions', [ 'route' => 'holder' ]);
 
         /*
 
