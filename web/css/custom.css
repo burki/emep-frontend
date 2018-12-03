@@ -780,3 +780,7 @@ td.normal a, .listviewrow, .artist-text {
 .heading-title-menu{
     text-align: right;
 }
+
+.button:hover {
+    color: rgba(255,255,255, 0.75)
+}
