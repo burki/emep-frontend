@@ -299,6 +299,8 @@ extends SearchListBuilder
             'E.preface',
             'E.description',
             'L.name',
+            'L.name_translit',
+            'L.name_alternate',
             'L.place',
         ]);
 

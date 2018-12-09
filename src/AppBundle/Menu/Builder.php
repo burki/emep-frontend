@@ -93,7 +93,7 @@ class Builder
             'route' => 'location',
         ]);
 
-        $menu['Search Lists']->addChild('Organising Bodies', [
+        $menu['Search Lists']->addChild('Organizing Bodies', [
             'route' => 'organizer',
         ]);
 
