@@ -380,6 +380,11 @@ extends SearchListBuilder
 
         $this->addSearchFilters($queryBuilder, [
             'IE.title',
+            'IE.title_translit',
+            'IE.title_alternate',
+            'IE.owner',
+            'IE.owner_alternate',
+            'IE.displaycreator',
             'P.lastname',
             'P.firstname',
             'E.title',
@@ -388,10 +393,9 @@ extends SearchListBuilder
             'E.title_alternate',
             'E.subtitle',
             'E.subtitle_alternate',
-            'E.organizing_committee',
-            'E.preface',
-            'E.description',
             'L.name',
+            'L.name_translit',
+            'L.name_alternate',
             'L.place',
         ]);
 
