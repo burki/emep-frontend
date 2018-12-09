@@ -101,7 +101,7 @@ class Builder
             'route' => 'holder',
         ]);
 
-        
+
 
 
         $menu->addChild('Advanced Search', [ 'route' => 'search' ]);

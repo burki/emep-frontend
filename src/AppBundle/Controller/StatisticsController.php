@@ -746,6 +746,63 @@ EOT;
         return $ids;
     }
 
+
+    // CONTINUE HERE
+    public static function exhibitionNationalityPersonIds($em, $nationality, $exhibitionId = null)
+    {
+        $qb = $em->createQueryBuilder();
+
+        $qb->select([
+            'P.id',
+            'P.nationality',
+            'COUNT(DISTINCT IE.id) AS numEntries'
+        ])
+            ->from('AppBundle:ItemExhibition', 'IE')
+            ->innerJoin('IE.person', 'P')
+            ->where('IE.title IS NOT NULL')
+            ->where('P.nationality = ' . $nationality)
+            ->groupBy('P.id')
+            ->orderBy('P.nationality')
+        ;
+
+        if (!is_null($exhibitionId)) {
+            $qb->innerJoin('AppBundle:Exhibition', 'E',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE.exhibition = E AND E.id = :exhibitionId')
+                ->setParameter('exhibitionId', $exhibitionId);
+        }
+
+        $statsByNationality = [];
+        $totalArtists = 0;
+        $totalItemExhibition = 0;
+        $result = $qb->getQuery()->getResult();
+        foreach ($result as $row) {
+            $nationality = empty($row['nationality'])
+                ? 'XX' : $row['nationality'];
+            if (array_key_exists($nationality, self::$countryMap)) {
+                $nationality = self::$countryMap[$nationality];
+            }
+
+            if (!array_key_exists($nationality, $statsByNationality)) {
+                $statsByNationality[$nationality] = [
+                    'countArtists' => 0,
+                    'countItemExhibition' => 0,
+                ];
+            }
+
+            ++$totalArtists;
+            ++$statsByNationality[$nationality]['countArtists'];
+            $statsByNationality[$nationality]['countItemExhibition'] += $row['numEntries'];
+            $totalItemExhibition += $row['numEntries'];
+        }
+
+        return [
+            'totalArtists' => $totalArtists,
+            'totalItemExhibition' => $totalItemExhibition,
+            'nationalities' => $statsByNationality,
+        ];
+    }
+
     public static function exhibitionAgeDistribution($em, $exhibitionId = null, $gender = null, $countryQuery = null, $stringQuery = null, $currIds = [], $exhibitionCountries = [], $organizerTypesQuery = [], $artistBirthDateLeft = 'any' , $artistBirthDateRight= 'any', $artistDeathDateLeft = 'any' , $artistDeathDateRight =  'any')
     {
         $dbconn = $em->getConnection();

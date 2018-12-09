@@ -60,6 +60,8 @@
                                 url += '&series=' + encodeURIComponent(this.name);
                                 url += '&point=' + encodeURIComponent(event.point.name);
 
+                                console.log('URL: ', url);
+
                                 $('#detailModal').modal('show');
                                 $('#detailModal').find(".modal-body").load(url);
                             }
