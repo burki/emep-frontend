@@ -1,0 +1,97 @@
+    {% import 'Shared/highcharts.html.twig' as highcharts %}
+    {{ highcharts.head() }}
+
+    <script type="text/javascript">
+        var chart;
+        $(document).ready(function() {
+            chart = new Highcharts.Chart({
+                chart: {
+                    renderTo: '{{ container|raw }}',
+                    defaultSeriesType: 'column'
+                    /*, margin: [ 50, 50, 100, 80] */
+                },
+                title: {
+                    text: ' '
+                },
+                /*
+                subtitle: {
+                    text: {{ subtitle|raw }}
+                },
+                */
+                xAxis: {
+                    categories: {{ categories|raw }},
+                    labels: {
+                        rotation: 0,
+                        align: 'right'
+                    }
+                },
+                yAxis: [
+                    {
+                        title: {
+                            text: 'Count'
+                        },
+                        min: 0,
+                        tickInterval: 1,
+                        endOnTick: false,
+                        // max: 600
+                        // opposite: true
+                    },
+                ],
+                tooltip: {
+                    formatter: function() {
+                        // console.log(this);
+                        return '<b>'
+                            + Highcharts.numberFormat(this.y, 0)
+                            + ('Age (Deceased Artist)' == this.series.name ? ' deceased' : ' living')
+                            + ' persons exhibiting at age '
+                            + this.point.name
+                            + '</b>';
+                    }
+                },
+                plotOptions: {
+                    series: {
+                        stacking: 'normal',
+                        borderWidth: 1,
+                        groupPadding: 0,
+                        pointPadding: 0,
+                        events: {
+                            click: function (event) {
+                                var url = '{{ path('exhibition-stats-info', { 'id': exhibition_id }) }}?chart={{ container|raw }}';
+                                url += '&series=' + encodeURIComponent(this.name);
+                                url += '&point=' + encodeURIComponent(event.point.name);
+
+                                console.log('URL: ', url);
+
+                                $('#detailModal').modal('show');
+                                $('#detailModal').find(".modal-body").load(url);
+                            }
+                        }
+                    },
+                },
+                series: [
+                    {
+                        yAxis: 0,
+                        name: 'Age (Living Artist)',
+                        data: {{ age_at_exhibition_living|raw }},
+                        stack: 'age',
+                        borderColor: '#3683BA',
+                        borderWidth: 2,
+                        borderRadius: 3,
+                        color: '#3683BAbf'
+                    },
+                    {
+                        yAxis: 0,
+                        name: 'Age (Deceased Artist)',
+                        data: {{ age_at_exhibition_deceased|raw }},
+                        stack: 'age'
+                    }
+                ]
+            });
+        });
+    </script>
+
+{# chart seperated so we can reuse it in per exhibition stats #}
+
+
+<h3 class="chart-header" data-collapse="{{ container|raw }}"><span class="chartsymbol">+</span>Artists’ Exhibitioning Age<span class="charttypeTitle">(Bar Chart)</span></h3>
+<div class="collapse"  id="{{ container|raw }}" style="width: 100%;  height: 400px; margin: 0 auto"></div>
