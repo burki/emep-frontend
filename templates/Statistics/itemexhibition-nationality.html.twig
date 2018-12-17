@@ -35,14 +35,31 @@
                 endAngle: 90,
                 center: ['50%', '50%']
                 */
-            }
+            },
+            series: {
+                stacking: 'normal',
+                borderWidth: 1,
+                groupPadding: 0,
+                pointPadding: 0,
+                events: {
+                click: function (event) {
+                        var url = '{{ path('exhibition-stats-info', { 'id': exhibitionId }) }}?chart=container-countries';
+                        url += '&series=' + encodeURIComponent(this.name);
+                        url += '&point=' + encodeURIComponent(event.point.name);
+
+                        $('#detailModal').modal('show');
+                        $('#detailModal').find(".modal-body").load(url);
+                    }
+                }
+            },
         },
         series: [{
             name: 'Type of Work',
             type: 'pie',
             innerSize: '50%',
             data: {{ data|raw }}
-        }]
+        }],
+
     });
 {% endblock %}
 
@@ -51,3 +68,4 @@
 
     <div id="container" style="width: 100%; height: 400px; margin: 0 auto"></div>
 {% endblock %}
+

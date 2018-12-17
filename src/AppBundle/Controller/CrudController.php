@@ -91,6 +91,26 @@ extends Controller
         return $hydrationQuery->getResult();
     }
 
+    protected  function hydrateWorks($ids, $preserveOrder = false){
+        // hydrate with doctrine entity
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $hydrationQuery = $qb->select([ 'IE', 'field(IE.id, :ids) as HIDDEN field', 'IE.title as nameSort', 'IE.titleTransliterated','IE.measurements', 'IE.technique', 'IE.forsale', 'IE.price', 'IE.owner' ])
+            ->from('AppBundle:ItemExhibition', 'IE')
+            ->where('IE.id IN (:ids)')
+            ->orderBy($preserveOrder ? 'field' : 'nameSort')
+            ->getQuery();
+        ;
+
+
+        $hydrationQuery->setParameter('ids', $ids);
+
+
+        return $hydrationQuery->getResult();
+    }
+
     protected function instantiateCiteProc($locale)
     {
         $kernel = $this->get('kernel');

@@ -32,7 +32,10 @@
     <div class="contentcontainer nopadding w-container">
         <div class="lefthalf">
             <div class="subheader">{% if numExhibitions > 0 %}venue{% endif %}{% if numExhibitions > 0 and numOrganizerOf > 0 %} / {% endif %}{% if numOrganizerOf > 0 %}organizer{% endif %}</div>
-            <h1 class="heading">{{ location.name }}</h1>
+            <h1 class="heading">{{ location.nameTransliterated ? location.nameTransliterated : location.name }}</h1>
+            {% if exhibition.titleAppend is not empty %}
+                <h2 style="margin-top: -0.8rem"><span class="small">{{ location.name }}</span></h2>
+            {% endif %}
             <div class="artist_information">
                 {# load helper part#}
                 {% embed "Location/Parts/location-base-information.html.twig" %}

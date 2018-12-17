@@ -192,6 +192,28 @@ extends Controller
         return " AND E.status <> -1";
     }
 
+
+    public function getStringQueryForItemExhibitionIds($queryArray, $shortOrLongQuery)
+    {
+        if ($queryArray !== 'any') {
+            if ($shortOrLongQuery === 'long') {
+                $query = "ItemExhibition.id = " . join(" OR ItemExhibition.id = ", $queryArray);
+
+                return " AND ( " . $query . " )";
+            }
+
+            $query = "IE.id = " . join(" OR IE.id = ", $queryArray);
+
+            return " AND (" . $query . ")";
+        }
+
+        if ($shortOrLongQuery === 'long') {
+            return " AND ItemExhibition.status <> -1 ";
+        }
+
+        return " AND IE.status <> -1";
+    }
+
     public function getStringQueryForArtists($query, $shortOrLongQuery)
     {
         if ($query !== 'any') {
@@ -209,6 +231,174 @@ extends Controller
         }
 
         return " ";
+    }
+
+    public function exhibitionAgeDistributionIndex($ids = null)
+    {
+        $ids !== null ? array_push($ids, 'true') :  $ids = [];
+
+        $repo = $this->getDoctrine()
+            ->getRepository('AppBundle:Exhibition');
+
+
+        // display the artists by birth-year
+        $stats = StatisticsController::exhibitionAgeDistribution($em = $this->getDoctrine()->getEntityManager(), null, null, null, null, $ids);
+        $ageCount = & $stats['age_count'];
+
+        $categories = $total = [];
+        for ($age = $stats['min_age']; $age <= $stats['max_age'] && $age < 120; $age++) {
+            $categories[] = $age; // 0 == $age % 5 ? $year : '';
+
+            foreach ([ 'living', 'deceased' ] as $cat) {
+                $total['age_' . $cat][$age] = [
+                    'name' => $age,
+                    'y' => isset($ageCount[$age]) && isset($ageCount[$age][$cat])
+                        ? intval($ageCount[$age][$cat]) : 0,
+                ];
+            }
+        }
+
+        return $this->render('Statistics/person-exhibition-age-index-view.html.twig', [
+            'container' => 'container-age',
+            'categories' => json_encode($categories),
+            'age_at_exhibition_living' => json_encode(array_values($total['age_living'])),
+            'age_at_exhibition_deceased' => json_encode(array_values($total['age_deceased'])),
+            'exhibition_id' => 0,
+    ]);
+    }
+
+    public function exhibitionTypeOfWorksIndex ($ids = []) {
+
+
+        $ids !== [] ? array_push($ids, 'true') : $ids = [];
+
+        // type of work
+        $stats = StatisticsController::itemExhibitionTypeDistribution($em = $this->getDoctrine()->getEntityManager(), null, $ids);
+        $data = [];
+        foreach ($stats['types'] as $type => $count) {
+            $percentage = 100.0 * $count / $stats['total'];
+            $dataEntry = [
+                'name' => $type,
+                'y' => (int)$count,
+            ];
+            if ($percentage < 5) {
+                $dataEntry['dataLabels'] = [ 'enabled' => false ];
+            }
+            $data[] = $dataEntry;
+        }
+
+
+
+        return $this->render('Statistics/exhibition-type-index.html.twig', [
+            'container' => 'container-type',
+            'total' => $stats['total'],
+            'data' => json_encode($data),
+            'exhibitionId' => 0
+        ]);
+
+    }
+
+
+    public function exhibitionOrganizerDistribution ($ids = null) {
+        $ids !== null ? array_push($ids, 'true') : $ids = [];
+
+        $repo = $this->getDoctrine()
+            ->getRepository('AppBundle:Exhibition');
+
+        // type of work
+        $stats = StatisticsController::itemExhibitionOrganizerDistribution($em = $this->getDoctrine()->getEntityManager(), $ids);
+
+        $data = [];
+
+
+        foreach ($stats['types'] as $type => $count) {
+            $type ? '' : $type = 'unknown';
+            $percentage = 100.0 * $count / $stats['total'];
+            $dataEntry = [
+                'name' => $type,
+                'y' => (int)$count,
+            ];
+            if ($percentage < 5) {
+                $dataEntry['dataLabels'] = [ 'enabled' => false ];
+            }
+            $data[] = $dataEntry;
+        }
+
+
+        return $this->render('Statistics/exhibition-organizer-index.html.twig', [
+            'container' => 'container-organizer',
+            'total' => $stats['total'],
+            'data' => json_encode($data),
+            'exhibitionId' => 0
+        ]);
+    }
+
+    public function exhibitionCityDistribution ($ids = null) {
+        $ids !== null ? array_push($ids, 'true') : $ids = [];
+
+        $repo = $this->getDoctrine()
+            ->getRepository('AppBundle:Exhibition');
+
+        // type of work
+        $stats = StatisticsController::itemExhibitionLocationDistribution($em = $this->getDoctrine()->getEntityManager(), $ids);
+
+        $data = [];
+
+
+        foreach ($stats['types'] as $type => $count) {
+            $percentage = 100.0 * $count / $stats['total'];
+            $dataEntry = [
+                'name' => $type,
+                'y' => (int)$count,
+            ];
+            if ($percentage < 5) {
+                $dataEntry['dataLabels'] = [ 'enabled' => false ];
+            }
+            $data[] = $dataEntry;
+        }
+
+
+        return $this->render('Statistics/exhibition-city-index.html.twig', [
+            'container' => 'container-location',
+            'total' => $stats['total'],
+            'data' => json_encode($data),
+            'exhibitionId' => 0
+        ]);
+    }
+
+
+    public function exhibitionGenderDistribution ($ids = null) {
+
+        $ids !== null ? array_push($ids, 'true') : $ids = [];
+
+        $repo = $this->getDoctrine()
+            ->getRepository('AppBundle:Exhibition');
+
+        // type of work
+        $stats = StatisticsController::itemexhibitionGenderDistribution($em = $this->getDoctrine()->getEntityManager(), $ids);
+
+        $data = [];
+
+        foreach ($stats['stats'] as $type => $count) {
+            $percentage = 100.0 * $count / $stats['total'];
+            $dataEntry = [
+                'name' => $type,
+                'y' => (int)$count,
+            ];
+            if ($percentage < 5) {
+                $dataEntry['dataLabels'] = [ 'enabled' => false ];
+            }
+            $data[] = $dataEntry;
+        }
+
+
+        return $this->render('Statistics/exhibition-gender-index.html.twig', [
+            'container' => 'container-gender',
+            'total' => $stats['total'],
+            'data' => json_encode($data),
+            'exhibitionId' => 0
+        ]);
+
     }
 
     public function exhibitionByMonthIndex($countriesQuery, $organizerTypeQuery, $stringQuery, $currIds = [], $artistGender = '', $artistNationalities = [], $exhibitionStartDateLeft = 'any', $exhibitionStartDateRight = 'any')
@@ -284,6 +474,9 @@ extends Controller
                         GROUP BY start_year, MONTH(startdate)
                         ORDER BY start_year, start_month";
 
+
+
+
         $stmt = $dbconn->query($querystr);
         $frequency_count = [];
         $min_year = -1;
@@ -292,6 +485,7 @@ extends Controller
                 $min_year = (int)$row['start_year'];
             }
             $key = $row['start_year'] . sprintf('%02d', $row['start_month']);
+
             $how_many = (int)$row['how_many'];
             $frequency_count[$key] = $how_many;
         }
@@ -302,9 +496,35 @@ extends Controller
         $i = $min = $keys[0];
         $max = $keys[count($keys) - 1];
         $sum = 0;
+
         while ($i <= $max) {
             $key = $i;
             $categories[] = sprintf('%04d-%02d', $year = intval($i / 100), $month = $i % 100);
+
+
+            /*$querystrIds = "SELECT YEAR(startdate) AS start_year, MONTH(startdate) AS start_month, EArtist.exhId
+                        FROM (
+                            Select Exhibition.id as exhId, Exhibition.id_location as id_location, Exhibition.status as status, Exhibition.startdate as startdate
+                            FROM Exhibition
+                            LEFT JOIN ItemExhibition ON ItemExhibition.id_exhibition = Exhibition.id
+                            LEFT JOIN Person ON Person.id = ItemExhibition.id_person
+                            " . $nationalitySubquery . " 
+                            GROUP BY Exhibition.id
+                            ORDER BY Exhibition.id, Person.id
+                                ) as EArtist
+
+                        WHERE EArtist.status <> -1 AND MONTH(startdate) <> 0
+                        AND YEAR(startdate) = " . $year .  " AND MONTH(startdate) = " . $month . "
+                        GROUP BY start_year, MONTH(startdate)
+                        ORDER BY start_year, start_month";
+
+            // get ids for click event on bar
+            $stmt = $dbconn->query($querystrIds);
+            while ($row = $stmt->fetch()) {
+                // print_r($rowId['exhId']);
+                //print_r('-------- new  ---------');
+            }*/
+
             $count = array_key_exists($key, $frequency_count) ? $frequency_count[$key] : 0;
             $sum += $count;
             $data[] = $count;
@@ -676,22 +896,124 @@ extends Controller
         ]);
     }
 
-    public static function itemExhibitionTypeDistribution($em, $exhibitionId = null)
+
+    public static function itemExhibitionOrganizerDistribution($em, $currIds = []){
+
+        $dbconn = $em->getConnection();
+
+        $where = '';
+
+        if (in_array("true", $currIds)) {
+            // remove true statement from ids
+            $pos = array_search('true', $currIds);
+            unset($currIds[$pos]);
+
+            if($where === ''){
+                $where = 'WHERE Exhibition.id <> -1 ';
+            }
+
+            $where .= StatisticsController::getStringQueryForExhibitionIds($currIds, 'long');
+        }
+
+
+        $querystr = "SELECT COUNT(*) AS how_many, Exhibition.organizer_type FROM Exhibition
+        " . $where . "
+        GROUP BY Exhibition.organizer_type
+        ORDER BY how_many DESC";
+
+
+
+        $stmt = $dbconn->query($querystr);
+        $total = 0;
+        $stats = [];
+        while ($row = $stmt->fetch()) {
+            $city = $row['organizer_type'];
+            $stats[$city] = $row['how_many'];
+            $total += $row['how_many'];
+        }
+
+        return [
+            'total' => $total,
+            'types' => $stats,
+        ];
+    }
+
+
+
+
+    public static function itemExhibitionLocationDistribution($em, $currIds = []){
+
+        $dbconn = $em->getConnection();
+
+        $where = '';
+
+        if (in_array("true", $currIds)) {
+            // remove true statement from ids
+            $pos = array_search('true', $currIds);
+            unset($currIds[$pos]);
+
+            if($where === ''){
+                $where = 'WHERE Exhibition.id <> -1 ';
+            }
+
+            $where .= StatisticsController::getStringQueryForExhibitionIds($currIds, 'long');
+        }
+
+
+        $querystr = "
+        SELECT COUNT(*) AS how_many, Location.place FROM Exhibition 
+        INNER JOIN Location ON Location.id = Exhibition.id_location
+        " . $where . "
+        GROUP BY Location.place
+        ORDER BY how_many DESC
+        ";
+
+        $stmt = $dbconn->query($querystr);
+        $total = 0;
+        $stats = [];
+        while ($row = $stmt->fetch()) {
+            $city = $row['place'];
+            $stats[$city] = $row['how_many'];
+            $total += $row['how_many'];
+        }
+
+        return [
+            'total' => $total,
+            'types' => $stats,
+        ];
+    }
+
+    // TODO doesn't work without any filters
+    public static function itemExhibitionTypeDistribution($em, $exhibitionId = null, $currIds = [])
     {
         $dbconn = $em->getConnection();
 
+
+        $where = '';
+
         $where = !is_null($exhibitionId)
             ? sprintf('WHERE ItemExhibition.id_exhibition=%d', intval($exhibitionId))
-            : '';
+            : 'WHERE ItemExhibition.id <> -1 AND TypeTerm.id > 0 ';
 
-        $querystr = <<<EOT
-SELECT TypeTerm.id, TypeTerm.name, TypeTerm.aat, COUNT(*) AS how_many
-FROM ItemExhibition
-LEFT OUTER JOIN Term TypeTerm ON ItemExhibition.type=TypeTerm.id
-{$where}
-GROUP BY TypeTerm.id, TypeTerm.name
-ORDER BY TypeTerm.name
-EOT;
+        if (in_array("true", $currIds)) {
+            // remove true statement from ids
+            $pos = array_search('true', $currIds);
+            unset($currIds[$pos]);
+
+            if($where === ''){
+                $where = 'WHERE ItemExhibition.id <> -1 AND TypeTerm.id > 0 ';
+            }
+
+            $where .= StatisticsController::getStringQueryForItemExhibitionIds($currIds, 'long');
+        }
+
+        $querystr = "
+        SELECT TypeTerm.id, TypeTerm.name, TypeTerm.aat, COUNT(*) AS how_many
+        FROM ItemExhibition
+        LEFT OUTER JOIN Term TypeTerm ON ItemExhibition.type=TypeTerm.id
+        " . $where . " 
+        GROUP BY TypeTerm.id, TypeTerm.name
+        ORDER BY TypeTerm.name";
 
         $stmt = $dbconn->query($querystr);
         $total = 0;
@@ -708,6 +1030,42 @@ EOT;
             'total' => $total,
             'types' => $stats,
         ];
+    }
+
+
+    public static function itemExhibitionTypeDistributionFull($em, $labelTerm, $exhibitionId = null)
+    {
+        $dbconn = $em->getConnection();
+
+        $where = !is_null($exhibitionId)
+            ? sprintf('WHERE ItemExhibition.id_exhibition=%d', intval($exhibitionId))
+            : '';
+
+
+        $labelTerm = $labelTerm === 'unknown'
+            ? '0_unknown'
+            : $labelTerm;
+
+        $andWhere = !is_null($labelTerm)
+            ? sprintf('AND TypeTerm.name="%s"', $labelTerm)
+            : '';
+
+        $querystr = <<<EOT
+SELECT ItemExhibition.id, TypeTerm.name, TypeTerm.aat
+FROM ItemExhibition
+LEFT OUTER JOIN Term TypeTerm ON ItemExhibition.type=TypeTerm.id
+{$where} {$andWhere}
+ORDER BY TypeTerm.name
+EOT;
+
+        $stmt = $dbconn->query($querystr);
+        $total = 0;
+        $ids = [];
+        while ($row = $stmt->fetch()) {
+            array_push($ids,$row['id']);
+        }
+
+        return $ids;
     }
 
     public static function exhibitionAgePersonIds($em, $age, $exhibitionId = null)
@@ -760,10 +1118,11 @@ EOT;
             ->from('AppBundle:ItemExhibition', 'IE')
             ->innerJoin('IE.person', 'P')
             ->where('IE.title IS NOT NULL')
-            ->where('P.nationality = ' . $nationality)
+            ->where("P.nationality = '" . $nationality . "'")
             ->groupBy('P.id')
             ->orderBy('P.nationality')
         ;
+
 
         if (!is_null($exhibitionId)) {
             $qb->innerJoin('AppBundle:Exhibition', 'E',
@@ -773,10 +1132,13 @@ EOT;
         }
 
         $statsByNationality = [];
+        $artistIds = [];
         $totalArtists = 0;
         $totalItemExhibition = 0;
         $result = $qb->getQuery()->getResult();
+
         foreach ($result as $row) {
+
             $nationality = empty($row['nationality'])
                 ? 'XX' : $row['nationality'];
             if (array_key_exists($nationality, self::$countryMap)) {
@@ -794,16 +1156,23 @@ EOT;
             ++$statsByNationality[$nationality]['countArtists'];
             $statsByNationality[$nationality]['countItemExhibition'] += $row['numEntries'];
             $totalItemExhibition += $row['numEntries'];
+
+            array_push($artistIds, $row['id']);
+
+
+
         }
 
-        return [
+        return [ 'artists'=>$artistIds ];
+
+        /*return [
             'totalArtists' => $totalArtists,
             'totalItemExhibition' => $totalItemExhibition,
             'nationalities' => $statsByNationality,
-        ];
+        ];*/
     }
 
-    public static function exhibitionAgeDistribution($em, $exhibitionId = null, $gender = null, $countryQuery = null, $stringQuery = null, $currIds = [], $exhibitionCountries = [], $organizerTypesQuery = [], $artistBirthDateLeft = 'any' , $artistBirthDateRight= 'any', $artistDeathDateLeft = 'any' , $artistDeathDateRight =  'any')
+    public static function exhibitionAgeDistribution($em, $exhibitionId = null, $gender = null, $countryQuery = null, $stringQuery = null, $currIds = [], $exhibitionCountries = [], $organizerTypesQuery = [], $artistBirthDateLeft = 'any' , $artistBirthDateRight= 'any', $artistDeathDateLeft = 'any' , $artistDeathDateRight =  'any', $currIdsExh = [])
     {
         $dbconn = $em->getConnection();
 
@@ -814,7 +1183,7 @@ EOT;
         // build where query for exhibitionID
         if (!is_null($exhibitionId)) {
             $where = sprintf('WHERE Exhibition.id=%d',
-                             intval($exhibitionId));
+                intval($exhibitionId));
             $conditionCounter++;
         }
 
@@ -845,15 +1214,34 @@ EOT;
 
             $where .=  StatisticsController::getStringQueryForLocationInArtist($exhibitionCountries, 'country', 'long');
 
-
-
-            if (in_array("true", $currIds)) {
-                // remove true statement from ids
-                $pos = array_search('true', $currIds);
-                unset($currIds[$pos]);
-                $where .= StatisticsController::getStringQueryForPersonIds($currIds, 'long');
-            }
         }
+
+        if (in_array("true", $currIds)) {
+            // remove true statement from ids
+            $pos = array_search('true', $currIds);
+            unset($currIds[$pos]);
+
+            if($where === ''){
+                $where = 'WHERE Exhibition.id <> -1 ';
+            }
+
+            $where .= StatisticsController::getStringQueryForPersonIds($currIds, 'long');
+        }
+
+
+        if (in_array("true", $currIdsExh)) {
+            // remove true statement from ids
+            $pos = array_search('true', $currIdsExh);
+            unset($currIdsExh[$pos]);
+
+            if($where === ''){
+                $where = 'WHERE Exhibition.id <> -1 ';
+            }
+
+            $where .= StatisticsController::getStringQueryForExhibitionIds($currIdsExh, 'long');
+        }
+
+
 
 
         $querystr = <<<EOT
@@ -891,6 +1279,62 @@ EOT;
             'min_age' => $min_age,
             'max_age' => $max_age,
             'age_count' => $ageCount,
+        ];
+    }
+
+
+    public static function itemexhibitionGenderDistribution($em, $currIds = [])
+    {
+        $dbconn = $em->getConnection();
+
+        $conditionCounter = 0;
+
+        $where = '';
+
+
+        if (in_array("true", $currIds)) {
+            // remove true statement from ids
+            $pos = array_search('true', $currIds);
+            unset($currIds[$pos]);
+
+            if($where === ''){
+                $where = 'WHERE Exhibition.id <> -1 ';
+            }
+
+            $where .= StatisticsController::getStringQueryForExhibitionIds($currIds, 'long');
+        }
+
+
+
+
+        $querystr = <<<EOT
+SELECT COUNT(*) AS how_many, Person.sex
+FROM Exhibition
+INNER JOIN ItemExhibition ON ItemExhibition.id_exhibition=Exhibition.id
+INNER JOIN Person ON ItemExhibition.id_person=Person.id AND Person.birthdate IS NOT NULL
+LEFT JOIN Location ON Location.id = Exhibition.id_location
+$where
+GROUP BY Person.sex
+EOT;
+
+
+        $stmt = $dbconn->query($querystr);
+        $total = 0;
+        $male = 0;
+        $female = 0;
+        while ($row = $stmt->fetch()) {
+            if($row['sex'] === 'M'){
+                $male = $row['how_many'];
+            }else if ($row['sex'] === 'F') {
+                $female = $row['how_many'];
+            }
+
+            $total += $row['how_many'];
+        }
+
+        return [
+            'stats' => ['male' => $male, 'female' => $female ],
+            'total' => $total
         ];
     }
 
@@ -939,12 +1383,15 @@ EOT;
             ++$statsByNationality[$nationality]['countArtists'];
             $statsByNationality[$nationality]['countItemExhibition'] += $row['numEntries'];
             $totalItemExhibition += $row['numEntries'];
+
         }
+
 
         return [
             'totalArtists' => $totalArtists,
             'totalItemExhibition' => $totalItemExhibition,
             'nationalities' => $statsByNationality,
+            'exhId' => $exhibitionId
         ];
     }
 

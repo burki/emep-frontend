@@ -770,6 +770,7 @@ extends CrudController
             'catalogueEntries' => $this->findCatalogueEntries($person),
             'similar' => $this->findSimilar($person),
             'currentPageId' => $id,
+            'countryArray' => $this->buildCountries(),
             'dataNumberOfExhibitionsPerYear' => $dataNumberOfExhibitionsPerYear,
             'dataNumberOfExhibitionsPerCity' => $dataNumberOfExhibitionsPerCity,
             'dataNumberOfExhibitionsPerCountry' => $dataNumberOfExhibitionsPerCountry,

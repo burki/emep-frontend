@@ -3,12 +3,24 @@
 {% import 'Shared/helper.html.twig' as helper %}
 
 {% block body %}
-    {% for type,persons in personsByType %}
-        <h2>{{ type|capitalize }} Artists exhibiting at Age {{ age }}</h2>
-        <ul class="list-group">
-        {% for person in persons %}
-            <li class="list-group-item">{{ helper.person_list_item(person) }}</li>
-        {% endfor %}
-        </ul>
-    {% endfor %}
+    <h2>{{ heading }}</h2>
+    <ul class="list-group">
+        {% if type == "person" %}
+            {% for person in elements %}
+                <li class="list-group-item">{{ helper.person_list_item(person) }}</li>
+            {% endfor %}
+        {% elseif type == "works" %}
+            {% for work in elements %}
+                {% set work = work[0] %}
+                <li class="list-group-item">
+                    {{ work['nameSort'] }}{{ work['titleTransliterated'] ? ', ' +  work['titleTransliterated'] : '' }}
+                    {{ work['forsale'] == 'Y' ? ', for sale' : '' }}
+                    {{ work['forsale'] == 'N' ? ', not for sale' : '' }}
+                    {{ work['measurements'] ? ', measurements: ' + work['measurements']  : '' }}
+                    {{ work['price'] ? ', price: ' + work['price']  : '' }}
+                    {{ work['owner'] ? ', owner: ' + work['owner']  : '' }}
+                </li>
+            {% endfor %}
+        {% endif %}
+    </ul>
 {% endblock %}

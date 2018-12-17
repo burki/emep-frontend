@@ -97,9 +97,6 @@ class Builder
             'route' => 'organizer',
         ]);
 
-        $menu['Search Lists']->addChild('Holding Institutions', [
-            'route' => 'holder',
-        ]);
 
 
 
@@ -147,6 +144,11 @@ class Builder
 
         $menu['Info']->addChild('Cooperating Institutions', [
             'route' => 'cooperating',
+        ]);
+
+
+        $menu['Info']->addChild('Holding Institutions', [
+            'route' => 'holder',
         ]);
 
 

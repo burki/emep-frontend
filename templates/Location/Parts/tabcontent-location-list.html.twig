@@ -95,7 +95,7 @@
                 {% endif %}
                 <tr class="listviewrow">
                     <td class="title"><span class="checkmark {% if location.id in ids %} checked {% endif %}" data-id="{{ location.id }}"></span>
-                        <a href="{{ path('location', { 'id' : location.id }) }}"><b>{{ location.name }}</b></a>
+                        <a href="{{ path('location', { 'id' : location.id }) }}"><b>{{ location.nameTransliterated ? location.nameTransliterated : location.name }}</b></a>
                     </td>
 
                     <td class="normal">

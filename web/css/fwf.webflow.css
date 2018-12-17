@@ -887,7 +887,7 @@ a {
 
 .main-stat-number {
   color: rgba(91, 105, 116, .8);
-  font-size: 12px;
+  font-size: 11px;
   line-height: 12px;
   font-weight: 400;
   text-align: center;
@@ -1013,9 +1013,9 @@ a {
 
 .heading-2 {
   margin-top: 0px;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
   color: #5b6974;
-  font-size: 24px;
+  font-size: 18px;
   line-height: 24px;
   text-align: center;
 }
@@ -1037,17 +1037,19 @@ a {
   align-items: center;
   border-radius: 7px;
   background-image: url('../images/composition-iv-1911.jpg');
-  background-position: 50% 50%;
+  background-position: 50% 100%;
   background-size: cover;
   font-size: 18px;
   font-weight: 700;
 }
 
 .button {
-  padding: 27px 45px;
+  padding: 27px 55px;
   border-radius: 5px;
   background-color: #1869a3;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .58);
+  font-size: 20px;
+  font-weight: 900;
 }
 
 @media (max-width: 991px) {

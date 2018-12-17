@@ -22,7 +22,7 @@
 {% if deathPlace is not empty or person.deathDate is not empty %}
     <div class="artist-information-container">
         <div class="artist-information-label">{{ 'Died'|trans }}:</div>
-        <div class="artist-information-text">{{ person.deathDate|dateincomplete -}}
+        <div class="artist-information-text">{{ person.nationality|dateincomplete -}}
             {% if deathPlace is not empty %}{% if person.deathDate is not empty %}{{- ',' }}{% endif %}
                 {% if deathPlace.id is not empty %}
                     <a href="{% if deathPlace.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : deathPlace.tgn }) }}{% else %}{{ path('place', { 'id' : deathPlace.id }) }}{% endif %}">
@@ -35,6 +35,12 @@
         </div>
     </div>
 {% endif %}
+
+<div class="artist-information-container">
+    <div class="artist-information-label">{{ 'Nationality'|trans }}:</div>
+    <div class="artist-information-text">{{ countryArray[person.nationality] -}}
+    </div>
+</div>
 
 {# addresses #}
 {% set addresses = person.addressesSeparated %}
