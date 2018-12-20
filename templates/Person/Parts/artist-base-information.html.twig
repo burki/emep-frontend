@@ -1,4 +1,4 @@
-{# birth place and date#}
+{# birth place and date #}
 {% set birthPlace = person.birthPlaceInfo(app.request.locale) %}
 {% if birthPlace is not empty or person.birthDate is not empty %}
     <div class="artist-information-container">
@@ -22,7 +22,7 @@
 {% if deathPlace is not empty or person.deathDate is not empty %}
     <div class="artist-information-container">
         <div class="artist-information-label">{{ 'Died'|trans }}:</div>
-        <div class="artist-information-text">{{ person.nationality|dateincomplete -}}
+        <div class="artist-information-text">{{ person.deathDate|dateincomplete -}}
             {% if deathPlace is not empty %}{% if person.deathDate is not empty %}{{- ',' }}{% endif %}
                 {% if deathPlace.id is not empty %}
                     <a href="{% if deathPlace.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : deathPlace.tgn }) }}{% else %}{{ path('place', { 'id' : deathPlace.id }) }}{% endif %}">
