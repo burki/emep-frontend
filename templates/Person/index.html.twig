@@ -42,7 +42,7 @@
     <div class="filter-combination-container">
         <div class="filters-heading">
             <div class="advanced-filters-title"><span class="advanced-filters-title-sign">+</span> Filters</div>
-            <div class="advanced-ftilers-container" style="display:none">
+            <div class="advanced-filters-container" style="display:none">
                 <div class="advanced-filters-selection">
                     <select id="advancedFilterType" class="text-field-class w-select">
                         <option value="birthYearArtist">birth year of artist</option>
@@ -144,7 +144,6 @@
                             <div>is</div>
                         </div>
                         <div class="first-filter-term">
-                            {# find country to text method #}
                             <div>active</div>
                         </div>
                     </div>
@@ -167,7 +166,6 @@
                             <div>is in between</div>
                         </div>
                         <div class="first-filter-term">
-                            {# find country to text method #}
                             <div>{{ birthDate['left_date']|date("Y") }} and {{ birthDate['right_date']|date("Y") }}</div>
                         </div>
                     </div>
@@ -191,7 +189,6 @@
                             <div>is in between</div>
                         </div>
                         <div class="first-filter-term">
-                            {# find country to text method #}
                             <div>{{ deathDate['left_date']|date("Y") }} and {{ deathDate['right_date']|date("Y") }}</div>
                         </div>
                     </div>
@@ -238,7 +235,6 @@
                             <div>is equal to</div>
                         </div>
                         <div class="first-filter-term">
-                            {# find country to text method #}
                             <div>{{ orgBody }}</div>
                         </div>
                     </div>
@@ -453,7 +449,7 @@
 
 
             $('.advanced-filters-title').on('click', function() {
-                $('.advanced-ftilers-container').toggle();
+                $('.advanced-filters-container').toggle();
 
                 // toggle + / -  sign
                 if($('.advanced-filters-title-sign').text() == '+'){
