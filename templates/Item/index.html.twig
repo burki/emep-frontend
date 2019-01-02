@@ -14,7 +14,18 @@
 {% block body %}
     <h1>{{ pageTitle }}</h1>
     <div class="row">
-        <div class="col-sm-8">
+        <div class="col-sm-12">
+        {% if collections is not empty %}
+        <form method="get">
+            <select name="collection" onchange="this.form.submit()">
+                <option value="">-- all --</option>
+                {% for id,name in collections %}
+                <option value="{{ id }}"{% if id == collection %} selected="selected"{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+        </form>
+        {% endif %}
+
         {% if results is not empty %}
         {% set last_creator = null %}
         {% for item in results %}

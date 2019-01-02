@@ -29,8 +29,8 @@ class Item
     private $status = 0;
 
     /**
-     * #ORM\ManyToOne(targetEntity="Collection", cascade={"all"}, fetch="EAGER")
-     * #ORM\JoinColumn(name="collection", referencedColumnName="id")
+     * @ORM\ManyToOne(targetEntity="Collection", cascade={"all"}, fetch="EAGER")
+     * @ORM\JoinColumn(name="collection", referencedColumnName="id")
      */
     private $collection;
 

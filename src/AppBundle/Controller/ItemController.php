@@ -16,6 +16,25 @@ extends Controller
 {
     use SharingBuilderTrait;
 
+    protected function buildCollections()
+    {
+        $em = $this->getDoctrine()
+                ->getManager();
+
+        $result = $em->createQuery("SELECT C.id, C.name FROM AppBundle:Collection C"
+                                   . " WHERE C.status <> -1"
+                                   . " ORDER BY C.name")
+                ->getResult();
+
+        $collections = [];
+
+        foreach ($result as $row) {
+            $collections[$row['id']] = $row['name'];
+        }
+
+        return $collections;
+    }
+
     /**
      * @Route("/work", name="item-index")
      * @Route("/work/by-exhibition", name="item-by-exhibition")
@@ -32,6 +51,7 @@ extends Controller
         $qbPerson = $this->getDoctrine()
                 ->getManager()
                 ->createQueryBuilder();
+
         $qbPerson->select('P')
             ->distinct()
             ->from('AppBundle:Person', 'P')
@@ -100,7 +120,16 @@ extends Controller
             if (!empty($person) && intval($person) > 0) {
                 $qb->andWhere(sprintf('P.id=%d', intval($person)));
             }
+
             $persons = $qbPerson->getQuery()->getResult();
+        }
+
+        $collections = $this->buildCollections();
+        $collection = $request->get('collection');
+
+        if (!empty($collection) && array_key_exists($collection, $collections)) {
+            $qb->innerJoin('I.collection', 'C');
+            $qb->andWhere(sprintf('C.id=%d', intval($collection)));
         }
 
         $results = $qb->getQuery()
@@ -113,6 +142,8 @@ extends Controller
             'pageTitle' => $this->get('translator')->trans('Works'),
             'results' => $results,
             'persons' => $persons,
+            'collections' => $collections,
+            'collection' => $collection,
         ]);
     }
 
