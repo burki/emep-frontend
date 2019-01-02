@@ -18,7 +18,8 @@
 
 namespace AppBundle\Twig;
 
-class AppExtension extends \Twig_Extension
+class AppExtension
+extends \Twig_Extension
 {
     private $translator;
     private $slugifyer;
@@ -47,6 +48,8 @@ class AppExtension extends \Twig_Extension
     {
         return [
             // general
+            new \Twig_SimpleFilter('without', [ $this, 'withoutFilter' ]),
+
             new \Twig_SimpleFilter('dateincomplete', [ $this, 'dateincompleteFilter' ]),
             new \Twig_SimpleFilter('datedecade', [ $this, 'datedecadeFilter' ]),
             new \Twig_SimpleFilter('epoch', [ $this, 'epochFilter' ]),
@@ -60,6 +63,26 @@ class AppExtension extends \Twig_Extension
             new \Twig_SimpleFilter('renderCitation', [ $this, 'renderCitation' ],
                                    [ 'is_safe' => [ 'html' ] ]),
         ];
+    }
+
+    // see https://api.drupal.org/api/drupal/core%21themes%21engines%21twig%21twig.engine/function/twig_without/8.2.x
+    public function withoutFilter($element) {
+        if ($element instanceof \ArrayAccess) {
+            $filtered_element = clone $element;
+        }
+        else {
+            $filtered_element = $element;
+        }
+
+        $args = func_get_args();
+        unset($args[0]);
+        foreach ($args as $arg) {
+            if (isset($filtered_element[$arg])) {
+                unset($filtered_element[$arg]);
+            }
+        }
+
+        return $filtered_element;
     }
 
     private function getLocale()
