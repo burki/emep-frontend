@@ -661,6 +661,28 @@ EOT;
     }
 
     /**
+     * TODO: share with ItemController
+     */
+    protected function buildCollections()
+    {
+        $em = $this->getDoctrine()
+                ->getManager();
+
+        $result = $em->createQuery("SELECT C.id, C.name FROM AppBundle:Collection C"
+                                   . " WHERE C.status <> -1"
+                                   . " ORDER BY C.name")
+                ->getResult();
+
+        $collections = [];
+
+        foreach ($result as $row) {
+            $collections[$row['id']] = $row['name'];
+        }
+
+        return $collections;
+    }
+
+    /**
      * TODO: rename since we added cities as well
      *
      * @Route("/work/by-person", name="item-by-person")
