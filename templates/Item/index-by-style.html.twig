@@ -16,8 +16,9 @@
     <div class="row">
         <div class="col-sm-8">
         {% if results is not empty %}
-        {% if persons is not null %}
+        {% if persons is not null or collections is not empty %}
             <form method="get">
+                {% if persons is not null %}
                 <select name="person" onchange="this.form.submit()">
                     <option value="">-- all --</option>
                     {% for person in persons %}
@@ -26,6 +27,15 @@
                         </option>
                     {% endfor %}
                 </select>
+                {% endif %}
+                {% if collections is not empty %}
+                <select name="collection" onchange="this.form.submit()">
+                    <option value="">-- all --</option>
+                    {% for id,name in collections %}
+                    <option value="{{ id }}"{% if id == collection %} selected="selected"{% endif %}>{{ name }}</option>
+                    {% endfor %}
+                </select>
+                {% endif %}
             </form>
         {% endif %}
         {% set last_style = null %}

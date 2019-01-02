@@ -219,6 +219,17 @@
 {% endblock %}
 
 {% block body %}
+    {% if collections is not empty %}
+    <form method="get">
+        <select name="collection" onchange="this.form.submit()">
+            <option value="">-- all --</option>
+            {% for id,name in collections %}
+            <option value="{{ id }}"{% if id == collection %} selected="selected"{% endif %}>{{ name }}</option>
+            {% endfor %}
+        </select>
+    </form>
+    {% endif %}
+
     <h3>By Artist</h3>
     <div id="container" style="width: 100%; height: 400px; margin: 0 auto"></div>
     <h3>By City</h3>

@@ -508,7 +508,7 @@ extends Controller
                             FROM Exhibition
                             LEFT JOIN ItemExhibition ON ItemExhibition.id_exhibition = Exhibition.id
                             LEFT JOIN Person ON Person.id = ItemExhibition.id_person
-                            " . $nationalitySubquery . " 
+                            " . $nationalitySubquery . "
                             GROUP BY Exhibition.id
                             ORDER BY Exhibition.id, Person.id
                                 ) as EArtist
@@ -961,7 +961,7 @@ extends Controller
 
 
         $querystr = "
-        SELECT COUNT(*) AS how_many, Location.place FROM Exhibition 
+        SELECT COUNT(*) AS how_many, Location.place FROM Exhibition
         INNER JOIN Location ON Location.id = Exhibition.id_location
         " . $where . "
         GROUP BY Location.place
@@ -1011,7 +1011,7 @@ extends Controller
         SELECT TypeTerm.id, TypeTerm.name, TypeTerm.aat, COUNT(*) AS how_many
         FROM ItemExhibition
         LEFT OUTER JOIN Term TypeTerm ON ItemExhibition.type=TypeTerm.id
-        " . $where . " 
+        " . $where . "
         GROUP BY TypeTerm.id, TypeTerm.name
         ORDER BY TypeTerm.name";
 
@@ -1918,10 +1918,28 @@ EOT;
             'data' => json_encode($data),
             'persons' => $data,
         ]);
+    }
 
+    /**
+     * TODO: share with ItemController
+     */
+    protected function buildCollections()
+    {
+        $em = $this->getDoctrine()
+                ->getManager();
 
+        $result = $em->createQuery("SELECT C.id, C.name FROM AppBundle:Collection C"
+                                   . " WHERE C.status <> -1"
+                                   . " ORDER BY C.name")
+                ->getResult();
 
+        $collections = [];
 
+        foreach ($result as $row) {
+            $collections[$row['id']] = $row['name'];
+        }
+
+        return $collections;
     }
 
     /**
@@ -1929,36 +1947,50 @@ EOT;
      *
      * @Route("/work/by-person", name="item-by-person")
      */
-    public function itemByPersonAction()
+    public function itemByPersonAction(Request $request)
     {
+        $collections = $this->buildCollections();
+        $collection = $request->get('collection');
+
+        $collectionCondition = '';
+        if (!empty($collection) && array_key_exists($collection, $collections)) {
+            $collectionCondition = sprintf(' AND Item.collection=%d',
+                                           intval($collection));
+        }
+
         // display the number of works / exhibited works by artist
         $em = $this->getDoctrine()->getEntityManager();
 
         $dbconn = $em->getConnection();
         $querystr = "SELECT 'items' AS type, COUNT(*) AS how_many FROM Item"
                   . " WHERE status <> -1"
+                  . $collectionCondition
                   ;
         $querystr .= " UNION SELECT 'total' AS type, COUNT(ItemExhibition.id) AS how_many"
-                   . " FROM Item INNER JOIN ItemExhibition ON Item.id=ItemExhibition.id_item WHERE Item.status <> -1";
+                   . " FROM Item INNER JOIN ItemExhibition ON Item.id=ItemExhibition.id_item"
+                   . " WHERE Item.status <> -1" . $collectionCondition;
+
         $stmt = $dbconn->query($querystr);
         $subtitle_parts = [];
         while ($row = $stmt->fetch()) {
           if ('active' == $row['type']) {
             $total_active = $row['how_many'];
           }
+
           $subtitle_parts[] = $row['how_many'];
         }
+
         $subtitle = implode(' out of ', $subtitle_parts) . ' persons';
 
         // by person
         $data = [];
         $styles = [];
-        foreach (['works', 'works_exhibited', 'exhibitions' ] as $key) {
+        foreach ([ 'works', 'works_exhibited', 'exhibitions' ] as $key) {
             if ('works_exhibited' == $key) {
                 $querystr = "SELECT COUNT(ItemExhibition.id) AS how_many, Person.lastname, Person.firstname"
                           . ' FROM Person'
                           . ' INNER JOIN ItemPerson ON Person.id=ItemPerson.id_person'
-                          . ' INNER JOIN Item ON ItemPerson.id_item = Item.id'
+                          . ' INNER JOIN Item ON ItemPerson.id_item = Item.id' . $collectionCondition
                           . ' INNER JOIN ItemExhibition ON ItemExhibition.id_item=Item.id'
                           . ' WHERE Person.status <> -1 AND Item.status <> -1'
                           . ' GROUP BY Person.id'
@@ -1969,7 +2001,7 @@ EOT;
                 $querystr = 'SELECT COUNT(DISTINCT ItemExhibition.id_exhibition) AS how_many, Person.lastname, Person.firstname'
                           . ' FROM Person'
                           . ' INNER JOIN ItemPerson ON Person.id=ItemPerson.id_person'
-                          . ' INNER JOIN Item ON ItemPerson.id_item = Item.id'
+                          . ' INNER JOIN Item ON ItemPerson.id_item = Item.id' . $collectionCondition
                           . ' INNER JOIN ItemExhibition ON ItemExhibition.id_item=Item.id'
                           . ' WHERE Person.status <> -1 AND Item.status <> -1'
                           . ' GROUP BY Person.id'
@@ -1980,17 +2012,19 @@ EOT;
                 $querystr = "SELECT COUNT(Item.id) AS how_many, Person.lastname, Person.firstname, IFNULL(Term.name, 'unknown') AS style"
                           . ' FROM Person'
                           . ' INNER JOIN ItemPerson ON Person.id=ItemPerson.id_person'
-                          . ' INNER JOIN Item ON ItemPerson.id_item = Item.id'
+                          . ' INNER JOIN Item ON ItemPerson.id_item = Item.id' . $collectionCondition
                           . ' LEFT OUTER JOIN Term ON Item.style=Term.id'
                           . ' WHERE Person.status <> -1 AND Item.status <> -1'
                           . ' GROUP BY Person.id, style'
                           . ' ORDER BY Person.lastname, Person.firstname, Person.id, style'
                           ;
             }
+
             $stmt = $dbconn->query($querystr);
 
             while ($row = $stmt->fetch()) {
                 $fullname = $row['lastname'] . ', ' . $row['firstname'];
+
                 if ('works' == $key) {
                     $style = $row['style'];
                     if (!in_array($style, $styles)) {
@@ -2009,7 +2043,7 @@ EOT;
         $categories = array_keys($data);
         for ($i = 0; $i < count($categories); $i++) {
             $category = $categories[$i];
-            foreach (['works', 'works_exhibited', 'exhibitions']
+            foreach ([ 'works', 'works_exhibited', 'exhibitions' ]
                      as $key) {
                 if ('works' == $key) {
                     foreach ($styles as $style) {
@@ -2032,14 +2066,14 @@ EOT;
 
         // by place
         $place_data = [];
-        foreach (['works', 'works_exhibited', 'exhibitions' ] as $key) {
+        foreach ([ 'works', 'works_exhibited', 'exhibitions' ] as $key) {
             if ('works_exhibited' == $key) {
                 $querystr = 'SELECT COUNT(ItemExhibition.id) AS how_many, COALESCE(Geoname.name_alternate, Geoname.name) AS place'
                             . " FROM Exhibition"
                             . " INNER JOIN Location ON Location.id=Exhibition.id_location"
                             . " INNER JOIN Geoname ON Geoname.tgn=Location.place_tgn"
                             . ' INNER JOIN ItemExhibition ON ItemExhibition.id_exhibition=Exhibition.id'
-                            . ' INNER JOIN Item ON Item.id=ItemExhibition.id_item AND Item.id <> -1'
+                            . ' INNER JOIN Item ON Item.id=ItemExhibition.id_item AND Item.id <> -1' . $collectionCondition
                             . " WHERE"
                             . " Exhibition.status <> -1"
                           . ' GROUP BY Geoname.tgn'
@@ -2052,7 +2086,7 @@ EOT;
                             . " INNER JOIN Location ON Location.id=Exhibition.id_location"
                             . " INNER JOIN Geoname ON Geoname.tgn=Location.place_tgn"
                             . ' INNER JOIN ItemExhibition ON ItemExhibition.id_exhibition=Exhibition.id'
-                            . ' INNER JOIN Item ON Item.id=ItemExhibition.id_item AND Item.id <> -1'
+                            . ' INNER JOIN Item ON Item.id=ItemExhibition.id_item AND Item.id <> -1' . $collectionCondition
                             . " WHERE"
                             . " Exhibition.status <> -1"
                           . ' GROUP BY Geoname.tgn'
@@ -2065,13 +2099,14 @@ EOT;
                             . " INNER JOIN Location ON Location.id=Exhibition.id_location"
                             . " INNER JOIN Geoname ON Geoname.tgn=Location.place_tgn"
                             . ' INNER JOIN ItemExhibition ON ItemExhibition.id_exhibition=Exhibition.id'
-                            . ' INNER JOIN Item ON Item.id=ItemExhibition.id_item AND Item.id <> -1'
+                            . ' INNER JOIN Item ON Item.id=ItemExhibition.id_item AND Item.id <> -1' . $collectionCondition
                             . " WHERE"
                             . " Exhibition.status <> -1"
                           . ' GROUP BY Geoname.tgn'
                           . ' ORDER BY Geoname.country_code, place'
                           ;
             }
+
             $stmt = $dbconn->query($querystr);
 
             while ($row = $stmt->fetch()) {
@@ -2212,6 +2247,9 @@ EOT;
             'persons_by_place_persons' => $categories,
             'persons_by_place' => $persons_by_place,
             'persons_by_year' => $persons_by_year,
+
+            'collections' => $collections,
+            'collection' => $collection,
         ]);
     }
 
