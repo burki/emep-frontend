@@ -11,23 +11,23 @@ extends SearchListBuilder
     protected $entity = 'ItemExhibition';
 
     var $rowDescr = [
-        'person' => [
-            'label' => 'Person',
-        ],
-        'catalogueId' => [
-            'label' => 'Cat.No.',
-        ],
         'title' => [
             'label' => 'Title',
         ],
         'type' => [
             'label' => 'Type',
         ],
+        'person' => [
+            'label' => 'Person',
+        ],
+        'catalogueId' => [
+            'label' => 'Cat.No.',
+        ],
         'exhibition' => [
             'label' => 'Exhibition',
         ],
         'startdate' => [
-            'label' => 'Date',
+            'label' => 'Exh. Date',
         ],
         'place' => [
             'label' => 'City',
@@ -209,9 +209,6 @@ extends SearchListBuilder
                 'nationality' => [
                     'label' => '(Preferred) Nationality',
                 ],
-                'catalogueId' => [
-                    'label' => 'Cat.No.',
-                ],
                 'title' => [
                     'label' => 'Title',
                 ],
@@ -236,11 +233,14 @@ extends SearchListBuilder
                         }
                     },
                 ],
+                'catalogueId' => [
+                    'label' => 'Cat.No.',
+                ],
                 'exhibition' => [
                     'label' => 'Exhibition',
                 ],
                 'startdate' => [
-                    'label' => 'Date',
+                    'label' => 'Exh. Date',
                 ],
                 'place' => [
                     'label' => 'City',

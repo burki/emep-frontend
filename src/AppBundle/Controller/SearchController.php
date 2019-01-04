@@ -28,11 +28,11 @@ extends CrudController
     const PAGE_SIZE = 50;
 
     static $entities = [
-        'ItemExhibition',
         'Exhibition',
+        'Person',
+        'ItemExhibition',
         'Venue',
         'Organizer',
-        'Person',
     ];
 
     /**
@@ -674,13 +674,10 @@ extends CrudController
         if (array_key_exists('filter', $parameters)) {
             $this->form->submit($parameters['filter']);
         }
+
         $filters = $this->form->getData();
 
         switch ($entity) {
-            case 'Exhibition':
-                return new \AppBundle\Utils\ExhibitionListBuilder($connection, $request, $urlGenerator, $filters, $extended);
-                break;
-
             case 'Venue':
                 return new \AppBundle\Utils\VenueListBuilder($connection, $request, $urlGenerator, $filters, $extended);
                 break;
@@ -694,8 +691,13 @@ extends CrudController
                 break;
 
             case 'ItemExhibition':
-            default:
                 return new \AppBundle\Utils\ItemExhibitionListBuilder($connection, $request, $urlGenerator, $filters, $extended);
+
+            case 'Exhibition':
+            default:
+                return new \AppBundle\Utils\ExhibitionListBuilder($connection, $request, $urlGenerator, $filters, $extended);
+                break;
+
         }
     }
 
