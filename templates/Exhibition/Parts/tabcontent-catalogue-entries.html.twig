@@ -1,7 +1,7 @@
 {% block entries %}
     {% import 'Shared/datatables.html.twig' as datatables %}
     {{ datatables.head() }}
-    
+
     <style>
         .collapsed {
             display: none;
@@ -19,7 +19,9 @@
                     { "orderSequence": [ "desc", "asc" ] },
                     { "orderSequence": [ "desc", "asc" ] },
                     { "orderSequence": [ "desc", "asc" ] },
-                    { "orderSequence": [ "desc", "asc" ] }
+                    { "orderSequence": [ "desc", "asc" ] },
+                    {},
+                    {}
                 ]
             });
         });
@@ -203,7 +205,7 @@
 
                 {% set addresses = catalogueEntry.person.addressesSeparated(exhibition.id) %}
 
-                <tr dclass="listviewrow">
+                <tr class="listviewrow">
 
                     <td>{{ catalogueEntry.getTitleFull }}</td>
                     <td><a href="{% if catalogueEntry.person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : catalogueEntry.person.ulan }) }}{% elseif catalogueEntry.person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : catalogueEntry.person.gnd }) }}{% else %}{{ path('person', { 'id' : catalogueEntry.person.id }) }}{% endif %}">{{ catalogueEntry.person.fullname(true) }}</a></td>
