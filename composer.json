@@ -39,9 +39,9 @@
         "shapecode/hidden-entity-type-bundle": "^3.0",
 
         "symfony/monolog-bundle": "^3.3",
-        "symfony/swiftmailer-bundle": "@stable",
-        "sensio/framework-extra-bundle": "@stable",
-        "knplabs/knp-menu-bundle": "@stable",
+        "symfony/swiftmailer-bundle": "^3.2",
+        "sensio/framework-extra-bundle": "^5.2",
+        "knplabs/knp-menu-bundle": "^2.2",
 
         "symfony/asset": "^4.2",
         "symfony/assetic-bundle": "dev-master as 2.8.3",
