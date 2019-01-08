@@ -457,6 +457,28 @@ extends ListBuilder
                        $this->formatRowValue($val, [], $format));
     }
 
+    protected function buildLinkedExhibition(&$row, $val, $format)
+    {
+        if ('html' != $format) {
+            return false;
+        }
+
+        if (!empty($row['exhibition_translit'])) {
+            // show translit / translation in brackets instead of original
+            $parts = [ $row['exhibition_translit'] ];
+
+            if (!empty($row['exhibition_alternate'])) {
+                $parts[] = $row['exhibition_alternate'];
+            }
+
+            $val = sprintf('[%s]', join(' : ', $parts));
+        }
+
+        return sprintf('<a href="%s">%s</a>',
+                       $this->urlGenerator->generate('exhibition', [ 'id' => $row['exhibition_id'] ]),
+                       $this->formatRowValue($val, [], $format));
+    }
+
     public function buildHeaderRow()
     {
         $ret = [];

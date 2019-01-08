@@ -204,7 +204,7 @@ extends SearchListBuilder
         }
 
         $this->rowDescr['exhibition']['buildValue'] = function (&$row, $val, $listBuilder, $key, $format) {
-            return $listBuilder->buildLinkedValue($val, 'exhibition', [ 'id' => $row['id'] ], $format);
+            return $listBuilder->buildLinkedExhibition($row, $val, $format);
         };
 
         $this->rowDescr['location']['buildValue'] = function (&$row, $val, $listBuilder, $key, $format) {
@@ -228,6 +228,8 @@ extends SearchListBuilder
             'SQL_CALC_FOUND_ROWS E.id',
             'E.id AS exhibition_id',
             'E.title AS exhibition',
+            'E.title_alternate AS exhibition_alternate',
+            'E.title_translit AS exhibition_translit',
             'E.type AS type',
             'DATE(E.startdate) AS startdate',
             'DATE(E.enddate) AS enddate',

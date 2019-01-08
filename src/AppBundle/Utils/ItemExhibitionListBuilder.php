@@ -269,7 +269,7 @@ extends SearchListBuilder
         };
 
         $this->rowDescr['exhibition']['buildValue'] = function (&$row, $val, $listBuilder, $key, $format) {
-            return $listBuilder->buildLinkedValue($val, 'exhibition', [ 'id' => $row['exhibition_id'] ], $format);
+            return $listBuilder->buildLinkedExhibition($row, $val, $format);
         };
 
         $this->rowDescr['location']['buildValue'] = function (&$row, $val, $listBuilder, $key, $format) {
@@ -316,13 +316,15 @@ extends SearchListBuilder
             'IE.owner AS owner',
             'IE.forsale AS forsale',
             'IE.price AS price',
-            'E.currency AS currency',
-            "E.title AS exhibition",
-            "E.id AS exhibition_id",
+            'E.id AS exhibition_id',
+            'E.title AS exhibition',
+            'E.title_alternate AS exhibition_alternate',
+            'E.title_translit AS exhibition_translit',
             'DATE(E.startdate) AS startdate',
             'DATE(E.enddate) AS enddate',
             'E.displaydate AS displaydate',
-            "E.type AS exhibition_type",
+            'E.type AS exhibition_type',
+            'E.currency AS currency',
             'L.name AS location',
             'L.id AS location_id',
             'L.type AS location_type',
@@ -387,6 +389,8 @@ extends SearchListBuilder
             'IE.displaycreator',
             'P.lastname',
             'P.firstname',
+            'P.name_variant',
+            'P.name_variant_ulan',
             'E.title',
             'E.title_short',
             'E.title_translit',
