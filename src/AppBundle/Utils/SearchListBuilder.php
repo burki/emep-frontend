@@ -208,9 +208,20 @@ extends ListBuilder
         return $this;
     }
 
-    public function getQueryFilters()
+    public function getQueryFilters($entityToId = false)
     {
-        return $this->queryFilters;
+        if (!$entityToId) {
+            return $this->queryFilters;
+        }
+
+        $ret = $this->queryFilters;
+        array_walk_recursive($ret, function (&$item, $key) {
+            if (is_object($item)) {
+                $item = $item->getId();
+            }
+        });
+
+        return $ret;
     }
 
     public function buildLikeCondition($search, $fields, $basename = 'search')

@@ -207,10 +207,6 @@ extends SearchListBuilder
             return $listBuilder->buildLinkedExhibition($row, $val, $format);
         };
 
-        $this->rowDescr['location']['buildValue'] = function (&$row, $val, $listBuilder, $key, $format) {
-            return $listBuilder->buildLinkedValue($val, 'location', [ 'id' => $row['location_id'] ], $format);
-        };
-
         $this->rowDescr['place']['buildValue'] = function (&$row, $val, $listBuilder, $key, $format) {
             $key_tgn = $key . '_tgn';
 
@@ -219,6 +215,10 @@ extends SearchListBuilder
             }
 
             return $listBuilder->buildLinkedValue($val, 'place-by-tgn', [ 'tgn' => $row[$key_tgn] ], $format);
+        };
+
+        $this->rowDescr['location']['buildValue'] = function (&$row, $val, $listBuilder, $key, $format) {
+            return $listBuilder->buildLinkedValue($val, 'location', [ 'id' => $row['location_id'] ], $format);
         };
     }
 

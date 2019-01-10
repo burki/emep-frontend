@@ -193,7 +193,7 @@
                     </div>
                     <div class="subfilter-buttons-container">
                         <div class="subfilter-remove">
-                            {% set filtersRemaining = listBuilder.queryFilters|without(entity) %}
+                            {% set filtersRemaining = listBuilder.queryFilters(true)|without(entity) %}
                             {% set filtersEntityRemaining = filters|without(key) %}
                             {% if filtersEntityRemaining is not empty %}
                                 {% set filtersRemaining = filtersRemaining|merge({ (entity) : filtersEntityRemaining }) %}
