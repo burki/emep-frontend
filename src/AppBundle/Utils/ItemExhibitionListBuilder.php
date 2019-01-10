@@ -20,6 +20,9 @@ extends SearchListBuilder
         'person' => [
             'label' => 'Person',
         ],
+        'price' => [
+            'label' => 'Price',
+        ],
         'catalogueId' => [
             'label' => 'Cat.No.',
         ],
@@ -226,12 +229,6 @@ extends SearchListBuilder
                 ],
                 'price' => [
                     'label' => 'Price',
-                    'buildValue' => function (&$row, $val, $listBuilder, $key, $format) {
-                        if (!empty($val)) {
-                            return $this->formatRowValue($this->formatPrice($val, $row['currency']),
-                                                         [], $format);
-                        }
-                    },
                 ],
                 'catalogueId' => [
                     'label' => 'Cat.No.',
@@ -297,6 +294,15 @@ extends SearchListBuilder
 
             return $this->formatRowValue($val, [], $format);
         };
+
+        if (array_key_exists('price', $this->rowDescr)) {
+            $this->rowDescr['price']['buildValue'] = function (&$row, $val, $listBuilder, $key, $format) {
+                if (!empty($val)) {
+                    return $this->formatRowValue($this->formatPrice($val, $row['currency']),
+                                                 [], $format);
+                }
+            };
+        }
     }
 
     protected function setSelect($queryBuilder)
