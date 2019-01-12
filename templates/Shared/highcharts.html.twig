@@ -5,3 +5,26 @@
     <script src="{{ app.request.basepath }}/vendor/highcharts/modules/heatmap.js"></script>
     <script src="{{ app.request.basepath }}/js/highchart_custom_theme.js"></script>
 {% endmacro %}
+
+{% macro clickableChartHeader() %}
+    <script>
+        $('hx\\:include').each(function() {
+            // when hinclude is done: see https://github.com/mnot/hinclude/pull/50
+            $(this).on('hinclude', function() {
+                // make .chart-header clickable
+                $('.chart-header').on('click', function(event) {
+                    event.stopImmediatePropagation();
+                    var collapseId = $(this).data('collapse');
+
+                    // console.log('collapse id: ', collapseId);
+                    $('#' + collapseId).toggleClass('collapse');
+                    if ($('#' + collapseId).hasClass('collapse')) {
+                        $(this).find('.chartsymbol').html('+');
+                    } else {
+                        $(this).find('.chartsymbol').html('-');
+                    }
+                });
+            });
+        });
+    </script>
+{% endmacro %}

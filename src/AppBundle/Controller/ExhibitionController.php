@@ -959,10 +959,9 @@ extends CrudController
 
     public function statsActionDetail($id)
     {
-        $repo = $this->getDoctrine()
-            ->getRepository('AppBundle:Exhibition');
-
         if (!empty($id)) {
+            $repo = $this->getDoctrine()
+                ->getRepository('AppBundle:Exhibition');
             $routeParams = [ 'id' => $id ];
             $exhibition = $repo->findOneById($id);
         }
@@ -1017,6 +1016,7 @@ extends CrudController
             }
             $data[] = $dataEntry;
         }
+
         $template = $this->get('twig')->loadTemplate('Statistics/itemexhibition-nationality.html.twig');
         $charts[] = $template->renderBlock('chart', [
             'container' => 'container-nationality',
@@ -1046,26 +1046,22 @@ extends CrudController
             'container' => 'container-type',
             'total' => $stats['total'],
             'data' => json_encode($data),
-            'exhibitionId' => $exhibition->getId()
-
+            'exhibitionId' => $exhibition->getId(),
         ]);
 
         // display the static content
         return $this->render('Exhibition/stats-detail.html.twig', [
             'chart' => implode("\n", $charts),
-            'exhibitionId' => $exhibition->getId()
-
+            'exhibitionId' => $exhibition->getId(),
         ]);
     }
 
 
     public function statsActionIndex($ids = null)
     {
-
-        $repo = $this->getDoctrine()
-            ->getRepository('AppBundle:Exhibition');
-
         if (!empty($id)) {
+            $repo = $this->getDoctrine()
+                ->getRepository('AppBundle:Exhibition');
             $routeParams = [ 'id' => $id ];
             $exhibition = $repo->findOneById($id);
         }
@@ -1121,6 +1117,7 @@ extends CrudController
             }
             $data[] = $dataEntry;
         }
+
         $template = $this->get('twig')->loadTemplate('Statistics/itemexhibition-nationality.html.twig');
         $charts[] = $template->renderBlock('chart', [
             'container' => 'container-nationality',
@@ -1151,14 +1148,12 @@ extends CrudController
             'total' => $stats['total'],
             'data' => json_encode($data),
             'exhibitionId' => $exhibition->getId()
-
         ]);
 
         // display the static content
         return $this->render('Exhibition/stats-detail.html.twig', [
             'chart' => implode("\n", $charts),
-            'exhibitionId' => $exhibition->getId()
-
+            'exhibitionId' => $exhibition->getId(),
         ]);
     }
 }

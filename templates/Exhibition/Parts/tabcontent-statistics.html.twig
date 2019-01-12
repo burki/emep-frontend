@@ -2,7 +2,5 @@
     {% import 'Shared/highcharts.html.twig' as highcharts %}
     {{ highcharts.head() }}
 
-    <script src="{{ app.request.basepath }}/js/hinclude.js"></script>
-
     {{ render_hinclude(controller('AppBundle\\Controller\\ExhibitionController::statsActionDetail', { id: currentPageId }), { 'default': 'Loading...' }) }}
 </div>

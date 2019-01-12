@@ -1,10 +1,8 @@
-
-
 $('.chart-header').on('click', function(event) {
     event.stopImmediatePropagation();
     var collapseId = $(this).data('collapse');
 
-    console.log('collapse id: ', collapseId);
+    // console.log('collapse id: ', collapseId);
     $('#' + collapseId).toggleClass( "collapse" );
     if( $('#' + collapseId).hasClass('collapse') ) {
         $(this).find('.chartsymbol').html('+');
@@ -12,4 +10,3 @@ $('.chart-header').on('click', function(event) {
         $(this).find('.chartsymbol').html('-');
     }
 });
-

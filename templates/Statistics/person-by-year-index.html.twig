@@ -1,11 +1,6 @@
-    {% import 'Shared/highcharts.html.twig' as highcharts %}
-    {{ highcharts.head() }}
-
     <script type="text/javascript">
-        var chart;
-
         $(document).ready(function() {
-            chart = new Highcharts.Chart({
+            new Highcharts.Chart({
                 chart: {
                     renderTo: 'container-by-year',
                     defaultSeriesType: 'column'

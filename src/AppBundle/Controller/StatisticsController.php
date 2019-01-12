@@ -371,11 +371,8 @@ extends Controller
 
         $ids !== null ? array_push($ids, 'true') : $ids = [];
 
-        $repo = $this->getDoctrine()
-            ->getRepository('AppBundle:Exhibition');
-
         // type of work
-        $stats = StatisticsController::itemexhibitionGenderDistribution($em = $this->getDoctrine()->getEntityManager(), $ids);
+        $stats = StatisticsController::itemexhibitionGenderDistribution($this->getDoctrine()->getEntityManager(), $ids);
 
         $data = [];
 
@@ -391,14 +388,12 @@ extends Controller
             $data[] = $dataEntry;
         }
 
-
         return $this->render('Statistics/exhibition-gender-index.html.twig', [
             'container' => 'container-gender',
             'total' => $stats['total'],
             'data' => json_encode($data),
             'exhibitionId' => 0
         ]);
-
     }
 
     public function exhibitionByMonthIndex($countriesQuery, $organizerTypeQuery, $stringQuery, $currIds = [], $artistGender = '', $artistNationalities = [], $exhibitionStartDateLeft = 'any', $exhibitionStartDateRight = 'any')
@@ -413,8 +408,6 @@ extends Controller
         $countryQueryString .= " AND ". $this->getArrayQueryString('Exhibition', 'organizer_type', $organizerTypeQuery, 'Exhibition.status <> -1');
         $countryQueryString .= " ". $this->getStringQueryForExhibitions($stringQuery, 'long');
 
-
-        //print_r(StatisticsController::getStringQueryForPersonsInExhibitions($artistNationalities, 'country', 'long'));
         $artistNationalitiesQueryString = StatisticsController::getStringQueryForPersonsInExhibitions($artistNationalities, 'country', 'long');
 
 
@@ -440,8 +433,7 @@ extends Controller
             // . " ". $countryQueryString
             . " GROUP BY start_year, MONTH(startdate)"
             . " ORDER BY start_year, start_month"
-        ;
-
+            ;
 
         $nationalitySubquery = " ";
 
@@ -475,8 +467,6 @@ extends Controller
                         ORDER BY start_year, start_month";
 
 
-
-
         $stmt = $dbconn->query($querystr);
         $frequency_count = [];
         $min_year = -1;
@@ -500,30 +490,6 @@ extends Controller
         while ($i <= $max) {
             $key = $i;
             $categories[] = sprintf('%04d-%02d', $year = intval($i / 100), $month = $i % 100);
-
-
-            /*$querystrIds = "SELECT YEAR(startdate) AS start_year, MONTH(startdate) AS start_month, EArtist.exhId
-                        FROM (
-                            Select Exhibition.id as exhId, Exhibition.id_location as id_location, Exhibition.status as status, Exhibition.startdate as startdate
-                            FROM Exhibition
-                            LEFT JOIN ItemExhibition ON ItemExhibition.id_exhibition = Exhibition.id
-                            LEFT JOIN Person ON Person.id = ItemExhibition.id_person
-                            " . $nationalitySubquery . "
-                            GROUP BY Exhibition.id
-                            ORDER BY Exhibition.id, Person.id
-                                ) as EArtist
-
-                        WHERE EArtist.status <> -1 AND MONTH(startdate) <> 0
-                        AND YEAR(startdate) = " . $year .  " AND MONTH(startdate) = " . $month . "
-                        GROUP BY start_year, MONTH(startdate)
-                        ORDER BY start_year, start_month";
-
-            // get ids for click event on bar
-            $stmt = $dbconn->query($querystrIds);
-            while ($row = $stmt->fetch()) {
-                // print_r($rowId['exhId']);
-                //print_r('-------- new  ---------');
-            }*/
 
             $count = array_key_exists($key, $frequency_count) ? $frequency_count[$key] : 0;
             $sum += $count;
@@ -736,7 +702,6 @@ extends Controller
 
     public function personByYearActionPart($countriesQuery, $genderQuery, $stringQuery, $currIds = [], $exhibitionCountries = [], $organizerTypesQuery = [], $artistBirthDateLeft = 'any' , $artistBirthDateRight= 'any', $artistDeathDateLeft = 'any' , $artistDeathDateRight =  'any')
     {
-
         // display the artists by birth-year, the catalog-entries by exhibition-year
         $em = $this->getDoctrine()->getEntityManager();
 
@@ -853,21 +818,6 @@ extends Controller
             $max_year = 2000;
         }
 
-        /*
-        $total_works = 0;
-
-        $querystr = 'SELECT PublicationPerson.publication_ord AS year, Publication.complete_works = 0 AS base, COUNT(DISTINCT Publication.id) AS how_many FROM Person LEFT OUTER JOIN PublicationPerson ON PublicationPerson.person_id=Person.id LEFT OUTER JOIN Publication ON Publication.id=PublicationPerson.publication_id AND Publication.status >= 0 WHERE Person.status >= 0 AND PublicationPerson.publication_ord IS NOT NULL'
-                  // . ' AND sex IS NOT NULL'
-                  . ' GROUP BY PublicationPerson.publication_ord, Publication.complete_works = 0'
-                  . ' ORDER BY PublicationPerson.publication_ord, Publication.complete_works = 0';
-        $stmt = $dbconn->query($querystr);
-        while ($row = $stmt->fetch()) {
-            $total_works += $row['how_many'];
-            $key = $row['base'] ? 'works_issued_base' : 'works_issued_extended';
-            $data[$row['year']][$key] = $row['how_many'];
-        }
-        */
-
         $categories = [];
         for ($year = $min_year; $year <= $max_year; $year++) {
             $categories[] = 0 == $year % 5 ? $year : '';
@@ -889,10 +839,6 @@ extends Controller
             'categories' => json_encode($categories),
             'person_birth' => json_encode(array_values($total['birth'])),
             'person_death' => json_encode(array_values($total['death'])),
-            /*
-            'works_base' => json_encode(array_values($total['works_issued_base'])),
-            'works_extended' => json_encode(array_values($total['works_issued_extended'])),
-            */
         ]);
     }
 
@@ -1450,14 +1396,6 @@ EOT;
                 ];
             }
         }
-
-        /*$template = $this->get('twig')->loadTemplate('Statistics/person-exhibition-age-index.html.twig');
-        $chart = $template->renderBlock('chart', [
-            'container' => 'container-age',
-            'categories' => json_encode($categories),
-            'age_at_exhibition_living' => json_encode(array_values($total['age_living'])),
-            'age_at_exhibition_deceased' => json_encode(array_values($total['age_deceased'])),
-        ]);*/
 
         // display the static content
         return $this->render('Statistics/person-exhibition-age-index.html.twig', [

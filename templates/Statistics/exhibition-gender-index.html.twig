@@ -32,13 +32,13 @@
                 groupPadding: 0,
                 pointPadding: 0,
                 events: {
-                click: function (event) {
-                    var url = '{{ path('exhibition-stats-info', { 'id': exhibitionId }) }}?chart=container-works';
-                    url += '&series=' + encodeURIComponent(this.name);
-                    url += '&point=' + encodeURIComponent(event.point.name);
+                    click: function (event) {
+                        var url = '{{ path('exhibition-stats-info', { 'id': exhibitionId }) }}?chart=container-works';
+                        url += '&series=' + encodeURIComponent(this.name);
+                        url += '&point=' + encodeURIComponent(event.point.name);
 
-                    $('#detailModal').modal('show');
-                    $('#detailModal').find(".modal-body").load(url);
+                        $('#detailModal').modal('show');
+                        $('#detailModal').find('.modal-body').load(url);
                     }
                 }
             },

@@ -34,8 +34,5 @@
     {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::exhibitionOrganizerDistribution', {ids: realIds }), {'default': 'Loading... <br/>'}) }}
     {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::exhibitionGenderDistribution', {ids: realIds }), {'default': 'Loading... <br/>'}) }}
     {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::exhibitionTypeOfWorksIndex', {ids: realIds }), {'default': 'Loading... <br/>'}) }}
-
-
-
-
+    {{ highcharts.clickableChartHeader() }}
 </div>

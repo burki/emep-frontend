@@ -1,10 +1,6 @@
-    {% import 'Shared/highcharts.html.twig' as highcharts %}
-    {{ highcharts.head() }}
-
     <script type="text/javascript">
-        var chart;
         $(document).ready(function() {
-            chart = new Highcharts.Chart({
+            new Highcharts.Chart({
                 chart: {
                     renderTo: '{{ container|raw }}',
                     defaultSeriesType: 'column'
@@ -60,10 +56,10 @@
                                 url += '&series=' + encodeURIComponent(this.name);
                                 url += '&point=' + encodeURIComponent(event.point.name);
 
-                                console.log('URL: ', url);
+                                // console.log('URL: ', url);
 
                                 $('#detailModal').modal('show');
-                                $('#detailModal').find(".modal-body").load(url);
+                                $('#detailModal').find('.modal-body').load(url);
                             }
                         }
                     },
@@ -90,7 +86,7 @@
         });
     </script>
 
-{# chart seperated so we can reuse it in per exhibition stats #}
+{# chart separated so we can reuse it in per exhibition stats #}
 
 
 <h3 class="chart-header" data-collapse="{{ container|raw }}"><span class="chartsymbol">+</span>Artists’ Exhibitioning Age<span class="charttypeTitle">(Bar Chart)</span></h3>

@@ -83,7 +83,6 @@
     {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::personExhibitionAgeActionPart', {countriesQuery: countriesQuery, genderQuery: genderQuery, stringQuery: stringQuery, currIds: ids, exhibitionCountries: exhibitionCountries, organizerTypesQuery: organizerTypesQuery, artistBirthDateLeft: artistBirthDateLeft, artistBirthDateRight: artistBirthDateRight, artistDeathDateLeft: artistDeathDateLeft, artistDeathDateRight: artistDeathDateRight}), {'default': 'Loading... <br/>'}) }}
     {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::exhibitionPerPersonPart', {countriesQuery: countriesQuery, genderQuery: genderQuery, stringQuery: stringQuery, currIds: ids, exhibitionCountries: exhibitionCountries, organizerTypesQuery: organizerTypesQuery, artistBirthDateLeft: artistBirthDateLeft, artistBirthDateRight: artistBirthDateRight, artistDeathDateLeft: artistDeathDateLeft, artistDeathDateRight: artistDeathDateRight}), {'default': 'Loading... <br/>'}) }}
     {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::personsWikipediaPart', {countriesQuery: countriesQuery, genderQuery: genderQuery, stringQuery: stringQuery, currIds: ids, exhibitionCountries: exhibitionCountries, organizerTypesQuery: organizerTypesQuery, artistBirthDateLeft: artistBirthDateLeft, artistBirthDateRight: artistBirthDateRight, artistDeathDateLeft: artistDeathDateLeft, artistDeathDateRight: artistDeathDateRight}), {'default': 'Loading... <br/>'}) }}
-
-
+    {{ highcharts.clickableChartHeader() }}
 
 </div>

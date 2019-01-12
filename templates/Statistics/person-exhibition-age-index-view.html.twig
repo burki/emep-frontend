@@ -1,6 +1,3 @@
-    {% import 'Shared/highcharts.html.twig' as highcharts %}
-    {{ highcharts.head() }}
-
     <script type="text/javascript">
         var chart;
         $(document).ready(function() {
@@ -60,10 +57,10 @@
                                 url += '&series=' + encodeURIComponent(this.name);
                                 url += '&point=' + encodeURIComponent(event.point.name);
 
-                                console.log('URL: ', url);
+                                // console.log('URL: ', url);
 
                                 $('#detailModal').modal('show');
-                                $('#detailModal').find(".modal-body").load(url);
+                                $('#detailModal').find('.modal-body').load(url);
                             }
                         }
                     },

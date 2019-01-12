@@ -15,8 +15,8 @@
                 <select id="personSelector" class="text-field-class w-select end-selector"><option value="" selected="selected">select gender</option><option value="F">female</option><option value="M">male</option></select>
                 <select id="countrySelector" class="text-field-class w-select middle-selector">
                     <option value>select country</option>
-                    {% for abrriviation,countryname in countryArray %}
-                        <option value="{{ abrriviation }}">{{ countryname }}</option>
+                    {% for countrycode,countryname in countryArray %}
+                        <option value="{{ countrycode }}">{{ countryname }}</option>
                     {% endfor %}
                 </select>
             </div>

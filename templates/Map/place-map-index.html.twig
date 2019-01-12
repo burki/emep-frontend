@@ -1,15 +1,13 @@
 {% import 'Shared/map-leaflet.html.twig' as map %}
 
-<script>
-
-    $(document).on("rerenderMap", function(e){
+    <script>
+    $(document).on('rerenderMap', function(e) {
         setTimeout(function() {
             map.invalidateSize();
             map.setZoom(2);
         }, 200);
     });
-
-</script>
+    </script>
 
     <style>
     .my-tooltip {
@@ -139,7 +137,6 @@
                 var marker = L.circleMarker(L.latLng(a[0], a[1]), markerProperties)
                     .bindTooltip(title + ' (' + count + ')', {className: 'my-tooltip'})
                     ;
-
             }
 
             marker.number = count;
