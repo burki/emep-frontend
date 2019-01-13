@@ -9,6 +9,7 @@ class ExhibitionListBuilder
 extends SearchListBuilder
 {
     protected $entity = 'Exhibition';
+    var $mode = '';
 
     var $rowDescr = [
         'startdate' => [
@@ -146,11 +147,25 @@ extends SearchListBuilder
                                 Request $request,
                                 UrlGeneratorInterface $urlGenerator,
                                 $queryFilters = null,
-                                $extended = false)
+                                $mode = '')
     {
+        $this->mode = $mode;
+
         parent::__construct($connection, $request, $urlGenerator, $queryFilters);
 
-        if ($extended) {
+        if ('stats-nationality' == $this->mode) {
+            $this->orders = [ 'default' => [ 'asc' => [ 'countryCode DESC' ] ] ];
+        }
+        else if ('stats-by-month' == $this->mode) {
+            $this->orders = [ 'default' => [ 'asc' => [ 'start_year', 'start_month' ] ] ];
+        }
+        else if ('stats-place' == $this->mode) {
+            $this->orders = [ 'default' => [ 'asc' => [ 'how_many DESC' ] ] ];
+        }
+        else if ('stats-organizer-type' == $this->mode) {
+            $this->orders = [ 'default' => [ 'asc' => [ 'how_many DESC' ] ] ];
+        }
+        else if ('extended' == $this->mode) {
             $this->rowDescr = [
                 'exhibition_id' => [
                     'label' => 'ID',
@@ -224,6 +239,56 @@ extends SearchListBuilder
 
     protected function setSelect($queryBuilder)
     {
+        if ('stats-nationality' == $this->mode) {
+            $queryBuilder->select([
+                'PL.country_code AS countryCode',
+                'P.country AS nationality',
+                'COUNT(DISTINCT IE.id) AS numEntries',
+            ]);
+
+            return $this;
+        }
+
+        if ('stats-by-month' == $this->mode) {
+            $queryBuilder->select([
+                'YEAR(E.startdate) AS start_year',
+                'MONTH(E.startdate) AS start_month',
+                'COUNT(DISTINCT E.id) AS how_many',
+            ]);
+
+            return $this;
+        }
+
+        if ('stats-age' == $this->mode) {
+            $queryBuilder->select([
+                'DISTINCT E.startdate AS startdate',
+                'E.id AS exhibition_id',
+                'P.id AS person_id',
+                'P.birthdate AS birthdate',
+                'P.deathdate AS deathdate',
+            ]);
+
+            return $this;
+        }
+
+        if ('stats-place' == $this->mode) {
+            $queryBuilder->select([
+                'L.place AS place',
+                'COUNT(DISTINCT E.id) AS how_many',
+            ]);
+
+            return $this;
+        }
+
+        if ('stats-organizer-type' == $this->mode) {
+            $queryBuilder->select([
+                'E.organizer_type AS organizer_type',
+                'COUNT(DISTINCT E.id) AS how_many',
+            ]);
+
+            return $this;
+        }
+
         $queryBuilder->select([
             'SQL_CALC_FOUND_ROWS E.id',
             'E.id AS exhibition_id',
@@ -258,7 +323,24 @@ extends SearchListBuilder
 
     protected function setJoin($queryBuilder)
     {
-        $queryBuilder->groupBy('E.id');
+        if ('stats-nationality' == $this->mode) {
+            $queryBuilder->groupBy('countryCode, nationality');
+        }
+        else if ('stats-by-month' == $this->mode) {
+            $queryBuilder->groupBy('start_month, start_year');
+        }
+        else if ('stats-age' == $this->mode) {
+            $queryBuilder->groupBy('E.id, P.id');
+        }
+        else if ('stats-place' == $this->mode) {
+            $queryBuilder->groupBy('L.place');
+        }
+        else if ('stats-organizer-type' == $this->mode) {
+            $queryBuilder->groupBy('organizer_type');
+        }
+        else {
+            $queryBuilder->groupBy('E.id');
+        }
 
         $queryBuilder->leftJoin('E',
                                 'ItemExhibition', 'IE',
@@ -276,7 +358,7 @@ extends SearchListBuilder
                                 'Location', 'O',
                                 'O.id=EL.id_location');
 
-        if (array_key_exists('person', $this->queryFilters)) {
+        if (array_key_exists('person', $this->queryFilters) || in_array($this->mode, [ 'stats-nationality', 'stats-age' ])) {
             // so we can filter on P.*
             $queryBuilder->join('IE',
                                 'Person', 'P',
@@ -289,6 +371,10 @@ extends SearchListBuilder
     protected function setFilter($queryBuilder)
     {
         $queryBuilder->andWhere('E.status <> -1');
+
+        if ('stats-by-month' == $this->mode) {
+            $queryBuilder->andWhere('MONTH(E.startdate) <> 0');
+        }
 
         $this->addSearchFilters($queryBuilder, [
             'E.title',

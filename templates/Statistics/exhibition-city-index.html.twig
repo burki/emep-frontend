@@ -1,55 +1,54 @@
 
+    <script type="text/javascript">
+        $(document).ready(function() {
+            Highcharts.chart('{{ container|raw }}', {
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: 0,
+                    plotShadow: false
+                },
+                title: {
+                    text: ' ',
+                },
+                subtitle: {
+                    text: '{{ total }} exhibitions'
+                },
+                tooltip: {
+                    pointFormat: '<b>{point.percentage:.1f}%</b> ({point.y} exhibitions)'
+                },
+                plotOptions: {
+                    pie: {
+                        /*
+                        startAngle: -90,
+                        endAngle: 90,
+                        center: ['50%', '50%']
+                        */
+                    },
+                    series: {
+                        stacking: 'normal',
+                        borderWidth: 1,
+                        groupPadding: 0,
+                        pointPadding: 0,
+                        events: {
+                            click: function (event) {
+                                var url = '{{ path('exhibition-stats-info', { 'id': exhibitionId }) }}?chart=container-works';
+                                url += '&series=' + encodeURIComponent(this.name);
+                                url += '&point=' + encodeURIComponent(event.point.name);
 
-<script type="text/javascript">
-    var chart;
-    Highcharts.chart('{{ container|raw }}', {
-        chart: {
-            plotBackgroundColor: null,
-            plotBorderWidth: 0,
-            plotShadow: false
-        },
-        title: {
-            text: ' ',
-        },
-        subtitle: {
-            text: '{{ total }} catalogue entries'
-        },
-        tooltip: {
-            pointFormat: '<b>{point.percentage:.1f}%</b> ({point.y} cat. entries)'
-        },
-        plotOptions: {
-            pie: {
-
-                /*
-                startAngle: -90,
-                endAngle: 90,
-                center: ['50%', '50%']
-                */
-            },
-            series: {
-                stacking: 'normal',
-                borderWidth: 1,
-                groupPadding: 0,
-                pointPadding: 0,
-                events: {
-                click: function (event) {
-                    var url = '{{ path('exhibition-stats-info', { 'id': exhibitionId }) }}?chart=container-works';
-                    url += '&series=' + encodeURIComponent(this.name);
-                    url += '&point=' + encodeURIComponent(event.point.name);
-
-                    $('#detailModal').modal('show');
-                    $('#detailModal').find(".modal-body").load(url);
-                    }
-                }
-            },
-        },
-        series: [{
-            name: 'Type of Work',
-            type: 'pie',
-            innerSize: '50%',
-            data: {{ data|raw }}
-        }]
-    });
+                                $('#detailModal').modal('show');
+                                $('#detailModal').find(".modal-body").load(url);
+                            }
+                        }
+                    },
+                },
+                series: [{
+                    name: 'Type of Work',
+                    type: 'pie',
+                    innerSize: '50%',
+                    data: {{ data|raw }}
+                }]
+            });
+        });
 </script>
 
 <h3 class="chart-header" data-collapse="{{ container|raw }}"><span class="chartsymbol">+</span>City Distribution<span class="charttypeTitle">(Pie Chart)</span></h3>

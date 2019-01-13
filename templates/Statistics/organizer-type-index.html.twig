@@ -1,0 +1,31 @@
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#container-locations-types').highcharts({
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie'
+                },
+                title: {
+                    text: ' '
+                },
+                tooltip: {
+                    pointFormat: '{point.y} Organizing Bodies (<b>{point.percentage:.1f}%</b>)'
+                },
+                plotOptions: {
+                    pie: {
+                    }
+                },
+                series: [{
+                    name: 'City:',
+                    type: 'pie',
+                    innerSize: '50%',
+                    data: {{ data|raw }}
+                }]
+            });
+        });
+    </script>
+
+    <h3 class="chart-header" data-collapse="container-locations-types"><span class="chartsymbol">+</span>Types of Organizing Bodies<span class="charttypeTitle">(Pie Chart)</span></h3>
+    <div class="collapse" id="container-locations-types" style="width: 100%; height: 400px; margin: 0 auto;"></div>

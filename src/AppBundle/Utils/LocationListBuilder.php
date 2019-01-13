@@ -104,11 +104,19 @@ extends SearchListBuilder
                                 Request $request,
                                 UrlGeneratorInterface $urlGenerator,
                                 $queryFilters = null,
-                                $extended = false)
+                                $mode = '')
     {
+        $this->mode = $mode;
+
         parent::__construct($connection, $request, $urlGenerator, $queryFilters);
 
-        if ($extended) {
+        if ('stats-type' == $this->mode) {
+            $this->orders = [ 'default' => [ 'asc' => [ 'type' ] ] ];
+        }
+        else if ('stats-country' == $this->mode) {
+            $this->orders = [ 'default' => [ 'asc' => [ 'country_code' ] ] ];
+        }
+        else if ('extended' == $this->mode) {
             $this->rowDescr = [
                 'location_id' => [
                     'label' => 'ID',
@@ -173,6 +181,24 @@ extends SearchListBuilder
 
     protected function setSelect($queryBuilder)
     {
+        if ('stats-type' == $this->mode) {
+            $queryBuilder->select([
+                $this->alias . '.type AS type',
+                'COUNT(DISTINCT ' . $this->alias . '.id) AS how_many',
+            ]);
+
+            return $this;
+        }
+
+        if ('stats-country' == $this->mode) {
+            $queryBuilder->select([
+                'P' . $this->alias . '.country_code AS country_code',
+                'COUNT(DISTINCT ' . $this->alias . '.id) AS how_many',
+            ]);
+
+            return $this;
+        }
+
         $queryBuilder->select([
             'SQL_CALC_FOUND_ROWS ' . $this->alias . '.id',
             $this->alias . '.id AS location_id',
@@ -212,7 +238,15 @@ extends SearchListBuilder
 
     protected function setJoin($queryBuilder)
     {
-        $queryBuilder->groupBy($this->alias . '.id');
+        if ('stats-type' == $this->mode) {
+            $queryBuilder->groupBy($this->alias . '.type');
+        }
+        else if ('stats-country' == $this->mode) {
+            $queryBuilder->groupBy('country_code');
+        }
+        else {
+            $queryBuilder->groupBy($this->alias . '.id');
+        }
 
         $queryBuilder->leftJoin($this->alias,
                                 'Geoname', 'P' . $this->alias,

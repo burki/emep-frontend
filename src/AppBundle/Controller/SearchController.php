@@ -25,6 +25,8 @@ use AppBundle\Utils\SearchListPagination;
 class SearchController
 extends CrudController
 {
+    use StatisticsBuilderTrait;
+
     const PAGE_SIZE = 50;
 
     static $entities = [
@@ -285,7 +287,7 @@ extends CrudController
      */
     public function exportAction(Request $request, UrlGeneratorInterface $urlGenerator)
     {
-        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, true);
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'extended');
 
         set_time_limit(5 * 60); // ItemExhibition is large
 
@@ -306,8 +308,256 @@ extends CrudController
         exit;
     }
 
+    /**
+     * @Route("/search/stats", name="search-stats")
+     */
+    public function statsAction(Request $request,
+                                UrlGeneratorInterface $urlGenerator,
+                                UserInterface $user = null)
+    {
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator);
+        $charts = [];
+
+        switch ($listBuilder->getEntity()) {
+            case 'Exhibition':
+                // exhibtion country-nationality matrix
+                $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-nationality');
+                $query = $listBuilder->query();
+                // echo $query->getSQL();
+
+                $stmt = $query->execute();
+                $renderParams = $this->processExhibitionNationality($stmt);
+                if (!empty($renderParams)) {
+                    $template = $this->get('twig')->loadTemplate('Statistics/exhibition-nationality-index.html.twig');
+
+                    $charts[] = $template->render($renderParams);
+                }
+
+                // by month
+                $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-by-month');
+
+                $query = $listBuilder->query();
+                // echo $query->getSQL();
+
+                $stmt = $query->execute();
+                $renderParams = $this->processExhibitionByMonth($stmt);
+                if (!empty($renderParams)) {
+                    $template = $this->get('twig')->loadTemplate('Statistics/exhibition-by-month-index.html.twig');
+
+                    $charts[] = $template->render($renderParams);
+                }
+
+                // exhibition age
+                $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-age');
+
+                $query = $listBuilder->query();
+                $innerSql = $query->getSQL();
+
+                $sql = <<<EOT
+SELECT COUNT(*) AS how_many,
+YEAR(EB.startdate) - YEAR(EB.birthdate) AS age,
+IF (EB.deathdate IS NOT NULL AND YEAR(EB.deathdate) < YEAR(EB.startdate), 'deceased', 'living') AS state
+FROM
+({$innerSql}) AS EB
+GROUP BY age, state
+ORDER BY age, state, how_many
+EOT;
+
+                $params = $query->getParameters();
+
+                $stmt = $query->getConnection()->executeQuery($sql, $params);
+                $renderParams = $this->processExhibitionAge($stmt);
+                if (!empty($renderParams)) {
+                    $template = $this->get('twig')->loadTemplate('Statistics/person-exhibition-age-index.html.twig');
+
+                    $charts[] = $template->render($renderParams);
+                }
+
+                // place
+                $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-place');
+                $query = $listBuilder->query();
+                // echo $query->getSQL();
+
+                $stmt = $query->execute();
+                $renderParams = $this->processExhibitionPlace($stmt);
+                if (!empty($renderParams)) {
+                    $template = $this->get('twig')->loadTemplate('Statistics/exhibition-city-index.html.twig');
+
+                    $charts[] = $template->render($renderParams);
+                }
+
+                // type of organizer
+                $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-organizer-type');
+                $query = $listBuilder->query();
+                // echo $query->getSQL();
+
+                $stmt = $query->execute();
+                $renderParams = $this->processExhibitionOrganizerType($stmt);
+                if (!empty($renderParams)) {
+                    $template = $this->get('twig')->loadTemplate('Statistics/exhibition-organizer-index.html.twig');
+
+                    $charts[] = $template->render($renderParams);
+                }
+
+                break;
+
+            case 'Person':
+                // nationality
+                $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-nationality');
+                $query = $listBuilder->query();
+                // echo $query->getSQL();
+
+                $stmt = $query->execute();
+                $renderParams = $this->processPersonNationality($stmt);
+                if (!empty($renderParams)) {
+                    $template = $this->get('twig')->loadTemplate('Statistics/person-nationality-index.html.twig');
+
+                    $charts[] = $template->render($renderParams);
+                }
+
+                // birth/death
+                $listBuilderBirth = $this->instantiateListBuilder($request, $urlGenerator, 'stats-by-year-birth');
+                // $query = $listBuilderBirth->query();
+                // echo $query->getSQL()
+
+                $listBuilderDeath = $this->instantiateListBuilder($request, $urlGenerator, 'stats-by-year-death');
+                // $query = $listBuilderDeath->query();
+                //  echo $query->getSQL());
+
+                $renderParams = $this->processPersonBirthDeath([
+                    'birth' => $listBuilderBirth->query(),
+                    'death' => $listBuilderDeath->query(),
+                ]);
+
+                if (!empty($renderParams)) {
+                    $template = $this->get('twig')->loadTemplate('Statistics/person-by-year-index.html.twig');
+
+                    $charts[] = $template->render($renderParams);
+                }
+
+                // exhibition-distribution
+                $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-exhibition-distribution');
+                $query = $listBuilder->query();
+                // echo $query->getSQL();
+
+                $stmt = $query->execute();
+                $renderParams = $this->processPersonDistribution([ 'exhibition' => $query ]);
+                if (!empty($renderParams)) {
+                    $template = $this->get('twig')->loadTemplate('Statistics/person-distribution-index.html.twig');
+
+                    $charts[] = $template->render($renderParams);
+                }
+
+                // wikipedia
+                $lang = in_array($request->get('lang'), [ 'en', 'de', 'fr' ])
+                    ? $request->get('lang') : 'en';
+
+                $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-popularity');
+                $query = $listBuilder->query();
+                // echo $query->getSQL();
+
+                $stmt = $query->execute();
+                $renderParams = $this->processPersonPopularity($stmt, $lang);
+                if (!empty($renderParams)) {
+                    $template = $this->get('twig')->loadTemplate('Statistics/person-wikipedia-index.html.twig');
+
+                    $charts[] = $template->render($renderParams);
+                }
+
+                break;
+
+            case 'ItemExhibition':
+                $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-type');
+
+                $query = $listBuilder->query();
+                // echo $query->getSQL();
+
+                $stmt = $query->execute();
+                $renderParams = $this->processItemExhibitionType($stmt);
+                if (!empty($renderParams)) {
+                    $template = $this->get('twig')->loadTemplate('Statistics/exhibition-type-index.html.twig');
+
+                    $charts[] = $template->render($renderParams);
+                }
+
+                break;
+
+            case 'Venue':
+                // type
+                $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-type');
+                $query = $listBuilder->query();
+                // echo $query->getSQL();
+
+                $stmt = $query->execute();
+                $renderParams = $this->processLocationType($stmt);
+                if (!empty($renderParams)) {
+                    $template = $this->get('twig')->loadTemplate('Statistics/venue-type-index.html.twig');
+
+                    $charts[] = $template->render($renderParams);
+                }
+
+                // country
+                $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-country');
+                $query = $listBuilder->query();
+                // echo $query->getSQL();
+
+                $stmt = $query->execute();
+                $renderParams = $this->processLocationCountry($stmt);
+                if (!empty($renderParams)) {
+                    $template = $this->get('twig')->loadTemplate('Statistics/venue-country-index.html.twig');
+
+                    $charts[] = $template->render($renderParams);
+                }
+
+                break;
+
+            case 'Organizer':
+                // type
+                $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-type');
+                $query = $listBuilder->query();
+                // echo $query->getSQL();
+
+                $stmt = $query->execute();
+                $renderParams = $this->processLocationType($stmt);
+                if (!empty($renderParams)) {
+                    $template = $this->get('twig')->loadTemplate('Statistics/organizer-type-index.html.twig');
+
+                    $charts[] = $template->render($renderParams);
+                }
+
+                // country
+                $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-country');
+                $query = $listBuilder->query();
+                // echo $query->getSQL();
+
+                $stmt = $query->execute();
+                $renderParams = $this->processLocationCountry($stmt);
+                if (!empty($renderParams)) {
+                    $template = $this->get('twig')->loadTemplate('Statistics/organizer-country-index.html.twig');
+
+                    $charts[] = $template->render($renderParams);
+                }
+
+                break;
+        }
+
+        if (empty($charts)) {
+            $charts[] = 'No matching data found. Please adjust the filters';
+        }
+
+        return $this->render('Search/stats.html.twig', [
+            'pageTitle' => $this->get('translator')->trans('Advanced Search'),
+            'listBuilder' => $listBuilder,
+            'form' => $this->form->createView(),
+            'searches' => $this->lookupSearches($user),
+
+            'charts' => implode("\n", $charts),
+        ]);
+    }
+
     /* TODO: move to shared helper */
-    private function buildDisplayDate ($row) {
+    private function buildDisplayDate($row)
+    {
         if (!empty($row['displaydate'])) {
             return $row['displaydate'];
         }
@@ -322,7 +572,7 @@ extends CrudController
                               UrlGeneratorInterface $urlGenerator,
                               UserInterface $user = null)
     {
-        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, true);
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'extended');
         if (!in_array($entity = $listBuilder->getEntity(), [ 'Exhibition', 'Venue', 'Organizer', 'Person'])) {
             $routeParams = [
                 'entity' => $listBuilder->getEntity(),
@@ -644,7 +894,7 @@ extends CrudController
 
     protected function instantiateListBuilder(Request $request,
                                               UrlGeneratorInterface $urlGenerator,
-                                              $extended = false)
+                                              $mode = false)
     {
         $connection = $this->getDoctrine()->getEntityManager()->getConnection();
 
@@ -679,23 +929,23 @@ extends CrudController
 
         switch ($entity) {
             case 'Venue':
-                return new \AppBundle\Utils\VenueListBuilder($connection, $request, $urlGenerator, $filters, $extended);
+                return new \AppBundle\Utils\VenueListBuilder($connection, $request, $urlGenerator, $filters, $mode);
                 break;
 
             case 'Organizer':
-                return new \AppBundle\Utils\OrganizerListBuilder($connection, $request, $urlGenerator, $filters, $extended);
+                return new \AppBundle\Utils\OrganizerListBuilder($connection, $request, $urlGenerator, $filters, $mode);
                 break;
 
             case 'Person':
-                return new \AppBundle\Utils\PersonListBuilder($connection, $request, $urlGenerator, $filters, $extended);
+                return new \AppBundle\Utils\PersonListBuilder($connection, $request, $urlGenerator, $filters, $mode);
                 break;
 
             case 'ItemExhibition':
-                return new \AppBundle\Utils\ItemExhibitionListBuilder($connection, $request, $urlGenerator, $filters, $extended);
+                return new \AppBundle\Utils\ItemExhibitionListBuilder($connection, $request, $urlGenerator, $filters, $mode);
 
             case 'Exhibition':
             default:
-                return new \AppBundle\Utils\ExhibitionListBuilder($connection, $request, $urlGenerator, $filters, $extended);
+                return new \AppBundle\Utils\ExhibitionListBuilder($connection, $request, $urlGenerator, $filters, $mode);
                 break;
 
         }

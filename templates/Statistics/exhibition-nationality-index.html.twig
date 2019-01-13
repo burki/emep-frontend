@@ -2,10 +2,7 @@
     <script src="{{ app.request.basepath }}/js/collapseChart.js"></script>
 
     <script type="text/javascript">
-        var chart;
-
         $(document).ready(function() {
-            // console.log('its loaded');
             Highcharts.chart('container-country', {
                 chart: {
                     type: 'heatmap',
@@ -57,7 +54,5 @@
         });
     </script>
 
-
- <h3 class="chart-header" data-collapse="container-country"><span class="chartsymbol">+</span>Artists’ Nationality by Exhibiting Country<span class="charttypeTitle">(Matrix in %)</span></h3>
-
- <div class="collapse" id="container-country" style="width: 100%; margin: 0;"></div>
+    <h3 class="chart-header" data-collapse="container-country"><span class="chartsymbol">+</span>Artists’ Nationality by Exhibiting Country<span class="charttypeTitle">(Matrix in %)</span></h3>
+    <div class="collapse" id="container-country" style="width: 100%; margin: 0;"></div>

@@ -3,8 +3,6 @@
     {{ highcharts.head() }}
 
     <script type="text/javascript">
-        var chart;
-
         $(document).ready(function() {
             $('#container-venues-types').highcharts({
                 chart: {
@@ -52,7 +50,7 @@
                     }
                 },
                 series: [{
-                    name: 'City:',
+                    name: 'Country:',
                     type: 'pie',
                     innerSize: '50%',
                     data: {{ indexDataNumberCountries[0]|raw }}

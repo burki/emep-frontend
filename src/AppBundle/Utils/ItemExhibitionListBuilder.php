@@ -191,11 +191,16 @@ extends SearchListBuilder
                                 Request $request,
                                 UrlGeneratorInterface $urlGenerator,
                                 $queryFilters = null,
-                                $extended = false)
+                                $mode = '')
     {
+        $this->mode = $mode;
+
         parent::__construct($connection, $request, $urlGenerator, $queryFilters);
 
-        if ($extended) {
+        if ('stats-type' == $this->mode) {
+            $this->orders = [ 'default' => [ 'asc' => [ 'type' ] ] ];
+        }
+        else if ('extended' == $this->mode) {
             $this->rowDescr = [
                 'id' => [
                     'label' => 'ID',
@@ -307,6 +312,15 @@ extends SearchListBuilder
 
     protected function setSelect($queryBuilder)
     {
+        if ('stats-type' == $this->mode) {
+            $queryBuilder->select([
+                'TypeTerm.name AS type',
+                'COUNT(DISTINCT IE.id) AS how_many',
+            ]);
+
+            return $this;
+        }
+
         $queryBuilder->select([
             'SQL_CALC_FOUND_ROWS IE.id',
             'IE.id AS id',
@@ -354,7 +368,12 @@ extends SearchListBuilder
 
     protected function setJoin($queryBuilder)
     {
-        $queryBuilder->groupBy('IE.id');
+        if ('stats-type' == $this->mode) {
+            $queryBuilder->groupBy('IE.type');
+        }
+        else {
+            $queryBuilder->groupBy('IE.id');
+        }
 
         $queryBuilder->leftJoin('IE',
                                 'Person', 'P',

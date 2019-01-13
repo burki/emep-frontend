@@ -13,6 +13,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 class StatisticsController
 extends Controller
 {
+    use StatisticsBuilderTrait;
+
     static $countryMap = [ 'UA' => 'RU' ]; // don't count Ukrania seperately
 
     public function getStringQueryForExhibitions($query, $shortOrLongQuery)
@@ -264,12 +266,11 @@ extends Controller
             'age_at_exhibition_living' => json_encode(array_values($total['age_living'])),
             'age_at_exhibition_deceased' => json_encode(array_values($total['age_deceased'])),
             'exhibition_id' => 0,
-    ]);
+        ]);
     }
 
-    public function exhibitionTypeOfWorksIndex ($ids = []) {
-
-
+    public function exhibitionTypeOfWorksIndex($ids = [])
+    {
         $ids !== [] ? array_push($ids, 'true') : $ids = [];
 
         // type of work
@@ -287,26 +288,24 @@ extends Controller
             $data[] = $dataEntry;
         }
 
-
-
         return $this->render('Statistics/exhibition-type-index.html.twig', [
             'container' => 'container-type',
             'total' => $stats['total'],
             'data' => json_encode($data),
             'exhibitionId' => 0
         ]);
-
     }
 
 
-    public function exhibitionOrganizerDistribution ($ids = null) {
+    public function exhibitionOrganizerDistribution($ids = null)
+    {
         $ids !== null ? array_push($ids, 'true') : $ids = [];
 
         $repo = $this->getDoctrine()
             ->getRepository('AppBundle:Exhibition');
 
         // type of work
-        $stats = StatisticsController::itemExhibitionOrganizerDistribution($em = $this->getDoctrine()->getEntityManager(), $ids);
+        $stats = StatisticsController::buildExhibitionOrganizerDistribution($em = $this->getDoctrine()->getEntityManager(), $ids);
 
         $data = [];
 
@@ -333,17 +332,17 @@ extends Controller
         ]);
     }
 
-    public function exhibitionCityDistribution ($ids = null) {
+    public function exhibitionCityDistribution($ids = null)
+    {
         $ids !== null ? array_push($ids, 'true') : $ids = [];
 
         $repo = $this->getDoctrine()
             ->getRepository('AppBundle:Exhibition');
 
-        // type of work
-        $stats = StatisticsController::itemExhibitionLocationDistribution($em = $this->getDoctrine()->getEntityManager(), $ids);
+        // places
+        $stats = StatisticsController::exhibitionLocationDistribution($em = $this->getDoctrine()->getEntityManager(), $ids);
 
         $data = [];
-
 
         foreach ($stats['types'] as $type => $count) {
             $percentage = 100.0 * $count / $stats['total'];
@@ -357,7 +356,6 @@ extends Controller
             $data[] = $dataEntry;
         }
 
-
         return $this->render('Statistics/exhibition-city-index.html.twig', [
             'container' => 'container-location',
             'total' => $stats['total'],
@@ -366,9 +364,8 @@ extends Controller
         ]);
     }
 
-
-    public function exhibitionGenderDistribution ($ids = null) {
-
+    public function exhibitionGenderDistribution($ids = null)
+    {
         $ids !== null ? array_push($ids, 'true') : $ids = [];
 
         // type of work
@@ -401,7 +398,6 @@ extends Controller
         $em = $this->getDoctrine()->getEntityManager();
 
         $countryQueryString = '';
-
 
         // search in geoname and in location, apparently location.country is sometimes not set...
         $countryQueryString .= " AND (". $this->getCountryQueryString('Location', 'Exhibition', 'country', $countriesQuery) ." OR " . $this->getCountryQueryString('Geoname', 'Exhibition', 'country_code', $countriesQuery) . " ) ";
@@ -525,7 +521,6 @@ extends Controller
         ]);
     }
 
-
     /**
      * @Route("/exhibition/by-month", name="exhibition-by-month")
      */
@@ -560,7 +555,8 @@ extends Controller
         $sum = 0;
         while ($i <= $max) {
             $key = $i;
-            $categories[] = sprintf('%04d-%02d', $year = intval($i / 100), $month = $i % 100);
+            $categories[] = sprintf('%04d-%02d',
+                                    $year = intval($i / 100), $month = $i % 100);
             $count = array_key_exists($key, $frequency_count) ? $frequency_count[$key] : 0;
             $sum += $count;
             $data[] = $count;
@@ -583,6 +579,7 @@ extends Controller
                 $i = $i + (100 - $i % 100) + 1;
             }
         }
+
         $data_avg = round(1.0 * $sum / count($data), 1);
 
         // display the static content
@@ -625,14 +622,10 @@ extends Controller
         foreach ([ 'birth', 'death' ] as $key) {
             $date_field = $key . 'date';
             $querystr = 'SELECT YEAR(' . $date_field . ') AS year'
-                      // . ', sex'
                       . ', COUNT(*) AS how_many'
                       . ' FROM Person WHERE status >= 0 AND ' . $date_field . ' IS NOT NULL'
-                      // . ' AND sex IS NOT NULL'
                       . ' GROUP BY YEAR(' . $date_field. ')'
-                      // . ', sex'
                       . ' ORDER BY YEAR(' . $date_field . ')'
-                      //. ', sex'
                       ;
             $stmt = $dbconn->query($querystr);
 
@@ -640,12 +633,15 @@ extends Controller
                 if (0 == $min_year || $row['year'] < $min_year) {
                     $min_year = $row['year'];
                 }
+
                 if ($row['year'] > $max_year) {
                     $max_year = $row['year'];
                 }
+
                 if (!isset($data[$row['year']])) {
                     $data[$row['year']] = [];
                 }
+
                 $data[$row['year']][$key] = $row['how_many'];
             }
         }
@@ -653,33 +649,15 @@ extends Controller
         if ($min_year < 1820) {
             $min_year = 1820;
         }
+
         if ($max_year > 2000) {
             $max_year = 2000;
         }
 
-        /*
-        $total_works = 0;
-
-        $querystr = 'SELECT PublicationPerson.publication_ord AS year, Publication.complete_works = 0 AS base, COUNT(DISTINCT Publication.id) AS how_many FROM Person LEFT OUTER JOIN PublicationPerson ON PublicationPerson.person_id=Person.id LEFT OUTER JOIN Publication ON Publication.id=PublicationPerson.publication_id AND Publication.status >= 0 WHERE Person.status >= 0 AND PublicationPerson.publication_ord IS NOT NULL'
-                  // . ' AND sex IS NOT NULL'
-                  . ' GROUP BY PublicationPerson.publication_ord, Publication.complete_works = 0'
-                  . ' ORDER BY PublicationPerson.publication_ord, Publication.complete_works = 0';
-        $stmt = $dbconn->query($querystr);
-        while ($row = $stmt->fetch()) {
-            $total_works += $row['how_many'];
-            $key = $row['base'] ? 'works_issued_base' : 'works_issued_extended';
-            $data[$row['year']][$key] = $row['how_many'];
-        }
-        */
-
         $categories = [];
         for ($year = $min_year; $year <= $max_year; $year++) {
             $categories[] = 0 == $year % 5 ? $year : '';
-            foreach (['birth', 'death',
-                           // 'works',
-                      'works_issued_base', 'works_issued_extended']
-                     as $key)
-            {
+            foreach ([ 'birth', 'death' ] as $key) {
                 $total[$key][$year] = [
                     'name' => $year,
                     'y' => isset($data[$year][$key])
@@ -693,10 +671,6 @@ extends Controller
             'categories' => json_encode($categories),
             'person_birth' => json_encode(array_values($total['birth'])),
             'person_death' => json_encode(array_values($total['death'])),
-            /*
-            'works_base' => json_encode(array_values($total['works_issued_base'])),
-            'works_extended' => json_encode(array_values($total['works_issued_extended'])),
-            */
         ]);
     }
 
@@ -748,7 +722,7 @@ extends Controller
         ;
 
         // for the selected ones
-        $querystr .= " AND " . $andWhere . " " .$exhibitionCountryQuery . " " . $organizerQuery ;
+        $querystr .= " AND " . $andWhere . " " . $exhibitionCountryQuery . " " . $organizerQuery ;
 
 
         $querystr .= " UNION SELECT 'total' AS type, COUNT(DISTINCT Person.id) AS how_many"
@@ -760,8 +734,7 @@ extends Controller
         ;
 
         // for the total number of personas
-        $querystr .= " AND " . $andWhere . " " .$exhibitionCountryQuery . " ". $organizerQuery ;
-
+        $querystr .= " AND " . $andWhere . " " . $exhibitionCountryQuery . " " . $organizerQuery ;
 
 
         $stmt = $dbconn->query($querystr);
@@ -821,10 +794,11 @@ extends Controller
         $categories = [];
         for ($year = $min_year; $year <= $max_year; $year++) {
             $categories[] = 0 == $year % 5 ? $year : '';
-            foreach (['birth', 'death',
-                         // 'works',
-                         'works_issued_base', 'works_issued_extended']
-                     as $key)
+            foreach ([
+                    'birth', 'death',
+                    // 'works',
+                    'works_issued_base', 'works_issued_extended',
+                ] as $key)
             {
                 $total[$key][$year] = [
                     'name' => $year,
@@ -842,9 +816,8 @@ extends Controller
         ]);
     }
 
-
-    public static function itemExhibitionOrganizerDistribution($em, $currIds = []){
-
+    public static function buildExhibitionOrganizerDistribution($em, $currIds = [])
+    {
         $dbconn = $em->getConnection();
 
         $where = '';
@@ -887,8 +860,7 @@ extends Controller
 
 
 
-    public static function itemExhibitionLocationDistribution($em, $currIds = []){
-
+    public static function exhibitionLocationDistribution($em, $currIds = []){
         $dbconn = $em->getConnection();
 
         $where = '';
@@ -1186,9 +1158,6 @@ EOT;
 
             $where .= StatisticsController::getStringQueryForExhibitionIds($currIdsExh, 'long');
         }
-
-
-
 
         $querystr = <<<EOT
 SELECT COUNT(*) AS how_many,
@@ -2370,8 +2339,8 @@ EOT;
                 'P = IE.person')
             ->where('E.status <> -1')
             ->where('L.status <> -1')
-            ->andWhere("${countryQueryString}")
-            ->groupBy('P.id')
+            ->andWhere($countryQueryString)
+            ->groupBy('P.id,Pl.countryCode')
             ->orderBy('C.name', 'DESC')
         ;
 
@@ -2382,7 +2351,11 @@ EOT;
 
         $statsByCountry = [];
         $statsByNationality = [];
+        $lastPersonId = -1;
         foreach ($result as $row) {
+            if (0 == $row['numEntries']) {
+                continue;
+            }
 
             $cc = $row['countryCode'];
             if (array_key_exists($cc, self::$countryMap)) {
@@ -2417,14 +2390,20 @@ EOT;
                     'countItemExhibition' => 0,
                 ];
             }
-            ++$statsByCountry[$cc]['countByNationality'][$nationality]['countArtists'];
-            ++$statsByCountry[$cc]['totalArtists'];
-            ++$statsByNationality[$nationality]['countArtists'];
+
+            if ($lastPersonId != $row['id']) {
+                ++$statsByCountry[$cc]['countByNationality'][$nationality]['countArtists'];
+                ++$statsByCountry[$cc]['totalArtists'];
+                ++$statsByNationality[$nationality]['countArtists'];
+
+                $lastPersonId = $row['id'];
+            }
 
             $statsByCountry[$cc]['countByNationality'][$nationality]['countItemExhibition'] += $row['numEntries'];
             $statsByCountry[$cc]['totalItemExhibition'] += $row['numEntries'];
             $statsByNationality[$nationality]['countItemExhibition'] += $row['numEntries'];
         }
+
 
         $key = 'countItemExhibition'; // alternative: 'countArtists'
 
@@ -2434,7 +2413,6 @@ EOT;
         }
 
         $countries = array_keys($statsByCountry);
-
 
         uksort($nationalities, function ($idxA, $idxB) use ($countries, $nationalities) {
             if ('XX' == $idxA) {
@@ -2461,14 +2439,13 @@ EOT;
         });
 
 
-
-
         $maxNationality = 16;
         $xCategories = array_keys($nationalities);
         if (count($xCategories) > $maxNationality) {
             $xCategories = array_merge(array_slice($xCategories, 0, $maxNationality - 1 ),
                 [ 'unknown', 'other' ]);
         }
+
         // exit;
 
         $valuesFinal = [];
@@ -2547,7 +2524,7 @@ EOT;
             ->innerJoin('IE.person', 'P')
             ->where('L.status <> -1')
             // ->andWhere("Pl.countryCode IN('CH', 'NL')") // test
-            ->groupBy('P.id')
+            ->groupBy('P.id, Pl.countryCode')
             ->orderBy('C.name', 'DESC')
             ;
 

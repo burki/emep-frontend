@@ -4,7 +4,6 @@
                 chart: {
                     renderTo: 'container-by-year',
                     defaultSeriesType: 'column'
-                    /*, margin: [ 50, 50, 100, 80] */
                 },
                 title: {
                     text: ' '
@@ -60,23 +59,8 @@
                     }
                 },
                 series: [
-                    /*
-                    {
-                        yAxis: 0,
-                        name: 'Gesamtwerk',
-                        data: {{ works_extended }},
-                        stack: 'works'
-                    },
-                    {
-                        yAxis: 0,
-                        name: 'Individuelle Werke',
-                        data: {{ works_base }},
-                        stack: 'works'
-                    },
-                    */
                     {
                         type: 'line',
-                        //dashStyle: 'Solid', // 'shortdot',
                         marker: {
                             enabled: false
                         },
@@ -88,7 +72,6 @@
                     },
                     {
                         type: 'line',
-                        //dashStyle: 'Solid',
                         marker: {
                             enabled: false
                         },
@@ -99,9 +82,8 @@
                         color: '#303030'
                     }
                 ]
-       });
-    });
-
+            });
+        });
     </script>
 
     <h3 class="chart-header" data-collapse="container-by-year"><span class="chartsymbol">+</span>Artists by Year of Birth/Death<span class="charttypeTitle">(Line Chart)</span></h3>

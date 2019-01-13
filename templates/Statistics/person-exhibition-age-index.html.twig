@@ -38,8 +38,9 @@
                         // console.log(this);
                         return '<b>'
                             + Highcharts.numberFormat(this.y, 0)
+                            + ' exhibition appearances of '
                             + ('Age (Deceased Artist)' == this.series.name ? ' deceased' : ' living')
-                            + ' persons exhibiting at age '
+                            + ' artists aged '
                             + this.point.name
                             + '</b>';
                     }
@@ -57,7 +58,6 @@
                                 url += '&point=' + encodeURIComponent(event.point.name);
 
                                 // console.log('URL: ', url);
-
                                 $('#detailModal').modal('show');
                                 $('#detailModal').find('.modal-body').load(url);
                             }
@@ -87,7 +87,5 @@
     </script>
 
 {# chart separated so we can reuse it in per exhibition stats #}
-
-
 <h3 class="chart-header" data-collapse="{{ container|raw }}"><span class="chartsymbol">+</span>Artists’ Exhibitioning Age<span class="charttypeTitle">(Bar Chart)</span></h3>
 <div class="collapse"  id="{{ container|raw }}" style="width: 100%;  height: 400px; margin: 0 auto"></div>

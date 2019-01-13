@@ -9,6 +9,7 @@ class PersonListBuilder
 extends SearchListBuilder
 {
     protected $entity = 'Person';
+    var $mode = '';
     protected $joinLatLong = false; // for maps
 
     var $rowDescr = [
@@ -180,13 +181,24 @@ extends SearchListBuilder
                                 Request $request,
                                 UrlGeneratorInterface $urlGenerator,
                                 $queryFilters = null,
-                                $extended = false)
+                                $mode = '')
     {
+        $this->mode = $mode;
+
         parent::__construct($connection, $request, $urlGenerator, $queryFilters);
 
         $this->joinLatLong = 'search-map' == $request->get('_route');
 
-        if ($extended) {
+        if (in_array($this->mode, [ 'stats-nationality', 'stats-exhibition-distribution' ])) {
+            $this->orders = [ 'default' => [ 'asc' => [ 'how_many DESC' ] ] ];
+        }
+        else if (in_array($this->mode, [ 'stats-by-year-birth', 'stats-by-year-death' ])) {
+            $this->orders = [ 'default' => [ 'asc' => [ 'year' ] ] ];
+        }
+        else if ('stats-popularity' == $this->mode) {
+            $this->orders = [ 'default' => [ 'asc' => [ 'count_exhibition DESC' ] ] ];
+        }
+        else if ('extended' == $this->mode) {
             $this->rowDescr = [
                 'person_id' => [
                     'label' => 'ID',
@@ -288,6 +300,56 @@ extends SearchListBuilder
             return $this;
         }
 
+        if ('stats-nationality' == $this->mode) {
+            $queryBuilder->select([
+                'P.country AS nationality',
+                'COUNT(DISTINCT P.id) AS how_many',
+            ]);
+
+            return $this;
+        }
+
+        if (in_array($this->mode, [ 'stats-by-year-birth', 'stats-by-year-death' ])) {
+            $queryBuilder->select([
+                'YEAR(P.' . ( 'stats-by-year-death' == $this->mode ? 'death' : 'birth' ) . 'date) AS year',
+                'COUNT(DISTINCT P.id) AS how_many',
+            ]);
+
+            return $this;
+        }
+
+        if ('stats-exhibition-distribution' == $this->mode) {
+            $queryBuilder->select([
+                'P.id AS person_id',
+                'COUNT(DISTINCT IE.id_exhibition) AS how_many',
+            ]);
+
+            return $this;
+        }
+
+        if ('stats-popularity' == $this->mode) {
+            $queryBuilder->select([
+                "CONCAT(P.lastname, ', ', IFNULL(P.firstname, '')) AS person",
+                'P.id AS person_id',
+                "DATE(P.birthdate) AS birthdate",
+                "P.birthplace AS birthplace",
+                "P.birthplace_tgn AS birthplace_tgn",
+                "DATE(P.deathdate) AS deathdate",
+                "P.deathplace AS deathplace",
+                "P.deathplace_tgn AS deathplace_tgn",
+                "P.ulan AS ulan",
+                "P.pnd AS gnd",
+                "P.wikidata AS wikidata",
+                'P.sex AS gender',
+                'P.country AS nationality',
+                'P.status AS status',
+                'COUNT(DISTINCT IE.id_exhibition) AS count_exhibition',
+                'P.additional AS additional',
+            ]);
+
+            return $this;
+        }
+
         $queryBuilder->select([
             'SQL_CALC_FOUND_ROWS P.id',
             "CONCAT(P.lastname, ', ', IFNULL(P.firstname, '')) AS person",
@@ -320,7 +382,15 @@ extends SearchListBuilder
 
     protected function setJoin($queryBuilder)
     {
-        $queryBuilder->groupBy('P.id');
+        if ('stats-nationality' == $this->mode) {
+            $queryBuilder->groupBy('nationality');
+        }
+        else if (in_array($this->mode, [ 'stats-by-year-birth', 'stats-by-year-death' ])) {
+            $queryBuilder->groupBy('year');
+        }
+        else {
+            $queryBuilder->groupBy('P.id');
+        }
 
         $queryBuilder->leftJoin('P',
                                 'ItemExhibition', 'IE',
@@ -378,6 +448,16 @@ extends SearchListBuilder
     {
         // don't show deleted
         $queryBuilder->andWhere('P.status <> -1');
+
+        if ('stats-popularity' == $this->mode) {
+            $queryBuilder->andWhere('P.wikidata IS NOT NULL');
+        }
+        else if (in_array($this->mode, [ 'stats-by-year-birth', 'stats-by-year-death' ])) {
+            $queryBuilder->andWhere('P.' . ( 'stats-by-year-death' == $this->mode ? 'death' : 'birth' ) . 'date IS NOT NULL');
+        }
+        else if ('stats-exhibition-distribution' == $this->mode) {
+            $queryBuilder->having('how_many >= 1');
+        }
 
         $this->addSearchFilters($queryBuilder, [
             'P.lastname',
