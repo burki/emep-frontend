@@ -364,8 +364,16 @@ ORDER BY age, state, how_many
 EOT;
 
                 $params = $query->getParameters();
+                $connection = $query->getConnection();
+                foreach ($params as $key => $values) {
+                    if (is_array($values)) {
+                        $sql = str_replace(':' . $key,
+                                           join(', ', array_map(function ($val) use ($connection)  { return is_int($val) ? $val : $connection->quote($val); }, $values)),
+                                           $sql);
+                    }
+                }
 
-                $stmt = $query->getConnection()->executeQuery($sql, $params);
+                $stmt = $connection->executeQuery($sql, $params);
                 $renderParams = $this->processExhibitionAge($stmt);
                 if (!empty($renderParams)) {
                     $template = $this->get('twig')->loadTemplate('Statistics/person-exhibition-age-index.html.twig');
