@@ -6,6 +6,8 @@
     {% import 'Shared/select2.html.twig' as select2 %}
     {{ select2.head() }}
 
+    <script src="{{ app.request.basepath }}/js/js.cookie.js"></script>
+
     <script>
     $(document).ready(function($) {
         // Remove empty fields from GET forms
@@ -24,6 +26,54 @@
 
         // initialize select2
         $('.select2').select2();
+
+        // checkmark worker
+        var active = Cookies.getJSON('{{ listBuilder.entity }}');
+        if (!(active instanceof Array)) {
+            active = [];
+        }
+        for (var i = 0; i < active.length; i++) {
+            $('span.checkmark[data-id="' + active[i] + '"]').addClass('checked');
+        }
+
+        $('.checkbox-filter-button').on('click', function() {
+            if (active.length !== 0 ) {
+                {% if 'Venue' == listBuilder.entity %}{% set selector = 'location' %}{% else %}{% set selector = listBuilder.entity|lower %}{% endif %}
+                var select2selector = '#filter_{{ selector }}_{{ selector }}';
+                // remove anything active
+                $(select2selector).val(null).trigger('change');
+                for (var i = 0; i < active.length; i++) {
+                    // add new
+                    var $newOption = $("<option selected='selected'></option>").val(active[i]).text(active[i]);
+                    $(select2selector).append($newOption).trigger('change');
+                }
+                // submit form
+                $('#search').submit();
+            }
+        });
+
+        $('.checkmark').on('click', function() {
+            var currId = $(this).data('id');
+            var index = active.indexOf(currId);
+            if ($(this).hasClass('checked')) {
+                // remove
+                if (index > -1) {
+                    active.splice(index, 1);
+                }
+            }
+            else {
+                // add
+                if (index == -1) {
+                    active.push(currId);
+                }
+            }
+
+            $(this).toggleClass('checked');
+
+            Cookies.set('{{ listBuilder.entity }}', active);
+
+            // console.log(active);
+        });
     });
 
     function saveQuery() {
@@ -237,6 +287,7 @@
                     <div class="advanced-search-settings"><a href="{{ path('search-stats', app.request.query.all) }}"><span class="checkbox-filter-button">Show Statistics</a></span></a></div>
                 {% endif %}
 
+                {% if 'ItemExhibition' != listBuilder.entity %}<div class="advanced-search-settings"><span class="checkbox-filter-button">apply checkbox filter</span></div>{% endif %}
                 <div class="icontab download-csv"><a title="Download as Excel-File" href="{{ path('search-export', app.request.query.all) }}"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage"></a></div>
 
                 {% if app.user  %}
@@ -297,7 +348,7 @@
                     <tr>
                         {% set rowValues = listBuilder.buildRow(row, 'html') %}
                         {% for val in rowValues %}
-                        <td>{{ val|raw }}</td>
+                        <td>{% if loop.first %}{% if 'ItemExhibition' != listBuilder.entity %}<span class="checkmark" data-id="{{ row.id }}"></span>{% endif %}{% endif %}{{ val|raw }}</td>
                         {% endfor %}
                     </tr>
                     {% endfor %}
