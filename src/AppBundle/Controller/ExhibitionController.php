@@ -8,13 +8,15 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
-use AppBundle\Utils\CsvResponse;
-
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-use AppBundle\Utils\SearchListBuilder;
+use Pagerfanta\Pagerfanta;
 
+use AppBundle\Utils\CsvResponse;
+use AppBundle\Utils\SearchListBuilder;
+use AppBundle\Utils\SearchListPagination;
+use AppBundle\Utils\SearchListAdapter;
 
 
 /**
@@ -23,6 +25,8 @@ use AppBundle\Utils\SearchListBuilder;
 class ExhibitionController
 extends CrudController
 {
+    use MapBuilderTrait;
+    use StatisticsBuilderTrait;
     use SharingBuilderTrait;
 
     protected function buildCountries()
@@ -91,132 +95,13 @@ extends CrudController
         ]);
     }
 
-
-    /**
-     * @Route("/exhibition/csv", name="exhibition-csv")
-     */
-    public function indexToCsvAction(Request $request)
-    {
-        $route = $request->get('_route');
-
-        $qb = $this->getDoctrine()
-            ->getManager()
-            ->createQueryBuilder();
-
-        $qb->select([
-            'E',
-            // 'COUNT(DISTINCT A.id) AS numArtistSort',
-            'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-            "E.startdate HIDDEN dateSort",
-            "CONCAT(COALESCE(P.alternateName, P.name), E.startdate) HIDDEN placeSort"
-        ])
-            ->from('AppBundle:Exhibition', 'E')
-            ->leftJoin('E.location', 'L')
-            ->leftJoin('L.place', 'P')
-            //->leftJoin('L.place', 'Person')
-            // ->leftJoin('E.artists', 'A')
-            ->leftJoin('AppBundle:ItemExhibition', 'IE',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = E AND IE.title IS NOT NULL')
-            ->leftJoin('AppBundle:Person', 'Person',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'Person = IE.person')
-            ->where('E.status <> -1')
-            ->groupBy('E.id')
-            ->orderBy('dateSort')
-        ;
-
-
-        $leftYear = 1905;
-        $rightYear = 1915;
-
-        $organizerTypes = $this->buildOrganizerTypes();
-        $form = $this->get('form.factory')->create(\AppBundle\Filter\ExhibitionFilterType::class, [
-            'country_choices' => array_flip($this->buildCountries()),
-            'organizer_type_choices' => array_combine($organizerTypes, $organizerTypes),
-            'ids' => range(0, 9999),
-            'years' => [$leftYear, $rightYear]
-        ]);
-
-
-        // $formIds = $this->get('form.factory')->create(\AppBundle\Filter\ExhibitionFilterTypeIds::class, []);
-
-
-
-        if ($request->query->has($form->getName())) {
-            // manually bind values from the request
-            $form->submit($request->query->get($form->getName()));
-
-            // build the query from the given form object
-            $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($form, $qb);
-        }
-
-
-
-        // echo ($mapdata['bounds']);
-
-        $result = $qb->getQuery()->execute();
-
-
-        /*  CREATE DATABLE LIKE THE FRONTEND */
-
-
-        $csvResult = [];
-
-        foreach ($result as $value) {
-                $innerArray = [];
-
-                // echo ('  |   ');
-
-
-                // print_r( $value[0]->getStartdate() );
-                // echo '  |   ';
-                // print_r( $value[0]->getEnddate() );
-                // echo '  |   ';
-                // print_r( $value[0]->title );
-                // echo '  |   ';
-
-                $location = $value[0]->location;
-                $locationLabel = '';
-                $locationName = '';
-
-                if ($location) {
-                    $locationLabel = $value[0]->location->getPlaceLabel();
-                    $locationName = $value[0]->location->getName();
-                }
-
-                // print_r( $locationLabel );
-                // echo '  |   ';
-                // print_r( $locationName );
-                // echo '  |   ';
-                // print_r( $value['numCatEntrySort'] );
-                // echo '  |   ';
-                // print_r( $value[0]->getOrganizerType() );
-                // echo '  |   ';
-
-                array_push($innerArray, $value[0]->getStartdate(), $value[0]->getEnddate(), $value[0]->title, $locationLabel, $locationName, $value['numCatEntrySort'], $value[0]->getOrganizerType() );
-
-
-                array_push($csvResult, $innerArray);
-        }
-
-        // print_r($csvResult);
-
-        /* END DATATABLE CREATION LIKE FRONTEND */
-
-
-        $response = new CSVResponse( $csvResult, 200, explode( ', ', 'Startdate, Enddate, Title, City, Venue, # of Cat. Entries, type' ) );
-        $response->setFilename( "data.csv" );
-        return $response;
-    }
-
     /**
      * @Route("/exhibition", name="exhibition-index")
      */
-    public function indexAction(Request $request, UserInterface $user = null)
+    public function indexAction(Request $request,
+                                UrlGeneratorInterface $urlGenerator,
+                                UserInterface $user = null)
     {
-
-
         // redirect to saved query
         if ('POST' == $request->getMethod() && !is_null($user)) {
             // check a useraction was requested
@@ -233,7 +118,7 @@ extends CrudController
 
                 if (!is_null($userAction)) {
                     return $this->redirectToRoute($userAction->getRoute(),
-                        $userAction->getRouteParams());
+                                                  $userAction->getRouteParams());
                 }
             }
         }
@@ -241,42 +126,11 @@ extends CrudController
 
         $route = $request->get('_route');
 
-        // print_r( $request );
-
-        $qb = $this->getDoctrine()
-                ->getManager()
-                ->createQueryBuilder();
-
-        $qb->select([
-                'E',
-                // 'COUNT(DISTINCT A.id) AS numArtistSort',
-                'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-                "E.startdate HIDDEN dateSort",
-                // "CONCAT(COALESCE(P.alternateName, P.name), E.startdate) HIDDEN placeSort, L.name HIDDEN venueSort, E.title HIDDEN titleSort, E.organizerType HIDDEN sortOrgType"
-                "CONCAT(COALESCE(P.alternateName, P.name), E.startdate) HIDDEN placeSort, L.name HIDDEN venueSort, CASE WHEN E.titleExtended IS NULL THEN E.title ELSE E.titleExtended END HIDDEN titleSort, E.organizerType HIDDEN sortOrgType"
-            ])
-            ->from('AppBundle:Exhibition', 'E')
-            ->leftJoin('E.location', 'L')
-            ->leftJoin('L.place', 'P')
-            //->leftJoin('L.place', 'Person')
-            // ->leftJoin('E.artists', 'A')
-            ->leftJoin('AppBundle:ItemExhibition', 'IE',
-                       \Doctrine\ORM\Query\Expr\Join::WITH,
-                       'IE.exhibition = E AND IE.title IS NOT NULL')
-            ->leftJoin('AppBundle:Person', 'Person',
-                        \Doctrine\ORM\Query\Expr\Join::WITH,
-                       'Person = IE.person')
-            ->where('E.status <> -1')
-            ->groupBy('E.id')
-            ->orderBy('dateSort')
-            ;
-
-
         $leftYear = 1905;
         $rightYear = 1915;
 
         $organizerTypes = $this->buildOrganizerTypes();
-        $form = $this->get('form.factory')->create(\AppBundle\Filter\ExhibitionFilterType::class, [
+        $form = $this->form = $this->get('form.factory')->create(\AppBundle\Filter\ExhibitionFilterType::class, [
             'country_choices' => array_flip($this->buildCountries()),
             'organizer_type_choices' => array_combine($organizerTypes, $organizerTypes),
             'ids' => range(0, 9999),
@@ -284,44 +138,22 @@ extends CrudController
         ]);
 
 
-        // $formIds = $this->get('form.factory')->create(\AppBundle\Filter\ExhibitionFilterTypeIds::class, []);
-
-
-
-        if ($request->query->has($form->getName())) {
-            // manually bind values from the request
-            $form->submit($request->query->get($form->getName()));
-
-            // build the query from the given form object
-            $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($form, $qb);
-        }
-
-
-
-        $countries = $form->get('country')->getData();
-        $organizerType = $form->get('organizer_type')->getData();
+        // build up stuff to pass along
         $stringQuery = $form->get('search')->getData();
-        $ids = $form->get('id')->getData();
+        $organizerType = $form->get('exhibition')->get('organizer_type')->getData();
+        $ids = $form->get('exhibition')->get('id')->getData();
+        $countries = $form->get('location')->get('geoname')->getData();
         $artistGender = $form->get('gender')->getData();
         $artistNationalities = $form->get('nationality')->getData();
         $exhibitionStartDate = $form->get('startdate')->getData();
 
 
-
-
-        $pagination = $this->buildPagination($request, $qb->getQuery(), [
-            // the following leads to wrong display in combination with our
-            // helper.pagination_sortable()
-            // 'defaultSortFieldName' => 'dateSort', 'defaultSortDirection' => 'asc',
-        ]);
-
-
-        $result = $qb->getQuery()->execute();
-
         $currIds = [];
+        /*
         foreach ($result as $exh){
             array_push($currIds, $exh[0]->getId());
         }
+        */
 
         // refactor this --- only reason is because to many get variable
         if (count($currIds) > 500){
@@ -330,30 +162,105 @@ extends CrudController
 
         // print_r(($result[0]));
 
+        $requestURI = $request->getRequestUri();
 
-        $requestURI =  $request->getRequestUri();
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, 'Exhibition');
 
-         return $this->render('Exhibition/index.html.twig', [
-             'realIds' => $currIds,
-             'pageTitle' => $this->get('translator')->trans('Exhibitions'),
-            'pagination' => $pagination,
-            'form' => $form->createView(),
+        $listPagination = new SearchListPagination($listBuilder);
+
+        $page = $request->get('page', 1);
+        $listPage = $listPagination->get($this->pageSize, ($page - 1) * $this->pageSize);
+
+        $adapter = new SearchListAdapter($listPage);
+        $pager = new Pagerfanta($adapter);
+        $pager->setMaxPerPage($listPage['limit']);
+        $pager->setCurrentPage(intval($listPage['offset'] / $listPage['limit']) + 1);
+
+        return $this->render('Exhibition/index.html.twig', [
+            // 'realIds' => $currIds,
+            'pageTitle' => $this->get('translator')->trans('Exhibitions'),
+            // 'pagination' => $pagination,
+            'pager' => $pager,
+
+            'listBuilder' => $listBuilder,
+            'form' => $this->form->createView(),
+
             //'formIds'=> $formIds->createView(),
-            'realData' => $result,
+            //'realData' => $result,
             'countryArray' => $this->buildCountries(),
             'organizerTypesArray' => $organizerTypes,
             'countries' => $countries,
             'ids' => $ids,
             'organizerType' => $organizerType,
             'stringPart' => $stringQuery,
-             'minStartYear' => $leftYear,
-             'maxStartYear' => $rightYear,
-             'artistGender' => $artistGender,
+            'minStartYear' => $leftYear,
+            'maxStartYear' => $rightYear,
+            'artistGender' => $artistGender,
             'artistNationalities' => $artistNationalities,
             'exhibitionStartDate' => $exhibitionStartDate,
-             'requestURI' => $requestURI,
-             'searches' => $this->lookupSearches($user, 'exhibition')
+            'requestURI' => $requestURI,
+            'searches' => $this->lookupSearches($user, 'exhibition')
         ]);
+    }
+
+    /**
+     * @Route("/exhibition/map", name="exhibition-index-map")
+     */
+    public function indexMapAction(Request $request,
+                                   UrlGeneratorInterface $urlGenerator,
+                                   UserInterface $user = null)
+    {
+        $leftYear = 1905;
+        $rightYear = 1915;
+        $organizerTypes = $this->buildOrganizerTypes();
+        $form = $this->form = $this->get('form.factory')->create(\AppBundle\Filter\ExhibitionFilterType::class, [
+            'country_choices' => array_flip($this->buildCountries()),
+            'organizer_type_choices' => array_combine($organizerTypes, $organizerTypes),
+            'ids' => range(0, 9999),
+            'years' => [$leftYear, $rightYear]
+        ]);
+
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'extended', $entity = 'Exhibition');
+        $query = $listBuilder->query();
+        // echo($query->getSQL());
+
+        $stmt = $query->execute();
+
+        $renderParams = $this->processMapEntries($stmt, $entity);
+
+        return $this->render('Map/place-map-index.html.twig', $renderParams + [
+            'filter' => null,
+            'bounds' => [
+                [ 60, -120 ],
+                [ -15, 120 ],
+            ],
+            'markerStyle' => 'exhibition-by-place' == 'default',
+            'persons' => [], // $persons,
+        ]);
+    }
+
+    /**
+     * @Route("/exhibition/stats", name="exhibition-index-stats")
+     */
+    public function indexStatsAction(Request $request,
+                                     UrlGeneratorInterface $urlGenerator,
+                                     UserInterface $user = null)
+    {
+        $leftYear = 1905;
+        $rightYear = 1915;
+        $organizerTypes = $this->buildOrganizerTypes();
+        $form = $this->form = $this->get('form.factory')->create(\AppBundle\Filter\ExhibitionFilterType::class, [
+            'country_choices' => array_flip($this->buildCountries()),
+            'organizer_type_choices' => array_combine($organizerTypes, $organizerTypes),
+            'ids' => range(0, 9999),
+            'years' => [$leftYear, $rightYear]
+        ]);
+
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, $entity = 'Exhibition');
+
+        $charts = $this->buildExhibitionCharts($request, $urlGenerator, $listBuilder);
+
+        return new \Symfony\Component\HttpFoundation\Response(implode("\n", $charts));
     }
 
 

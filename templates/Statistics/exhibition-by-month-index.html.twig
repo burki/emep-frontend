@@ -1,8 +1,13 @@
-    <script type="text/javascript">
-    var chart;
+    <h3 class="chart-header" data-collapse="container-exhibitions-bar"><span class="chartsymbol">+</span>Number of Exhibitions by Month<span class="charttypeTitle">(Bar Chart)</span></h3>
+    <div class="collapse" id="container-exhibitions-bar" style="width: 100%; height: 400px; margin: 0 auto;"></div>
 
-    $(document).ready(function() {
-        $('#container-exhibtions-bar').highcharts({
+    <h3 class="chart-header" data-collapse="container-exhibitions-bubble"><span class="chartsymbol">+</span>Number of Exhibitions by Month<span class="charttypeTitle">(Bubble Chart)</span></h3>
+    <div class="collapse" id="container-exhibitions-bubble" style="width: 100%; height: 400px; margin: 0 auto;"></div>
+
+    <script type="text/javascript">
+
+    // $(document).ready(function() {
+        $('#container-exhibitions-bar').highcharts({
             chart: {
                 // renderTo: 'container',
                 zoomType: 'xy'
@@ -44,7 +49,7 @@
 
 
         // see http://jsfiddle.net/KmPJE/1/
-        $('#container-exhibtions-bubble').highcharts({
+        $('#container-exhibitions-bubble').highcharts({
             chart: {
                 defaultSeriesType: 'scatter'
             },
@@ -79,14 +84,5 @@
             }]
         });
 
-    });
+    // });
     </script>
-
-    <h3 class="chart-header" data-collapse="container-exhibtions-bar"><span class="chartsymbol">+</span>Number of Exhibitions by Month<span class="charttypeTitle">(Bar Chart)</span></h3>
-    <div class="collapse" id="container-exhibtions-bar" style="width: 100%; height: 400px; margin: 0 auto;"></div>
-
-    <h3 class="chart-header" data-collapse="container-exhibtions-bubble"><span class="chartsymbol">+</span>Number of Exhibitions by Month<span class="charttypeTitle">(Bubble Chart)</span></h3>
-    <div class="collapse" id="container-exhibtions-bubble" style="width: 100%; height: 400px; margin: 0 auto;"></div>
-
-
-    <script src="{{ app.request.basepath }}/js/collapseChart.js"></script>

@@ -1,5 +1,8 @@
+    <h3 class="chart-header" data-collapse="{{ container|raw }}"><span class="chartsymbol">+</span>Artists’ Exhibitioning Age<span class="charttypeTitle">(Bar Chart)</span></h3>
+    <div class="collapse"  id="{{ container|raw }}" style="width: 100%;  height: 400px; margin: 0 auto"></div>
+
     <script type="text/javascript">
-        $(document).ready(function() {
+        // $(document).ready(function() {
             new Highcharts.Chart({
                 chart: {
                     renderTo: '{{ container|raw }}',
@@ -83,9 +86,5 @@
                     }
                 ]
             });
-        });
+        // });
     </script>
-
-{# chart separated so we can reuse it in per exhibition stats #}
-<h3 class="chart-header" data-collapse="{{ container|raw }}"><span class="chartsymbol">+</span>Artists’ Exhibitioning Age<span class="charttypeTitle">(Bar Chart)</span></h3>
-<div class="collapse"  id="{{ container|raw }}" style="width: 100%;  height: 400px; margin: 0 auto"></div>

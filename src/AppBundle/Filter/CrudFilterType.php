@@ -18,6 +18,7 @@ extends AbstractType
             'label' => false,
             'attr' => [
                 'placeholder' => 'Search',
+                'class' => 'text-field-class w-input search-input input-text-search',
             ],
             'apply_filter' => function (QueryInterface $filterQuery, $field, $values) use ($searchFields, $useFulltext)
             {

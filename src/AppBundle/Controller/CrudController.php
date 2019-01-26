@@ -2,9 +2,13 @@
 
 namespace AppBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
+
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Intl\Intl;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
-use Symfony\Component\Intl\Intl;
 
 /**
  *
@@ -70,6 +74,74 @@ extends Controller
             $limit, // limit per page
             $options
         );
+    }
+
+    static function array_filter_recursive($array, $callback = null, $remove_empty_arrays = false)
+    {
+        foreach ($array as $key => & $value) { // mind the reference
+            if (is_array($value)) {
+                $value = self::array_filter_recursive($value, $callback, $remove_empty_arrays);
+                if ($remove_empty_arrays && ! (bool) $value) {
+                    unset($array[$key]);
+                }
+            }
+            else {
+                if ( ! is_null($callback) && ! $callback($value)) {
+                    unset($array[$key]);
+                }
+                elseif ('' === $value || ! (bool) $value) {
+                    unset($array[$key]);
+                }
+            }
+        }
+        unset($value); // kill the reference
+
+        return $array;
+    }
+
+    protected function instantiateListBuilder(Request $request,
+                                              UrlGeneratorInterface $urlGenerator,
+                                              $mode = false,
+                                              $entity = null)
+    {
+        $connection = $this->getDoctrine()->getEntityManager()->getConnection();
+
+        $parameters = $request->query->all();
+        $parameters = self::array_filter_recursive($parameters, null, true); // remove empty values
+
+        if (array_key_exists('filter', $parameters)) {
+            static $submitCalled = false; // buildExhibitionCharts calls instantiateListBuilder multiple times
+
+            if (!$submitCalled) {
+                // var_dump($parameters['filter']);
+                $this->form->submit($parameters['filter']);
+                $submitCalled = true;
+            }
+        }
+
+        $filters = $this->form->getData();
+
+        switch ($entity) {
+            case 'Venue':
+                return new \AppBundle\Utils\VenueListBuilder($connection, $request, $urlGenerator, $filters, $mode);
+                break;
+
+            case 'Organizer':
+                return new \AppBundle\Utils\OrganizerListBuilder($connection, $request, $urlGenerator, $filters, $mode);
+                break;
+
+            case 'Person':
+                return new \AppBundle\Utils\PersonListBuilder($connection, $request, $urlGenerator, $filters, $mode);
+                break;
+
+            case 'ItemExhibition':
+                return new \AppBundle\Utils\ItemExhibitionListBuilder($connection, $request, $urlGenerator, $filters, $mode);
+
+            case 'Exhibition':
+            default:
+                return new \AppBundle\Utils\ExhibitionListBuilder($connection, $request, $urlGenerator, $filters, $mode);
+                break;
+        }
     }
 
     protected function hydratePersons($ids, $preserveOrder = false)

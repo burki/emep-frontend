@@ -515,4 +515,98 @@ trait StatisticsBuilderTrait
             'data' => json_encode($data),
         ];
     }
+
+    function buildExhibitionCharts($request, $urlGenerator, $listBuilder)
+    {
+        $charts = [];
+
+        // exhibition country-nationality matrix
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-nationality', $listBuilder->getEntity());
+        $query = $listBuilder->query();
+        // echo $query->getSQL();
+
+        $stmt = $query->execute();
+        $renderParams = $this->processExhibitionNationality($stmt);
+        if (!empty($renderParams)) {
+            $template = $this->get('twig')->loadTemplate('Statistics/exhibition-nationality-index.html.twig');
+
+            $charts[] = $template->render($renderParams);
+        }
+
+        // by month
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-by-month', $listBuilder->getEntity());
+
+        $query = $listBuilder->query();
+        // echo $query->getSQL();
+
+        $stmt = $query->execute();
+        $renderParams = $this->processExhibitionByMonth($stmt);
+        if (!empty($renderParams)) {
+            $template = $this->get('twig')->loadTemplate('Statistics/exhibition-by-month-index.html.twig');
+
+            $charts[] = $template->render($renderParams);
+        }
+
+        // exhibition age
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-age', $listBuilder->getEntity());
+
+        $query = $listBuilder->query();
+        $innerSql = $query->getSQL();
+
+        $sql = <<<EOT
+SELECT COUNT(*) AS how_many,
+YEAR(EB.startdate) - YEAR(EB.birthdate) AS age,
+IF (EB.deathdate IS NOT NULL AND YEAR(EB.deathdate) < YEAR(EB.startdate), 'deceased', 'living') AS state
+FROM
+({$innerSql}) AS EB
+GROUP BY age, state
+ORDER BY age, state, how_many
+EOT;
+
+        $params = $query->getParameters();
+        $connection = $query->getConnection();
+        foreach ($params as $key => $values) {
+            if (is_array($values)) {
+                $sql = str_replace(':' . $key,
+                                   join(', ', array_map(function ($val) use ($connection)  { return is_int($val) ? $val : $connection->quote($val); }, $values)),
+                                   $sql);
+            }
+        }
+
+        $stmt = $connection->executeQuery($sql, $params);
+        $renderParams = $this->processExhibitionAge($stmt);
+        if (!empty($renderParams)) {
+            $template = $this->get('twig')->loadTemplate('Statistics/person-exhibition-age-index.html.twig');
+
+            $charts[] = $template->render($renderParams);
+        }
+
+        // place
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-place', $listBuilder->getEntity());
+        $query = $listBuilder->query();
+        // echo $query->getSQL();
+
+        $stmt = $query->execute();
+        $renderParams = $this->processExhibitionPlace($stmt);
+        if (!empty($renderParams)) {
+            $template = $this->get('twig')->loadTemplate('Statistics/exhibition-city-index.html.twig');
+
+            $charts[] = $template->render($renderParams);
+        }
+
+        // type of organizer
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-organizer-type', $listBuilder->getEntity());
+        $query = $listBuilder->query();
+        // echo $query->getSQL();
+
+        $stmt = $query->execute();
+        $renderParams = $this->processExhibitionOrganizerType($stmt);
+        if (!empty($renderParams)) {
+            $template = $this->get('twig')->loadTemplate('Statistics/exhibition-organizer-index.html.twig');
+
+            $charts[] = $template->render($renderParams);
+        }
+
+        return $charts;
+    }
 }

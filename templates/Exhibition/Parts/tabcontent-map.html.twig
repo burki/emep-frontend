@@ -8,29 +8,5 @@
     {% import 'Shared/select2.html.twig' as select2 %}
     {{ select2.head() }}
 
-    {%  set countriesQuery = 'any' %}
-    {%  set organizerTypeQuery = 'any' %}
-    {%  set stringQuery = 'any' %}
-
-    {% if countries|length %}
-        {% set countriesQuery = countries %}
-    {% endif %}
-
-    {% if organizerType|length %}
-        {% set organizerTypeQuery = organizerType %}
-    {% endif %}
-
-    {% if stringPart|length %}
-        {% set stringQuery = stringPart %}
-    {% endif %}
-
-    {% set exhibitionStartDateLeft = 'any' %}
-    {% set exhibitionStartDateRight = 'any' %}
-
-    {% if exhibitionStartDate['left_date'] %}
-        {% set exhibitionStartDateLeft = exhibitionStartDate['left_date']|date('Y-m-d') %}
-        {% set exhibitionStartDateRight = exhibitionStartDate['right_date']|date('Y-m-d') %}
-    {% endif %}
-
-    {{ render_hinclude(controller('AppBundle\\Controller\\MapController::exhibitionByPlaceIndexPart', { countriesQuery: countriesQuery, organizerTypeQuery: organizerTypeQuery, stringQuery: stringQuery, currIds: ids, artistGender:artistGender, artistNationalities:artistNationalities, exhibitionStartDateLeft:exhibitionStartDateLeft, exhibitionStartDateRight: exhibitionStartDateRight}), {'default': 'Loading...'}) }}
+    {{ render_hinclude(url('exhibition-index-map', app.request.query.all), {'default': 'Loading...'}) }}
 </div>

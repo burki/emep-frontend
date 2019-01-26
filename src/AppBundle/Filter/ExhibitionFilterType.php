@@ -16,95 +16,66 @@ extends CrudFilterType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $this->addSearchFilter($builder, [
-            // Exhibition.title,Exhibition.title_short,Exhibition.title_translit,Exhibition.title_alternate,Exhibition.subtitle,
-            // Location.name,Location.place,Person.lastname,Person.firstname,Exhibition.organizer,Exhibition.organizing_committee,Exhibition.description,Exhibition.comment_internal
-            'E.title', 'E.titleTransliterated', 'E.titleAlternate',
-            'L.name', 'L.placeLabel',
-        ]);
-
-        $builder->add('country', Filters\ChoiceFilterType::class, [
-            'choices' => [ 'select country' => '' ] + $options['data']['country_choices'],
-            'multiple' => true,
-            'apply_filter' => function (QueryInterface $filterQuery, $field, $values) {
-                if (empty($values['value'])) {
-                    return null;
-                }
-
-                $paramName = sprintf('p_%s', str_replace('.', '_', $field));
-
-                // expression that represent the condition
-                $expression = $filterQuery->getExpr()->in(/* $field */ 'P.countryCode', ':'.$paramName);
-
-                // expression parameters
-                $parameters = [
-                    $paramName => [ $values['value'], \Doctrine\DBAL\Connection::PARAM_STR_ARRAY ],
-                ];
-                return $filterQuery->createCondition($expression, $parameters);
-            },
-        ]);
-
-        $builder->add('organizer_type', Filters\ChoiceFilterType::class, [
-            'label' => 'Type of Organizing Body',
-            'multiple' => true,
-            'choices' => $options['data']['organizer_type_choices'],
+        $builder->add('search', Filters\TextFilterType::class, [
+            'label' => false,
             'attr' => [
-                'data-placeholder' => 'select type of organizing body',
+                'placeholder' => 'search exhibition title',
+                'class' => 'text-field-class w-input search-input input-text-search',
             ],
-            'apply_filter' => function (QueryInterface $filterQuery, $field, $values) {
-                if (empty($values['value'])) {
-                    return null;
-                }
-
-                $paramName = sprintf('e_%s', str_replace('.', '_', $field));
-
-                // expression that represent the condition
-                $expression = $filterQuery->getExpr()->in('E.organizerType', ':'.$paramName);
-
-                // expression parameters
-                $parameters = [
-                    $paramName => [ $values['value'], \Doctrine\DBAL\Connection::PARAM_STR_ARRAY ],
-                ];
-
-                return $filterQuery->createCondition($expression, $parameters);
-            },
         ]);
 
-
-
-        $builder->add('id', Filters\ChoiceFilterType::class, [
-            'choices' => [ 'select ids' => 'true'] + $options['data']['ids'],
-            'multiple' => true,
-            'apply_filter' => function (QueryInterface $filterQuery, $field, $values) {
-
-
-
-                if (empty($values['value'])) {
-                    return null;
+        $locationClass = new class extends \Symfony\Component\Form\AbstractType {
+            public function buildForm(FormBuilderInterface $builder, array $options)
+            {
+                $country_geoname_choices = $options['data']['country_choices'];
+                foreach ($country_geoname_choices as $label => $cc) {
+                    $country_geoname_choices[$label] = 'cc:' . $cc;
                 }
 
-                $paramName = sprintf('p_%s', str_replace('.', '_', $field));
+                $builder->add('geoname', Filters\ChoiceFilterType::class, [
+                    'choices' => [ 'select country' => '' ] + $country_geoname_choices,
+                    'multiple' => false,
+                    'attr' => [
+                        'data-placeholder' => 'select country',
+                        'class' => 'text-field-class w-select middle-selector',
+                    ],
+                ]);
+            }
 
-                // expression that represent the condition
+            public function getName()
+            {
+                return 'location';
+            }
+        };
 
+        $builder->add('location', get_class($locationClass), $options);
 
-                $expression = $filterQuery->getExpr()->in('E.id', ':'.$paramName);
-                // expression parameters
-                $parameters = [
-                    $paramName => [ $values['value'], \Doctrine\DBAL\Connection::PARAM_STR_ARRAY ],
-                ];
+        $exhibitionClass = new class extends \Symfony\Component\Form\AbstractType {
+            public function buildForm(FormBuilderInterface $builder, array $options)
+            {
+                $builder->add('organizer_type', Filters\ChoiceFilterType::class, [
+                    'label' => 'Type of Organizing Body',
+                    'multiple' => false,
+                    'choices' => [ 'select type of organizing body' => '' ] + $options['data']['organizer_type_choices'],
+                    'attr' => [
+                        'data-placeholder' => 'select type of organizing body',
+                        'class' => 'text-field-class w-select end-selector',
+                    ],
+                ]);
 
-                // check if it should be filtered by ids as well
-                if (in_array("true", $values['value'])) {
-                    return $filterQuery->createCondition($expression, $parameters);
-                }
+                $builder->add('id', Filters\ChoiceFilterType::class, [
+                    'choices' => [ 'select ids' => 'true'] + $options['data']['ids'],
+                    'multiple' => true,
+                ]);
+            }
 
-                // returns empty array if it shouldn't be filtered yet ---> for paging
-                return [];
+            public function getName()
+            {
+                return 'exhibition';
+            }
+        };
 
-            },
-        ]);
-
+        $builder->add('exhibition', get_class($exhibitionClass), $options);
 
 
         // QUERYING FOR OTHER MODELS
@@ -143,6 +114,7 @@ extends CrudFilterType
             },
         ]);
 
+
         $builder->add('gender', Filters\ChoiceFilterType::class, [
             'choices' => [
                 'female' => 'F',
@@ -171,6 +143,6 @@ extends CrudFilterType
 
     public function getBlockPrefix()
     {
-        return 'exhibition_filter';
+        return 'filter';
     }
 }
