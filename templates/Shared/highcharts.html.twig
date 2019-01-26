@@ -11,6 +11,7 @@
         $('hx\\:include').each(function() {
             // when hinclude is done: see https://github.com/mnot/hinclude/pull/50
             $(this).on('hinclude', function() {
+                // console.log('Loaded: ' + $(this).attr('src'));
                 // make .chart-header clickable
                 $('.chart-header').on('click', function(event) {
                     event.stopImmediatePropagation();

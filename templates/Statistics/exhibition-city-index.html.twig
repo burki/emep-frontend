@@ -1,6 +1,8 @@
+    <h3 class="chart-header" data-collapse="{{ container|raw }}"><span class="chartsymbol">+</span>City Distribution<span class="charttypeTitle">(Pie Chart)</span></h3>
+    <div class="collapse"  id="{{ container|raw }}" style="width: 100%;  height: 400px; margin: 0 auto"></div>
 
     <script type="text/javascript">
-        $(document).ready(function() {
+        // $(document).ready(function() {
             Highcharts.chart('{{ container|raw }}', {
                 chart: {
                     plotBackgroundColor: null,
@@ -48,8 +50,5 @@
                     data: {{ data|raw }}
                 }]
             });
-        });
+        // });
 </script>
-
-<h3 class="chart-header" data-collapse="{{ container|raw }}"><span class="chartsymbol">+</span>City Distribution<span class="charttypeTitle">(Pie Chart)</span></h3>
-<div class="collapse"  id="{{ container|raw }}" style="width: 100%;  height: 400px; margin: 0 auto"></div>

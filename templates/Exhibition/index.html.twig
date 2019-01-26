@@ -8,7 +8,8 @@
 
     <script>
         $(document).ready(function() {
-            $('#exhibition_filter_organizer_type').select2();
+            // initialize select2
+            $('.select2').select2();
         });
     </script>
 
@@ -17,47 +18,26 @@
 {% endblock %}
 
 {% block body %}
-
-
-
     <h1 class="heading">{{ pageTitle }}</h1>
 
+    <form class="filter exhibitionFilterForm indexForm" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
     <div class="searchbarcontainer">
-        <!--<form  class="filter" method="get" action="{{ path(app.request.attributes.get('_route')) }}"> -->
         <div class="searchbarinputcontainer">
-            <input type="text" class="text-field-class w-input search-input input-text-search" placeholder="search" value="{{ stringPart }}">
-            <select id="countrySelector" class="text-field-class w-select middle-selector">
-                <option value>select country</option>
-                {% for abrriviation,countryname in countryArray %}
-                    <option value="{{ abrriviation }}">{{ countryname }}</option>
-                {% endfor %}
-            </select>
-            <select id="organizerSelectore" class="text-field-class w-select end-selector">
-                <option value>select type of organizing body</option>
-                {% for organizer in organizerTypesArray %}
-                    <option value="{{ organizer }}">{{ organizer }}</option>
-                {% endfor %}
-            </select>
+            {{ form_widget(form.search) }}
+            {{ form_widget(form.location.geoname) }}
+            {{ form_widget(form.exhibition.organizer_type) }}
         </div>
         <div class="searchbuttoncontainer"><input type="submit" name="submit-filter" value="Search" class="submit-button w-button submit-filter-visible">
         </div>
-        <!--</form>-->
     </div>
-
 
     <div class="searchbarcontainer w-form hidden-form">
 
-        <form class="filter exhibitionFilterForm indexForm" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
             <div class="searchbarinputcontainer">
                 {{ form_rest(form) }}
             </div>
-            <div class="searchbuttoncontainer"><input type="submit" name="submit-filter" value="Search" class="submit-button w-button">
-            </div>
-        </form>
     </div>
-
-
-
+    </form>
 
     {%  set startyear = startYear %}
 
@@ -90,8 +70,8 @@
                 <div class="advanced-filters-nationalityArtist" style="display:none">
                     <select id="advanced-filters-nationalityArtist-select" class="advanced-filters-nationalityArtist-select text-field-class w-select">
                         <option value="">select country</option>
-                        {% for abrriviation,countryname in countryArray %}
-                            <option value="{{ abrriviation }}">{{ countryname }}</option>
+                        {% for abbreviation,countryname in countryArray %}
+                            <option value="{{ abbreviation }}">{{ countryname }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -123,7 +103,7 @@
                         </div>
                         <div class="first-filter-term">
                             {# find country to text method #}
-                            <div>{{ countryArray[countryAbbreviation]|capitalize }}</div>
+                            <div>{{ countryArray[countryAbbreviation|replace({'cc:' : ''})]|capitalize }}</div>
                         </div>
                     </div>
                     <div class="subfilter-buttons-container">
@@ -286,9 +266,6 @@
             // END SAVE QUERY FUNCTIONALITY
 
 
-
-            $('.searchbarinputcontainer input[type=text]').attr("placeholder", "search exhibition title");
-
             // ADVANED SEARCH FILTERS
 
             var rangeSliderExhibitionStartDate = document.getElementById('advanced-filters-startDateRangeExhibition-range');
@@ -375,24 +352,24 @@
             /* REMOVE FUNCTIONS */
 
             $('#removeArtistGender').on('click', function() {
-                $('#exhibition_filter_gender').val('');
+                $('#filter_gender').val('');
                 $( ".indexForm" ).submit();
             })
 
             $('#removeArtistNationality').on('click', function() {
                 // console.log('this data: ', $(this).attr('data-artistNationality'));
-                removeValueFromMultiSelect($(this).attr('data-artistNationality'), "#exhibition_filter_nationality");
+                removeValueFromMultiSelect($(this).attr('data-artistNationality'), "#filter_nationality");
                 $( ".indexForm" ).submit();
             });
 
             $('#remove-start-date-filter').on('click', function() {
-                $('#exhibition_filter_startdate_left_date_year').val('');
-                $('#exhibition_filter_startdate_left_date_month').val('');
-                $('#exhibition_filter_startdate_left_date_day').val('');
+                $('#filter_startdate_left_date_year').val('');
+                $('#filter_startdate_left_date_month').val('');
+                $('#filter_startdate_left_date_day').val('');
 
-                $('#exhibition_filter_startdate_right_date_year').val('');
-                $('#exhibition_filter_startdate_right_date_month').val('');
-                $('#exhibition_filter_startdate_right_date_day').val('');
+                $('#filter_startdate_right_date_year').val('');
+                $('#filter_startdate_right_date_month').val('');
+                $('#filter_startdate_right_date_day').val('');
 
                 $( ".indexForm" ).submit();
             });
@@ -418,23 +395,23 @@
 
                     // check if set
                     if(startyear && endyear){
-                        $('#exhibition_filter_startdate_left_date_year').val(startyear);
-                        $('#exhibition_filter_startdate_left_date_month').val(1);
-                        $('#exhibition_filter_startdate_left_date_day').val(1);
+                        $('#filter_startdate_left_date_year').val(startyear);
+                        $('#filter_startdate_left_date_month').val(1);
+                        $('#filter_startdate_left_date_day').val(1);
 
-                        $('#exhibition_filter_startdate_right_date_year').val(endyear);
-                        $('#exhibition_filter_startdate_right_date_month').val(12);
-                        $('#exhibition_filter_startdate_right_date_day').val(31);
+                        $('#filter_startdate_right_date_year').val(endyear);
+                        $('#filter_startdate_right_date_month').val(12);
+                        $('#filter_startdate_right_date_day').val(31);
                     }
 
                 }else if( currAdvancedFilterSelection === "nationalityArtist" ){
                     // set/add natioanlity of Artist to current selection
-                    addValueToMutliSelect($('#advanced-filters-nationalityArtist-select').val(), '#exhibition_filter_nationality')
+                    addValueToMutliSelect($('#advanced-filters-nationalityArtist-select').val(), '#filter_nationality')
 
                 }else if( currAdvancedFilterSelection === "genderArtist" ){
                     // set gender of artist
                     // console.log('current val of artist: ', $('.advanced-filters-genderArtist-select').val() );
-                    $('#exhibition_filter_gender').val( $('.advanced-filters-genderArtist-select').val() );
+                    $('#filter_gender').val( $('.advanced-filters-genderArtist-select').val() );
 
                 }
             }
@@ -461,67 +438,23 @@
             // END ADVANCED SEARCH FILTERS
 
 
-            $('.countryAbbr').on('click', function () {
-                var currSelection = $('#exhibition_filter_country').val();
-                var currCountry = $(this).data('country');
-                // remove array element
-                currSelection.splice($.inArray(currCountry, currSelection), 1);
-                $('#exhibition_filter_country').val(currSelection);
-                // submit form
-                $( ".exhibitionFilterForm" ).submit();
-            });
-
-            $('.organizer').on('click', function () {
-                var currSelection = $('#exhibition_filter_organizer_type').val();
-                var currCountry = $(this).data('organizer');
-                // remove array element
-                currSelection.splice($.inArray(currCountry, currSelection), 1);
-                $('#exhibition_filter_organizer_type').val(currSelection);
-
-                // submit form
-                $( ".exhibitionFilterForm" ).submit();
-            });
-
             // submitting form
             $('.exhibitionFilterForm').on('submit', function (e) {
                 // console.log('submiting now ....');
 
                 setAdvancedCustomFilterValues();
-
-                // countries
-                var currSelectionCountries = $('#exhibition_filter_country').val() !== null ? $('#exhibition_filter_country').val() : [];
-                var currCountrySelected = $('#countrySelector').val();
-                currSelectionCountries.push(currCountrySelected);
-                currSelectionCountries = jQuery.unique(currSelectionCountries);
-
-                currSelectionCountries = currSelectionCountries.filter(Boolean)  //filters all non-true values ---> especially empty strings
-                $('#exhibition_filter_country').val(currSelectionCountries);
-
-
-                // organization type
-                var currSelectionOrganizer = $('#exhibition_filter_organizer_type').val() ? $('#exhibition_filter_organizer_type').val() : [];
-                var currOrganizationSelected = $('#organizerSelectore').val();
-                currSelectionOrganizer.push(currOrganizationSelected);
-
-                currSelectionOrganizer = jQuery.unique(currSelectionOrganizer);
-                $('#exhibition_filter_organizer_type').val(currSelectionOrganizer);
             });
 
             $('.submit-filter-visible').on('click', function() {
                 $( ".indexForm" ).submit();
             });
-            $('.input-text-search').bind('input', function() {
-                $('#exhibition_filter_search').val($(this).val());
-                // console.log('change event:', $(this).val());
-            })
-
 
 
             // checkmark worker
             $('.checkmark').on('click', function() {
                 // console.log('checkbox checked: ', $(this).data('id'));
                 const currId = $(this).data('id').toString();
-                var currIdArray = $('#exhibition_filter_id').val() ? $('#exhibition_filter_id').val() : [];
+                var currIdArray = $('#filter_id').val() ? $('#filter_id').val() : [];
 
 
                 if($(this).hasClass("checked")){
@@ -537,7 +470,7 @@
 
                 currIdArray = jQuery.unique(currIdArray);
 
-                $('#exhibition_filter_id').val( currIdArray );
+                $('#filter_id').val( currIdArray );
 
 
                 // rebuild paging urls
@@ -559,12 +492,12 @@
 
             $('.checkbox-filter-button').on('click', function() {
                 // add true to the filter array
-                var currIdArray = $('#exhibition_filter_id').val() ? $('#exhibition_filter_id').val() : [];
+                var currIdArray = $('#filter_id').val() ? $('#filter_id').val() : [];
 
                 // currIdArray = jQuery.unique('true');
                 if( currIdArray.length !== 0 ){
                     currIdArray.push('true');
-                    $('#exhibition_filter_id').val( currIdArray );
+                    $('#filter_id').val( currIdArray );
                     $( ".indexForm" ).submit();
                 }
                 // submit form
@@ -573,25 +506,14 @@
 
             $('.exhibition-ids-filter-remove').on('click', function() {
                 // remove true option from array
-                var currIdArray = $('#exhibition_filter_id').val() ? $('#exhibition_filter_id').val() : [];
+                var currIdArray = $('#filter_id').val() ? $('#filter_id').val() : [];
                 var index = currIdArray.indexOf('true');
                 if (index !== -1) currIdArray.splice(index, 1);
 
-                $('#exhibition_filter_id').val( currIdArray );
+                $('#filter_id').val( currIdArray );
                 // submit form
                 $( ".indexForm" ).submit();
             });
-
-
-            $('.download-csv').on('click', function() {
-                var action = $('.exhibitionFilterForm').attr('action');
-                // console.log('first action: ', action);
-                $('.exhibitionFilterForm').attr('action', '{{ path('exhibition-csv') }}');
-                $('.exhibitionFilterForm').submit();
-                // resetting action to old one
-                $('.exhibitionFilterForm').attr('action', action);
-            });
-
 
             // show checkmarks if filter is already set
             {% if ids|length > 0 %}
@@ -626,7 +548,7 @@
                 // console.log(new URL(decodeURIComponent(pages[i].href)).searchParams.getAll("exhibition_filter[id][1]"));
                 // console.log(pages[i].href.searchParams.getAll("exhibition_filter[id]"));
 
-                var exhibitionIdsVal = $('#exhibition_filter_id').val() ? $('#exhibition_filter_id').val() : [];
+                var exhibitionIdsVal = $('#filter_id').val() ? $('#filter_id').val() : [];
                 for(i = 0; i < exhibitionIdsVal.length; i++){
                     currPageURL.searchParams.append( 'exhibition_filter[id][' + i + ']', exhibitionIdsVal[i] );
                 }
@@ -641,10 +563,7 @@
 
 
     <div class="contentcontainer w-container">
-
-
         <div class="listviewrow">
-
             {# tabs headers #}
             {% embed "Exhibition/Parts/tabs-header-index.html.twig" %}
             {% endembed %}
@@ -661,8 +580,6 @@
             </div><!-- .tab-content -->
         </div>
     </div>
-
-
 
 
     {% if 'placeSort' == sortField %}
@@ -706,8 +623,6 @@
 
     <script>
         $(document).ready(function() {
-
-
             // Order by the grouping
             $('#exhibitions tbody').on( 'click', 'tr.group', function () {
                 var currentOrder = table.order()[0];
@@ -725,13 +640,8 @@
 
                 $('.collapseRow[data-rowname="' + splitGroup + '"]').toggleClass('collapsed');
 
-
                 // console.log($(this).data('name'));
-                } );
+            });
         });
     </script>
-
-
-
-
 {% endblock %}
