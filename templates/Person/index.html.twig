@@ -2,27 +2,37 @@
 
 {% import 'Shared/helper.html.twig' as helper %}
 
+{% block head %}
+    {% import 'Shared/select2.html.twig' as select2 %}
+    {{ select2.head() }}
+
+    <script>
+        $(document).ready(function() {
+            // initialize select2
+            $('.select2').select2();
+        });
+    </script>
+
+    {#% import 'Shared/datatables.html.twig' as datatables %}
+    {{ datatables.head() }#}
+{% endblock %}
+
 {% block body %}
 
     <div class="w-container">
 
         <h1 class="heading">{{ pageTitle }}</h1>
 
+    <form class="filter personFilterForm indexForm" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
+
         <div class="searchbarcontainer">
-            <!--<form  class="filter" method="get" action="{{ path(app.request.attributes.get('_route')) }}"> -->
             <div class="searchbarinputcontainer">
-                <input type="text" class="text-field-class w-input search-input input-text-search" placeholder="search" value="{{ stringPart }}">
-                <select id="personSelector" class="text-field-class w-select end-selector"><option value="" selected="selected">select gender</option><option value="F">female</option><option value="M">male</option></select>
-                <select id="countrySelector" class="text-field-class w-select middle-selector">
-                    <option value>select country</option>
-                    {% for countrycode,countryname in countryArray %}
-                        <option value="{{ countrycode }}">{{ countryname }}</option>
-                    {% endfor %}
-                </select>
+                {{ form_widget(form.search) }}
+                {{ form_widget(form.person.gender) }}
+                {{ form_widget(form.person.nationality) }}
             </div>
             <div class="searchbuttoncontainer"><input type="submit" name="submit-filter" value="Search" class="submit-button w-button submit-filter-visible">
             </div>
-            <!--</form>-->
         </div>
 
     </div>
@@ -30,14 +40,11 @@
 
     <div class="searchbarcontainer w-form hidden-form">
 
-        <form class="filter exhibitionFilterForm indexForm" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
             <div class="searchbarinputcontainer">
                 {{ form_rest(form) }}
             </div>
-            <div class="searchbuttoncontainer"><input type="submit" name="submit-filter" value="Search" class="submit-button w-button">
-            </div>
-        </form>
     </div>
+    </form>
 
     <div class="filter-combination-container">
         <div class="filters-heading">
@@ -252,15 +259,15 @@
 
     <script>
         $(document).ready(function() {
-
-            // IMPLEMENT SAVE QUERY FUNCTIONALITY
-
+            /*
             $('.w-input').keypress(function (e) {
                 if (e.which == 13) {
                     $('.indexForm').submit();
                     return false;    //<---- Add this line
                 }
             });
+            */
+            // IMPLEMENT SAVE QUERY FUNCTIONALITY
 
             function saveQuery() {
                 // change action for saving current query
@@ -283,9 +290,6 @@
             });
 
             // END SAVE QUERY FUNCTIONALITY
-
-
-            $('.searchbarinputcontainer input[type=text]').attr("placeholder", "search artist name");
 
 
             // ADVANED SEARCH FILTERS
@@ -568,7 +572,7 @@
             });
 
 
-
+            /*
             $('.exhibitionFilterForm').on('submit', function (e) {
                 // console.log('submiting now ....');
 
@@ -590,14 +594,8 @@
 
                 $('#person_filter_gender').val(currGender);
             });
+            */
 
-            $('.submit-filter-visible').on('click', function() {
-                $( ".exhibitionFilterForm" ).submit();
-            });
-            $('.input-text-search').bind('input', function() {
-                $('#person_filter_search').val($(this).val());
-                // console.log('change event:', $(this).val());
-            })
             // checkmark worker
             $('.checkmark').on('click', function() {
                 // console.log('checkbox checked: ', $(this).data('id'));
@@ -661,16 +659,6 @@
                 $('#person_filter_id').val( currIdArray );
                 // submit form
                 $( ".exhibitionFilterForm" ).submit();
-            });
-
-
-            $('.download-csv').on('click', function() {
-                var action = $('.exhibitionFilterForm').attr('action');
-                // console.log('first action: ', action);
-                $('.exhibitionFilterForm').attr('action', '{{ path('person-csv') }}');
-                $('.exhibitionFilterForm').submit();
-                // resetting action to old one
-                $('.exhibitionFilterForm').attr('action', action);
             });
 
 

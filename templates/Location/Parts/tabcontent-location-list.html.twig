@@ -21,113 +21,42 @@
         })
     </script>
 
-    {% if pagination.getTotalItemCount > 0 %}
-        {# helper.pagination_count(pagination) #}
+        {% if pager.getNbResults() > 0 %}
+            {% set sortField = app.request.get('sort') %}
+            <div style="width: 100%; text-align: right;">
+                {{ pager.currentPageOffsetStart }} - {{ pager.currentPageOffsetEnd }} of {{ pager.getNbResults() }}
+            </div>
 
-
-        <div style="width: 100%; text-align: right;">{{ helper.pagination_count(pagination) }}</div>
-
-        <table id="venuesLists" class="table table-striped table-bordered dataTable listviewcontainer">
-            <thead>
-            <tr class="listviewheading">
-                <th class="">{{ helper.pagination_sortable(pagination, 'Name', 'nameSort') }}</th>
-                <th class="">{{ helper.pagination_sortable(pagination, 'City', 'placeSort') }}</th>
-                <th class="">{{ helper.pagination_sortable(pagination, 'Type', 'typeSort') }}</th>
-                <th class="">{{ helper.pagination_sortable(pagination, '# Exhibitions', 'numExhibitionSort', 'desc') }}</th>
-                <th class="">{{ helper.pagination_sortable(pagination, '# Cat. Entries', 'numCatEntrySort', 'desc') }}</th>
-            </tr>
-            </thead>
-            <tbody>
-
-            {% set last_initial = '' %}
-            {% set last_countryCode = '' %}
-
-            {% for row in pagination %}
-
-
-                {% set location = row[0] %}
-
-
-                {% set place = location.place %}
-                {# <ul class="list-unstyled"> #}
-                {% if 'nameSort' == sortField %}
-                    {# ignore #}
-                {% elseif 'numExhibitionSort' == sortField %}
-                    {% set initial = row['numExhibitionSort'] %}
-                {% elseif 'numCatEntrySort' == sortField %}
-                    {% set initial = row['numCatEntrySort'] %}
-                {% else %}
-                    {% set sortField = 'countryPlaceNameSort' %}
-                    {% if location.placeLabel is not empty %}
-                        {% set initial = location.placeLabel %}
-                    {% endif %}
-                {% endif %}
-                {% if initial != last_initial %}
-                    {% if last_initial != null %}
-                        {# </ul> #}
-                    {% endif %}
-                    {% if 'countryPlaceNameSort' == sortField and last_countryCode != place.countryCode %}
-                        {#
-                            <h3>
-                                {%  if place.countryCode == '' %}
-                                    No Country
-                                {% else %}
-                                    {{ countryName(place.countryCode) }}
-                                {% endif %}
-                            </h3>
-                        #}
-                        {% set last_countryCode = place.countryCode %}
-                    {% endif %}
-                    {#
-                        <h4>
-                            {% if 'countryPlaceNameSort' == sortField %}
-                                {% if place is not null %}
-                                    {{ helper.place_linked(place) }}
-                                {% endif %}
+            <table id="venuesLists" class="table table-striped table-bordered dataTable listviewcontainer">
+                <thead>
+                    <tr class="listviewheading">
+                        {% for key, label in listBuilder.buildHeaderRow() %}
+                        <th>
+                            {% set sortInfo = listBuilder.sortInfo(key) %}
+                            {% if sortInfo is not empty %}
+                                <a href="{{ sortInfo.action }}"{% if sortInfo.active is not empty %} class="{{ sortInfo.active }}"{% endif %}>{{ label }}</a>
                             {% else %}
-                                {{ initial }}
+                                {{ label }}
                             {% endif %}
-                        </h4>
-                    #}
+                        </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
 
-                    {% set last_initial = initial %}
-                    {# <ul class="list-group"> #}
-                {% endif %}
-                <tr class="listviewrow">
-                    <td class="title"><span class="checkmark {% if location.id in ids %} checked {% endif %}" data-id="{{ location.id }}"></span>
-                        <a href="{{ path('location', { 'id' : location.id }) }}"><b>{{ location.nameTransliterated ? location.nameTransliterated : location.name }}</b></a>
-                    </td>
+                <tbody>
+                    {% for row in pager.currentPageResults %}
+                    <tr>
+                        {% set rowValues = listBuilder.buildRow(row, 'html') %}
+                        {% for val in rowValues %}
+                        <td>{% if loop.first %}{% if 'ItemExhibition' != listBuilder.entity %}<span class="checkmark" data-id="{{ row.id }}"></span>{% endif %}{% endif %}{{ val|raw }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
 
-                    <td class="normal">
-
-                        {{ helper.place_linked(place) }}
-                    </td>
-
-                    <td class="normal">
-                        {{ location.getType() }}
-                    </td>
-
-                    {% set count = row['numExhibitionSort'] %}
-                    <td class="normal">
-                        {{ count }}
-                    </td>
-
-                    {% set countEntries = row['numCatEntrySort'] %}
-                    <td class="normal">
-                        {{ countEntries }}
-                    </td>
-
-                </tr>
-
-            {% endfor %}
-            </tbody>
-        </table>
-        {# </ul> #}
-        {# display navigation #}
-        <div class="navigation">
-            {{ knp_pagination_render(pagination) }}
-        </div>
-    {% else %}
-        No Venues found
-    {% endif %}
+            <div class="pagerfanta">{{ pagerfanta(pager, 'twitter_bootstrap3', { 'omitFirstPage': true }) }}</div>
+        {% else %}
+            No matching venues found. Please adjust your search.
+        {% endif %}
 </div>

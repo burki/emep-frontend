@@ -609,4 +609,106 @@ EOT;
 
         return $charts;
     }
+
+    function buildPersonCharts($request, $urlGenerator, $listBuilder)
+    {
+        $charts = [];
+
+        // nationality
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-nationality', $listBuilder->getEntity());
+        $query = $listBuilder->query();
+        // echo $query->getSQL();
+
+        $stmt = $query->execute();
+        $renderParams = $this->processPersonNationality($stmt);
+        if (!empty($renderParams)) {
+            $template = $this->get('twig')->loadTemplate('Statistics/person-nationality-index.html.twig');
+
+            $charts[] = $template->render($renderParams);
+        }
+
+        // birth/death
+        $listBuilderBirth = $this->instantiateListBuilder($request, $urlGenerator, 'stats-by-year-birth', $listBuilder->getEntity());
+        // $query = $listBuilderBirth->query();
+        // echo $query->getSQL()
+
+        $listBuilderDeath = $this->instantiateListBuilder($request, $urlGenerator, 'stats-by-year-death', $listBuilder->getEntity());
+        // $query = $listBuilderDeath->query();
+        //  echo $query->getSQL());
+
+        $renderParams = $this->processPersonBirthDeath([
+            'birth' => $listBuilderBirth->query(),
+            'death' => $listBuilderDeath->query(),
+        ]);
+
+        if (!empty($renderParams)) {
+            $template = $this->get('twig')->loadTemplate('Statistics/person-by-year-index.html.twig');
+
+            $charts[] = $template->render($renderParams);
+        }
+
+        // exhibition-distribution
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-exhibition-distribution', $listBuilder->getEntity());
+        $query = $listBuilder->query();
+        // echo $query->getSQL();
+
+        $stmt = $query->execute();
+        $renderParams = $this->processPersonDistribution([ 'exhibition' => $query ]);
+        if (!empty($renderParams)) {
+            $template = $this->get('twig')->loadTemplate('Statistics/person-distribution-index.html.twig');
+
+            $charts[] = $template->render($renderParams);
+        }
+
+        // wikipedia
+        $lang = in_array($request->get('lang'), [ 'en', 'de', 'fr' ])
+            ? $request->get('lang') : 'en';
+
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-popularity', $listBuilder->getEntity());
+        $query = $listBuilder->query();
+        // echo $query->getSQL();
+
+        $stmt = $query->execute();
+        $renderParams = $this->processPersonPopularity($stmt, $lang);
+        if (!empty($renderParams)) {
+            $template = $this->get('twig')->loadTemplate('Statistics/person-wikipedia-index.html.twig');
+
+            $charts[] = $template->render($renderParams);
+        }
+
+        return $charts;
+    }
+
+    function buildLocationCharts($request, $urlGenerator, $listBuilder)
+    {
+        $charts = [];
+
+        // type
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-type', $listBuilder->getEntity());
+        $query = $listBuilder->query();
+        // echo $query->getSQL();
+
+        $stmt = $query->execute();
+        $renderParams = $this->processLocationType($stmt);
+        if (!empty($renderParams)) {
+            $template = $this->get('twig')->loadTemplate('Statistics/organizer-type-index.html.twig');
+
+            $charts[] = $template->render($renderParams);
+        }
+
+        // country
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-country', $listBuilder->getEntity());
+        $query = $listBuilder->query();
+        // echo $query->getSQL();
+
+        $stmt = $query->execute();
+        $renderParams = $this->processLocationCountry($stmt);
+        if (!empty($renderParams)) {
+            $template = $this->get('twig')->loadTemplate('Statistics/organizer-country-index.html.twig');
+
+            $charts[] = $template->render($renderParams);
+        }
+
+        return $charts;
+    }
 }

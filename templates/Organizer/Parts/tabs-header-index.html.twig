@@ -4,7 +4,7 @@
         <div class="tabsymbols">
             <div class="advanced-search-settings"><span class="checkbox-filter-button">apply checkbox filter</span></div>
             <div class="icontab advanced-search active"><img src="{{ app.request.basepath }}/img/setttings_icon_blue.svg" class="iconimage" title="show/hide checkbox filter"></div>
-            <div class="icontab download-csv"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage" title="download current data as csv"></div>
+            <div class="icontab download-csv"><a href="{{ path('search-export', { 'entity' : 'Organizer'}|merge(app.request.query.all)) }}"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage" title="download current data as csv"></a></div>
 
             {% if app.user  %}
             <form id="saveQuery" action="{{ path('organizer-save') }}?entity={{  requestURI|url_encode }}" method="POST">
@@ -25,7 +25,7 @@
         <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 1em">
             <li role="presentation" class="active"><a href="#venuesList" aria-controls="entries" role="tab" data-toggle="tab">{{ 'Organizing Bodies'|trans }}</a></li>
             <li role="presentation"><a href="#map" role="tab" data-toggle="tab" onclick="clickMap()">{{ 'Map'|trans }}</a></li>
-            <li role="presentation"><a href="#statistics" role="tab" data-toggle="tab" onclick="clickMap()">{{ 'Statistics'|trans }}</a></li>
+            <li role="presentation"><a href="#stats" role="tab" data-toggle="tab">{{ 'Statistics'|trans }}</a></li>
         </ul>
     </div>
 

@@ -263,7 +263,6 @@ extends CrudController
         return new \Symfony\Component\HttpFoundation\Response(implode("\n", $charts));
     }
 
-
     // TODO MOVE TO SHARED
     protected function lookupSearches($user)
     {

@@ -326,67 +326,7 @@ extends CrudController
                 break;
 
             case 'Person':
-                // nationality
-                $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-nationality');
-                $query = $listBuilder->query();
-                // echo $query->getSQL();
-
-                $stmt = $query->execute();
-                $renderParams = $this->processPersonNationality($stmt);
-                if (!empty($renderParams)) {
-                    $template = $this->get('twig')->loadTemplate('Statistics/person-nationality-index.html.twig');
-
-                    $charts[] = $template->render($renderParams);
-                }
-
-                // birth/death
-                $listBuilderBirth = $this->instantiateListBuilder($request, $urlGenerator, 'stats-by-year-birth');
-                // $query = $listBuilderBirth->query();
-                // echo $query->getSQL()
-
-                $listBuilderDeath = $this->instantiateListBuilder($request, $urlGenerator, 'stats-by-year-death');
-                // $query = $listBuilderDeath->query();
-                //  echo $query->getSQL());
-
-                $renderParams = $this->processPersonBirthDeath([
-                    'birth' => $listBuilderBirth->query(),
-                    'death' => $listBuilderDeath->query(),
-                ]);
-
-                if (!empty($renderParams)) {
-                    $template = $this->get('twig')->loadTemplate('Statistics/person-by-year-index.html.twig');
-
-                    $charts[] = $template->render($renderParams);
-                }
-
-                // exhibition-distribution
-                $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-exhibition-distribution');
-                $query = $listBuilder->query();
-                // echo $query->getSQL();
-
-                $stmt = $query->execute();
-                $renderParams = $this->processPersonDistribution([ 'exhibition' => $query ]);
-                if (!empty($renderParams)) {
-                    $template = $this->get('twig')->loadTemplate('Statistics/person-distribution-index.html.twig');
-
-                    $charts[] = $template->render($renderParams);
-                }
-
-                // wikipedia
-                $lang = in_array($request->get('lang'), [ 'en', 'de', 'fr' ])
-                    ? $request->get('lang') : 'en';
-
-                $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-popularity');
-                $query = $listBuilder->query();
-                // echo $query->getSQL();
-
-                $stmt = $query->execute();
-                $renderParams = $this->processPersonPopularity($stmt, $lang);
-                if (!empty($renderParams)) {
-                    $template = $this->get('twig')->loadTemplate('Statistics/person-wikipedia-index.html.twig');
-
-                    $charts[] = $template->render($renderParams);
-                }
+                $charts = $this->buildPersonCharts($request, $urlGenerator, $listBuilder);
 
                 break;
 
@@ -436,32 +376,8 @@ extends CrudController
                 break;
 
             case 'Organizer':
-                // type
-                $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-type');
-                $query = $listBuilder->query();
-                // echo $query->getSQL();
-
-                $stmt = $query->execute();
-                $renderParams = $this->processLocationType($stmt);
-                if (!empty($renderParams)) {
-                    $template = $this->get('twig')->loadTemplate('Statistics/organizer-type-index.html.twig');
-
-                    $charts[] = $template->render($renderParams);
-                }
-
-                // country
-                $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-country');
-                $query = $listBuilder->query();
-                // echo $query->getSQL();
-
-                $stmt = $query->execute();
-                $renderParams = $this->processLocationCountry($stmt);
-                if (!empty($renderParams)) {
-                    $template = $this->get('twig')->loadTemplate('Statistics/organizer-country-index.html.twig');
-
-                    $charts[] = $template->render($renderParams);
-                }
-
+                $charts = $this->buildLocationCharts($request, $urlGenerator, $listBuilder);
+                
                 break;
         }
 

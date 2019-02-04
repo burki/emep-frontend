@@ -187,7 +187,8 @@ extends SearchListBuilder
 
         parent::__construct($connection, $request, $urlGenerator, $queryFilters);
 
-        $this->joinLatLong = 'search-map' == $request->get('_route');
+        // TODO: it might be better to use a new map-$mode instead of _route
+        $this->joinLatLong = in_array($request->get('_route'), [ 'search-map', 'person-index-map' ]);
 
         if (in_array($this->mode, [ 'stats-nationality', 'stats-exhibition-distribution' ])) {
             $this->orders = [ 'default' => [ 'asc' => [ 'how_many DESC' ] ] ];

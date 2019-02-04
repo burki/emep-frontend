@@ -1,70 +1,7 @@
-<div role="tabpanel" class="tab-pane" id="statistics">
+<div role="tabpanel" class="tab-pane" id="stats">
     {% import 'Shared/highcharts.html.twig' as highcharts %}
     {{ highcharts.head() }}
 
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $('#container-venues-types').highcharts({
-                chart: {
-                    plotBackgroundColor: null,
-                    plotBorderWidth: null,
-                    plotShadow: false,
-                    type: 'pie'
-                },
-                title: {
-                    text: ' '
-                },
-                tooltip: {
-                    pointFormat: '{point.y} Venues (<b>{point.percentage:.1f}%</b>)'
-                },
-                plotOptions: {
-                    pie: {
-                    }
-                },
-                series: [{
-                    name: 'City:',
-                    type: 'pie',
-                    innerSize: '50%',
-                    data: {{ indexDataNumberVenueType[0]|raw }}
-                }]
-            });
-        });
-
-
-        $(document).ready(function() {
-            $('#container-countries').highcharts({
-                chart: {
-                    plotBackgroundColor: null,
-                    plotBorderWidth: null,
-                    plotShadow: false,
-                    type: 'pie'
-                },
-                title: {
-                    text: ' '
-                },
-                tooltip: {
-                    pointFormat: '{point.y} Venues (<b>{point.percentage:.1f}%</b>)'
-                },
-                plotOptions: {
-                    pie: {
-                    }
-                },
-                series: [{
-                    name: 'Country:',
-                    type: 'pie',
-                    innerSize: '50%',
-                    data: {{ indexDataNumberCountries[0]|raw }}
-                }]
-            });
-        });
-    </script>
-
-    <h3 class="chart-header" data-collapse="container-venues-types"><span class="chartsymbol">+</span>Types of Venues<span class="charttypeTitle">(Pie Chart)</span></h3>
-    <div class="collapse" id="container-venues-types" style="width: 100%; height: 400px; margin: 0 auto;"></div>
-
-    <h3 class="chart-header" data-collapse="container-countries"><span class="chartsymbol">+</span>Countries of Venues<span class="charttypeTitle">(Pie Chart)</span></h3>
-    <div class="collapse" id="container-countries" style="width: 100%; height: 400px; margin: 0 auto;"></div>
-
-
-    <script src="{{ app.request.basepath }}/js/collapseChart.js"></script>
+    {{ render_hinclude(url('location-index-stats', app.request.query.all), {'default': 'Loading...'}) }}
+    {{ highcharts.clickableChartHeader() }}
 </div>

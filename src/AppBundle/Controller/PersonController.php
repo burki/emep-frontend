@@ -9,9 +9,15 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
-use AppBundle\Utils\CsvResponse;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+use Pagerfanta\Pagerfanta;
+
+use AppBundle\Utils\CsvResponse;
+use AppBundle\Utils\SearchListBuilder;
+use AppBundle\Utils\SearchListPagination;
+use AppBundle\Utils\SearchListAdapter;
 
 /**
  *
@@ -19,6 +25,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class PersonController
 extends CrudController
 {
+    use MapBuilderTrait;
+    use StatisticsBuilderTrait;
     use SharingBuilderTrait;
 
     protected function buildCountries()
@@ -48,110 +56,12 @@ extends CrudController
     }
 
     /**
-     * @Route("/person/csv", name="person-csv")
-     */
-    public function indexToCsvAction(Request $request)
-    {
-        $route = $request->get('_route');
-
-        $qb = $this->getDoctrine()
-            ->getManager()
-            ->createQueryBuilder();
-
-        $qb->select([
-            'P',
-            'COUNT(DISTINCT E.id) AS numExhibitionSort',
-            'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-            "P.sortName HIDDEN nameSort"
-        ])
-            ->from('AppBundle:Person', 'P')
-            ->leftJoin('P.exhibitions', 'E')
-
-            ->leftJoin('E.location', 'L')
-            ->leftJoin('L.place', 'Pl')
-
-            ->leftJoin('P.catalogueEntries', 'IE')
-            ->where('P.status <> -1')
-            ->groupBy('P.id') // for Count
-            ->orderBy('nameSort')
-        ;
-
-        $organizerTypes = $this->buildOrganizerTypes();
-
-        $minBirthYear = 1800;
-        $maxBirthYear = 1905;
-
-        $minDeathYear = 1850;
-        $maxDeathYear = 2000;
-
-
-        $form = $this->get('form.factory')->create(\AppBundle\Filter\PersonFilterType::class, [
-            'choices' => array_flip($this->buildCountries()),
-            'ids' => range(0, 9999),
-            'birthyears' => [$minBirthYear, $maxBirthYear],
-            'deathyears' => [$minDeathYear, $maxDeathYear],
-            'country_choices' => array_flip($this->buildCountries()),
-            'organizer_type_choices' => array_combine($organizerTypes, $organizerTypes)
-        ]);
-
-        if ($request->query->has($form->getName())) {
-            // manually bind values from the request
-            $form->submit($request->query->get($form->getName()));
-
-            // build the query from the given form object
-            $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($form, $qb);
-        }
-
-        // getting the form data fields to send it back down and use it in hinclude requests async
-        $gender = $form->get('gender')->getData();
-        $nationalities = $form->get('nationality')->getData();
-        $stringQuery = $form->get('search')->getData();
-        $ids = $form->get('id')->getData();
-
-
-
-        $pagination = $this->buildPagination($request, $qb->getQuery(), [
-            // the following leads to wrong display in combination with our
-            // helper.pagination_sortable()
-            // 'defaultSortFieldName' => 'nameSort', 'defaultSortDirection' => 'asc',
-        ]);
-
-        // echo ($mapdata['bounds']);
-
-        $result = $qb->getQuery()->execute();
-
-
-        /*  CREATE DATABLE LIKE THE FRONTEND */
-
-
-        $csvResult = [];
-
-        foreach ($result as $value) {
-            $innerArray = [];
-
-            $person = $value[0];
-
-            array_push($innerArray, $person->getFullname(true), $person->getBirthDate(), $person->getDeathDate(), $value['numExhibitionSort'], $value['numCatEntrySort'] );
-
-
-            array_push($csvResult, $innerArray);
-        }
-
-        // print_r($csvResult);
-
-        /* END DATATABLE CREATION LIKE FRONTEND */
-
-
-        $response = new CSVResponse( $csvResult, 200, explode( ', ', 'Startdate, Enddate, Title, City, Venue, # of Cat. Entries, type' ) );
-        $response->setFilename( "data.csv" );
-        return $response;
-    }
-
-    /**
      * @Route("/person", name="person-index")
      * @Route("/person-by-nationality", name="person-nationality")
      */
-    public function indexAction(Request $request, UserInterface $user = null)
+    public function indexAction(Request $request,
+                                UrlGeneratorInterface $urlGenerator,
+                                UserInterface $user = null)
     {
 
         // redirect to saved query
@@ -170,37 +80,10 @@ extends CrudController
 
                 if (!is_null($userAction)) {
                     return $this->redirectToRoute($userAction->getRoute(),
-                        $userAction->getRouteParams());
+                                                  $userAction->getRouteParams());
                 }
             }
         }
-
-        $requestURI =  $request->getRequestUri();
-
-
-        $qb = $this->getDoctrine()
-                ->getManager()
-                ->createQueryBuilder();
-
-        $qb->select([
-                'P',
-                'COUNT(DISTINCT E.id) AS numExhibitionSort',
-                'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-                "P.sortName HIDDEN nameSort",
-
-            ])
-            ->from('AppBundle:Person', 'P')
-            ->leftJoin('P.exhibitions', 'E')
-
-            ->leftJoin('E.location', 'L')
-            ->leftJoin('L.place', 'Pl')
-
-            ->leftJoin('P.catalogueEntries', 'IE')
-            ->where('P.status <> -1')
-            ->groupBy('P.id') // for Count
-            ->orderBy('nameSort')
-            ;
-
 
         $organizerTypes = $this->buildOrganizerTypes();
 
@@ -211,7 +94,7 @@ extends CrudController
         $maxDeathYear = 2000;
 
 
-        $form = $this->get('form.factory')->create(\AppBundle\Filter\PersonFilterType::class, [
+        $form = $this->form = $this->get('form.factory')->create(\AppBundle\Filter\PersonFilterType::class, [
             'choices' => array_flip($this->buildCountries()),
             'ids' => range(0, 9999),
             'birthyears' => [$minBirthYear, $maxBirthYear],
@@ -220,61 +103,130 @@ extends CrudController
             'organizer_type_choices' => array_combine($organizerTypes, $organizerTypes)
         ]);
 
-
-
-
-        if ($request->query->has($form->getName())) {
-            // manually bind values from the request
-            $form->submit($request->query->get($form->getName()));
-
-            // build the query from the given form object
-            $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($form, $qb);
-        }
-
         // getting the form data fields to send it back down and use it in hinclude requests async
-        $gender = $form->get('gender')->getData();
-        $nationalities = $form->get('nationality')->getData();
+        // $gender = $form->get('gender')->getData();
+        // $nationalities = $form->get('nationality')->getData();
         $stringQuery = $form->get('search')->getData();
-        $ids = $form->get('id')->getData();
-        $deathDate = $form->get('deathDate')->getData();
-        $birthDate = $form->get('birthDate')->getData();
+        // $ids = $form->get('id')->getData();
+        // $deathDate = $form->get('deathDate')->getData();
+        // $birthDate = $form->get('birthDate')->getData();
         $exhibitionCountries = $form->get('country')->getData();
         $organizerTypesQuery = $form->get('organizer_type')->getData();
 
+        $requestURI =  $request->getRequestUri();
 
-        $pagination = $this->buildPagination($request, $qb->getQuery(), [
-            // the following leads to wrong display in combination with our
-            // helper.pagination_sortable()
-            // 'defaultSortFieldName' => 'nameSort', 'defaultSortDirection' => 'asc',
-        ]);
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, 'Person');
 
+        $listPagination = new SearchListPagination($listBuilder);
 
-        $artists = $qb->getQuery()->getResult();
-        $indexDataNumberCountries = $this->indexDataNumberCountries($artists);
+        $page = $request->get('page', 1);
+        $listPage = $listPagination->get($this->pageSize, ($page - 1) * $this->pageSize);
+
+        $adapter = new SearchListAdapter($listPage);
+        $pager = new Pagerfanta($adapter);
+        $pager->setMaxPerPage($listPage['limit']);
+        $pager->setCurrentPage(intval($listPage['offset'] / $listPage['limit']) + 1);
 
         return $this->render('Person/index.html.twig', [
             'pageTitle' => $this->get('translator')->trans('Artists'),
-            'pagination' => $pagination,
+            // 'pagination' => $pagination,
+            'pager' => $pager,
+
+            'listBuilder' => $listBuilder,
             'form' => $form->createView(),
-            'nationalities' => $nationalities,
+            // 'nationalities' => $nationalities,
             'countryArray' => $this->buildCountries(),
-            'gender' => $gender,
-            'ids' => $ids,
+            // 'gender' => $gender,
+            // 'ids' => $ids,
             'stringPart' => $stringQuery,
             'minBirthYear' => $minBirthYear,
             'maxBirthYear' => $maxBirthYear,
             'minDeathYear' => $minDeathYear,
             'maxDeathYear' => $maxDeathYear,
             'organizerTypes' => $organizerTypes,
-            'deathDate' => $deathDate,
-            'birthDate' => $birthDate,
+            // 'deathDate' => $deathDate,
+            // 'birthDate' => $birthDate,
             'exhibitionCountries' => $exhibitionCountries,
             'organizerTypesQuery' => $organizerTypesQuery,
-            'indexDataNumberCountries' => $indexDataNumberCountries,
-            'artists' => $artists,
             'requestURI' =>  $requestURI,
-            'searches' => $this->lookupSearches($user, 'exhibition')
+            'searches' => $this->lookupSearches($user, 'person')
         ]);
+    }
+
+    /**
+     * @Route("/person/map", name="person-index-map")
+     */
+    public function indexMapAction(Request $request,
+                                   UrlGeneratorInterface $urlGenerator,
+                                   UserInterface $user = null)
+    {
+        $organizerTypes = $this->buildOrganizerTypes();
+
+        $minBirthYear = 1800;
+        $maxBirthYear = 1905;
+
+        $minDeathYear = 1850;
+        $maxDeathYear = 2000;
+
+
+        $form = $this->form = $this->get('form.factory')->create(\AppBundle\Filter\PersonFilterType::class, [
+            'choices' => array_flip($this->buildCountries()),
+            'ids' => range(0, 9999),
+            'birthyears' => [$minBirthYear, $maxBirthYear],
+            'deathyears' => [$minDeathYear, $maxDeathYear],
+            'country_choices' => array_flip($this->buildCountries()),
+            'organizer_type_choices' => array_combine($organizerTypes, $organizerTypes)
+        ]);
+
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'extended', $entity = 'Person');
+        $query = $listBuilder->query();
+        // echo($query->getSQL());
+
+        $stmt = $query->execute();
+
+        $renderParams = $this->processMapEntries($stmt, $entity);
+
+        return $this->render('Map/place-map-index.html.twig', $renderParams + [
+            'filter' => null,
+            'bounds' => [
+                [ 60, -120 ],
+                [ -15, 120 ],
+            ],
+            'markerStyle' => 'exhibition-by-place' == 'default',
+            'persons' => [], // $persons,
+        ]);
+    }
+
+    /**
+     * @Route("/person/stats", name="person-index-stats")
+     */
+    public function indexStatsAction(Request $request,
+                                     UrlGeneratorInterface $urlGenerator,
+                                     UserInterface $user = null)
+    {
+        $organizerTypes = $this->buildOrganizerTypes();
+
+        $minBirthYear = 1800;
+        $maxBirthYear = 1905;
+
+        $minDeathYear = 1850;
+        $maxDeathYear = 2000;
+
+
+        $form = $this->form = $this->get('form.factory')->create(\AppBundle\Filter\PersonFilterType::class, [
+            'choices' => array_flip($this->buildCountries()),
+            'ids' => range(0, 9999),
+            'birthyears' => [$minBirthYear, $maxBirthYear],
+            'deathyears' => [$minDeathYear, $maxDeathYear],
+            'country_choices' => array_flip($this->buildCountries()),
+            'organizer_type_choices' => array_combine($organizerTypes, $organizerTypes)
+        ]);
+
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, $entity = 'Person');
+
+        $charts = $this->buildPersonCharts($request, $urlGenerator, $listBuilder);
+
+        return new \Symfony\Component\HttpFoundation\Response(implode("\n", $charts));
     }
 
     // TODO MOVE TO SHARED

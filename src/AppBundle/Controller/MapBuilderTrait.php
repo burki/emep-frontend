@@ -19,7 +19,7 @@ trait MapBuilderTrait
 
         return \AppBundle\Utils\Formatter::daterangeIncomplete($row['startdate'], $row['enddate']);
     }
-    
+
     function processMapEntries($stmt, $entity)
     {
         $maxDisplay = 'Person' == $entity ? 15 : 10;

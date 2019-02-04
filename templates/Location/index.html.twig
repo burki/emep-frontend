@@ -8,50 +8,36 @@
 
     <script>
         $(document).ready(function() {
-            $('#location_filter_location_type').select2();
+            $('.select2').select2();
         });
     </script>
 {% endblock %}
 
 {% block body %}
-
     <div class="w-container">
 
         <h1 class="heading">{{ pageTitle }}</h1>
 
+    <form class="filter personFilterForm indexForm" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
 
         <div class="searchbarcontainer">
-            <!--<form  class="filter" method="get" action="{{ path(app.request.attributes.get('_route')) }}"> -->
             <div class="searchbarinputcontainer">
-                <input type="text" class="text-field-class w-input search-input input-text-search" placeholder="search" value="{{ stringPart }}">
-                <select id="countrySelector" class="text-field-class w-select middle-selector">
-                    <option value>select country</option>
-                    {% for abrriviation,countryname in countryArray %}
-                        <option value="{{ abrriviation }}">{{ countryname }}</option>
-                    {% endfor %}
-                </select>
-                <select id="organizerSelectore" class="text-field-class w-select end-selector">
-                    <option value>select type of venue</option>
-                    {% for organizer in organizerTypesArray %}
-                        <option value="{{ organizer }}">{{ organizer }}</option>
-                    {% endfor %}
-                </select>
+                {{ form_widget(form.search) }}
+                {{ form_widget(form.location.geoname) }}
+                {{ form_widget(form.location.type) }}
             </div>
             <div class="searchbuttoncontainer"><input type="submit" name="submit-filter" value="Search" class="submit-button w-button submit-filter-visible">
             </div>
-            <!--</form>-->
         </div>
     </div>
 
     <div class="searchbarcontainer w-form hidden-form">
 
-        <form class="filter exhibitionFilterForm" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
             <div class="searchbarinputcontainer">
                 {{ form_rest(form) }}
             </div>
             <div class="searchbuttoncontainer"><input type="submit" name="submit-filter" value="Search" class="submit-button w-button">
             </div>
-        </form>
     </div>
 
     <div class="filter-combination-container">
@@ -125,16 +111,19 @@
             {% endif %}
         </div>
     </div>
+        </form>
 
     <script>
         $(document).ready(function() {
-
+            /*
             $('.w-input').keypress(function (e) {
                 if (e.which == 13) {
                     $('.exhibitionFilterForm').submit();
                     return false;    //<---- Add this line
                 }
             });
+            */
+
 
             // IMPLEMENT SAVE QUERY FUNCTIONALITY
 
@@ -160,9 +149,6 @@
 
             // END SAVE QUERY FUNCTIONALITY
 
-            $('.searchbarinputcontainer input[type=text]').attr("placeholder", "search name of venue");
-
-
             $('.countryAbbr').on('click', function () {
                 var currSelection = $('#location_filter_country').val();
                 var currCountry = $(this).data('country');
@@ -184,6 +170,7 @@
                 $( ".exhibitionFilterForm" ).submit();
             });
 
+            /*
             $('.exhibitionFilterForm').on('submit', function (e) {
                 // console.log('submiting now ....');
 
@@ -210,15 +197,7 @@
                 currSelectionOrganizer = jQuery.unique(currSelectionOrganizer);
                 $('#location_filter_location_type').val(currSelectionOrganizer);
             });
-
-            $('.submit-filter-visible').on('click', function() {
-                $( ".exhibitionFilterForm" ).submit();
-            });
-            $('.input-text-search').bind('input', function() {
-                $('#location_filter_search').val($(this).val());
-                // console.log('change event:', $(this).val());
-            })
-
+            */
 
             // advanced search
 
@@ -289,15 +268,6 @@
             });
 
 
-            $('.download-csv').on('click', function() {
-                var action = $('.exhibitionFilterForm').attr('action');
-                // console.log('first action: ', action);
-                $('.exhibitionFilterForm').attr('action', '{{ path('location-csv') }}');
-                $('.exhibitionFilterForm').submit();
-                // resetting action to old one
-                $('.exhibitionFilterForm').attr('action', action);
-            });
-
             {% if ids|length > 0 %}
                 $(".checkmark").attr("style", "display:inline-block");;
                 $(".advanced-search-settings").show();
@@ -360,7 +330,6 @@
 
                 {% embed "Location/Parts/tabcontent-map.html.twig" %}
                 {% endembed %}
-
             </div><!-- .tab-content -->
         </div>
     </div>

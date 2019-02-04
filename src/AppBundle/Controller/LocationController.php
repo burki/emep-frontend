@@ -8,8 +8,15 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
-use AppBundle\Utils\CsvResponse;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+
+use Pagerfanta\Pagerfanta;
+
+use AppBundle\Utils\CsvResponse;
+use AppBundle\Utils\SearchListBuilder;
+use AppBundle\Utils\SearchListPagination;
+use AppBundle\Utils\SearchListAdapter;
 
 
 /**
@@ -18,6 +25,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class LocationController
 extends CrudController
 {
+    use MapBuilderTrait;
+    use StatisticsBuilderTrait;
     use SharingBuilderTrait;
 
     // TODO: share with ExhibitionController
@@ -39,114 +48,13 @@ extends CrudController
         return $this->buildActiveCountries($qb);
     }
 
-    /**
-     * @Route("/location/csv", name="location-csv")
-     */
-    public function indexToCsvAction(Request $request)
-    {
-        $route = $request->get('_route');
-
-        $qb = $this->getDoctrine()
-            ->getManager()
-            ->createQueryBuilder();
-
-        $qb->select([
-            'L',
-            "CONCAT(COALESCE(C.name, P.countryCode), COALESCE(P.alternateName,P.name),L.name) HIDDEN countryPlaceNameSort",
-            "L.name HIDDEN nameSort",
-            'COUNT(DISTINCT E.id) AS numExhibitionSort',
-            'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-        ])
-            ->from('AppBundle:Location', 'L')
-            ->leftJoin('L.place', 'P')
-            ->leftJoin('P.country', 'C')
-            ->leftJoin('AppBundle:Exhibition', 'E',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'E.location = L AND E.status <> -1')
-            ->leftJoin('AppBundle:ItemExhibition', 'IE',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = E AND IE.title IS NOT NULL')
-            ->where('L.status <> -1 AND 0 = BIT_AND(L.flags, 256)')
-            ->groupBy('L.id')
-            ->orderBy('countryPlaceNameSort')
-        ;
-
-        $types = $this->buildVenueTypes();
-        $form = $this->get('form.factory')->create(\AppBundle\Filter\LocationFilterType::class, [
-            'country_choices' => array_flip($this->buildCountries()),
-            'location_type_choices' => array_combine($types, $types),
-            'ids' => range(0, 9999)
-        ]);
-
-        if ($request->query->has($form->getName())) {
-            // manually bind values from the request
-            $form->submit($request->query->get($form->getName()));
-            // build the query from the given form object
-            $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($form, $qb);
-        }
-
-        $pagination = $this->buildPagination($request, $qb->getQuery(), [
-            // the following leads to wrong display in combination with our
-            // helper.pagination_sortable()
-            // 'defaultSortFieldName' => 'countryPlaceNameSort', 'defaultSortDirection' => 'asc',
-        ]);
-
-        $result = $qb->getQuery()->getResult();
-
-        $csvResult = [];
-
-        foreach ($result as $value) {
-            $innerArray = [];
-
-            // echo ('  |   ');
-
-
-            // print_r( $value[0]->getStartdate() );
-            // echo '  |   ';
-            // print_r( $value[0]->getEnddate() );
-            // echo '  |   ';
-            // print_r( $value[0]->title );
-            // echo '  |   ';
-
-            $location = $value[0];
-            $locationLabel = '';
-            $locationName = '';
-
-            if ($location) {
-                $locationLabel = $value[0]->getPlaceLabel();
-                $locationName = $value[0]->getName();
-            }
-
-            // print_r( $locationLabel );
-            // echo '  |   ';
-            // print_r( $locationName );
-            // echo '  |   ';
-            // print_r( $value['numCatEntrySort'] );
-            // echo '  |   ';
-            // print_r( $value[0]->getOrganizerType() );
-            // echo '  |   ';
-
-            array_push($innerArray, $locationName, $locationLabel, count($value[0]->getExhibitions()), $value['numCatEntrySort'] );
-
-
-            array_push($csvResult, $innerArray);
-        }
-
-        // print_r($csvResult);
-
-        /* END DATATABLE CREATION LIKE FRONTEND */
-
-
-        $response = new CSVResponse( $csvResult, 200, explode( ', ', 'Startdate, Enddate, Title, City, Venue, # of Cat. Entries, type' ) );
-        $response->setFilename( "data.csv" );
-        return $response;
-    }
-
 
     /**
      * @Route("/organizer", name="organizer-index")
      */
-    public function indexActionOrganizer(Request $request, UserInterface $user = null)
+    public function organizerIndexAction(Request $request,
+                                         UrlGeneratorInterface $urlGenerator,
+                                         UserInterface $user = null)
     {
 
         // redirect to saved query
@@ -170,106 +78,113 @@ extends CrudController
             }
         }
 
-        $requestURI =  $request->getRequestUri();
-
         $route = $request->get('_route');
 
-        $qb = $this->getDoctrine()
-            ->getManager()
-            ->createQueryBuilder();
-
-        $qb->select([
-            'L',
-            "CONCAT(COALESCE(C.name, P.countryCode), COALESCE(P.alternateName,P.name),L.name) HIDDEN countryPlaceNameSort",
-            "L.name HIDDEN nameSort",
-            'COUNT(DISTINCT E.id) AS numExhibitionSort',
-            'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-            "P.name HIDDEN placeSort",
-            "L.type HIDDEN typeSort"
-        ])
-            ->from('AppBundle:Location', 'L')
-            ->leftJoin('L.place', 'P')
-            ->leftJoin('P.country', 'C')
-        ;
-
-        if ('organizer-index' == $route) {
-            $qb
-                ->innerJoin('AppBundle:Exhibition', 'E',
-                    \Doctrine\ORM\Query\Expr\Join::WITH,
-                    'L MEMBER OF E.organizers AND E.status <> -1')
-                ->where('L.status <> -1')
-            ;
-        }
-        else {
-            $qb
-                ->leftJoin('AppBundle:Exhibition', 'E',
-                    \Doctrine\ORM\Query\Expr\Join::WITH,
-                    'E.location = L AND E.status <> -1')
-                ->where('L.status <> -1 AND 0 = BIT_AND(L.flags, 256)')
-            ;
-        }
-
-        $qb
-            ->leftJoin('AppBundle:ItemExhibition', 'IE',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = E AND IE.title IS NOT NULL')
-            ->groupBy('L.id')
-            ->orderBy('countryPlaceNameSort')
-        ;
-
         $types = $this->buildVenueTypes();
-        $form = $this->get('form.factory')->create(\AppBundle\Filter\LocationFilterType::class, [
+        $form = $this->form = $this->get('form.factory')->create(\AppBundle\Filter\LocationFilterType::class, [
             'country_choices' => array_flip($this->buildCountries()),
             'location_type_choices' => array_combine($types, $types),
+            'location_type_placeholder' => 'select type of organizing body',
             'ids' => range(0, 9999)
         ]);
 
-        if ($request->query->has($form->getName())) {
-            // manually bind values from the request
-            $form->submit($request->query->get($form->getName()));
-            // build the query from the given form object
-            $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($form, $qb);
-        }
-
-        $pagination = $this->buildPagination($request, $qb->getQuery(), [
-            // the following leads to wrong display in combination with our
-            // helper.pagination_sortable()
-            // 'defaultSortFieldName' => 'countryPlaceNameSort', 'defaultSortDirection' => 'asc',
-        ]);
-
-        $locations = $qb->getQuery()->getResult();
-
-        $countries = $form->get('country')->getData();
-        $locationType = $form->get('location_type')->getData();
+        // $countries = $form->get('country')->getData();
+        // $locationType = $form->get('location_type')->getData();
         $stringQuery = $form->get('search')->getData();
-        $ids = $form->get('id')->getData();
+        // $ids = $form->get('id')->getData();
 
-        $indexDataNumberVenueType = $this->indexDataNumberVenueType($locations);
-        $indexDataNumberCountries = $this->indexDataNumberCountries($locations);
+        $requestURI =  $request->getRequestUri();
+
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, 'Organizer');
+        $listPagination = new SearchListPagination($listBuilder);
+        $page = $request->get('page', 1);
+        $listPage = $listPagination->get($this->pageSize, ($page - 1) * $this->pageSize);
+        $adapter = new SearchListAdapter($listPage);
+        $pager = new Pagerfanta($adapter);
+        $pager->setMaxPerPage($listPage['limit']);
+        $pager->setCurrentPage(intval($listPage['offset'] / $listPage['limit']) + 1);
 
         return $this->render('Organizer/index.html.twig', [
             'pageTitle' => $this->get('translator')->trans('organizer-index' == $route ? 'Organizing Bodies' : 'Venues'),
-            'pagination' => $pagination,
+            // 'pagination' => $pagination,
+            'pager' => $pager,
+
+            'listBuilder' => $listBuilder,
             'form' => $form->createView(),
             'countryArray' => $this->buildCountries(),
             'organizerTypesArray' => $types,
-            'countries' => $countries,
-            'ids' => $ids,
-            'locationType' => $locationType,
+            // 'countries' => $countries,
+            // 'ids' => $ids,
+            // 'locationType' => $locationType,
             'stringPart' => $stringQuery,
-            'locations' => $locations,
-            'indexDataNumberVenueType' => $indexDataNumberVenueType,
-            'indexDataNumberCountries' => $indexDataNumberCountries,
+            // 'locations' => $locations,
             'requestURI' =>  $requestURI,
-            'searches' => $this->lookupSearchesOrganizer($user)
+            'searches' => $this->lookupSearches($user, 'organizer')
         ]);
     }
 
+    /**
+     * @Route("/organizer/map", name="organizer-index-map")
+     */
+    public function organizerIndexMapAction(Request $request,
+                                            UrlGeneratorInterface $urlGenerator,
+                                            UserInterface $user = null)
+    {
+        $types = $this->buildVenueTypes();
+        $form = $this->form = $this->get('form.factory')->create(\AppBundle\Filter\LocationFilterType::class, [
+            'country_choices' => array_flip($this->buildCountries()),
+            'location_type_choices' => array_combine($types, $types),
+            'location_type_placeholder' => 'select type of organizing body',
+            'ids' => range(0, 9999)
+        ]);
+
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'extended', $entity = 'Organizer');
+        $query = $listBuilder->query();
+        // echo($query->getSQL());
+
+        $stmt = $query->execute();
+
+        $renderParams = $this->processMapEntries($stmt, $entity);
+
+        return $this->render('Map/place-map-index.html.twig', $renderParams + [
+            'filter' => null,
+            'bounds' => [
+                [ 60, -120 ],
+                [ -15, 120 ],
+            ],
+            'markerStyle' => 'exhibition-by-place' == 'default',
+            'persons' => [], // $persons,
+        ]);
+    }
+
+    /**
+     * @Route("/organizer/stats", name="organizer-index-stats")
+     */
+    public function organizerIndexStatsAction(Request $request,
+                                              UrlGeneratorInterface $urlGenerator,
+                                              UserInterface $user = null)
+    {
+        $types = $this->buildVenueTypes();
+        $form = $this->form = $this->get('form.factory')->create(\AppBundle\Filter\LocationFilterType::class, [
+            'country_choices' => array_flip($this->buildCountries()),
+            'location_type_choices' => array_combine($types, $types),
+            'location_type_placeholder' => 'select type of organizing body',
+            'ids' => range(0, 9999)
+        ]);
+
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, $entity = 'Organizer');
+
+        $charts = $this->buildLocationCharts($request, $urlGenerator, $listBuilder);
+
+        return new \Symfony\Component\HttpFoundation\Response(implode("\n", $charts));
+    }
 
     /**
      * @Route("/location", name="location-index")
      */
-    public function indexAction(Request $request, UserInterface $user = null)
+    public function indexAction(Request $request,
+                                UrlGeneratorInterface $urlGenerator,
+                                UserInterface $user = null)
     {
 
         // redirect to saved query
@@ -293,101 +208,106 @@ extends CrudController
             }
         }
 
-        $requestURI =  $request->getRequestUri();
-
         $route = $request->get('_route');
 
-        $qb = $this->getDoctrine()
-                ->getManager()
-                ->createQueryBuilder();
-
-        $qb->select([
-                'L',
-                "CONCAT(COALESCE(C.name, P.countryCode), COALESCE(P.alternateName,P.name),L.name) HIDDEN countryPlaceNameSort",
-                "L.name HIDDEN nameSort",
-                'COUNT(DISTINCT E.id) AS numExhibitionSort',
-                'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-                "P.name HIDDEN placeSort",
-                "L.type HIDDEN typeSort"
-            ])
-            ->from('AppBundle:Location', 'L')
-            ->leftJoin('L.place', 'P')
-            ->leftJoin('P.country', 'C')
-            ;
-
-        if ('organizer-index' == $route) {
-            $qb
-                ->innerJoin('AppBundle:Exhibition', 'E',
-                           \Doctrine\ORM\Query\Expr\Join::WITH,
-                           'L MEMBER OF E.organizers AND E.status <> -1')
-                ->where('L.status <> -1')
-                ;
-        }
-        else {
-            $qb
-                ->leftJoin('AppBundle:Exhibition', 'E',
-                           \Doctrine\ORM\Query\Expr\Join::WITH,
-                           'E.location = L AND E.status <> -1')
-                ->where('L.status <> -1 AND 0 = BIT_AND(L.flags, 256)')
-                ;
-        }
-
-        $qb
-            ->leftJoin('AppBundle:ItemExhibition', 'IE',
-                       \Doctrine\ORM\Query\Expr\Join::WITH,
-                       'IE.exhibition = E AND IE.title IS NOT NULL')
-            ->groupBy('L.id')
-            ->orderBy('countryPlaceNameSort')
-            ;
-
         $types = $this->buildVenueTypes();
-        $form = $this->get('form.factory')->create(\AppBundle\Filter\LocationFilterType::class, [
+        $form = $this->form = $this->get('form.factory')->create(\AppBundle\Filter\LocationFilterType::class, [
             'country_choices' => array_flip($this->buildCountries()),
             'location_type_choices' => array_combine($types, $types),
+            'location_type_placeholder' => 'select type of venue',
             'ids' => range(0, 9999)
         ]);
 
-        if ($request->query->has($form->getName())) {
-            // manually bind values from the request
-            $form->submit($request->query->get($form->getName()));
-            // build the query from the given form object
-            $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($form, $qb);
-        }
-
-        $pagination = $this->buildPagination($request, $qb->getQuery(), [
-            // the following leads to wrong display in combination with our
-            // helper.pagination_sortable()
-            // 'defaultSortFieldName' => 'countryPlaceNameSort', 'defaultSortDirection' => 'asc',
-        ]);
-
-        $locations = $qb->getQuery()->getResult();
-
-        $countries = $form->get('country')->getData();
-        $locationType = $form->get('location_type')->getData();
+        // $countries = $form->get('country')->getData();
+        // $locationType = $form->get('location_type')->getData();
         $stringQuery = $form->get('search')->getData();
-        $ids = $form->get('id')->getData();
+        // $ids = $form->get('id')->getData();
 
-        $indexDataNumberVenueType = $this->indexDataNumberVenueType($locations);
-        $indexDataNumberCountries = $this->indexDataNumberCountries($locations);
+        $requestURI =  $request->getRequestUri();
+
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, 'Venue');
+        $listPagination = new SearchListPagination($listBuilder);
+        $page = $request->get('page', 1);
+        $listPage = $listPagination->get($this->pageSize, ($page - 1) * $this->pageSize);
+        $adapter = new SearchListAdapter($listPage);
+        $pager = new Pagerfanta($adapter);
+        $pager->setMaxPerPage($listPage['limit']);
+        $pager->setCurrentPage(intval($listPage['offset'] / $listPage['limit']) + 1);
 
         return $this->render('Location/index.html.twig', [
             'pageTitle' => $this->get('translator')->trans('organizer-index' == $route ? 'Organizing Bodies' : 'Venues'),
-            'pagination' => $pagination,
+            // 'pagination' => $pagination,
+            'pager' => $pager,
+
+            'listBuilder' => $listBuilder,
             'form' => $form->createView(),
             'countryArray' => $this->buildCountries(),
             'organizerTypesArray' => $types,
-            'countries' => $countries,
-            'ids' => $ids,
-            'locationType' => $locationType,
+            // 'countries' => $countries,
+            // 'ids' => $ids,
+            // 'locationType' => $locationType,
             'stringPart' => $stringQuery,
-            'locations' => $locations,
-            'indexDataNumberVenueType' => $indexDataNumberVenueType,
-            'indexDataNumberCountries' => $indexDataNumberCountries,
+            // 'locations' => $locations,
             'requestURI' =>  $requestURI,
             'searches' => $this->lookupSearches($user)
         ]);
     }
 
+    /**
+     * @Route("/location/map", name="location-index-map")
+     */
+    public function indexMapAction(Request $request,
+                                   UrlGeneratorInterface $urlGenerator,
+                                   UserInterface $user = null)
+    {
+        $types = $this->buildVenueTypes();
+        $form = $this->form = $this->get('form.factory')->create(\AppBundle\Filter\LocationFilterType::class, [
+            'country_choices' => array_flip($this->buildCountries()),
+            'location_type_choices' => array_combine($types, $types),
+            'location_type_placeholder' => 'select type of venue',
+            'ids' => range(0, 9999)
+        ]);
+
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'extended', $entity = 'Venue');
+        $query = $listBuilder->query();
+        // echo($query->getSQL());
+
+        $stmt = $query->execute();
+
+        $renderParams = $this->processMapEntries($stmt, $entity);
+
+        return $this->render('Map/place-map-index.html.twig', $renderParams + [
+            'filter' => null,
+            'bounds' => [
+                [ 60, -120 ],
+                [ -15, 120 ],
+            ],
+            'markerStyle' => 'exhibition-by-place' == 'default',
+            'persons' => [], // $persons,
+        ]);
+    }
+
+    /**
+     * @Route("/location/stats", name="location-index-stats")
+     */
+    public function indexStatsAction(Request $request,
+                                     UrlGeneratorInterface $urlGenerator,
+                                     UserInterface $user = null)
+    {
+        $types = $this->buildVenueTypes();
+        $form = $this->form = $this->get('form.factory')->create(\AppBundle\Filter\LocationFilterType::class, [
+            'country_choices' => array_flip($this->buildCountries()),
+            'location_type_choices' => array_combine($types, $types),
+            'location_type_placeholder' => 'select type of venue',
+            'ids' => range(0, 9999)
+        ]);
+
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, $entity = 'Venue');
+
+        $charts = $this->buildLocationCharts($request, $urlGenerator, $listBuilder);
+
+        return new \Symfony\Component\HttpFoundation\Response(implode("\n", $charts));
+    }
 
     // TODO MOVE TO SHARED
     protected function lookupSearchesOrganizer($user)
