@@ -74,15 +74,14 @@
 
     <div class="contentcontainer w-container">
          <div class="listviewrow">
-                {% if person.exhibitions|length > 0 %}
+                {% set exhibitionArray = person.getExhibitions(-1) %}
+                {% if exhibitionArray|length > 0 %}
 
                     {# tabs headers #}
                     {% embed "Person/Parts/tabs-header.html.twig" %}
                     {% endembed %}
 
                     <div class="tab-content">
-
-                        {% set exhibitionArray = person.exhibitions %}
                         {% embed "Person/Parts/tabcontent-exhibitions.html.twig" %}
                         {% endembed %}
 

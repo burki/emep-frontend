@@ -481,10 +481,8 @@ extends CrudController
 
         // build all the ids
         $exhibitionIds = [];
-        foreach ($entity->getExhibitions() as $exhibition) {
-            if ($exhibition->getStatus() <> -1) {
-                $exhibitionIds[] = $exhibition->getId();
-            }
+        foreach ($entity->getExhibitions(-1) as $exhibition) {
+            $exhibitionIds[] = $exhibition->getId();
         }
 
         $numExhibitions = count($exhibitionIds);
@@ -555,7 +553,9 @@ extends CrudController
                 'E.id',
             ])
             ->from('AppBundle:ItemExhibition', 'IE')
-            ->innerJoin('IE.exhibition', 'E')
+            ->innerJoin('AppBundle:Exhibition', 'E',
+                        \Doctrine\ORM\Query\Expr\Join::WITH,
+                        'IE.exhibition = E AND E.status <> -1')
             ->where("IE.person = :person")
             ;
 
@@ -681,7 +681,7 @@ extends CrudController
             return new JsonLdResponse($person->jsonLdSerialize($locale));
         }
 
-        $result = $person->getExhibitions();
+        $result = $person->getExhibitions(-1);
 
         $csvResult = [];
 
@@ -887,7 +887,7 @@ extends CrudController
         $exhibitionPlaces = [];
 
 
-        $exhibitions = $person->exhibitions;
+        $exhibitions = $person->getExhibitions(-1);
 
         foreach ($exhibitions as $exhibition) {
             array_push($exhibitionPlaces, (string) $exhibition->getOrganizerType() );
@@ -927,7 +927,7 @@ extends CrudController
     {
         $exhibitionPlaces = [];
 
-        foreach ($person->getExhibitions() as $exhibition) {
+        foreach ($person->getExhibitions(-1) as $exhibition) {
             $location = $exhibition->getLocation();
             if (is_null($location)) {
                 continue;
@@ -968,7 +968,7 @@ extends CrudController
     {
         $exhibitionPlaces = [];
 
-        foreach ($person->getExhibitions() as $exhibition) {
+        foreach ($person->getExhibitions(-1) as $exhibition) {
             $location = $exhibition->getLocation();
             if (is_null($location)) {
                 continue;
@@ -1018,7 +1018,7 @@ extends CrudController
         $exhibitionYear = [];
 
 
-        $exhibitions = $person->exhibitions;
+        $exhibitions = $person->getExhibitions(-1);
 
         foreach ($exhibitions as $exhibition) {
             array_push($exhibitionYear, (int) date('Y', strtotime($exhibition->getStartDate())) );
