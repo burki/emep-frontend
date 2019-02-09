@@ -490,6 +490,28 @@ extends ListBuilder
                        $this->formatRowValue($val, [], $format));
     }
 
+    protected function buildLinkedLocation(&$row, $val, $format)
+    {
+        if ('html' != $format) {
+            return false;
+        }
+
+        if (!empty($row['location_translit'])) {
+            // show translit / translation in brackets instead of original
+            $parts = [ $row['location_translit'] ];
+
+            if (!empty($row['location_alternate'])) {
+                $parts[] = $row['location_alternate'];
+            }
+
+            $val = sprintf('[%s]', join(' : ', $parts));
+        }
+
+        return sprintf('<a href="%s">%s</a>',
+                       $this->urlGenerator->generate('location', [ 'id' => $row['location_id'] ]),
+                       $this->formatRowValue($val, [], $format));
+    }
+
     public function buildHeaderRow()
     {
         $ret = [];

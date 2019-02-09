@@ -432,11 +432,15 @@ implements \JsonSerializable, JsonLdSerializable
 
     public function getNameAppend()
     {
-        if (!empty($this->nameTransliterated)) {
+        if (!empty($this->nameTransliterated) || !empty($this->nameAlternate)) {
             $append = [];
 
             if (!empty(!empty($this->nameTransliterated))) {
                 $append[] = $this->nameTransliterated;
+            }
+
+            if (!empty(!empty($this->nameAlternate))) {
+                $append[] = $this->nameAlternate;
             }
 
             return sprintf('[%s]', implode(' : ', $append));
