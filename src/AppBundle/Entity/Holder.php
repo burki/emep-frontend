@@ -131,6 +131,12 @@ implements \JsonSerializable, JsonLdSerializable
     protected $gnd;
 
     /**
+     * @var string
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $ulan;
+
+    /**
      * @ORM\OneToMany(targetEntity="BibitemHolder", mappedBy="holder")
      */
     protected $holderOf;
@@ -545,6 +551,30 @@ implements \JsonSerializable, JsonLdSerializable
     }
 
     /**
+     * Sets ulan.
+     *
+     * @param string $ulan
+     *
+     * @return $this
+     */
+    public function setUlan($ulan)
+    {
+        $this->ulan = $ulan;
+
+        return $this;
+    }
+
+    /**
+     * Gets ulan.
+     *
+     * @return string
+     */
+    public function getUlan()
+    {
+        return $this->ulan;
+    }
+
+    /**
      * Sets foundingLocation.
      *
      * @param Place $foundingLocation
@@ -571,7 +601,7 @@ implements \JsonSerializable, JsonLdSerializable
         return $this->foundingLocation;
     }
     */
- 
+
     public function findBibitems($em, $catalogueEntriesOnly = false)
     {
         $qb = $em->createQueryBuilder();

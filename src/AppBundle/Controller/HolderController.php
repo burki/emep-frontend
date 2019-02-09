@@ -3,13 +3,12 @@
 namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-
 use AppBundle\Utils\CsvResponse;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 
 /**
@@ -38,75 +37,6 @@ extends CrudController
     }
 
     /**
-     * @Route("/holder/csv", name="holder-csv")
-     */
-    public function indexToCsvAction(Request $request)
-    {
-        $route = $request->get('_route');
-
-        $qb = $this->getDoctrine()
-            ->getManager()
-            ->createQueryBuilder();
-
-        $qb->select([
-            'H',
-            "CONCAT(COALESCE(H.countryCode, ''),H.placeLabel,H.name) HIDDEN countryPlaceNameSort",
-            "H.name HIDDEN nameSort",
-            'COUNT(DISTINCT BH.bibitem) AS numBibitemSort',
-        ])
-            ->from('AppBundle:Holder', 'H')
-            ->leftJoin('AppBundle:BibitemHolder', 'BH',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'BH.holder = H')
-            ->where('H.status <> -1')
-            ->groupBy('H.id')
-            ->orderBy('nameSort')
-        ;
-
-        $form = $this->get('form.factory')->create(\AppBundle\Filter\HolderFilterType::class, [
-            'country_choices' => array_flip($this->buildCountries()),
-            'ids' => range(0, 9999)
-        ]);
-
-        if ($request->query->has($form->getName())) {
-            // manually bind values from the request
-            $form->submit($request->query->get($form->getName()));
-
-            // build the query from the given form object
-            $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($form, $qb);
-        }
-
-        $pagination = $this->buildPagination($request, $qb->getQuery(), [
-            // the following leads to wrong display in combination with our
-            // helper.pagination_sortable()
-            // 'defaultSortFieldName' => 'countryPlaceNameSort', 'defaultSortDirection' => 'asc',
-        ]);
-
-        $countries = $form->get('country')->getData();
-        $stringQuery = $form->get('search')->getData();
-        $ids = $form->get('id')->getData();
-
-        $result = $qb->getQuery()->execute();
-
-        $csvResult = [];
-
-        foreach ($result as $value) {
-            $innerArray = [];
-
-            $entry = $value[0];
-
-            array_push($innerArray, $entry->getName(), $value['numBibitemSort'] );
-
-            array_push($csvResult, $innerArray);
-        }
-
-        $response = new CSVResponse( $csvResult, 200, explode( ', ', 'Name, # of Catalogues' ) );
-        $response->setFilename( "data.csv" );
-        return $response;
-    }
-
-
-    /**
      * @Route("/holder", name="holder-index")
      */
     public function indexAction(Request $request, UserInterface $user = null)
@@ -127,12 +57,12 @@ extends CrudController
 
                 if (!is_null($userAction)) {
                     return $this->redirectToRoute($userAction->getRoute(),
-                        $userAction->getRouteParams());
+                                                  $userAction->getRouteParams());
                 }
             }
         }
 
-        $requestURI =  $request->getRequestUri();
+        $requestURI = $request->getRequestUri();
 
         $route = $request->get('_route');
 
@@ -200,6 +130,62 @@ extends CrudController
         ]);
     }
 
+    /**
+     * @Route("/holder/csv", name="holder-csv")
+     */
+    public function indexToCsvAction(Request $request)
+    {
+        $route = $request->get('_route');
+
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb->select([
+                'H',
+                "CONCAT(COALESCE(H.countryCode, ''), H.placeLabel, H.name) HIDDEN countryPlaceNameSort",
+                'H.name HIDDEN nameSort',
+                'COUNT(DISTINCT BH.bibitem) AS numBibitemSort',
+            ])
+            ->from('AppBundle:Holder', 'H')
+            ->leftJoin('AppBundle:BibitemHolder', 'BH',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'BH.holder = H')
+            ->where('H.status <> -1')
+            ->groupBy('H.id')
+            ->orderBy('nameSort')
+            ;
+
+        $form = $this->get('form.factory')->create(\AppBundle\Filter\HolderFilterType::class, [
+            'country_choices' => array_flip($this->buildCountries()),
+            'ids' => range(0, 9999)
+        ]);
+
+        if ($request->query->has($form->getName())) {
+            // manually bind values from the request
+            $form->submit($request->query->get($form->getName()));
+
+            // build the query from the given form object
+            $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($form, $qb);
+        }
+
+        $result = $qb->getQuery()->execute();
+
+        $csvResult = [];
+
+        foreach ($result as $value) {
+            $innerArray = [];
+
+            $entry = $value[0];
+
+            array_push($innerArray, $entry->getName(), $value['numBibitemSort'] );
+
+            array_push($csvResult, $innerArray);
+        }
+
+        return new CsvResponse($csvResult, 200, [ 'Name', '# of Catalogues' ], 'holding_institutions.xlsx');
+    }
+
     // TODO MOVE TO SHARED
     protected function lookupSearches($user)
     {
@@ -244,8 +230,6 @@ extends CrudController
 
         $form = $this->createForm(\AppBundle\Form\Type\SaveSearchType::class);
 
-        //$form->get
-
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -274,46 +258,6 @@ extends CrudController
         ]);
     }
 
-
-    /**
-     * @Route("/holder/catalogues/csv/{id}", requirements={"id" = "\d+"}, name="holder-catalogue-csv")
-     */
-    public function detailActionCatalogueCSV(Request $request, $id = null, $ulan = null, $gnd = null)
-    {
-        $routeName = $request->get('_route'); $routeParams = [];
-
-        $repo = $this->getDoctrine()
-            ->getRepository('AppBundle:Holder');
-
-        if (!empty($id)) {
-            $routeParams = [ 'id' => $id ];
-            $holder = $repo->findOneById($id);
-        }
-
-        if (!isset($holder) || $holder->getStatus() == -1) {
-            return $this->redirectToRoute('holder-index');
-        }
-
-        $result = $holder->findBibitems($this->getDoctrine()->getManager(), true);
-
-        $csvResult = [];
-
-        foreach ($result as $key => $value) {
-            $bibitem = $value[0];
-
-            $innerArray = [];
-
-            array_push($innerArray, $bibitem->getTitle(), $bibitem->getPublicationLocation(), $bibitem->getDatePublished());
-
-            array_push($csvResult, $innerArray);
-        }
-
-        $response = new CSVResponse( $csvResult, 200, explode( ', ', 'Startdate, Enddate, Title, City, Venue, # of Cat. Entries, type' ) );
-        $response->setFilename( "data.csv" );
-
-        return $response;
-    }
-
     /**
      * @Route("/holder/{id}", requirements={"id" = "\d+"}, name="holder")
      */
@@ -340,32 +284,31 @@ extends CrudController
 
         $citeProc = $this->instantiateCiteProc($request->getLocale());
 
-
         $qb = $this->getDoctrine()
             ->getManager()
             ->createQueryBuilder();
 
         $qb->select([
-            'H',
-            "H.placeLabel ",
-            "P.latitude",
-            "P.longitude"
-        ])
+                'H',
+                'H.placeLabel',
+                'P.latitude',
+                'P.longitude'
+            ])
             ->from('AppBundle:Holder', 'H')
             ->leftJoin('AppBundle:Place', 'P',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'P.name = H.placeLabel')
             ->where('H.id = ' . $id)
-        ;
-
-        $place = ($qb->getQuery()->execute());
+            ;
 
         $bibitems = $holder->findBibitems($this->getDoctrine()->getManager(), true);
 
         $dataNumberOfItemType = $this->detailDataNumberOfItemType($bibitems);
 
+        $holderPlace = $qb->getQuery()->execute();
+
         return $this->render('Holder/detail.html.twig', [
-            'place' => $place[0],
+            'place' => $holderPlace[0],
             'pageTitle' => $holder->getName(),
             'holder' => $holder,
             'bibitems' => $bibitems,
@@ -408,5 +351,58 @@ extends CrudController
         $finalDataJson .= ']';
 
         return [ $finalDataJson, array_sum($countsOnly) ];
+    }
+
+    /**
+     * @Route("/holder/{id}/catalogues/csv", requirements={"id" = "\d+"}, name="holder-catalogue-csv")
+     */
+    public function detailActionCatalogueCsv(Request $request, $id = null, $ulan = null, $gnd = null)
+    {
+        $routeName = $request->get('_route'); $routeParams = [];
+
+        $repo = $this->getDoctrine()
+            ->getRepository('AppBundle:Holder');
+
+        if (!empty($id)) {
+            $routeParams = [ 'id' => $id ];
+            $holder = $repo->findOneById($id);
+        }
+
+        if (!isset($holder) || $holder->getStatus() == -1) {
+            return $this->redirectToRoute('holder-index');
+        }
+
+        $result = $holder->findBibitems($this->getDoctrine()->getManager(), true);
+
+        $csvResult = [];
+
+        foreach ($result as $key => $value) {
+            $bibitem = $value[0];
+
+            $innerArray = [];
+
+            $year = '';
+            $datePublished = $bibitem->getDatePublished();
+            if (!is_null($datePublished) && preg_match('/^(\d{4})/', $datePublished, $matches)) {
+                $year = $matches[1];
+            }
+
+            $publisher = $bibitem->getPublisher();
+            if (!is_null($publisher)) {
+                $publisher = $publisher->getName();
+            }
+
+            array_push($innerArray,
+                       $bibitem->getTitle(),
+                       $bibitem->getPublicationLocation(),
+                       $publisher,
+                       $year);
+
+            array_push($csvResult, $innerArray);
+        }
+
+        return new CsvResponse($csvResult, 200, [
+                'Title', 'Place of Publication', 'Publisher', 'Year of Publication',
+            ], 'catalogues.xlsx');
     }
 }
