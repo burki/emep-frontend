@@ -3,9 +3,8 @@
 namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Intl\Intl;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 /**
  *

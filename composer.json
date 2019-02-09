@@ -40,7 +40,6 @@
 
         "symfony/monolog-bundle": "^3.3",
         "symfony/swiftmailer-bundle": "^3.2",
-        "sensio/framework-extra-bundle": "^5.2",
         "knplabs/knp-menu-bundle": "^2.2",
 
         "symfony/asset": "^4.2",
