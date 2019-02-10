@@ -279,7 +279,7 @@ extends CrudController
 
         $locale = $request->getLocale();
         if (in_array($request->get('_route'), [ 'location-jsonld' ])) {
-            return new JsonLdResponse($person->jsonLdSerialize($locale));
+            return new JsonLdResponse($holder->jsonLdSerialize($locale));
         }
 
         $citeProc = $this->instantiateCiteProc($request->getLocale());
@@ -303,8 +303,6 @@ extends CrudController
 
         $bibitems = $holder->findBibitems($this->getDoctrine()->getManager(), true);
 
-        $dataNumberOfItemType = $this->detailDataNumberOfItemType($bibitems);
-
         $holderPlace = $qb->getQuery()->execute();
 
         return $this->render('Holder/detail.html.twig', [
@@ -313,44 +311,14 @@ extends CrudController
             'holder' => $holder,
             'bibitems' => $bibitems,
             'citeProc' => $citeProc,
-            'dataNumberOfItemType' => $dataNumberOfItemType,
             'pageMeta' => [
                 /*
-                'jsonLd' => $exhibition->jsonLdSerialize($locale),
-                'og' => $this->buildOg($exhibition, $routeName, $routeParams),
-                'twitter' => $this->buildTwitter($exhibition, $routeName, $routeParams),
+                'jsonLd' => $holder->jsonLdSerialize($locale),
+                'og' => $this->buildOg($holder, $routeName, $routeParams),
+                'twitter' => $this->buildTwitter($holder, $routeName, $routeParams),
                 */
             ],
         ]);
-    }
-
-    public function detailDataNumberOfItemType($bibitems)
-    {
-        $itemTypes = [];
-
-        foreach ($bibitems as $bibitem) {
-            array_push($itemTypes, $bibitem[0]->getItemType());
-        }
-
-        $valuesTotal = array_count_values($itemTypes);
-
-        $valuesOnly = array_keys($valuesTotal);
-        $countsOnly =  array_values($valuesTotal);
-
-        $i = 0;
-        $finalDataJson = '[';
-
-        foreach ($valuesOnly as $val) {
-            $i > 0 ? $finalDataJson .= ", " : '';
-
-            $count = $countsOnly[$i] ;
-
-            $finalDataJson .= "{ name: '${val}', y: ${count} } ";
-            $i += 1;
-        }
-        $finalDataJson .= ']';
-
-        return [ $finalDataJson, array_sum($countsOnly) ];
     }
 
     /**

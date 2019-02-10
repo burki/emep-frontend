@@ -54,7 +54,7 @@
                         return '<b>'
                             + Highcharts.numberFormat(this.y, 0)
                             + ('Age (Deceased Artist)' == this.series.name ? ' deceased' : ' living')
-                            + ' persons exhibiting at age'
+                            + ' persons exhibiting at age '
                             + this.point.name
                             + '</b>';
                     }
@@ -102,4 +102,3 @@
     <div id="{{ container|raw }}" style="width: 100%;  height: 400px; margin: 0 auto"></div>
     {{ helper.show_detailmodal() }}
 {% endblock %}
-

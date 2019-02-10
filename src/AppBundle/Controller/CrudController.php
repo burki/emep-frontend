@@ -32,6 +32,35 @@ extends Controller
         return $countriesActive;
     }
 
+    /**
+     *
+     */
+    protected function buildPersonNationalities()
+    {
+        $qb = $this->getDoctrine()
+                ->getManager()
+                ->createQueryBuilder();
+
+        $qb->select([
+                'P.nationality',
+            ])
+            ->distinct()
+            ->from('AppBundle:Person', 'P')
+            ->where('P.status <> -1 AND P.nationality IS NOT NULL')
+            ;
+
+        $countriesActive = [];
+
+        foreach ($qb->getQuery()->getResult() as $result) {
+            $countryCode = $result['nationality'];
+            $countriesActive[$countryCode] = Intl::getRegionBundle()->getCountryName($countryCode);
+        }
+
+        asort($countriesActive);
+
+        return $countriesActive;
+    }
+
     protected function buildVenueTypes()
     {
         $em = $this->getDoctrine()
@@ -142,6 +171,25 @@ extends Controller
                 return new \AppBundle\Utils\ExhibitionListBuilder($connection, $request, $urlGenerator, $filters, $mode);
                 break;
         }
+    }
+
+    protected function hydrateExhibitions($ids, $preserveOrder = false)
+    {
+        // hydrate with doctrine entity
+        $qb = $this->getDoctrine()
+                ->getManager()
+                ->createQueryBuilder();
+
+        $hydrationQuery = $qb->select([ 'E', 'field(E.id, :ids) as HIDDEN field', 'E.startdate HIDDEN dateSort' ])
+            ->from('AppBundle:Exhibition', 'E')
+            ->where('E.id IN (:ids)')
+            ->orderBy($preserveOrder ? 'field' : 'dateSort')
+            ->getQuery();
+            ;
+
+        $hydrationQuery->setParameter('ids', $ids);
+
+        return $hydrationQuery->getResult();
     }
 
     protected function hydratePersons($ids, $preserveOrder = false)

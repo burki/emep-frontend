@@ -681,6 +681,9 @@ EOT;
 
     function buildLocationCharts($request, $urlGenerator, $listBuilder)
     {
+        $routeName = $request->get('_route');
+        $prefix = preg_match('/^organizer/', $routeName) ? 'organizer' : 'location';
+
         $charts = [];
 
         // type
@@ -691,7 +694,7 @@ EOT;
         $stmt = $query->execute();
         $renderParams = $this->processLocationType($stmt);
         if (!empty($renderParams)) {
-            $template = $this->get('twig')->loadTemplate('Statistics/organizer-type-index.html.twig');
+            $template = $this->get('twig')->loadTemplate('Statistics/' . $prefix . '-type-index.html.twig');
 
             $charts[] = $template->render($renderParams);
         }
@@ -704,7 +707,7 @@ EOT;
         $stmt = $query->execute();
         $renderParams = $this->processLocationCountry($stmt);
         if (!empty($renderParams)) {
-            $template = $this->get('twig')->loadTemplate('Statistics/organizer-country-index.html.twig');
+            $template = $this->get('twig')->loadTemplate('Statistics/' . $prefix . '-country-index.html.twig');
 
             $charts[] = $template->render($renderParams);
         }

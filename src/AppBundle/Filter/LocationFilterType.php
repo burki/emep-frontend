@@ -23,7 +23,7 @@ extends CrudFilterType
         $locationClass = new class extends \Symfony\Component\Form\AbstractType {
             public function buildForm(FormBuilderInterface $builder, array $options)
             {
-                $country_geoname_choices = $options['data']['country_choices'];
+                $country_geoname_choices = $options['data']['choices']['country'];
                 foreach ($country_geoname_choices as $label => $cc) {
                     $country_geoname_choices[$label] = 'cc:' . $cc;
                 }
@@ -40,16 +40,11 @@ extends CrudFilterType
                 $builder->add('type', Filters\ChoiceFilterType::class, [
                     'label' => 'Type',
                     'multiple' => false,
-                    'choices' => [ $options['data']['location_type_placeholder'] => '' ] + $options['data']['location_type_choices'],
+                    'choices' => [ $options['data']['placeholders']['location_type'] => '' ] + $options['data']['choices']['location_type'],
                     'attr' => [
-                        'data-placeholder' => 'select location type',
-                        'class' => 'text-field-class w-select middle-selector',
+                        'data-placeholder' => $options['data']['placeholders']['location_type'],
+                        'class' => 'text-field-class w-select end-selector',
                     ],
-                ]);
-
-                $builder->add('id', Filters\ChoiceFilterType::class, [
-                    'choices' => [ 'select ids' => 'true'] + $options['data']['ids'],
-                    'multiple' => true,
                 ]);
             }
 

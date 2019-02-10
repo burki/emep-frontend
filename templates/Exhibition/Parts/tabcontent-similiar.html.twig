@@ -21,8 +21,8 @@
             <table id="similartable" class="table table-striped table-bordered dataTable listviewcontainer">
                 <thead>
                 <tr class="listviewheading">
-                    <th><span>Exhibitions</span></th>
-                    <th><span># Artists</span></th>
+                    <th><span>Exhibition</span></th>
+                    <th><span># of common Artists</span></th>
                 </tr>
                 </thead>
 
@@ -42,7 +42,7 @@
 
             {% for exhibition_id in similar_keys %}
 
-               {% if similar[exhibition_id]['count'] > 1 or numArtists == 1 %}
+               {% if similar[exhibition_id]['count'] > 0 or numArtists == 1 %}
                     {% if not similar_found %}
                         {% set similar_found = true %}
 

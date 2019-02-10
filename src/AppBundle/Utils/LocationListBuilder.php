@@ -160,8 +160,11 @@ extends SearchListBuilder
             ];
         }
 
-        $this->rowDescr['location']['buildValue'] = function (&$row, $val, $listBuilder, $key, $format) {
-            return $listBuilder->buildLinkedValue($val, 'location', [ 'id' => $row['id'] ], $format);
+        $entity = $this->entity;
+        $this->rowDescr['location']['buildValue'] = function (&$row, $val, $listBuilder, $key, $format) use ($entity) {
+            return $entity == $this->entity
+                ? $listBuilder->buildLinkedOrganizer($row, $val, $format)
+                : $listBuilder->buildLinkedLocation($row, $val, $format);
         };
 
         $this->rowDescr['place']['buildValue'] = function (&$row, $val, $listBuilder, $key, $format) {

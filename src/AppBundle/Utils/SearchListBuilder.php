@@ -490,7 +490,7 @@ extends ListBuilder
                        $this->formatRowValue($val, [], $format));
     }
 
-    protected function buildLinkedLocation(&$row, $val, $format)
+    protected function buildLinkedLocation(&$row, $val, $format, $route_name = 'location')
     {
         if ('html' != $format) {
             return false;
@@ -508,8 +508,13 @@ extends ListBuilder
         }
 
         return sprintf('<a href="%s">%s</a>',
-                       $this->urlGenerator->generate('location', [ 'id' => $row['location_id'] ]),
+                       $this->urlGenerator->generate($route_name, [ 'id' => $row['location_id'] ]),
                        $this->formatRowValue($val, [], $format));
+    }
+
+    protected function buildLinkedOrganizer(&$row, $val, $format)
+    {
+        return $this->buildLinkedLocation($row, $val, $format /*, 'organizer' */); // currently use same route
     }
 
     public function buildHeaderRow()

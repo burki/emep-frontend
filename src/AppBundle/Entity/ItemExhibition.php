@@ -192,6 +192,15 @@ class ItemExhibition
         return $this->exhibition;
     }
 
+    public function getCatalogueIdSortIndex()
+    {
+        if (!is_null($this->catalogueId) && preg_match('/^(\d+)/', $this->catalogueId, $matches)) {
+            return intval($matches[1]);
+        }
+
+        return 0;
+    }
+
     public function setExhibition($exhibition)
     {
         $this->exhibition = $exhibition;
@@ -303,15 +312,18 @@ class ItemExhibition
     public function getTypeParts()
     {
         $typeParts = [];
+
         if (!is_null($this->type)) {
             $type =  $this->type->getName();
             if ('0_unknown' != $type) {
                 $typeParts[] = $type;
             }
         }
+
         if (!empty($this->technique)) {
             $typeParts[] = $this->technique;
         }
+
         if (!empty($this->measurements)) {
             $typeParts[] = $this->measurements;
         }

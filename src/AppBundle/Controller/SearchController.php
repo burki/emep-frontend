@@ -37,35 +37,6 @@ extends CrudController
     ];
 
     /**
-     * TODO: move into a shared trait
-     */
-    protected function buildPersonNationalities()
-    {
-        $qb = $this->getDoctrine()
-                ->getManager()
-                ->createQueryBuilder();
-
-        $qb->select([
-                'P.nationality',
-            ])
-            ->distinct()
-            ->from('AppBundle:Person', 'P')
-            ->where('P.status <> -1 AND P.nationality IS NOT NULL')
-            ;
-
-        $countriesActive = [];
-
-        foreach ($qb->getQuery()->getResult() as $result) {
-            $countryCode = $result['nationality'];
-            $countriesActive[$countryCode] = Intl::getRegionBundle()->getCountryName($countryCode);
-        }
-
-        asort($countriesActive);
-
-        return $countriesActive;
-    }
-
-    /**
      *
      */
     protected function buildItemExhibitionTypes()

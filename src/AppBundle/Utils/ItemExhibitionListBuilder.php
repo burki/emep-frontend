@@ -235,6 +235,9 @@ extends SearchListBuilder
                 'price' => [
                     'label' => 'Price',
                 ],
+                'displaylocation' => [
+                    'label' => 'Room',
+                ],
                 'catalogueId' => [
                     'label' => 'Cat.No.',
                 ],
@@ -336,6 +339,7 @@ extends SearchListBuilder
             'IE.owner AS owner',
             'IE.forsale AS forsale',
             'IE.price AS price',
+            'IE.displaylocation AS displaylocation',
             'E.id AS exhibition_id',
             'E.title AS exhibition',
             'E.title_alternate AS exhibition_alternate',

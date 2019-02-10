@@ -591,6 +591,28 @@ implements \JsonSerializable, JsonLdSerializable
     }
 
     /**
+     * Gets both venue and organized exhibitions.
+     *
+     */
+    public function getAllExhibitions()
+    {
+        $ret = [];
+
+        $exhibitions = $this->getExhibitions();
+        if (!is_null($exhibitions)) {
+            $ret = $exhibitions->toArray();
+        }
+
+        $exhibitions = $this->getOrganizerOf(true);
+        if (!is_null($exhibitions)) {
+            $ret = array_merge($ret, $exhibitions->toArray());
+        }
+
+        return $ret;
+    }
+
+
+    /**
      * Sets additional.
      *
      * @param array $additional

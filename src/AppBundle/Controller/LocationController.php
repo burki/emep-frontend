@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Intl\Intl;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -79,20 +80,16 @@ extends CrudController
 
         $route = $request->get('_route');
 
-        $types = $this->buildVenueTypes();
-        $form = $this->form = $this->get('form.factory')->create(\AppBundle\Filter\LocationFilterType::class, [
-            'country_choices' => array_flip($this->buildCountries()),
-            'location_type_choices' => array_combine($types, $types),
-            'location_type_placeholder' => 'select type of organizing body',
-            'ids' => range(0, 9999)
+        $venueTypes = $this->buildVenueTypes();
+        $form = $this->form = $this->createForm(\AppBundle\Filter\LocationFilterType::class, [
+            'choices' => [
+                'country' => array_flip($this->buildCountries()),
+                'location_type' => array_combine($venueTypes, $venueTypes),
+            ],
+            'placeholders' => [
+                'location_type' => 'select type of organizing body',
+            ],
         ]);
-
-        // $countries = $form->get('country')->getData();
-        // $locationType = $form->get('location_type')->getData();
-        $stringQuery = $form->get('search')->getData();
-        // $ids = $form->get('id')->getData();
-
-        $requestURI =  $request->getRequestUri();
 
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, 'Organizer');
         $listPagination = new SearchListPagination($listBuilder);
@@ -105,19 +102,10 @@ extends CrudController
 
         return $this->render('Organizer/index.html.twig', [
             'pageTitle' => $this->get('translator')->trans('organizer-index' == $route ? 'Organizing Bodies' : 'Venues'),
-            // 'pagination' => $pagination,
             'pager' => $pager,
 
             'listBuilder' => $listBuilder,
             'form' => $form->createView(),
-            'countryArray' => $this->buildCountries(),
-            'organizerTypesArray' => $types,
-            // 'countries' => $countries,
-            // 'ids' => $ids,
-            // 'locationType' => $locationType,
-            'stringPart' => $stringQuery,
-            // 'locations' => $locations,
-            'requestURI' =>  $requestURI,
             'searches' => $this->lookupSearches($user, 'organizer')
         ]);
     }
@@ -129,12 +117,15 @@ extends CrudController
                                             UrlGeneratorInterface $urlGenerator,
                                             UserInterface $user = null)
     {
-        $types = $this->buildVenueTypes();
-        $form = $this->form = $this->get('form.factory')->create(\AppBundle\Filter\LocationFilterType::class, [
-            'country_choices' => array_flip($this->buildCountries()),
-            'location_type_choices' => array_combine($types, $types),
-            'location_type_placeholder' => 'select type of organizing body',
-            'ids' => range(0, 9999)
+        $venueTypes = $this->buildVenueTypes();
+        $form = $this->form = $this->createForm(\AppBundle\Filter\LocationFilterType::class, [
+            'choices' => [
+                'country' => array_flip($this->buildCountries()),
+                'location_type' => array_combine($venueTypes, $venueTypes),
+            ],
+            'placeholders' => [
+                'location_type' => 'select type of organizing body',
+            ],
         ]);
 
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'extended', $entity = 'Organizer');
@@ -152,7 +143,6 @@ extends CrudController
                 [ -15, 120 ],
             ],
             'markerStyle' => 'exhibition-by-place' == 'default',
-            'persons' => [], // $persons,
         ]);
     }
 
@@ -163,12 +153,15 @@ extends CrudController
                                               UrlGeneratorInterface $urlGenerator,
                                               UserInterface $user = null)
     {
-        $types = $this->buildVenueTypes();
-        $form = $this->form = $this->get('form.factory')->create(\AppBundle\Filter\LocationFilterType::class, [
-            'country_choices' => array_flip($this->buildCountries()),
-            'location_type_choices' => array_combine($types, $types),
-            'location_type_placeholder' => 'select type of organizing body',
-            'ids' => range(0, 9999)
+        $venueTypes = $this->buildVenueTypes();
+        $form = $this->form = $this->createForm(\AppBundle\Filter\LocationFilterType::class, [
+            'choices' => [
+                'country' => array_flip($this->buildCountries()),
+                'location_type' => array_combine($venueTypes, $venueTypes),
+            ],
+            'placeholders' => [
+                'location_type' => 'select type of organizing body',
+            ],
         ]);
 
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, $entity = 'Organizer');
@@ -209,20 +202,16 @@ extends CrudController
 
         $route = $request->get('_route');
 
-        $types = $this->buildVenueTypes();
-        $form = $this->form = $this->get('form.factory')->create(\AppBundle\Filter\LocationFilterType::class, [
-            'country_choices' => array_flip($this->buildCountries()),
-            'location_type_choices' => array_combine($types, $types),
-            'location_type_placeholder' => 'select type of venue',
-            'ids' => range(0, 9999)
+        $venueTypes = $this->buildVenueTypes();
+        $form = $this->form = $this->createForm(\AppBundle\Filter\LocationFilterType::class, [
+            'choices' => [
+                'country' => array_flip($this->buildCountries()),
+                'location_type' => array_combine($venueTypes, $venueTypes),
+            ],
+            'placeholders' => [
+                'location_type' => 'select type of venue',
+            ],
         ]);
-
-        // $countries = $form->get('country')->getData();
-        // $locationType = $form->get('location_type')->getData();
-        $stringQuery = $form->get('search')->getData();
-        // $ids = $form->get('id')->getData();
-
-        $requestURI =  $request->getRequestUri();
 
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, 'Venue');
         $listPagination = new SearchListPagination($listBuilder);
@@ -235,20 +224,10 @@ extends CrudController
 
         return $this->render('Location/index.html.twig', [
             'pageTitle' => $this->get('translator')->trans('organizer-index' == $route ? 'Organizing Bodies' : 'Venues'),
-            // 'pagination' => $pagination,
             'pager' => $pager,
 
             'listBuilder' => $listBuilder,
             'form' => $form->createView(),
-            'countryArray' => $this->buildCountries(),
-            'organizerTypesArray' => $types,
-            // 'countries' => $countries,
-            // 'ids' => $ids,
-            // 'locationType' => $locationType,
-            'stringPart' => $stringQuery,
-            // 'locations' => $locations,
-            'requestURI' =>  $requestURI,
-            'searches' => $this->lookupSearches($user)
         ]);
     }
 
@@ -259,12 +238,15 @@ extends CrudController
                                    UrlGeneratorInterface $urlGenerator,
                                    UserInterface $user = null)
     {
-        $types = $this->buildVenueTypes();
-        $form = $this->form = $this->get('form.factory')->create(\AppBundle\Filter\LocationFilterType::class, [
-            'country_choices' => array_flip($this->buildCountries()),
-            'location_type_choices' => array_combine($types, $types),
-            'location_type_placeholder' => 'select type of venue',
-            'ids' => range(0, 9999)
+        $venueTypes = $this->buildVenueTypes();
+        $form = $this->form = $this->createForm(\AppBundle\Filter\LocationFilterType::class, [
+            'choices' => [
+                'country' => array_flip($this->buildCountries()),
+                'location_type' => array_combine($venueTypes, $venueTypes),
+            ],
+            'placeholders' => [
+                'location_type' => 'select type of venue',
+            ],
         ]);
 
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'extended', $entity = 'Venue');
@@ -282,7 +264,6 @@ extends CrudController
                 [ -15, 120 ],
             ],
             'markerStyle' => 'exhibition-by-place' == 'default',
-            'persons' => [], // $persons,
         ]);
     }
 
@@ -293,12 +274,15 @@ extends CrudController
                                      UrlGeneratorInterface $urlGenerator,
                                      UserInterface $user = null)
     {
-        $types = $this->buildVenueTypes();
-        $form = $this->form = $this->get('form.factory')->create(\AppBundle\Filter\LocationFilterType::class, [
-            'country_choices' => array_flip($this->buildCountries()),
-            'location_type_choices' => array_combine($types, $types),
-            'location_type_placeholder' => 'select type of venue',
-            'ids' => range(0, 9999)
+        $venueTypes = $this->buildVenueTypes();
+        $form = $this->form = $this->createForm(\AppBundle\Filter\LocationFilterType::class, [
+            'choices' => [
+                'country' => array_flip($this->buildCountries()),
+                'location_type' => array_combine($venueTypes, $venueTypes),
+            ],
+            'placeholders' => [
+                'location_type' => 'select type of venue',
+            ],
         ]);
 
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, $entity = 'Venue');
@@ -458,104 +442,93 @@ extends CrudController
         ]);
     }
 
-
-    public function indexDataNumberCountries($results)
+    protected function getExhibitionIds($location)
     {
-        $countryCodes = [];
+        // get exhibition-ids both as venue and as organizers
+        $exhibitionIds = [];
 
-        foreach ($results as $result) {
-            $location = $result[0];
-            $place = $location->getPlace();
-            if (!is_null($place)) {
-                $countryCode = $place->getCountryCode();
-            }
-            else {
-                $countryCode = $location->getCountry();
-            }
-
-            array_push($countryCodes, $countryCode);
+        $exhibitions = $location->getExhibitions();
+        if (!is_null($exhibitions)) {
+            $exhibitionIds = array_map(function ($exhibition) { return $exhibition->getId(); }, $exhibitions->toArray());
         }
 
-        // replacing null values
-        $countryCodes = array_replace($countryCodes,array_fill_keys(array_keys($countryCodes, null),''));
-
-        $valuesTotal = array_count_values($countryCodes);
-
-        $valuesOnly = array_keys($valuesTotal);
-        $countsOnly =  array_values($valuesTotal);
-
-
-        $i = 0;
-        $finalDataJson = '[';
-
-        foreach ($valuesOnly as $val) {
-            $i > 0 ? $finalDataJson .= ", " : '';
-
-            $count = $countsOnly[$i] ;
-
-            $finalDataJson .= '{ name: "' . $val . '", y: '. $count . '} ';
-            $i += 1;
+        $exhibitions = $location->getOrganizerOf();
+        if (!is_null($exhibitions)) {
+            $exhibitionIds = array_unique(
+                array_merge($exhibitionIds,
+                            array_map(function ($exhibition) { return $exhibition->getId(); }, $exhibitions->toArray())));
         }
-        $finalDataJson .= ']';
 
-        return [ $finalDataJson, array_sum($countsOnly) ];
+        return $exhibitionIds;
     }
 
-
-    public function indexDataNumberVenueType($locations)
+    protected function getArtistsByExhibitionIds($exhibitionIds)
     {
-        //$exhibitions = $location->getExhibitions();
-
-        $venueTypes = [];
-
-        foreach ($locations as $location) {
-
-            //print count($entries);
-            //print '   ';
-
-            $currType = (string) $location[0]->getType() == '' ? 'unknown' : (string) $location[0]->getType();
-
-            array_push($venueTypes, (string) $currType );
-
+        if (empty($exhibitionIds)) {
+            return [];
         }
 
-        $typesTotal = array_count_values ( $venueTypes );
+        // artists this venue
+        $qb = $this->getDoctrine()
+                ->getManager()
+                ->createQueryBuilder();
 
-        //$exhibitionPlacesArray = array_keys($exhibitionPlaces);
+        $qb->select([
+                'P',
+                'COUNT(DISTINCT E.id) AS numExhibitionSort',
+                'COUNT(DISTINCT IE.id) AS numCatEntrySort',
+                "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort"
+            ])
+            ->from('AppBundle:Person', 'P')
+            ->innerJoin('AppBundle:ItemExhibition', 'IE',
+                       \Doctrine\ORM\Query\Expr\Join::WITH,
+                       'IE.person = P AND IE.title IS NOT NULL')
+            ->innerJoin('IE.exhibition', 'E')
+            ->where('E.id IN(:ids) AND E.status <> -1')
+            ->setParameter('ids', $exhibitionIds)
+            ->groupBy('P.id')
+            ->orderBy('nameSort')
+            ;
 
-        // print_r($exhibitionPlacesArray);
+        return $qb->getQuery()->getResult();
+    }
 
-        $typesOnly = ( array_keys($typesTotal) );
-        $valuesOnly =  array_values( $typesTotal );
+    protected function getExhibitionStatsByIds($exhibitionIds) {
+        $exhibitionStats = [];
 
-
-        $sumOfAllTypes= array_sum(array_values($typesTotal));
-
-        $i = 0;
-        $finalDataJson = '[';
-
-        foreach ($typesOnly as $place) {
-
-            $i > 0 ? $finalDataJson .= ", " : '';
-
-            $numberOfExhibitions = $valuesOnly[$i] ;
-
-            $finalDataJson .= '{ name: "' .$place. '", y: '. $numberOfExhibitions . '} ';
-            $i += 1;
+        if (empty($exhibitionIds)) {
+            return $exhibitionStats;
         }
-        $finalDataJson .= ']';
 
+        // stats
+        $qb = $this->getDoctrine()
+                ->getManager()
+                ->createQueryBuilder();
+        $qb->select([
+                'E.id AS id',
+                'COUNT(DISTINCT IE.id) AS numCatEntrySort',
+                'COUNT(DISTINCT P.id) AS numPersonSort',
+            ])
+            ->from('AppBundle:Exhibition', 'E')
+            ->leftJoin('AppBundle:ItemExhibition', 'IE',
+                       \Doctrine\ORM\Query\Expr\Join::WITH,
+                       'IE.exhibition = E AND IE.title IS NOT NULL')
+            ->leftJoin('IE.person', 'P')
+            ->where('E.id IN (:ids) AND E.status <> -1')
+            ->setParameter('ids', $exhibitionIds)
+            ->groupBy('E.id')
+            ;
 
+        foreach ($qb->getQuery()->getResult() as $row) {
+           $exhibitionStats[$row['id']] = $row;
+        }
 
-        $returnArray = [$finalDataJson, $sumOfAllTypes];
-
-
-        return $returnArray;
+        return $exhibitionStats;
     }
 
 
     /**
-     * @Route("/location/artists/csv/{id}", requirements={"id" = "\d+"}, name="location-artists-csv")
+     * @Route("/location/{id}/artists/csv", requirements={"id" = "\d+"}, name="location-artists-csv")
      */
     public function detailActionArtists(Request $request, $id = null, $ulan = null, $gnd = null)
     {
@@ -573,79 +546,29 @@ extends CrudController
             return $this->redirectToRoute('location-index');
         }
 
-        $locale = $request->getLocale();
-        if (in_array($request->get('_route'), [ 'location-jsonld' ])) {
-            return new JsonLdResponse($person->jsonLdSerialize($locale));
-        }
+        $exhibitionIds = $this->getExhibitionIds($location);
 
-        // artists this venue
-        $qb = $this->getDoctrine()
-            ->getManager()
-            ->createQueryBuilder();
-
-        $qb->select([
-            'P',
-            'COUNT(DISTINCT E.id) AS numExhibitionSort',
-            'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-            "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort"
-        ])
-            ->from('AppBundle:Person', 'P')
-            ->innerJoin('AppBundle:ItemExhibition', 'IE',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.person = P AND IE.title IS NOT NULL')
-            ->innerJoin('IE.exhibition', 'E')
-            ->where('E.location = :location AND E.status <> -1')
-            ->setParameter('location', $location)
-            ->groupBy('P.id')
-            ->orderBy('nameSort')
-        ;
-        $artists = $qb->getQuery()->getResult();
-
-        // stats
-        $qb = $this->getDoctrine()
-            ->getManager()
-            ->createQueryBuilder();
-        $qb->select([
-            'E.id AS id',
-            'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-            'COUNT(DISTINCT P.id) AS numPersonSort',
-        ])
-            ->from('AppBundle:Exhibition', 'E')
-            ->leftJoin('E.location', 'L')
-            ->leftJoin('AppBundle:ItemExhibition', 'IE',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = E AND IE.title IS NOT NULL')
-            ->leftJoin('IE.person', 'P')
-            ->where('E.location = :location AND E.status <> -1')
-            ->setParameter('location', $location)
-            ->groupBy('E.id')
-        ;
-        $exhibitionStats = [];
-        foreach ($qb->getQuery()->getResult() as $row) {
-            $exhibitionStats[$row['id']] = $row;
-        }
-
-        $result = $artists;
+        $artists = $this->getArtistsByExhibitionIds($exhibitionIds);
 
         $csvResult = [];
 
-        foreach ($result as $key=>$value) {
-
+        foreach ($artists as $key => $value) {
             $artist = $value[0];
 
             $innerArray = [];
-            array_push($innerArray, $artist->getFullName(true), $value['numExhibitionSort'], $value['numCatEntrySort'] );
+            array_push($innerArray,
+                       $artist->getFullName(true),
+                       $value['numExhibitionSort'],
+                       $value['numCatEntrySort'] );
 
             array_push($csvResult, $innerArray);
         }
 
-        $response = new CSVResponse( $csvResult, 200, explode( ', ', 'Startdate, Enddate, Title, City, Venue, # of Cat. Entries, type' ) );
-        $response->setFilename( "data.csv" );
-        return $response;
+        return new CsvResponse($csvResult, 200, explode( ', ', 'Person, # of Exhibitions, # of Cat. Entries'));
     }
 
     /**
-     * @Route("/location/exhibitions/csv/{id}", requirements={"id" = "\d+"}, name="location-exhibitions-csv")
+     * @Route("/location/{id}/exhibitions/csv", requirements={"id" = "\d+"}, name="location-exhibitions-csv")
      */
     public function detailActionExhibitions(Request $request, $id = null, $ulan = null, $gnd = null)
     {
@@ -663,73 +586,22 @@ extends CrudController
             return $this->redirectToRoute('location-index');
         }
 
-        $locale = $request->getLocale();
-        if (in_array($request->get('_route'), [ 'location-jsonld' ])) {
-            return new JsonLdResponse($person->jsonLdSerialize($locale));
-        }
-
-        // artists this venue
-        $qb = $this->getDoctrine()
-            ->getManager()
-            ->createQueryBuilder();
-
-        $qb->select([
-            'P',
-            'COUNT(DISTINCT E.id) AS numExhibitionSort',
-            'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-            "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort"
-        ])
-            ->from('AppBundle:Person', 'P')
-            ->innerJoin('AppBundle:ItemExhibition', 'IE',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.person = P AND IE.title IS NOT NULL')
-            ->innerJoin('IE.exhibition', 'E')
-            ->where('E.location = :location AND E.status <> -1')
-            ->setParameter('location', $location)
-            ->groupBy('P.id')
-            ->orderBy('nameSort')
-        ;
-        $artists = $qb->getQuery()->getResult();
-
-        // stats
-        $qb = $this->getDoctrine()
-            ->getManager()
-            ->createQueryBuilder();
-
-        $qb->select([
-            'E.id AS id',
-            'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-            'COUNT(DISTINCT P.id) AS numPersonSort',
-        ])
-            ->from('AppBundle:Exhibition', 'E')
-            ->leftJoin('E.location', 'L')
-            ->leftJoin('AppBundle:ItemExhibition', 'IE',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = E AND IE.title IS NOT NULL')
-            ->leftJoin('IE.person', 'P')
-            ->where('E.location = :location AND E.status <> -1')
-            ->setParameter('location', $location)
-            ->groupBy('E.id')
-        ;
-        $exhibitionStats = [];
-        foreach ($qb->getQuery()->getResult() as $row) {
-            $exhibitionStats[$row['id']] = $row;
-        }
-
-        $result = $location->getExhibitions();
-
         $csvResult = [];
 
-        foreach ($result as $exhibition) {
+        foreach ($location->getAllExhibitions() as $exhibition) {
             $innerArray = [];
-            array_push($innerArray, $exhibition->getStartdate(), $exhibition->getEnddate(), $exhibition->getLocation()->getPlaceLabel(), $exhibitionStats[$exhibition->getId()]['numCatEntrySort'] );
+            array_push($innerArray,
+                       $exhibition->getStartdate(), $exhibition->getEnddate(), $exhibition->getDisplaydate(),
+                       $exhibition->getTitle(),
+                       $exhibition->getLocation()->getPlaceLabel(),
+                       $exhibition->getLocation()->getName(),
+                       $exhibition->getOrganizerType(),
+                       $exhibitionStats[$exhibition->getId()]['numCatEntrySort']);
 
             array_push($csvResult, $innerArray);
         }
 
-        $response = new CSVResponse( $csvResult, 200, explode( ', ', 'Startdate, Enddate, Title, City, Venue, # of Cat. Entries, type' ) );
-        $response->setFilename( "data.csv" );
-        return $response;
+        return new CsvResponse($csvResult, 200, explode( ', ', 'Start Date, End Date, Display Date, Title, City, Venue, Type of Org. Body, # of Cat. Entries'));
     }
 
     /**
@@ -754,56 +626,13 @@ extends CrudController
 
         $locale = $request->getLocale();
         if (in_array($request->get('_route'), [ 'location-jsonld' ])) {
-            return new JsonLdResponse($person->jsonLdSerialize($locale));
+            return new JsonLdResponse($location->jsonLdSerialize($locale));
         }
 
-        // artists this venue
-        $qb = $this->getDoctrine()
-                ->getManager()
-                ->createQueryBuilder();
+        $exhibitionIds = $this->getExhibitionIds($location);
 
-        $qb->select([
-                'P',
-                'COUNT(DISTINCT E.id) AS numExhibitionSort',
-                'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-                "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort"
-            ])
-            ->from('AppBundle:Person', 'P')
-            ->innerJoin('AppBundle:ItemExhibition', 'IE',
-                       \Doctrine\ORM\Query\Expr\Join::WITH,
-                       'IE.person = P AND IE.title IS NOT NULL')
-            ->innerJoin('IE.exhibition', 'E')
-            ->where('E.location = :location AND E.status <> -1')
-            ->setParameter('location', $location)
-            ->groupBy('P.id')
-            ->orderBy('nameSort')
-            ;
-        $artists = $qb->getQuery()->getResult();
-
-        // stats
-        $qb = $this->getDoctrine()
-                ->getManager()
-                ->createQueryBuilder();
-        $qb->select([
-                'E.id AS id',
-                'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-                'COUNT(DISTINCT P.id) AS numPersonSort',
-            ])
-            ->from('AppBundle:Exhibition', 'E')
-            ->leftJoin('E.location', 'L')
-            ->leftJoin('AppBundle:ItemExhibition', 'IE',
-                       \Doctrine\ORM\Query\Expr\Join::WITH,
-                       'IE.exhibition = E AND IE.title IS NOT NULL')
-            ->leftJoin('IE.person', 'P')
-            ->where('E.location = :location AND E.status <> -1')
-            ->setParameter('location', $location)
-            ->groupBy('E.id')
-            ;
-        $exhibitionStats = [];
-        foreach ($qb->getQuery()->getResult() as $row) {
-           $exhibitionStats[$row['id']] = $row;
-        }
-
+        $artists = $this->getArtistsByExhibitionIds($exhibitionIds);
+        $exhibitionStats = $this->getExhibitionStatsByIds($exhibitionIds);
 
         // get alternative location for the case that the geo is empty
         $qbAlt = $this->getDoctrine()
@@ -811,19 +640,19 @@ extends CrudController
             ->createQueryBuilder();
 
         $qbAlt->select([
-            'L',
-            "L.placeLabel ",
-            "P.latitude",
-            "P.longitude"
-        ])
+                'L',
+                "L.placeLabel",
+                "P.latitude",
+                "P.longitude"
+            ])
             ->from('AppBundle:Location', 'L')
             ->leftJoin('AppBundle:Place', 'P',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'P.name = L.placeLabel')
             ->where('L.id = ' . $id)
-        ;
+            ;
 
-        $place = ($qbAlt->getQuery()->execute());
+        $place = $qbAlt->getQuery()->execute();
 
         $dataNumberOfArtistsPerCountry = $this->detailDataNumberOfArtistsPerCountry($artists);
 
@@ -839,9 +668,9 @@ extends CrudController
             'detailDataNumberItemTypes' => $detailDataNumberItemTypes,
             'pageMeta' => [
                 /*
-                'jsonLd' => $exhibition->jsonLdSerialize($locale),
-                'og' => $this->buildOg($exhibition, $routeName, $routeParams),
-                'twitter' => $this->buildTwitter($exhibition, $routeName, $routeParams),
+                'jsonLd' => $location->jsonLdSerialize($locale),
+                'og' => $this->buildOg($location, $routeName, $routeParams),
+                'twitter' => $this->buildTwitter($location, $routeName, $routeParams),
                 */
             ],
         ]);
@@ -849,7 +678,7 @@ extends CrudController
 
     public function detailDataNumberItemTypes($location)
     {
-        $exhibitions = $location->getExhibitions();
+        $exhibitions = $location->getAllExhibitions();
 
         $types = [];
 
@@ -865,69 +694,37 @@ extends CrudController
         }
 
         $typesTotal = array_count_values($types);
+        arsort($typesTotal);
 
-        $typesOnly = array_keys($typesTotal);
-        $valuesOnly = array_values($typesTotal);
+        $finalData = array_map(function ($key) use ($typesTotal) {
+                return [ 'name' => $key, 'y' => (int)$typesTotal[$key]];
+            },
+            array_keys($typesTotal));
 
+        $sumOfAllTypes = array_sum(array_values($typesTotal));
 
-        $sumOfAllTypes= array_sum(array_values($typesTotal));
-
-        $i = 0;
-        $finalDataJson = '[';
-
-        foreach ($typesOnly as $place) {
-            $i > 0 ? $finalDataJson .= ", " : '';
-
-            $numberOfExhibitions = $valuesOnly[$i] ;
-
-            $finalDataJson .= "{ name: '${place}', y: ${numberOfExhibitions} } ";
-            $i += 1;
-        }
-        $finalDataJson .= ']';
-
-
-        $returnArray = [ $finalDataJson, $sumOfAllTypes ];
-
-
-        return $returnArray;
+        return [ json_encode($finalData), $sumOfAllTypes ];
     }
-
-
-
 
     public function detailDataNumberOfArtistsPerCountry($artists)
     {
         $artistNationalities = [];
 
         foreach ($artists as $artist) {
-            array_push($artistNationalities, (string) $artist[0]->getNationality() );
+            array_push($artistNationalities, (string)$artist[0]->getNationality() );
         }
 
         $artistNationalitiesTotal = array_count_values($artistNationalities);
+        arsort($artistNationalitiesTotal);
 
-        $nationalitiesOnly = array_keys($artistNationalitiesTotal);
-        $valuesOnly = array_values($artistNationalitiesTotal);
-
+        $finalData = array_map(function ($key) use ($artistNationalitiesTotal) {
+                $name = '' === $key ? 'unknown' : Intl::getRegionBundle()->getCountryName($key);
+                return [ 'name' => $name, 'y' => (int)$artistNationalitiesTotal[$key]];
+            },
+            array_keys($artistNationalitiesTotal));
 
         $sumOfAllNationalities = array_sum(array_values($artistNationalitiesTotal));
 
-        $i = 0;
-        $finalDataJson = '[';
-
-        foreach ($nationalitiesOnly as $place) {
-
-            $i > 0 ? $finalDataJson .= ", " : '';
-
-            $numberOfExhibitions = $valuesOnly[$i] ;
-
-            $finalDataJson .= "{ name: '${place}', y: ${numberOfExhibitions} } ";
-            $i += 1;
-        }
-        $finalDataJson .= ']';
-
-
-        $returnArray = [ $finalDataJson, $sumOfAllNationalities, $i ];
-
-        return $returnArray;
+        return [ json_encode($finalData), $sumOfAllNationalities, count(array_keys($artistNationalitiesTotal)) ];
     }
 }

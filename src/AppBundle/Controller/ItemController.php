@@ -167,7 +167,7 @@ extends Controller
 
         $locale = $request->getLocale();
         if (in_array($request->get('_route'), [ 'item-jsonld' ])) {
-            return new JsonLdResponse($person->jsonLdSerialize($locale));
+            return new JsonLdResponse($item->jsonLdSerialize($locale));
         }
 
         return $this->render('Item/detail.html.twig', [
@@ -175,9 +175,9 @@ extends Controller
             'item' => $item,
             'pageMeta' => [
                 /*
-                'jsonLd' => $exhibition->jsonLdSerialize($locale),
-                'og' => $this->buildOg($exhibition, $routeName, $routeParams),
-                'twitter' => $this->buildTwitter($exhibition, $routeName, $routeParams),
+                'jsonLd' => $item->jsonLdSerialize($locale),
+                'og' => $this->buildOg($item, $routeName, $routeParams),
+                'twitter' => $this->buildTwitter($item, $routeName, $routeParams),
                 */
             ],
         ]);
