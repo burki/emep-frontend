@@ -402,9 +402,20 @@ extends ListBuilder
 
             if (!empty($organizerFilters[$key = 'geoname'])) {
                 $this->addGeonameFilter($queryBuilder, [
-                                            'cc' => 'OPL.country_code',
+                                            'cc' => 'PO.country_code',
                                             'tgn' => 'O.place_tgn',
                                         ], $key, $organizerFilters[$key]);
+            }
+        }
+
+        if (array_key_exists('holder', $this->queryFilters)) {
+            $holderFilters = & $this->queryFilters['holder'];
+
+            if (!empty($holderFilters[$key = 'geoname'])) {
+                $this->addGeonameFilter($queryBuilder, [
+                                            'cc' => 'H.country',
+                                            'tgn' => 'H.place_tgn',
+                                        ], $key, $holderFilters[$key]);
             }
         }
 

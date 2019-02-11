@@ -3,9 +3,9 @@
 namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
-
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Intl\Intl;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -88,6 +88,102 @@ extends Controller
         return array_column($result, 'type');
     }
 
+    /**
+     * Checks if a saved search is requested and if so, looks it up and redirects
+     */
+    protected function handleUserAction(Request $request, UserInterface $user)
+    {
+        if ('POST' == $request->getMethod() && !is_null($user)) {
+            // check a useraction was requested
+            $userActionId = $request->request->get('useraction');
+
+            if (!empty($userActionId)) {
+                $userAction = $this->getDoctrine()
+                    ->getManager()
+                    ->getRepository('AppBundle:UserAction')
+                    ->findOneBy([
+                        'id' => $userActionId,
+                        'user' => $user,
+                        'route' => $request->get('_route'),
+                    ]);
+
+                if (!is_null($userAction)) {
+                    return $this->redirectToRoute($userAction->getRoute(),
+                                                  $userAction->getRouteParams());
+                }
+            }
+        }
+    }
+
+    protected function handleSaveSearchAction(Request $request,
+                                              UrlGeneratorInterface $urlGenerator,
+                                              UserInterface $user)
+    {
+        list($route, $routeParams) = $this->buildSaveSearchParams($request, $urlGenerator);
+
+        if (empty($routeParams)) {
+            // nothing to save
+            return $this->redirectToRoute($route, $routeParams);
+        }
+
+        $form = $this->createForm(\AppBundle\Form\Type\SaveSearchType::class);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+
+            $userAction = new \AppBundle\Entity\UserAction();
+
+            $userAction->setUser($user);
+            $userAction->setRoute($route);
+            $userAction->setRouteParams($routeParams);
+
+            $userAction->setName($data['name']);
+
+            $em = $this->getDoctrine()
+                ->getManager();
+
+            $em->persist($userAction);
+            $em->flush();
+
+            return $this->redirectToRoute($route, $routeParams);
+        }
+
+        return $this->render('User/save.html.twig', [
+            'pageTitle' => $this->get('translator')->trans('Save your query'),
+            'form' => $form->createView(),
+        ]);
+    }
+
+    protected function lookupSearches($user, $routeName)
+    {
+        if (is_null($user)) {
+            return [];
+        }
+
+        $qb = $this->getDoctrine()
+                ->getManager()
+                ->createQueryBuilder();
+
+        $qb->select('UA')
+            ->from('AppBundle:UserAction', 'UA')
+            ->where("UA.route = :route")
+            ->andWhere("UA.user = :user")
+            ->orderBy("UA.createdAt", "DESC")
+            ->setParameter('route', $routeName)
+            ->setParameter('user', $user)
+            ;
+
+        $searches = [];
+
+        foreach ($qb->getQuery()->getResult() as $userAction) {
+            $searches[$userAction->getId()] = $userAction->getName();
+        }
+
+        return $searches;
+    }
+
     protected function buildPagination($request, $query, $options = [])
     {
         $paginator = $this->get('knp_paginator');
@@ -115,7 +211,7 @@ extends Controller
                 }
             }
             else {
-                if ( ! is_null($callback) && ! $callback($value)) {
+                if (!is_null($callback) && ! $callback($value)) {
                     unset($array[$key]);
                 }
                 elseif ('' === $value || ! (bool) $value) {
@@ -157,6 +253,10 @@ extends Controller
 
             case 'Organizer':
                 return new \AppBundle\Utils\OrganizerListBuilder($connection, $request, $urlGenerator, $filters, $mode);
+                break;
+
+            case 'Holder':
+                return new \AppBundle\Utils\HolderListBuilder($connection, $request, $urlGenerator, $filters, $mode);
                 break;
 
             case 'Person':

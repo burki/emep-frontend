@@ -7,7 +7,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Lexik\Bundle\FormFilterBundle\Filter\Query\QueryInterface;
 use Lexik\Bundle\FormFilterBundle\Filter\Form\Type as Filters;
 
-class LocationFilterType
+class OrganizerFilterType
 extends CrudFilterType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -20,7 +20,7 @@ extends CrudFilterType
             ],
         ]);
 
-        $locationClass = new class extends \Symfony\Component\Form\AbstractType {
+        $organizerClass = new class extends \Symfony\Component\Form\AbstractType {
             public function buildForm(FormBuilderInterface $builder, array $options)
             {
                 $country_geoname_choices = $options['data']['choices']['country'];
@@ -40,9 +40,9 @@ extends CrudFilterType
                 $builder->add('type', Filters\ChoiceFilterType::class, [
                     'label' => 'Type',
                     'multiple' => false,
-                    'choices' => [ 'select type of venue' => '' ] + $options['data']['choices']['location_type'],
+                    'choices' => [ 'select type of organizing body' => '' ] + $options['data']['choices']['location_type'],
                     'attr' => [
-                        'data-placeholder' => 'select type of venue',
+                        'data-placeholder' => 'select type of organizing body',
                         'class' => 'text-field-class w-select end-selector',
                     ],
                 ]);
@@ -50,11 +50,11 @@ extends CrudFilterType
 
             public function getName()
             {
-                return 'location';
+                return 'organizer';
             }
         };
 
-        $builder->add('location', get_class($locationClass), $options);
+        $builder->add('organizer', get_class($organizerClass), $options);
     }
 
     public function getBlockPrefix()

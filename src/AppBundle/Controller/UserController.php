@@ -26,13 +26,15 @@ extends Controller
     /**
      * @Route("/my-data", name="my-data")
      */
-    public function myDataAction(Request $request, UserInterface $user = null)
+    public function myDataAction(Request $request,
+                                 UrlGeneratorInterface $urlGenerator,
+                                 UserInterface $user = null)
     {
         if (is_null($user)) {
             return $this->redirectToRoute('login');
         }
 
-        $queries = $this->lookupAllSearches($user);
+        $queries = $this->lookupAllSearches($urlGenerator, $user);
 
         return $this->render('User/mydata.html.twig', [
             'pageTitle' => 'My Data',
@@ -40,7 +42,8 @@ extends Controller
         ]);
     }
 
-    protected function lookupAllSearches($user)
+    protected function lookupAllSearches(UrlGeneratorInterface $urlGenerator,
+                                         UserInterface $user)
     {
         if (is_null($user)) {
             return [];
@@ -55,16 +58,17 @@ extends Controller
             ->andWhere("UA.user = :user")
             ->orderBy("UA.createdAt", "DESC")
             ->setParameter('user', $user)
-        ;
+            ;
 
         $searches = [];
 
         foreach ($qb->getQuery()->getResult() as $userAction) {
-                $searches[$userAction->getId()] = [ $userAction->getName(),
-                    $userAction->getRoute(),
-                    $userAction->getRoute() . "/?" . http_build_query( $userAction->getRouteParams() )
-                ];
-
+            $searches[$userAction->getId()] = [
+                'name' => $userAction->getName(),
+                'route' => $userAction->getRoute(),
+                'url' => $urlGenerator->generate($userAction->getRoute(),
+                                                 $userAction->getRouteParams()),
+            ];
         }
 
         return $searches;

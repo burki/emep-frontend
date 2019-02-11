@@ -39,39 +39,7 @@
     </form>
 
     <script>
-        $(document).ready(function() {
-
-            $('.w-input').keypress(function (e) {
-                if (e.which == 13) {
-                    $('.indexForm').submit();
-                    return false;    //<---- Add this line
-                }
-            });
-
-            // IMPLEMENT SAVE QUERY FUNCTIONALITY
-
-            function saveQuery() {
-                // change action for saving current query
-                $form = $('#saveQuery');
-
-                // $form.attr('action', '{{ path('exhibition-save') }}');
-                $form.submit();
-            }
-
-            $('.save-query').on('click', function() {
-                // console.log('should save query');
-                saveQuery();
-            });
-
-            $('#saved-searches').on('change', function() {
-                // console.log('changed');
-                $form = $('#saveQuery');
-                $form.attr('action', '{{ path(app.request.get('_route')) }}');
-                $form.submit();
-            });
-
-            // END SAVE QUERY FUNCTIONALITY
-        });
+        {{ helper.indexform_actions('exhibition-save') }}
     </script>
 
     <div class="contentcontainer w-container">

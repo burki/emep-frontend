@@ -296,7 +296,7 @@
                     <form action="{{ path(app.request.get('_route'), { 'entity' : entity }) }}" method="POST" style="margin-left: 10px">
                         {% if searches is not empty %}
                             <select name="useraction" id="saved-searches" class="w-input select-queries" onchange="this.form.submit()">
-                                <option value="" >- Select Saved Query -</option>
+                                <option value="">- Select Saved Query -</option>
                                 {% for id, label in searches %}
                                     <option value="{{ id }}">{{ label }}</option>
                                 {% endfor %}

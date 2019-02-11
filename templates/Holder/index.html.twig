@@ -11,279 +11,28 @@
 {% endblock %}
 
 {% block body %}
-    <div class="w-container">
+    <h1 class="heading">{{ pageTitle }}</h1>
 
-        <h1 class="heading">{{ pageTitle }}</h1>
-
+    <form class="indexForm" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
         <div class="searchbarcontainer">
-            <!--<form  class="filter" method="get" action="{{ path(app.request.attributes.get('_route')) }}"> -->
             <div class="searchbarinputcontainer">
-                <input type="text" class="text-field-class w-input search-input input-text-search" placeholder="search" value="{{ stringPart }}">
-                <select id="countrySelector" class="text-field-class w-select end-selector">
-                    <option value>select country</option>
-                    {% for abrriviation,countryname in countryArray %}
-                        <option value="{{ abrriviation }}">{{ countryname }}</option>
-                    {% endfor %}
-                </select>
+                {{ form_widget(form.search) }}
+                {{ form_widget(form.holder.geoname) }}
             </div>
             <div class="searchbuttoncontainer"><input type="submit" name="submit-filter" value="Search" class="submit-button w-button submit-filter-visible">
             </div>
-            <!--</form>-->
         </div>
-    </div>
 
-
-    <div class="searchbarcontainer w-form hidden-form">
-        <form class="filter exhibitionFilterForm" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
-            <div class="searchbarinputcontainer holder">
+        <div class="searchbarcontainer w-form hidden-form">
+            <div class="searchbarinputcontainer">
                 {{ form_rest(form) }}
             </div>
-            <div class="searchbuttoncontainer">
-                <input type="submit" name="submit-filter" value="Search" class="submit-button w-button">
-            </div>
-        </form>
-    </div>
-
-    <div class="filter-combination-container">
-        <div class="filters-heading">Filters</div>
-
-        <div class="additional-filter-container">
-            {# refactor as macro #}
-            {% for countryAbbreviation in countries %}
-                <div class="filter-row">
-                    <div class="div-block-5">
-                        <div class="first-filter-term">
-                            <div>Country</div>
-                        </div>
-                        <div class="is_equal_to">
-                            <div>is equal to</div>
-                        </div>
-                        <div class="first-filter-term">
-                            {# find country to text method #}
-                            <div>{{ countryArray[countryAbbreviation]|capitalize }}</div>
-                        </div>
-                    </div>
-                    <div class="subfilter-buttons-container">
-                        <div class="subfilter-remove countryAbbr" data-country="{{ countryAbbreviation }}">
-                            <div>remove</div>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-
-            {% if "true" in ids %}
-                <div class="filter-row">
-                    <div class="div-block-5">
-                        <div class="first-filter-term">
-                            <div>Checkbox Filter</div>
-                        </div>
-                        <div class="is_equal_to">
-                            <div>is</div>
-                        </div>
-                        <div class="first-filter-term">
-                            <div>active</div>
-                        </div>
-                    </div>
-                    <div class="subfilter-buttons-container">
-                        <div class="subfilter-remove exhibition-ids-filter-remove" data-organizer="{{ organizer }}">
-                            <div>remove</div>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
-
         </div>
-    </div>
+    </form>
+
 
     <script>
-        $(document).ready(function() {
-
-            $('.w-input').keypress(function (e) {
-                if (e.which == 13) {
-                    $('.exhibitionFilterForm').submit();
-                    return false;    //<---- Add this line
-                }
-            });
-
-            // IMPLEMENT SAVE QUERY FUNCTIONALITY
-
-            function saveQuery() {
-                // change action for saving current query
-                $form = $('#saveQuery');
-
-                // $form.attr('action', '{{ path('holder-save') }}');
-                $form.submit();
-            }
-
-            $('.save-query').on('click', function() {
-                // console.log('should save query');
-                saveQuery();
-            });
-
-            $('#saved-searches').on('change', function() {
-                // console.log('changed');
-                $form = $('#saveQuery');
-                $form.attr('action', '{{ path(app.request.get('_route')) }}');
-                $form.submit();
-            });
-
-            // END SAVE QUERY FUNCTIONALITY
-
-
-            $('.searchbarinputcontainer input[type=text]').attr("placeholder", "search holding institution title");
-
-
-            $('.countryAbbr').on('click', function () {
-                var currSelection = $('#holder_filter_country').val();
-                var currCountry = $(this).data('country');
-                // remove array element
-                currSelection.splice($.inArray(currCountry, currSelection), 1);
-                $('#holder_filter_country').val(currSelection);
-                // submit form
-                $( ".exhibitionFilterForm" ).submit();
-            });
-
-
-            $('.exhibitionFilterForm').on('submit', function (e) {
-                // console.log('submiting now ....');
-
-                // countries
-                var currSelectionCountries = $('#holder_filter_country').val() !== null ? $('#holder_filter_country').val() : [];
-                // console.log('countries');
-                var currCountrySelected = $('#countrySelector').val();
-                currSelectionCountries.push(currCountrySelected);
-                currSelectionCountries = jQuery.unique(currSelectionCountries);
-
-                currSelectionCountries = currSelectionCountries.filter(Boolean)  //filters all non-true values ---> especially empty strings
-                $('#holder_filter_country').val(currSelectionCountries);
-            });
-
-            $('.submit-filter-visible').on('click', function() {
-                $( ".exhibitionFilterForm" ).submit();
-            });
-            $('.input-text-search').bind('input', function() {
-                $('#holder_filter_search').val($(this).val());
-                // console.log('change event:', $(this).val());
-            })
-
-            // checkmark worker
-            $('.checkmark').on('click', function() {
-                // console.log('checkbox checked: ', $(this).data('id'));
-                const currId = $(this).data('id').toString();
-                var currIdArray = $('#holder_filter_id').val() ? $('#holder_filter_id').val() : [];
-
-
-                if($(this).hasClass("checked")){
-                    var index = currIdArray.indexOf(currId);
-                    if (index > -1) {
-                        currIdArray.splice(index, 1);
-                    }
-                }else{
-                    currIdArray.push(currId);
-                }
-
-                $(this).toggleClass( "checked" );
-
-                currIdArray = jQuery.unique(currIdArray);
-
-                $('#holder_filter_id').val( currIdArray );
-
-
-                // rebuild paging urls
-                setNewPagingURLs();
-            });
-
-            $('.advanced-search').on('click', function () {
-                if(!$(this).hasClass('active')){
-                    $(".checkmark").attr("style", "display:inline-block");;
-                    $(".advanced-search-settings").show();
-                }else{
-                    $(".checkmark").attr("style", "display:none");;
-                    $(".advanced-search-settings").hide();
-                }
-
-                $(this).toggleClass('active');
-                $(".advanced-search-settings").toggleClass('active');
-            });
-
-            $('.checkbox-filter-button').on('click', function() {
-                // add true to the filter array
-                var currIdArray = $('#holder_filter_id').val() ? $('#holder_filter_id').val() : [];
-                // currIdArray = jQuery.unique('true');
-
-                // console.log('currIdArray', currIdArray);
-                if( currIdArray.length !== 0 ){
-                    currIdArray.push('true');
-                    $('#holder_filter_id').val( currIdArray );
-                    $( ".exhibitionFilterForm" ).submit();
-                }
-                // submit form
-            });
-
-            $('.exhibition-ids-filter-remove').on('click', function() {
-                // remove true option from array
-                var currIdArray = $('#holder_filter_id').val() ? $('#holder_filter_id').val() : [];
-                var index = currIdArray.indexOf('true');
-                if (index !== -1) currIdArray.splice(index, 1);
-
-                $('#holder_filter_id').val( currIdArray );
-                // submit form
-                $('.exhibitionFilterForm').submit();
-            });
-
-
-            $('.download-csv').on('click', function() {
-                var action = $('.exhibitionFilterForm').attr('action');
-                // console.log('first action: ', action);
-                $('.exhibitionFilterForm').attr('action', '{{ path('holder-csv') }}');
-                $('.exhibitionFilterForm').submit();
-                // resetting action to old one
-                $('.exhibitionFilterForm').attr('action', action);
-            });
-
-
-            // show checkmarks if filter is already set
-            {% if ids|length > 0 %}
-            $(".checkmark").attr("style", "display:inline-block");;
-            $(".advanced-search-settings").show();
-            {% endif %}
-
-        });
-
-        function setNewPagingURLs() {
-            var pages = $(".pagination").find('a');
-            for (j = 0; j<pages.length; j++){
-
-                var componentsToDelete = [];
-
-                var currPageURL = new URL(decodeURIComponent(pages[j].href));
-
-                // console.log(currPageURL.searchParams);
-                currPageURL.searchParams.forEach(function(param, key){
-                    // console.log('param: ', param); console.log('key: ', key);
-                    if(key.indexOf("holder_filter[id]") >= 0 ){
-                        componentsToDelete.push(key);
-                    }else{
-                        // creating url
-
-                    }
-                });
-
-                for (i = 0; i < componentsToDelete.length; i++){
-                    currPageURL.searchParams.delete(componentsToDelete[i]);
-                }
-                // console.log(new URL(decodeURIComponent(pages[i].href)).searchParams.getAll("exhibition_filter[id][1]"));
-                // console.log(pages[i].href.searchParams.getAll("exhibition_filter[id]"));
-
-                var exhibitionIdsVal = $('#holder_filter_id').val() ? $('#holder_filter_id').val() : [];
-                for(i = 0; i < exhibitionIdsVal.length; i++){
-                    currPageURL.searchParams.append( 'holder_filter[id][' + i + ']', exhibitionIdsVal[i] );
-                }
-
-                // set page url
-                pages[j].href = currPageURL;
-            }
-        }
+        {{ helper.indexform_actions('holder-save') }}
     </script>
 
     <div class="contentcontainer w-container">

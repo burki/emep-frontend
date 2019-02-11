@@ -1,5 +1,5 @@
 <?php
-// PlaceFilterType.php
+// HolderFilterType.php
 namespace AppBundle\Filter;
 
 use Symfony\Component\Form\FormBuilderInterface;
@@ -12,66 +12,43 @@ extends CrudFilterType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $this->addSearchFilter($builder, [
-            'H.name',
+        $builder->add('search', Filters\TextFilterType::class, [
+            'label' => false,
+            'attr' => [
+                'placeholder' => "search name",
+                'class' => 'text-field-class w-input search-input input-text-search',
+            ],
         ]);
 
-        $builder->add('country', Filters\ChoiceFilterType::class, [
-            'choices' => [ 'select country' => '' ] + $options['data']['country_choices'],
-            'multiple' => true,
-            'apply_filter' => function (QueryInterface $filterQuery, $field, $values) {
-                if (empty($values['value'])) {
-                    return null;
+        $holderClass = new class extends \Symfony\Component\Form\AbstractType {
+            public function buildForm(FormBuilderInterface $builder, array $options)
+            {
+                $country_geoname_choices = $options['data']['choices']['country'];
+                foreach ($country_geoname_choices as $label => $cc) {
+                    $country_geoname_choices[$label] = 'cc:' . $cc;
                 }
 
-                $paramName = sprintf('p_%s', str_replace('.', '_', $field));
+                $builder->add('geoname', Filters\ChoiceFilterType::class, [
+                    'choices' => [ 'select country' => '' ] + $country_geoname_choices,
+                    'multiple' => false,
+                    'attr' => [
+                        'data-placeholder' => 'select country',
+                        'class' => 'text-field-class w-select end-selector',
+                    ],
+                ]);
+            }
 
-                // expression that represent the condition
-                $expression = $filterQuery->getExpr()->in(/* $field */ 'H.countryCode', ':' . $paramName);
+            public function getName()
+            {
+                return 'holder';
+            }
+        };
 
-                // expression parameters
-                $parameters = [
-                    $paramName => [ $values['value'], \Doctrine\DBAL\Connection::PARAM_STR_ARRAY ],
-                ];
-
-                return $filterQuery->createCondition($expression, $parameters);
-            },
-        ]);
-
-        $builder->add('id', Filters\ChoiceFilterType::class, [
-            'choices' => [ 'select ids' => 'true'] + $options['data']['ids'],
-            'multiple' => true,
-            'apply_filter' => function (QueryInterface $filterQuery, $field, $values) {
-
-                if (empty($values['value'])) {
-                    return null;
-                }
-
-                $paramName = sprintf('p_%s', str_replace('.', '_', $field));
-
-                // expression that represent the condition
-
-
-                $expression = $filterQuery->getExpr()->in('H.id', ':'.$paramName);
-                // expression parameters
-                $parameters = [
-                    $paramName => [ $values['value'], \Doctrine\DBAL\Connection::PARAM_STR_ARRAY ],
-                ];
-
-                // check if it should be filtered by ids as well
-                if (in_array("true", $values['value'])) {
-                    return $filterQuery->createCondition($expression, $parameters);
-                }
-
-                // returns empty array if it shouldn't be filtered yet ---> for paging
-                return [];
-
-            },
-        ]);
+        $builder->add('holder', get_class($holderClass), $options);
     }
 
     public function getBlockPrefix()
     {
-        return 'holder_filter';
+        return 'filter';
     }
 }

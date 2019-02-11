@@ -53,6 +53,15 @@ extends CrudController
         return $countriesActive;
     }
 
+    protected function buildFilterForm()
+    {
+        $this->form = $this->createForm(\AppBundle\Filter\PersonFilterType::class, [
+            'choices' => [
+                'nationality' => array_flip($this->buildPersonNationalities()),
+            ],
+        ]);
+    }
+
     /**
      * @Route("/person", name="person-index")
      */
@@ -60,32 +69,12 @@ extends CrudController
                                 UrlGeneratorInterface $urlGenerator,
                                 UserInterface $user = null)
     {
-        // redirect to saved query
-        if ('POST' == $request->getMethod() && !is_null($user)) {
-            // check a useraction was requested
-            $userActionId = $request->request->get('useraction');
-            if (!empty($userActionId)) {
-                $userAction = $this->getDoctrine()
-                    ->getManager()
-                    ->getRepository('AppBundle:UserAction')
-                    ->findOneBy([
-                        'id' => $userActionId,
-                        'user' => $user,
-                        'route' => 'person',
-                    ]);
-
-                if (!is_null($userAction)) {
-                    return $this->redirectToRoute($userAction->getRoute(),
-                                                  $userAction->getRouteParams());
-                }
-            }
+        $response = $this->handleUserAction($request, $user);
+        if (!is_null($response)) {
+            return $response;
         }
 
-        $form = $this->form = $this->createForm(\AppBundle\Filter\PersonFilterType::class, [
-            'choices' => [
-                'nationality' => array_flip($this->buildPersonNationalities()),
-            ],
-        ]);
+        $this->buildFilterForm();
 
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, 'Person');
 
@@ -104,8 +93,8 @@ extends CrudController
             'pager' => $pager,
 
             'listBuilder' => $listBuilder,
-            'form' => $form->createView(),
-            'searches' => $this->lookupSearches($user, 'person')
+            'form' => $this->form->createView(),
+            'searches' => $this->lookupSearches($user, $request->get('_route')),
         ]);
     }
 
@@ -116,11 +105,7 @@ extends CrudController
                                    UrlGeneratorInterface $urlGenerator,
                                    UserInterface $user = null)
     {
-        $form = $this->form = $this->createForm(\AppBundle\Filter\PersonFilterType::class, [
-            'choices' => [
-                'nationality' => array_flip($this->buildPersonNationalities()),
-            ]
-        ]);
+        $this->buildFilterForm();
 
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'extended', $entity = 'Person');
         $query = $listBuilder->query();
@@ -147,11 +132,7 @@ extends CrudController
                                      UrlGeneratorInterface $urlGenerator,
                                      UserInterface $user = null)
     {
-        $form = $this->form = $this->createForm(\AppBundle\Filter\PersonFilterType::class, [
-            'choices' => [
-                'nationality' => array_flip($this->buildPersonNationalities()),
-            ]
-        ]);
+        $this->buildFilterForm();
 
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, $entity = 'Person');
 
@@ -160,78 +141,33 @@ extends CrudController
         return new \Symfony\Component\HttpFoundation\Response(implode("\n", $charts));
     }
 
-    // TODO MOVE TO SHARED
-    protected function lookupSearches($user)
+    protected function buildSaveSearchParams(Request $request, UrlGeneratorInterface $urlGenerator)
     {
-        if (is_null($user)) {
-            return [];
+        $route = str_replace('-save', '-index', $request->get('_route'));
+
+        $this->buildFilterForm();
+
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, 'Person');
+        $filters = $listBuilder->getQueryFilters();
+        if (empty($filters)) {
+            return [ $route, [] ];
         }
 
-        $qb = $this->getDoctrine()
-            ->getManager()
-            ->createQueryBuilder();
+        $routeParams = [
+            'filter' => $filters,
+        ];
 
-        $qb->select('UA')
-            ->from('AppBundle:UserAction', 'UA')
-            ->where("UA.route = 'person'")
-            ->andWhere("UA.user = :user")
-            ->orderBy("UA.createdAt", "DESC")
-            ->setParameter('user', $user)
-        ;
-
-        $searches = [];
-
-        foreach ($qb->getQuery()->getResult() as $userAction) {
-            $searches[$userAction->getId()] = $userAction->getName();
-        }
-
-        return $searches;
+        return [ $route, $routeParams ];
     }
 
     /**
      * @Route("/person/save", name="person-save")
      */
-    public function saveSearchActionPerson(Request $request,
-                                               UserInterface $user)
+    public function saveSearchAction(Request $request,
+                                     UrlGeneratorInterface $urlGenerator,
+                                     UserInterface $user)
     {
-
-        $parametersAsString = $request->get('entity');
-        $parametersAsString = str_replace("/person?", '', $parametersAsString);
-
-
-        parse_str($parametersAsString, $parameters);
-
-
-        $form = $this->createForm(\AppBundle\Form\Type\SaveSearchType::class);
-
-        //$form->get
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-
-            $userAction = new \AppBundle\Entity\UserAction();
-
-            $userAction->setUser($user);
-            $userAction->setRoute($route = 'person');
-            $userAction->setRouteParams($parameters);
-
-            $userAction->setName($data['name']);
-
-            $em = $this->getDoctrine()
-                ->getManager();
-
-            $em->persist($userAction);
-            $em->flush();
-
-            return $this->redirectToRoute($route, $parameters);
-        }
-
-        return $this->render('Search/save.html.twig', [
-            'pageTitle' => $this->get('translator')->trans('Save your query'),
-            'form' => $form->createView(),
-        ]);
+        return $this->handleSaveSearchAction($request, $urlGenerator, $user);
     }
 
     /**

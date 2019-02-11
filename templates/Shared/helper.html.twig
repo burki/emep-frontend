@@ -166,3 +166,46 @@
         service.replaceTagsOnLoad();
     </script>
 {% endmacro %}
+
+{% macro indexform_actions(saveRoute) %}
+        $(document).ready(function() {
+
+            $('.w-input').keypress(function (e) {
+                if (e.which == 13) {
+                    $('.indexForm').submit();
+
+                    return false;
+                }
+            });
+
+            // IMPLEMENT SAVE QUERY FUNCTIONALITY
+
+            function saveQuery() {
+                // change action for saving current query
+                $form = $('.indexForm');
+
+                $form.attr('action', '{{ path(saveRoute) }}');
+                $form.submit();
+            }
+
+            $('.save-query').on('click', function() {
+                saveQuery();
+            });
+
+            // END SAVE QUERY FUNCTIONALITY
+        });
+{% endmacro %}
+
+{% macro show_savedsearches(searches) %}
+    {% if app.user and searches is not empty %}
+            <form action="{{ path(app.request.get('_route')) }}" method="POST">
+                <select name="useraction" id="saved-searches" class="w-input select-queries" onchange="this.form.submit()">
+                    <option value="">- Select Saved Query -</option>
+                    {% for id, label in searches %}
+                        <option value="{{ id }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+    {% endif %}
+    <div class="icontab save-query"><img src="{{ app.request.basepath }}/img/save_icon.svg" class="iconimage" title="save your current query"></div>
+{% endmacro %}

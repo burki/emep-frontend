@@ -165,30 +165,48 @@ extends CrudController
     }
 
     /**
+     * Get all countries
+     */
+    protected function buildHolderGeonames()
+    {
+        $geonames = [];
+
+        $qb = $this->getDoctrine()
+                ->getManager()
+                ->createQueryBuilder();
+
+        $qb->select([
+                'H.countryCode',
+                'H.countryCode AS country',
+            ])
+            ->distinct()
+            ->from('AppBundle:Holder', 'H')
+            ->where('H.status <> -1')
+            ->orderBy('country')
+            ;
+
+        $lastCountryCode = '';
+
+        foreach ($qb->getQuery()->getResult() as $result) {
+            if ($lastCountryCode != $result['countryCode']) {
+                $key = 'cc:' . $result['countryCode'];
+                $geonames[$key] = $result['country'];
+            }
+        }
+
+        return $geonames;
+    }
+
+    /**
      * @Route("/search", name="search")
      */
     public function searchAction(Request $request,
                                  UrlGeneratorInterface $urlGenerator,
                                  UserInterface $user = null)
     {
-        if ('POST' == $request->getMethod() && !is_null($user)) {
-            // check a useraction was requested
-            $userActionId = $request->request->get('useraction');
-            if (!empty($userActionId)) {
-                $userAction = $this->getDoctrine()
-                    ->getManager()
-                    ->getRepository('AppBundle:UserAction')
-                    ->findOneBy([
-                        'id' => $userActionId,
-                        'user' => $user,
-                        'route' => 'search',
-                    ]);
-
-                if (!is_null($userAction)) {
-                    return $this->redirectToRoute($userAction->getRoute(),
-                                                  $userAction->getRouteParams());
-                }
-            }
+        $response = $this->handleUserAction($request, $user);
+        if (!is_null($response)) {
+            return $response;
         }
 
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator);
@@ -201,6 +219,24 @@ extends CrudController
         return $this->renderResult($listPage, $listBuilder, $user);
     }
 
+    protected function buildSaveSearchParams(Request $request, UrlGeneratorInterface $urlGenerator)
+    {
+        $route = 'search'; // maybe build from $request with a certain string replace pattern;
+
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator);
+        $filters = $listBuilder->getQueryFilters();
+        if (empty($filters)) {
+            return [ $route, [] ];
+        }
+
+        $routeParams = [
+            'entity' => $listBuilder->getEntity(),
+            'filter' => $filters,
+        ];
+
+        return [ $route, $routeParams ];
+    }
+
     /**
      * @Route("/search/save", name="search-save")
      */
@@ -208,48 +244,7 @@ extends CrudController
                                      UrlGeneratorInterface $urlGenerator,
                                      UserInterface $user)
     {
-        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator);
-        $filters = $listBuilder->getQueryFilters();
-
-        $routeParams = [
-            'entity' => $listBuilder->getEntity()
-        ];
-
-        if (empty($filters)) {
-            // nothing to save
-            return $this->redirectToRoute('search', $routeParams);
-        }
-
-        $routeParams['filter'] = $filters;
-
-        $form = $this->createForm(\AppBundle\Form\Type\SaveSearchType::class);
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-
-            $userAction = new \AppBundle\Entity\UserAction();
-
-            $userAction->setUser($user);
-            $userAction->setRoute($route = 'search');
-            $userAction->setRouteParams($routeParams);
-
-            $userAction->setName($data['name']);
-
-            $em = $this->getDoctrine()
-                ->getManager();
-
-            $em->persist($userAction);
-            $em->flush();
-
-            return $this->redirectToRoute($route, $routeParams);
-        }
-
-        return $this->render('Search/save.html.twig', [
-            'pageTitle' => $this->get('translator')->trans('Save your query'),
-            'form' => $form->createView(),
-        ]);
+        return $this->handleSaveSearchAction($request, $urlGenerator, $user);
     }
 
     /**
@@ -409,6 +404,7 @@ extends CrudController
      * @Route("/search/select/person", name="search-select-person")
      * @Route("/search/select/location", name="search-select-location")
      * @Route("/search/select/organizer", name="search-select-organizer")
+     * @Route("/search/select/holder", name="search-select-holder")
      * @Route("/search/select/exhibition", name="search-select-exhibition")
      */
     public function searchSelectAction(Request $request, UrlGeneratorInterface $urlGenerator)
@@ -445,6 +441,18 @@ extends CrudController
                         ;
                     break;
 
+                case 'search-select-holder':
+                    $listBuilder = new \AppBundle\Utils\HolderListBuilder($connection, $request, $urlGenerator, []);
+                    $fields = [ 'H.name' ];
+                    $queryBuilder = $listBuilder->getQueryBuilder();
+
+                    $queryBuilder
+                        ->from('Holder', 'H')
+                        ->andWhere('H.status <> -1')
+                        ->select("H.id AS id, H.name AS text")
+                        ;
+                    break;
+
                 case 'search-select-organizer':
                     $listBuilder = new \AppBundle\Utils\OrganizerListBuilder($connection, $request, $urlGenerator, []);
                     $fields = [ 'O.name', 'O.name_translit' ];
@@ -471,13 +479,13 @@ extends CrudController
                     break;
             }
 
-
             $condition = $listBuilder->buildLikeCondition($search, $fields);
 
             if (!empty($condition)) {
                 foreach ($condition['parameters'] as $name => $value) {
                     $queryBuilder->setParameter($name, $value);
                 }
+
                 foreach ($condition['andWhere'] as $andWhere) {
                     $queryBuilder->andWhere($andWhere);
                 }
@@ -504,8 +512,6 @@ extends CrudController
                         $append = \AppBundle\Utils\Formatter::daterangeIncomplete($row['startdate'], $row['enddate']);
                     }
 
-
-
                     $data[$i] = [
                         'id' => $row['id'],
                         'text' => $row['text']
@@ -513,9 +519,7 @@ extends CrudController
                     ];
                 }
             }
-
         }
-
 
         return new JsonResponse($data);
     }
@@ -529,7 +533,12 @@ extends CrudController
 
         $entity = $request->get('entity');
         if (!in_array($entity, self::$entities)) {
-            $entity = self::$entities[0];
+            if ('search-export' == $request->get('_route') && 'Holder' == $entity) {
+                // Holder has only export functionality
+            }
+            else {
+                $entity = self::$entities[0];
+            }
         }
 
         $venueTypes = $this->buildVenueTypes();
@@ -543,6 +552,7 @@ extends CrudController
                 'location_type' => array_combine($venueTypes, $venueTypes),
                 'organizer_geoname' => array_flip($this->buildOrganizerGeonames($request, $urlGenerator)),
                 'organizer_type' => array_combine($venueTypes, $venueTypes),
+                'holder_geoname' => array_flip($this->buildHolderGeonames()),
                 'exhibition_type' => array_combine($exhibitionTypes, $exhibitionTypes),
                 'exhibition_organizer_type' => array_combine($exhibitionOrganizerTypes, $exhibitionOrganizerTypes),
                 'itemexhibition_type' => array_flip($this->buildItemExhibitionTypes()),
@@ -553,11 +563,14 @@ extends CrudController
         $parameters = self::array_filter_recursive($parameters, null, true); // remove empty values
 
         if (array_key_exists('filter', $parameters)) {
-            // some values must be arrays and not scalar
+            // some values must be arrays and not scalar as in Basic Search
             $forceArray = [
                 'location' => [ 'geoname' ],
+                'organizer' => [ 'geoname' ],
+                'holder' => [ 'geoname' ],
                 'exhibition' => [ 'organizer_type' ],
             ];
+
             foreach ($forceArray as $group => $fields) {
                 if (!array_key_exists($group, $parameters['filter'])) {
                     continue;
@@ -584,6 +597,10 @@ extends CrudController
                 return new \AppBundle\Utils\OrganizerListBuilder($connection, $request, $urlGenerator, $filters, $mode);
                 break;
 
+            case 'Holder':
+                return new \AppBundle\Utils\HolderListBuilder($connection, $request, $urlGenerator, $filters, $mode);
+                break;
+
             case 'Person':
                 return new \AppBundle\Utils\PersonListBuilder($connection, $request, $urlGenerator, $filters, $mode);
                 break;
@@ -595,35 +612,7 @@ extends CrudController
             default:
                 return new \AppBundle\Utils\ExhibitionListBuilder($connection, $request, $urlGenerator, $filters, $mode);
                 break;
-
         }
-    }
-
-    protected function lookupSearches($user)
-    {
-        if (is_null($user)) {
-            return [];
-        }
-
-        $qb = $this->getDoctrine()
-                ->getManager()
-                ->createQueryBuilder();
-
-        $qb->select('UA')
-            ->from('AppBundle:UserAction', 'UA')
-            ->where("UA.route = 'search'")
-            ->andWhere("UA.user = :user")
-            ->orderBy("UA.createdAt", "DESC")
-            ->setParameter('user', $user)
-            ;
-
-        $searches = [];
-
-        foreach ($qb->getQuery()->getResult() as $userAction) {
-            $searches[$userAction->getId()] = $userAction->getName();
-        }
-
-        return $searches;
     }
 
     protected function renderResult($listPage, $listBuilder, UserInterface $user = null)
@@ -639,7 +628,7 @@ extends CrudController
 
             'listBuilder' => $listBuilder,
             'form' => $this->form->createView(),
-            'searches' => $this->lookupSearches($user),
+            'searches' => $this->lookupSearches($user, 'search'),
         ]);
     }
 }

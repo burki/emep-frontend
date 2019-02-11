@@ -22,7 +22,6 @@
     </script>
 
         {% if pager.getNbResults() > 0 %}
-            {% set sortField = app.request.get('sort') %}
             <div style="width: 100%; text-align: right;">
                 {{ pager.currentPageOffsetStart }} - {{ pager.currentPageOffsetEnd }} of {{ pager.getNbResults() }}
             </div>
