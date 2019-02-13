@@ -6,9 +6,14 @@
     {% import 'Shared/select2.html.twig' as select2 %}
     {{ select2.head() }}
 
+    <script src="{{ app.request.basepath }}/js/js.cookie.js"></script>
+
     <script>
         $(document).ready(function() {
             $('.select2').select2();
+
+            {{ helper.checkmark_actions(listBuilder.entity) }}
+            {{ helper.indexform_actions('organizer-save') }}
         });
     </script>
 {% endblock %}
@@ -34,11 +39,6 @@
         </div>
     </div>
     </form>
-
-    <script>
-        {{ helper.indexform_actions('organizer-save') }}
-    </script>
-
 
     <div class="contentcontainer w-container">
         <div class="listviewrow">

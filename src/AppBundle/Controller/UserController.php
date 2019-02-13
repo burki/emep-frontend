@@ -197,7 +197,6 @@ extends Controller
         ]);
     }
 
-
     /**
      * @Route("/forgot-password", name="user_recoverpassword")
      */

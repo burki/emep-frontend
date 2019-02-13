@@ -5,8 +5,8 @@ namespace AppBundle\Filter;
 use Symfony\Component\Form\FormBuilderInterface;
 
 use Lexik\Bundle\FormFilterBundle\Filter\Form\Type as Filters;
-use Lexik\Bundle\FormFilterBundle\Filter\Query\QueryInterface;
 
+use Tetranz\Select2EntityBundle\Form\Type\Select2EntityType;
 
 class PersonFilterType
 extends CrudFilterType
@@ -43,6 +43,24 @@ extends CrudFilterType
                         'data-placeholder' => 'select nationality',
                         'class' => 'text-field-class w-select end-selector',
                     ],
+                ]);
+
+                // copied over from Form/PersonFilterType, find a way to share
+                $builder->add('person', Select2EntityType::class, [
+                    'multiple' => true,
+                    'label' => 'Artist',
+                    'remote_route' => 'search-select-person',
+                    'class' => '\AppBundle\Entity\Person',
+                    'primary_key' => 'id',
+                    'text_property' => 'fullName',
+                    'minimum_input_length' => 2,
+                    'page_limit' => 10,
+                    'allow_clear' => false,
+                    'delay' => 25,
+                    'cache' => true,
+                    'cache_timeout' => 60000, // if 'cache' is true
+                    'language' => 'en',
+                    'placeholder' => '- all -',
                 ]);
             }
 

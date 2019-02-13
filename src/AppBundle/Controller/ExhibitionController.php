@@ -65,7 +65,7 @@ extends CrudController
         $this->buildFilterForm();
 
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, 'Exhibition');
-        $filters = $listBuilder->getQueryFilters();
+        $filters = $listBuilder->getQueryFilters(true);
         if (empty($filters)) {
             return [ $route, [] ];
         }

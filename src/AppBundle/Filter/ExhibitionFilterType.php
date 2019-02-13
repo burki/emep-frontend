@@ -4,8 +4,9 @@ namespace AppBundle\Filter;
 
 use Symfony\Component\Form\FormBuilderInterface;
 
-use Lexik\Bundle\FormFilterBundle\Filter\Query\QueryInterface;
 use Lexik\Bundle\FormFilterBundle\Filter\Form\Type as Filters;
+
+use Tetranz\Select2EntityBundle\Form\Type\Select2EntityType;
 
 class ExhibitionFilterType
 extends CrudFilterType
@@ -57,6 +58,24 @@ extends CrudFilterType
                         'data-placeholder' => 'select type of organizing body',
                         'class' => 'text-field-class w-select end-selector',
                     ],
+                ]);
+
+                // copied over from Form/ExhibitionFilterType, find a way to share
+                $builder->add('exhibition', Select2EntityType::class, [
+                    'multiple' => true,
+                    'label' => 'Exhibition',
+                    'remote_route' => 'search-select-exhibition',
+                    'class' => '\AppBundle\Entity\Exhibition',
+                    'primary_key' => 'id',
+                    'text_property' => 'title',
+                    'minimum_input_length' => 2,
+                    'page_limit' => 10,
+                    'allow_clear' => false,
+                    'delay' => 25,
+                    'cache' => true,
+                    'cache_timeout' => 60000, // if 'cache' is true
+                    'language' => 'en',
+                    'placeholder' => '- all -',
                 ]);
             }
 

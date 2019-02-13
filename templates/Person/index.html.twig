@@ -6,15 +6,20 @@
     {% import 'Shared/select2.html.twig' as select2 %}
     {{ select2.head() }}
 
+    <script src="{{ app.request.basepath }}/js/js.cookie.js"></script>
+
     <script>
         $(document).ready(function() {
             // initialize select2
             $('.select2').select2();
+
+            {{ helper.checkmark_actions(listBuilder.entity) }}
+            {{ helper.indexform_actions('person-save') }}
         });
     </script>
 
-    {% import 'Shared/datatables.html.twig' as datatables %}
-    {{ datatables.head() }}
+    {#% import 'Shared/datatables.html.twig' as datatables %}
+    {{ datatables.head() }#}
 {% endblock %}
 
 {% block body %}
@@ -37,11 +42,6 @@
             </div>
         </div>
     </form>
-
-    <script>
-        {{ helper.indexform_actions('person-save') }}
-    </script>
-
 
     <div class="contentcontainer w-container">
         <div class="listviewrow">

@@ -224,7 +224,7 @@ extends CrudController
         $route = 'search'; // maybe build from $request with a certain string replace pattern;
 
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator);
-        $filters = $listBuilder->getQueryFilters();
+        $filters = $listBuilder->getQueryFilters(true);
         if (empty($filters)) {
             return [ $route, [] ];
         }

@@ -411,6 +411,11 @@ extends ListBuilder
         if (array_key_exists('holder', $this->queryFilters)) {
             $holderFilters = & $this->queryFilters['holder'];
 
+            foreach ([ 'holder' => 'H.id' ] as $key => $field) {
+                $this->addInFilter($queryBuilder, $field, 'holder_' . $key,
+                                   array_key_exists($key,  $holderFilters) ? $holderFilters[$key] : null);
+            }
+
             if (!empty($holderFilters[$key = 'geoname'])) {
                 $this->addGeonameFilter($queryBuilder, [
                                             'cc' => 'H.country',
