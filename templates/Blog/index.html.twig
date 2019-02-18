@@ -1,0 +1,16 @@
+{% extends 'Base/base.html.twig' %}
+
+{% import 'Shared/helper.html.twig' as helper %}
+
+{% block body %}
+    <h1 class="heading">Blog</h1>
+
+    {% for post in posts %}
+        {#{ dump(post) }#}
+        <h3><a href="{{ path('blog', { 'slug': post['slug'] }) }}">{{ post['title']['rendered']|raw }}</a></h3>
+        <div>
+            {{ date(post['date'])|date('d.m.Y')}}
+            {{ post['excerpt']['rendered']|raw }}
+        </div>
+    {% endfor %}
+{% endblock %}
