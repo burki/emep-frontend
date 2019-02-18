@@ -18,4 +18,9 @@ parameters:
 
     ga.site_id: ~   # Google analytics code, e.g. 'UA-122763666-1'
 
+    # blog-integration
+    # app.wp-rest.url: "https://exhibitions.univie.ac.at"
+    # app.wp-rest.user: "wp-rest-client"
+    # app.wp-rest.password: "secret"
+
     # app.export.path: "%kernel.project_dir%/../site/htdocs/uploads/export" # default

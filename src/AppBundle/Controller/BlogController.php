@@ -88,7 +88,7 @@ extends Controller
             }
         }
 
-        if (empty($posts)) {
+        if (is_null($post)) {
             return $this->redirectToRoute('blog-index');
         }
 
