@@ -42,13 +42,9 @@
         };
         service.replaceTagsOnLoad();
     </script>
-
-
-
 {% endblock %}
 
 {% block body %}
-
     <div class="contentcontainer nopadding w-container">
         <div class="lefthalf">
             <div class="subheader">artist</div>
@@ -69,20 +65,16 @@
         </div>
     </div>
 
-
-
-
     <div class="contentcontainer w-container">
          <div class="listviewrow">
-                {% if person.exhibitions|length > 0 %}
+                {% set exhibitionArray = person.getExhibitions(-1) %}
+                {% if exhibitionArray|length > 0 %}
 
                     {# tabs headers #}
                     {% embed "Person/Parts/tabs-header.html.twig" %}
                     {% endembed %}
 
                     <div class="tab-content">
-
-                        {% set exhibitionArray = person.exhibitions %}
                         {% embed "Person/Parts/tabcontent-exhibitions.html.twig" %}
                         {% endembed %}
 
@@ -99,7 +91,6 @@
                 {% endif %}
             </div>
     </div>
-
 
     <div class="row">
         <div class="col-sm-8 person-description">
@@ -129,8 +120,6 @@
                 {% endfor %}
             </div>
         {% endif %}
-
-
 
 
         {# find a artist with all informations set correctly #}

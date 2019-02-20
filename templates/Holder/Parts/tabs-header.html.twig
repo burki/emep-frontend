@@ -2,7 +2,7 @@
     <!-- Nav tabs -->
     <div>
         <div class="tabsymbols">
-            <div class="icontab download-csv-catalogues" style="display:none;"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage" title="download current data as csv"></div>
+            <div class="icontab download-csv-catalogues" style="display:none;"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage" title="download current data"></div>
         </div>
         <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 1em">
             <li role="presentation" class="active entries-tab" ><a href="#entries" aria-controls="entries" role="tab" data-toggle="tab">{{ 'Catalogues'|trans }}</a></li>
@@ -10,17 +10,12 @@
                 {# authority file #}
                 <li role="presentation"><a href="#authority" aria-controls="authority" role="tab" data-toggle="tab">{{ 'Integrated Authority File'|trans }}</a></li>
             {% endif %}
-
-            {# currently all types are books, so leave it out
-            <li role="presentation"><a href="#statistics" aria-controls="statistics" role="tab" data-toggle="tab">{{ 'Statistics'|trans }}</a></li>
-            #}
         </ul>
-
     </div>
 
     <script>
         $('.download-csv-catalogues').on('click', function() {
-            window.location.href =  "{{ path('holder-catalogue-csv', { 'id': holder.getId() }) }}";
+            window.location.href = '{{ path('holder-catalogue-csv', { 'id': holder.getId() }) }}';
         });
 
         // make the right export button visible
@@ -29,7 +24,9 @@
             hideAll();
 
             setInterval(function() {
-                if( $('.entries-tab').hasClass('active') ){ hideAll(); $('.download-csv-catalogues').show(); }
+                if( $('.entries-tab').hasClass('active') ) {
+                    hideAll(); $('.download-csv-catalogues').show();
+                }
                 else {
                     hideAll();
                 }
@@ -39,6 +36,5 @@
         function hideAll() {
             $('.download-csv-catalogues').hide();
         }
-
     </script>
 {% endblock %}

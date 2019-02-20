@@ -27,62 +27,9 @@
         // initialize select2
         $('.select2').select2();
 
-        // checkmark worker
-        var active = Cookies.getJSON('{{ listBuilder.entity }}');
-        if (!(active instanceof Array)) {
-            active = [];
-        }
-        for (var i = 0; i < active.length; i++) {
-            $('span.checkmark[data-id="' + active[i] + '"]').addClass('checked');
-        }
-
-        $('.checkbox-filter-button').on('click', function() {
-            if (active.length !== 0 ) {
-                {% if 'Venue' == listBuilder.entity %}{% set selector = 'location' %}{% else %}{% set selector = listBuilder.entity|lower %}{% endif %}
-                var select2selector = '#filter_{{ selector }}_{{ selector }}';
-                // remove anything active
-                $(select2selector).val(null).trigger('change');
-                for (var i = 0; i < active.length; i++) {
-                    // add new
-                    var $newOption = $("<option selected='selected'></option>").val(active[i]).text(active[i]);
-                    $(select2selector).append($newOption).trigger('change');
-                }
-                // submit form
-                $('#search').submit();
-            }
-        });
-
-        $('.checkmark').on('click', function() {
-            var currId = $(this).data('id');
-            var index = active.indexOf(currId);
-            if ($(this).hasClass('checked')) {
-                // remove
-                if (index > -1) {
-                    active.splice(index, 1);
-                }
-            }
-            else {
-                // add
-                if (index == -1) {
-                    active.push(currId);
-                }
-            }
-
-            $(this).toggleClass('checked');
-
-            Cookies.set('{{ listBuilder.entity }}', active);
-
-            // console.log(active);
-        });
+        {{ helper.checkmark_actions(listBuilder.entity) }}
+        {{ helper.indexform_actions('search-save') }}
     });
-
-    function saveQuery() {
-        // change action for saving current query
-        $form = $('#search');
-
-        $form.attr('action', '{{ path('search-save') }}');
-        $form.submit();
-    }
     </script>
 
     <!-- most come after generic $('.select2').select2(); call above -->
@@ -93,7 +40,7 @@
     <div class="w-container">
         <h1 class="heading">{{ pageTitle }}</h1>
 
-            <form id="search" class="" action="{{ path(app.request.get('_route')) }}" method="GET">
+            <form id="search" class="indexForm" action="{{ path(app.request.get('_route')) }}" method="GET">
                 <input type="hidden" name="entity" value="{{ listBuilder.entity }}" />
                 {% set filter = listBuilder.queryFilters %}
 
@@ -296,7 +243,7 @@
                     <form action="{{ path(app.request.get('_route'), { 'entity' : entity }) }}" method="POST" style="margin-left: 10px">
                         {% if searches is not empty %}
                             <select name="useraction" id="saved-searches" class="w-input select-queries" onchange="this.form.submit()">
-                                <option value="" >- Select Saved Query -</option>
+                                <option value="">- Select Saved Query -</option>
                                 {% for id, label in searches %}
                                     <option value="{{ id }}">{{ label }}</option>
                                 {% endfor %}

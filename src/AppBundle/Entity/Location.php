@@ -156,6 +156,12 @@ implements \JsonSerializable, JsonLdSerializable
     protected $gnd;
 
     /**
+     * @var string
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $ulan;
+
+    /**
      * @var \DateTime
      *
      * #Gedmo\Timestampable(on="create")
@@ -426,11 +432,15 @@ implements \JsonSerializable, JsonLdSerializable
 
     public function getNameAppend()
     {
-        if (!empty($this->nameTransliterated)) {
+        if (!empty($this->nameTransliterated) || !empty($this->nameAlternate)) {
             $append = [];
 
             if (!empty(!empty($this->nameTransliterated))) {
                 $append[] = $this->nameTransliterated;
+            }
+
+            if (!empty(!empty($this->nameAlternate))) {
+                $append[] = $this->nameAlternate;
             }
 
             return sprintf('[%s]', implode(' : ', $append));
@@ -516,6 +526,30 @@ implements \JsonSerializable, JsonLdSerializable
     }
 
     /**
+     * Sets ulan.
+     *
+     * @param string $ulan
+     *
+     * @return $this
+     */
+    public function setUlan($ulan)
+    {
+        $this->ulan = $ulan;
+
+        return $this;
+    }
+
+    /**
+     * Gets ulan.
+     *
+     * @return string
+     */
+    public function getUlan()
+    {
+        return $this->ulan;
+    }
+
+    /**
      * Gets exhibitions.
      *
      */
@@ -555,6 +589,28 @@ implements \JsonSerializable, JsonLdSerializable
             }
         );
     }
+
+    /**
+     * Gets both venue and organized exhibitions.
+     *
+     */
+    public function getAllExhibitions()
+    {
+        $ret = [];
+
+        $exhibitions = $this->getExhibitions();
+        if (!is_null($exhibitions)) {
+            $ret = $exhibitions->toArray();
+        }
+
+        $exhibitions = $this->getOrganizerOf(true);
+        if (!is_null($exhibitions)) {
+            $ret = array_merge($ret, $exhibitions->toArray());
+        }
+
+        return $ret;
+    }
+
 
     /**
      * Sets additional.

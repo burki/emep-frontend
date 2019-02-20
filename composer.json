@@ -40,7 +40,6 @@
 
         "symfony/monolog-bundle": "^3.3",
         "symfony/swiftmailer-bundle": "^3.2",
-        "sensio/framework-extra-bundle": "^5.2",
         "knplabs/knp-menu-bundle": "^2.2",
 
         "symfony/asset": "^4.2",
@@ -76,7 +75,10 @@
         "cocur/background-process": "0.7.*",
 
         "ifedko/php-doctrine-dbal-pagination": "^2.0",
-        "white-october/pagerfanta-bundle": "^1.2"
+        "white-october/pagerfanta-bundle": "^1.2",
+
+        "vnn/wordpress-rest-api-client": "^1.2",
+        "guzzlehttp/guzzle": "^6.3"
     },
 
     "autoload": {

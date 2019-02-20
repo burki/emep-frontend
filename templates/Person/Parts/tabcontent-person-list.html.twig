@@ -4,13 +4,17 @@
 <script>
     $( document ).ready(function() {
         $('#theList').DataTable({
-            "dom": 'ilrtp',
+            'dom': 'ilrtp',
             responsive: true,
             paging: false,
             searching: false,
             info: false,
             ordering: false,
             "columns": [
+                { "orderSequence": [ "desc", "asc" ] },
+                { "orderSequence": [ "desc", "asc" ] },
+                { "orderSequence": [ "desc", "asc" ] },
+                { "orderSequence": [ "desc", "asc" ] },
                 { "orderSequence": [ "desc", "asc" ] },
                 { "orderSequence": [ "desc", "asc" ] },
                 { "orderSequence": [ "desc", "asc" ] },
@@ -22,97 +26,40 @@
 </script>
 
 <div role="tabpanel" class="tab-pane active" id="exhibitions">
-    {% if pagination.getTotalItemCount > 0 %}
-        {# helper.pagination_count(pagination) #}
-
-        <!--
-        <div class="sort-control">
-            {% set sortField = app.request.get('sort') %}
-            Sort by:
-            {{ helper.pagination_sortable(pagination, 'Name', 'nameSort') }}
-            {{ helper.pagination_sortable(pagination, 'Birth', 'P.birthDate') }}
-            {{ helper.pagination_sortable(pagination, 'Death', 'P.deathDate') }}
-            {{ helper.pagination_sortable(pagination, '# Exhibitions', 'numExhibitionSort', 'desc') }}
-            {{ helper.pagination_sortable(pagination, '# Cat. Entries', 'numCatEntrySort', 'desc') }}
+    {% if pager.getNbResults() > 0 %}
+        <div style="width: 100%; text-align: right;">
+            {{ pager.currentPageOffsetStart }} - {{ pager.currentPageOffsetEnd }} of {{ pager.getNbResults() }}
         </div>
-        -->
-        <div style="width: 100%; text-align: right;">{{ helper.pagination_count(pagination) }}</div>
-
         <table id="theList" class="table table-striped table-bordered dataTable listviewcontainer">
             <thead>
-            <tr class="listviewheading">
-                <th class="all">{{ helper.pagination_sortable(pagination, 'Name', 'nameSort') }}</th>
-                <th class="all">{{ helper.pagination_sortable(pagination, 'Birth Date', 'P.birthDate') }}</th>
-                <th class="all">{{ helper.pagination_sortable(pagination, 'Death Date', 'P.deathDate') }}</th>
-                <th class="number-center min-tablet-p">{{ helper.pagination_sortable(pagination, '# Exhibitions', 'numExhibitionSort', 'desc') }}</th>
-                <th class="number-right min-tablet-p">{{ helper.pagination_sortable(pagination, '# Cat. Entries', 'numCatEntrySort', 'desc') }}</th>
-            </tr>
-            </thead>
-            <tbody>
+                <thead>
+                    <tr class="listviewheading">
+                        {% for key, label in listBuilder.buildHeaderRow() %}
+                        <th>
+                            {% set sortInfo = listBuilder.sortInfo(key) %}
+                            {% if sortInfo is not empty %}
+                                <a href="{{ sortInfo.action }}"{% if sortInfo.active is not empty %} class="{{ sortInfo.active }}"{% endif %}>{{ label }}</a>
+                            {% else %}
+                                {{ label }}
+                            {% endif %}
+                        </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
 
-            {% set last_initial = '' %}
-            {% for row in pagination %}
-                {% set person = row[0] %}
-                {% if 'P.birthDate' == sortField %}
-                    {% set initial = person.birthDate|datedecade %}
-                {% elseif 'P.deathDate' == sortField %}
-                    {% set initial = person.deathDate|datedecade %}
-                {% elseif 'numExhibitionSort' == sortField %}
-                    {% set initial = row['numExhibitionSort'] %}
-                {% elseif 'numCatEntrySort' == sortField %}
-                    {% set initial = row['numCatEntrySort'] %}
-                {% else %}
-                    {% set initial = slugify.slugify(person.fullname|first)|upper %}
-                {% endif %}
-                {% if initial != last_initial %}
-                    {% if last_initial != '' %}
-                        {# </ul> #}
-                    {% endif %}
-                    {# <h2 class="artist-first-letter">{{ initial }}</h2> #}
-                    {% set last_initial = initial %}
-                    {# <ul class="list-group"> #}
-                {% endif %}
-
-                <tr class="listviewrow">
-                    <td class="title">
-                        <span class="checkmark {% if person.id in ids %} checked {% endif %}" data-id="{{ person.id }}"></span>
-                        <a href="{{ path('person', { 'id' : person.id }) }}">{{ person.fullname(true) }}</a>
-                    </td>
-
-                    <td class="date">
-                        {{ person.birthDate|dateincomplete -}}
-                    </td>
-
-                    <td class="date">
-                        {{ person.deathDate|dateincomplete -}}
-                    </td>
-
-                    {% set count = row['numExhibitionSort'] %}
-                    <td class="normal number-center">
-                        {{ count }}
-                    </td>
-
-                    {% set countEntries = row['numCatEntrySort'] %}
-                    <td class="normal number-right">
-                        {{ countEntries }}
-                    </td>
-
-                </tr>
-
-
-
-                <!--<li class="list-group-item">
-                {{ helper.person_list_item(person) }}{% if row['numExhibitionSort'] > 0 %}, {{ row['numExhibitionSort'] }} exh., {{ row['numCatEntrySort'] }} entr.{% endif %}
-            </li> -->
-            {% endfor %}
-            </tbody>
+                <tbody>
+                    {% for row in pager.currentPageResults %}
+                    <tr>
+                        {% set rowValues = listBuilder.buildRow(row, 'html') %}
+                        {% for val in rowValues %}
+                        <td>{% if loop.first %}{% if 'ItemExhibition' != listBuilder.entity %}<span class="checkmark" data-id="{{ row.id }}"></span>{% endif %}{% endif %}{{ val|raw }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
         </table>
-        {# </ul> #}
-        {# display navigation #}
-        <div class="navigation">
-            {{ knp_pagination_render(pagination) }}
-        </div>
+        <div class="pagerfanta">{{ pagerfanta(pager, 'twitter_bootstrap3', { 'omitFirstPage': true }) }}</div>
     {% else %}
-        No persons found
+        No matching artists found. Please adjust your search.
     {% endif %}
 </div>

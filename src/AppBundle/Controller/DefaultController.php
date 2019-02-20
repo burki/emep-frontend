@@ -4,9 +4,9 @@ namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\Annotation\Route;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use AppBundle\Utils\SearchListPagination;
 
@@ -18,9 +18,7 @@ extends Controller
 {
     /**
      * @Route("/", name="home")
-     * @Route("/data", name="data")
      */
-
     public function indexAction(Request $request, UrlGeneratorInterface $urlGenerator)
     {
         $connection = $this->getDoctrine()->getEntityManager()->getConnection();
@@ -62,7 +60,6 @@ extends Controller
     /**
      * @Route("/project", name="project")
      */
-
     public function infoAction()
     {
         return $this->render('Default/project.html.twig');
@@ -71,7 +68,6 @@ extends Controller
     /**
      * @Route("/using", name="using")
      */
-
     public function usingAction()
     {
         return $this->render('Default/using.html.twig');
@@ -80,7 +76,6 @@ extends Controller
     /**
      * @Route("/cooperating-institutions", name="cooperating")
      */
-
     public function cooperatingAction()
     {
         return $this->render('Default/cooperating_institutions.html.twig');

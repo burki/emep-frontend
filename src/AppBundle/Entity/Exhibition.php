@@ -303,6 +303,7 @@ class Exhibition
             if (!empty(!empty($this->titleTransliterated))) {
                 $append[] = $this->titleTransliterated;
             }
+
             if (!empty(!empty($this->titleAlternate))) {
                 $append[] = $this->titleAlternate;
             }

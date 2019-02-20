@@ -13,8 +13,8 @@
 {% if exhibition.location is not null %}
     {% set location = exhibition.location %}
     <div class="artist-information-container">
-        <div class="artist-information-label">Venue:</div>
-        <div class="artist-information-text"><a href="{{ path('location', { 'id' : location.id }) }}">{{ location.name }}</a>, {{ helper.place_linked(location.place) }}</div>
+        <div class="artist-information-label">{{ 'Venue'|trans }}:</div>
+        <div class="artist-information-text"><a href="{{ path('location', { 'id' : location.id }) }}">{{ location.nameAppend ? location.nameAppend : location.name }}</a>, {{ helper.place_linked(location.place) }}</div>
     </div>
 {% endif %}
 
@@ -68,7 +68,7 @@
     </div>
 {% endif %}
 
-<div class="artist-information-container-qucikstat">
+<div class="artist-information-container-quickstat">
     <div class="artist-information-label">Quickstats</div>
     <div class="statcontainer">
         <div class="artist-information-text-stats">Catalogue Entries: {{ catalogueEntries|length }}</div>

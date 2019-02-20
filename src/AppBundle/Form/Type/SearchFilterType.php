@@ -24,6 +24,9 @@ extends AbstractType
         $builder->add('organizer', OrganizerFilterType::class, $options);
         $builder->add('person', PersonFilterType::class, $options);
 
+        // currently only for expoer
+        $builder->add('holder', HolderFilterType::class, $options);
+
         // submit
         $builder->add('submit', SubmitType::class, [
             'label' => 'Search',

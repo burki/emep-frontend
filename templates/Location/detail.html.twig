@@ -5,21 +5,8 @@
 
 {% block head %}
     {{ map.head() }}
-    
-    <script src="{{ app.request.basepath }}/js/seealso.js"></script>
-    <script>
-        var service = new SeeAlsoCollection();
-        service.services = {
-            'gndaks' : new SeeAlsoService('https://beacon.findbuch.de/seemore/gnd-aks/-dewp@wd')
-        };
-        service.views = {
-            'seealso-ul' : new SeeAlsoUL({
-                linkTarget: '_blank',
-                maxItems: 100
-            })
-        };
-        service.replaceTagsOnLoad();
-    </script>
+
+    {{ helper.seealso_head_gnd() }}
 
     {% import 'Shared/datatables.html.twig' as datatables %}
     {{ datatables.head() }}
@@ -32,8 +19,8 @@
     <div class="contentcontainer nopadding w-container">
         <div class="lefthalf">
             <div class="subheader">{% if numExhibitions > 0 %}venue{% endif %}{% if numExhibitions > 0 and numOrganizerOf > 0 %} / {% endif %}{% if numOrganizerOf > 0 %}organizer{% endif %}</div>
-            <h1 class="heading">{{ location.nameTransliterated ? location.nameTransliterated : location.name }}</h1>
-            {% if exhibition.titleAppend is not empty %}
+            <h1 class="heading">{{ location.nameAppend ? location.nameAppend : location.name }}</h1>
+            {% if location.nameAppend is not empty %}
                 <h2 style="margin-top: -0.8rem"><span class="small">{{ location.name }}</span></h2>
             {% endif %}
             <div class="artist_information">
@@ -62,7 +49,7 @@
                     {% endembed %}
                 {% endif %}
 
-                {% if location.getOrganizerOf()|length > 0 %}
+                {% if location.organizerOf|length > 0 %}
                     {% embed "Location/Parts/tabcontent-organizer.html.twig" %}
                     {% endembed %}
                 {% endif %}

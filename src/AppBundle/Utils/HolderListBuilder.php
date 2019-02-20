@@ -5,97 +5,84 @@ namespace AppBundle\Utils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-abstract class LocationListBuilder
+class HolderListBuilder
 extends SearchListBuilder
 {
-    protected $entity = 'Location';
-    protected $alias = 'L';
+    protected $entity = 'Holder';
+    protected $alias = 'H';
 
     var $rowDescr = [
-        'location' => [
+        'holder' => [
             'label' => 'Name',
         ],
+        /*
         'place' => [
             'label' => 'City',
         ],
         'type' => [
             'label' => 'Type',
         ],
-        'count_exhibition' => [
-            'label' => 'Number of Exhibitions',
-        ],
-        'count_itemexhibition' => [
-            'label' => 'Number of Cat. Entries',
+        */
+        'count_bibitem' => [
+            'label' => 'Number of Catalogues',
         ],
     ];
 
     var $orders = [
-        'place' => [
+        'holder' => [
             'asc' => [
-                'L.place',
-                'L.name',
-                'L.id',
+                'H.name',
+                'H.place',
+                'H.id',
             ],
             'desc' => [
-                'L.place DESC',
-                'L.name DESC',
-                'L.id DESC',
+                'H.name DESC',
+                'H.place DESC',
+                'H.id DESC',
             ],
         ],
-        'location' => [
+        /*
+        'place' => [
             'asc' => [
-                'L.name',
-                'L.place',
-                'L.id',
+                'H.place',
+                'H.name',
+                'H.id',
             ],
             'desc' => [
-                'L.name DESC',
-                'L.place DESC',
-                'L.id DESC',
+                'H.place DESC',
+                'H.name DESC',
+                'H.id DESC',
             ],
         ],
         'type' => [
             'asc' => [
-                'L.type IS NOT NULL DESC',
-                'L.type',
-                'L.place',
-                'L.name',
-                'L.id',
+                'H.type IS NOT NULL DESC',
+                'H.type',
+                'H.place',
+                'H.name',
+                'H.id',
             ],
             'desc' => [
-                'L.type IS NOT NULL',
-                'L.type DESC',
-                'L.place DESC',
-                'L.name DESC',
-                'L.id DESC',
+                'H.type IS NOT NULL',
+                'H.type DESC',
+                'H.place DESC',
+                'H.name DESC',
+                'H.id DESC',
             ],
         ],
-        'count_exhibition' => [
+        */
+        'count_bibitem' => [
             'desc' => [
-                'count_exhibition DESC',
-                'L.place',
-                'L.name',
-                'L.id',
+                'count_bibitem DESC',
+                'place',
+                'H.name',
+                'H.id',
             ],
             'asc' => [
-                'count_exhibition',
-                'L.place',
-                'L.name',
-                'L.id',
-            ],
-        ],
-        'count_itemexhibition' => [
-            'desc' => [
-                'count_itemexhibition DESC',
-                'L.place',
-                'L.name',
-                'L.id',
-            ],
-            'asc' => [
-                'count_itemexhibition',
-                'L.place',
-                'L.name',
-                'L.id',
+                'count_bibitem',
+                'place',
+                'H.name',
+                'H.id',
             ],
         ],
     ];
@@ -110,18 +97,18 @@ extends SearchListBuilder
 
         parent::__construct($connection, $request, $urlGenerator, $queryFilters);
 
-        if ('stats-type' == $this->mode) {
+        /* if ('stats-type' == $this->mode) {
             $this->orders = [ 'default' => [ 'asc' => [ 'type' ] ] ];
         }
         else if ('stats-country' == $this->mode) {
             $this->orders = [ 'default' => [ 'asc' => [ 'country_code' ] ] ];
         }
-        else if ('extended' == $this->mode) {
+        else */ if ('extended' == $this->mode) {
             $this->rowDescr = [
-                'location_id' => [
+                'holder_id' => [
                     'label' => 'ID',
                 ],
-                'location' => [
+                'holder' => [
                     'label' => 'Name',
                 ],
                 'place' => [
@@ -130,6 +117,7 @@ extends SearchListBuilder
                 'country_code' => [
                     'label' => 'Country Code',
                 ],
+                /*
                 'type' => [
                     'label' => 'Type',
                 ],
@@ -139,17 +127,15 @@ extends SearchListBuilder
                 'dissolutiondate' => [
                     'label' => 'Dissolution Date',
                 ],
+                */
                 'ulan' => [
                     'label' => 'ULAN',
                 ],
                 'gnd' => [
                     'label' => 'GND',
                 ],
-                'count_exhibition' => [
-                    'label' => 'Number of Exhibitions',
-                ],
-                'count_itemexhibition' => [
-                    'label' => 'Number of Cat. Entries',
+                'count_bibitem' => [
+                    'label' => 'Number of Catalogues',
                 ],
                 'status' => [
                     'label' => 'Status',
@@ -161,25 +147,19 @@ extends SearchListBuilder
         }
 
         $entity = $this->entity;
-        $this->rowDescr['location']['buildValue'] = function (&$row, $val, $listBuilder, $key, $format) use ($entity) {
-            return $entity == $this->entity
-                ? $listBuilder->buildLinkedOrganizer($row, $val, $format)
-                : $listBuilder->buildLinkedLocation($row, $val, $format);
+        $this->rowDescr['holder']['buildValue'] = function (&$row, $val, $listBuilder, $key, $format) use ($entity) {
+            return $listBuilder->buildLinkedValue($val, 'holder', [ 'id' => $row['id'] ], $format);
         };
 
-        $this->rowDescr['place']['buildValue'] = function (&$row, $val, $listBuilder, $key, $format) {
-            if (empty($row['place_tgn'])) {
-                return false;
-            }
+        if (array_key_exists('place', $this->rowDescr)) {
+            $this->rowDescr['place']['buildValue'] = function (&$row, $val, $listBuilder, $key, $format) {
+                if (empty($row['place_tgn'])) {
+                    return false;
+                }
 
-            return $listBuilder->buildLinkedValue($val, 'place-by-tgn', [ 'tgn' => $row['place_tgn'] ], $format);
-        };
-    }
-
-    protected function buildSelectExhibitionCount()
-    {
-        return '(SELECT COUNT(*) FROM Exhibition EC WHERE EC.id_location='
-            . $this->alias . '.id AND EC.status <> -1) AS count_exhibition';
+                return $listBuilder->buildLinkedValue($val, 'place-by-tgn', [ 'tgn' => $row['place_tgn'] ], $format);
+            };
+        }
     }
 
     protected function setSelect($queryBuilder)
@@ -204,22 +184,21 @@ extends SearchListBuilder
 
         $queryBuilder->select([
             'SQL_CALC_FOUND_ROWS ' . $this->alias . '.id',
-            $this->alias . '.id AS location_id',
-            $this->alias . '.name AS location',
-            $this->alias . '.place AS place',
-            $this->alias . '.place_tgn AS place_tgn',
-            'P' . $this->alias . '.country_code AS country_code',
-            'DATE(' . $this->alias . '.foundingdate) AS foundingdate',
-            'DATE(' . $this->alias . '.dissolutiondate) AS dissolutiondate',
+            $this->alias . '.id AS holder_id',
+            $this->alias . '.name AS holder',
+            $this->alias . '.town AS place',
+            'NULL AS place_tgn', // $this->alias . '.place_tgn AS place_tgn',
+            $this->alias . '.country AS country_code', // 'P' . $this->alias . '.country_code AS country_code',
+            'NULL AS foundingdate', // 'DATE(' . $this->alias . '.foundingdate) AS foundingdate',
+            'NULL AS dissolutiondate', // DATE(' . $this->alias . '.dissolutiondate) AS dissolutiondate',
             $this->alias . '.gnd AS gnd',
             $this->alias . '.ulan AS ulan',
             $this->alias . '.type AS type',
             $this->alias . '.status AS status',
-            $this->alias . '.place_geo',
+            'NULL AS place_geo', // $this->alias . '.place_geo',
             'P' . $this->alias . '.latitude',
             'P' . $this->alias . '.longitude',
-            'COUNT(DISTINCT IE.id) AS count_itemexhibition',
-            $this->buildSelectExhibitionCount()
+            'COUNT(DISTINCT B.id) AS count_bibitem',
         ]);
 
         return $this;
@@ -227,16 +206,22 @@ extends SearchListBuilder
 
     protected function setFrom($queryBuilder)
     {
-        $queryBuilder->from('Location', $this->alias);
+        $queryBuilder->from('Holder', $this->alias);
 
         return $this;
     }
 
-    protected function setExhibitionJoin($queryBuilder)
+    protected function setBibitemJoin($queryBuilder)
     {
         $queryBuilder->leftJoin($this->alias,
-                                'Exhibition', 'E',
-                                'E.id_location=' . $this->alias . '.id AND E.status <> -1');
+                                'HolderPublication', 'BH',
+                                'BH.id_holder = ' . $this->alias . '.id');
+        $queryBuilder->leftJoin('BH',
+                                'Publication', 'B',
+                                'BH.id_publication = B.id AND B.status <> -1');
+        $queryBuilder->leftJoin('BH',
+                       'ExhibitionPublication', 'BE',
+                       'BE.id_publication = B.id AND BE.role = 1');// catalogues only
     }
 
     protected function setJoin($queryBuilder)
@@ -253,20 +238,10 @@ extends SearchListBuilder
 
         $queryBuilder->leftJoin($this->alias,
                                 'Geoname', 'P' . $this->alias,
-                                'P' . $this->alias . '.tgn=' . $this->alias . '.place_tgn');
+                                '1=0' // 'P' . $this->alias . '.tgn=' . $this->alias.'.place_tgn'
+                                );
 
-        $this->setExhibitionJoin($queryBuilder);
-
-        $queryBuilder->leftJoin('E',
-                                'ItemExhibition', 'IE',
-                                'E.id=IE.id_exhibition AND (IE.title IS NOT NULL OR IE.id_item IS NULL)');
-
-        if (array_key_exists('person', $this->queryFilters)) {
-            // so we can filter on P.*
-            $queryBuilder->join('IE',
-                                'Person', 'P',
-                                'P.id=IE.id_person AND P.status <> -1');
-        }
+        $this->setBibitemJoin($queryBuilder);
 
         return $this;
     }
@@ -278,7 +253,7 @@ extends SearchListBuilder
         $this->addSearchFilters($queryBuilder, [
             $this->alias . '.name',
             $this->alias . '.name_translit',
-            $this->alias . '.name_alternate',
+            // $this->alias . '.name_alternate',
             $this->alias . '.gnd',
             $this->alias . '.ulan',
             $this->alias . '.place',

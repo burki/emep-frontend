@@ -6,20 +6,25 @@
     {% import 'Shared/select2.html.twig' as select2 %}
     {{ select2.head() }}
 
+    <script src="{{ app.request.basepath }}/js/js.cookie.js"></script>
+
     <script>
         $(document).ready(function() {
             // initialize select2
             $('.select2').select2();
+            {{ helper.checkmark_actions(listBuilder.entity) }}
+            {{ helper.indexform_actions('exhibition-save') }}
         });
     </script>
 
-    {% import 'Shared/datatables.html.twig' as datatables %}
-    {{ datatables.head() }}
+    {#% import 'Shared/datatables.html.twig' as datatables %}
+    {{ datatables.head() }#}
 {% endblock %}
 
 {% block body %}
     <h1 class="heading">{{ pageTitle }}</h1>
 
+<<<<<<< HEAD
     <form class="filter exhibitionFilterForm indexForm" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
     <div class="searchbarcontainer">
         <div class="searchbarinputcontainer">
@@ -33,8 +38,12 @@
 
     <div class="searchbarcontainer w-form hidden-form">
 
+    <form class="indexForm" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
+        <div class="searchbarcontainer">
             <div class="searchbarinputcontainer">
-                {{ form_rest(form) }}
+                {{ form_widget(form.search) }}
+                {{ form_widget(form.location.geoname) }}
+                {{ form_widget(form.exhibition.organizer_type) }}
             </div>
     </div>
     </form>
@@ -561,6 +570,16 @@
     </script>
 
 
+            <div class="searchbuttoncontainer"><input type="submit" name="submit-filter" value="Search" class="submit-button w-button submit-filter-visible">
+            </div>
+        </div>
+
+        <div class="searchbarcontainer w-form hidden-form">
+            <div class="searchbarinputcontainer">
+                {{ form_rest(form) }}
+            </div>
+        </div>
+    </form>
 
     <div class="contentcontainer w-container">
         <div class="listviewrow">
@@ -620,23 +639,13 @@
     {% endif %}
 
 
-
     <script>
         $(document).ready(function() {
             // Order by the grouping
             $('#exhibitions tbody').on( 'click', 'tr.group', function () {
                 var currentOrder = table.order()[0];
-                /* if ( currentOrder[0] === groupColumn && currentOrder[1] === 'asc' ) {
-                    table.order( [ groupColumn, 'desc' ] ).draw();
-                }
-                else {
-                    table.order( [ groupColumn, 'asc' ] ).draw();
-                }*/
-
 
                 var splitGroup = $(this).data('name');
-
-                // console.log('.collapseRow[data-rowname="' + splitGroup + '"]');
 
                 $('.collapseRow[data-rowname="' + splitGroup + '"]').toggleClass('collapsed');
 

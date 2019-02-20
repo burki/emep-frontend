@@ -8,21 +8,5 @@
     {% import 'Shared/select2.html.twig' as select2 %}
     {{ select2.head() }}
 
-    {%  set countriesQuery = '' %}
-    {%  set locationTypeQuery = 'any' %}
-    {%  set stringQuery = 'any' %}
-
-    {% if countries|length %}
-        {% set countriesQuery = countries %}
-    {% endif %}
-
-    {% if locationType|length %}
-        {% set locationTypeQuery = locationType %}
-    {% endif %}
-
-    {% if stringPart|length %}
-        {% set stringQuery = stringPart %}
-    {% endif %}
-
-    {{ render_hinclude(controller('AppBundle\\Controller\\MapController::locationByPlacePart', { entity: 'Venue', countriesQuery: countriesQuery, locationTypeQuery: locationTypeQuery, stringQuery: stringQuery, currIds: ids }), {'default': 'Loading...'}) }}
+    {{ render_hinclude(url('location-index-map', app.request.query.all), {'default': 'Loading...'}) }}
 </div>

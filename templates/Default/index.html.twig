@@ -1,8 +1,6 @@
 {% extends 'Base/base.html.twig' %}
 
 {% block body %}
-
-
     <div class="container-6 w-container">
         <div class="main-stats-container">
             <h1 class="heading-2">Search lists of</h1>
@@ -27,8 +25,9 @@
                 </div>
             </div>
         </div>
-        <div class="advanced-search-header" style="background-image: url('img/composition-iv-1911.jpg')"><a href="{{ path('search') }}" class="button w-button">ADVANCED SEARCH</a></div>
+
+        <div class="advanced-search-header" style="background-image: url('{{ app.request.basepath }}/img/composition-iv-1911.jpg')">
+            <a href="{{ path('search') }}" class="button w-button">ADVANCED SEARCH</a>
+        </div>
     </div>
-
-
 {% endblock %}

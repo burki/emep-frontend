@@ -2,10 +2,11 @@
 
 namespace AppBundle\Controller;
 
-use \Symfony\Component\HttpFoundation\Request;
-use \Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Intl\Intl;
+use Symfony\Component\Routing\Annotation\Route;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 /**
  *
@@ -28,7 +29,7 @@ extends Controller
         }
 
         if ($shortOrLongQuery === 'long') {
-            return " AND Exhibition.status <> -1 ";
+            return " AND Exhibition.status <> -1";
         }
 
         return " AND E.status <> -1";
@@ -1289,6 +1290,8 @@ EOT;
 
             if (!array_key_exists($nationality, $statsByNationality)) {
                 $statsByNationality[$nationality] = [
+                    'label' => 'XX' == $nationality
+                        ? $nationality : Intl::getRegionBundle()->getCountryName($nationality),
                     'countArtists' => 0,
                     'countItemExhibition' => 0,
                 ];
@@ -1298,9 +1301,7 @@ EOT;
             ++$statsByNationality[$nationality]['countArtists'];
             $statsByNationality[$nationality]['countItemExhibition'] += $row['numEntries'];
             $totalItemExhibition += $row['numEntries'];
-
         }
-
 
         return [
             'totalArtists' => $totalArtists,

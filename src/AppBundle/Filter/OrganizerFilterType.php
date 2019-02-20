@@ -1,5 +1,5 @@
 <?php
-// PersonFilterType.php
+// LocationFilterType.php
 namespace AppBundle\Filter;
 
 use Symfony\Component\Form\FormBuilderInterface;
@@ -8,7 +8,7 @@ use Lexik\Bundle\FormFilterBundle\Filter\Form\Type as Filters;
 
 use Tetranz\Select2EntityBundle\Form\Type\Select2EntityType;
 
-class PersonFilterType
+class OrganizerFilterType
 extends CrudFilterType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -16,43 +16,46 @@ extends CrudFilterType
         $builder->add('search', Filters\TextFilterType::class, [
             'label' => false,
             'attr' => [
-                'placeholder' => "search artists' name",
+                'placeholder' => "search name",
                 'class' => 'text-field-class w-input search-input input-text-search',
             ],
         ]);
 
-        $personClass = new class extends \Symfony\Component\Form\AbstractType {
+        $organizerClass = new class extends \Symfony\Component\Form\AbstractType {
             public function buildForm(FormBuilderInterface $builder, array $options)
             {
-                $builder->add('gender', Filters\ChoiceFilterType::class, [
-                    'choices' => [
-                        'select gender' => '',
-                        'female' => 'F',
-                        'male' => 'M',
-                    ],
+                $country_geoname_choices = $options['data']['choices']['country'];
+                foreach ($country_geoname_choices as $label => $cc) {
+                    $country_geoname_choices[$label] = 'cc:' . $cc;
+                }
+
+                $builder->add('geoname', Filters\ChoiceFilterType::class, [
+                    'choices' => [ 'select country' => '' ] + $country_geoname_choices,
+                    'multiple' => false,
                     'attr' => [
-                        'data-placeholder' => 'select gender',
+                        'data-placeholder' => 'select country',
                         'class' => 'text-field-class w-select middle-selector',
                     ],
                 ]);
 
-                $builder->add('nationality', Filters\ChoiceFilterType::class, [
-                    'choices' => [ 'select nationality' => '' ] + $options['data']['choices']['nationality'],
+                $builder->add('type', Filters\ChoiceFilterType::class, [
+                    'label' => 'Type',
                     'multiple' => false,
+                    'choices' => [ 'select type of organizing body' => '' ] + $options['data']['choices']['location_type'],
                     'attr' => [
-                        'data-placeholder' => 'select nationality',
+                        'data-placeholder' => 'select type of organizing body',
                         'class' => 'text-field-class w-select end-selector',
                     ],
                 ]);
 
-                // copied over from Form/PersonFilterType, find a way to share
-                $builder->add('person', Select2EntityType::class, [
+                // copied over from Form/OrganizationFilterType, find a way to share
+                $builder->add('organizer', Select2EntityType::class, [
                     'multiple' => true,
-                    'label' => 'Artist',
-                    'remote_route' => 'search-select-person',
-                    'class' => '\AppBundle\Entity\Person',
+                    'label' => 'Organizer',
+                    'remote_route' => 'search-select-organizer',
+                    'class' => '\AppBundle\Entity\Location',
                     'primary_key' => 'id',
-                    'text_property' => 'fullName',
+                    'text_property' => 'name',
                     'minimum_input_length' => 2,
                     'page_limit' => 10,
                     'allow_clear' => false,
@@ -66,11 +69,11 @@ extends CrudFilterType
 
             public function getName()
             {
-                return 'person';
+                return 'organizer';
             }
         };
 
-        $builder->add('person', get_class($personClass), $options);
+        $builder->add('organizer', get_class($organizerClass), $options);
     }
 
     public function getBlockPrefix()

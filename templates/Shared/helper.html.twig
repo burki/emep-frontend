@@ -149,3 +149,107 @@
         </div>
     </div>
 {% endmacro %}
+
+{% macro seealso_head_gnd() %}
+    <script src="{{ app.request.basepath }}/js/seealso.js"></script>
+    <script>
+        var service = new SeeAlsoCollection();
+        service.services = {
+            'gndaks' : new SeeAlsoService('https://beacon.findbuch.de/seemore/gnd-aks/-dewp@wd')
+        };
+        service.views = {
+            'seealso-ul' : new SeeAlsoUL({
+                linkTarget: '_blank',
+                maxItems: 100
+            })
+        };
+        service.replaceTagsOnLoad();
+    </script>
+{% endmacro %}
+
+{% macro checkmark_actions(entity) %}
+    // checkmark worker
+    var active = Cookies.getJSON('{{ entity }}');
+    if (!(active instanceof Array)) {
+        active = [];
+    }
+    for (var i = 0; i < active.length; i++) {
+        $('span.checkmark[data-id="' + active[i] + '"]').addClass('checked');
+    }
+
+    $('.checkbox-filter-button').on('click', function() {
+        if (active.length !== 0 ) {
+            {% if 'Venue' == entity %}{% set selector = 'location' %}{% else %}{% set selector = entity|lower %}{% endif %}
+            var select2selector = '#filter_{{ selector }}_{{ selector }}';
+            // remove anything active
+            $(select2selector).val(null).trigger('change');
+            for (var i = 0; i < active.length; i++) {
+                // add new
+                var $newOption = $("<option selected='selected'></option>").val(active[i]).text(active[i]);
+                $(select2selector).append($newOption).trigger('change');
+            }
+
+            // submit form
+            $('.indexForm').submit();
+        }
+    });
+
+    $('.checkmark').on('click', function() {
+        var currId = $(this).data('id');
+        var index = active.indexOf(currId);
+        if ($(this).hasClass('checked')) {
+            // remove
+            if (index > -1) {
+                active.splice(index, 1);
+            }
+        }
+        else {
+            // add
+            if (index == -1) {
+                active.push(currId);
+            }
+        }
+
+        $(this).toggleClass('checked');
+
+        Cookies.set('{{ entity }}', active);
+    });
+{% endmacro %}
+
+{% macro indexform_actions(saveRoute) %}
+        $(document).ready(function() {
+            $('.w-input').keypress(function (e) {
+                if (e.which == 13) {
+                    $('.indexForm').submit();
+
+                    return false;
+                }
+            });
+
+            function saveQuery() {
+                // change action for saving current query
+                $form = $('.indexForm');
+
+                $form.attr('action', '{{ path(saveRoute) }}');
+                $form.submit();
+            }
+
+            $('.save-query').on('click', function() {
+                saveQuery();
+            });
+        });
+{% endmacro %}
+
+{% macro show_savedsearches(searches) %}
+    {% if app.user and searches is not empty %}
+            <form action="{{ path(app.request.get('_route')) }}" method="POST">
+                <select name="useraction" id="saved-searches" class="w-input select-queries" onchange="this.form.submit()">
+                    <option value="">- Select Saved Query -</option>
+                    {% for id, label in searches %}
+                        <option value="{{ id }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+    {% endif %}
+    <div class="icontab save-query"><img src="{{ app.request.basepath }}/img/save_icon.svg" class="iconimage" title="save your current query"></div>
+{% endmacro %}

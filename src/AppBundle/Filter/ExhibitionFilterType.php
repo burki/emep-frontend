@@ -2,14 +2,11 @@
 // ExhibitionFilterType.php
 namespace AppBundle\Filter;
 
-
 use Symfony\Component\Form\FormBuilderInterface;
 
-use Lexik\Bundle\FormFilterBundle\Filter\Query\QueryInterface;
 use Lexik\Bundle\FormFilterBundle\Filter\Form\Type as Filters;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormEvent;
 
+use Tetranz\Select2EntityBundle\Form\Type\Select2EntityType;
 
 class ExhibitionFilterType
 extends CrudFilterType
@@ -27,7 +24,9 @@ extends CrudFilterType
         $locationClass = new class extends \Symfony\Component\Form\AbstractType {
             public function buildForm(FormBuilderInterface $builder, array $options)
             {
-                $country_geoname_choices = $options['data']['country_choices'];
+
+                // $country_geoname_choices = $options['data']['country_choices'];
+                $country_geoname_choices = $options['data']['choices']['country'];
                 foreach ($country_geoname_choices as $label => $cc) {
                     $country_geoname_choices[$label] = 'cc:' . $cc;
                 }
@@ -56,16 +55,36 @@ extends CrudFilterType
                 $builder->add('organizer_type', Filters\ChoiceFilterType::class, [
                     'label' => 'Type of Organizing Body',
                     'multiple' => false,
-                    'choices' => [ 'select type of organizing body' => '' ] + $options['data']['organizer_type_choices'],
+                    // 'choices' => [ 'select type of organizing body' => '' ] + $options['data']['organizer_type_choices'],
+                    'choices' => [ 'select type of organizing body' => '' ] + $options['data']['choices']['exhibition_organizer_type'],
                     'attr' => [
                         'data-placeholder' => 'select type of organizing body',
                         'class' => 'text-field-class w-select end-selector',
                     ],
                 ]);
 
+                /*
                 $builder->add('id', Filters\ChoiceFilterType::class, [
                     'choices' => [ 'select ids' => 'true'] + $options['data']['ids'],
+                    'multiple' => true, */
+
+
+                // copied over from Form/ExhibitionFilterType, find a way to share
+                $builder->add('exhibition', Select2EntityType::class, [
                     'multiple' => true,
+                    'label' => 'Exhibition',
+                    'remote_route' => 'search-select-exhibition',
+                    'class' => '\AppBundle\Entity\Exhibition',
+                    'primary_key' => 'id',
+                    'text_property' => 'title',
+                    'minimum_input_length' => 2,
+                    'page_limit' => 10,
+                    'allow_clear' => false,
+                    'delay' => 25,
+                    'cache' => true,
+                    'cache_timeout' => 60000, // if 'cache' is true
+                    'language' => 'en',
+                    'placeholder' => '- all -',
                 ]);
             }
 

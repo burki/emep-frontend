@@ -1,0 +1,15 @@
+{% extends 'Base/base.html.twig' %}
+
+{% import 'Shared/helper.html.twig' as helper %}
+
+{% block body %}
+    <h1 class="heading"><a href="{{ path('blog-index') }}">Blog</a></h1>
+
+    <h2>{{ post['title']['rendered']|raw }}</h2>
+    <div>
+        {{ date(post['date'])|date('d.m.Y')}}
+    </div>
+    <div>
+    {{ post['content']['rendered']|raw }}
+    </div>
+{% endblock %}

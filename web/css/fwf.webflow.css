@@ -795,7 +795,7 @@ a {
   flex: 0 auto;
 }
 
-.artist-information-container-qucikstat {
+.artist-information-container-quickstat {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1238,7 +1238,7 @@ a {
     padding-right: 20px;
     padding-left: 20px;
   }
-  .artist-information-container-qucikstat {
+  .artist-information-container-quickstat {
     -webkit-box-orient: vertical;
     -webkit-box-direction: normal;
     -webkit-flex-direction: column;

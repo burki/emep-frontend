@@ -233,7 +233,7 @@ extends SearchListBuilder
         };
 
         $this->rowDescr['location']['buildValue'] = function (&$row, $val, $listBuilder, $key, $format) {
-            return $listBuilder->buildLinkedValue($val, 'location', [ 'id' => $row['location_id'] ], $format);
+            return $listBuilder->buildLinkedLocation($row, $val, $format);
         };
     }
 
@@ -302,6 +302,8 @@ extends SearchListBuilder
             'L.place AS place',
             'L.place_tgn AS place_tgn',
             'L.name AS location',
+            'L.name_alternate AS location_alternte',
+            'L.name_translit AS location_translit',
             'L.id AS location_id',
             'L.place_geo',
             'PL.latitude', 'PL.longitude',

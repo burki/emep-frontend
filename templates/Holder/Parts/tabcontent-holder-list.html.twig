@@ -5,10 +5,10 @@
     $( document ).ready(function() {
         $('#holderTable').DataTable({
             "dom": 'ilrtp',
-            responsive: true,
+            responsive: false,
             paging: false,
             searching: false,
-            info: true,
+            info: false,
             ordering: false
         });
     })
@@ -16,68 +16,41 @@
 
 
 <div role="tabpanel" class="tab-pane active" id="exhibitions">
-    {# helper.pagination_count(pagination) #}
-    <div style="width: 100%; text-align: right;">{{ helper.pagination_count(pagination) }}</div>
+        {% if pager.getNbResults() > 0 %}
+            <div style="width: 100%; text-align: right;">
+                {{ pager.currentPageOffsetStart }} - {{ pager.currentPageOffsetEnd }} of {{ pager.getNbResults() }}
+            </div>
 
-    {% set sortField = app.request.get('sort') %}
-    {% if pagination.getTotalItemCount > 0 %}
-        <table id="holderTable" class="table table-striped table-bordered dataTable listviewcontainer">
-        <thead>
-            <tr class="listviewheading">
-                <th class="desktop">{{ helper.pagination_sortable(pagination, 'Name', 'nameSort') }}</th>
-                <th class="desktop">{{ helper.pagination_sortable(pagination, '# of Catalogues', 'numBibitemSort', 'desc') }}</th>
-            </tr>
-        </thead>
+            <table id="holderTable" class="table table-striped table-bordered dataTable listviewcontainer">
+                <thead>
+                    <tr class="listviewheading">
+                        {% for key, label in listBuilder.buildHeaderRow() %}
+                        <th>
+                            {% set sortInfo = listBuilder.sortInfo(key) %}
+                            {% if sortInfo is not empty %}
+                                <a href="{{ sortInfo.action }}"{% if sortInfo.active is not empty %} class="{{ sortInfo.active }}"{% endif %}>{{ label }}</a>
+                            {% else %}
+                                {{ label }}
+                            {% endif %}
+                        </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
 
-        <tbody>
-        {% set last_initial = '' %}
-        {% set last_countryCode = '' %}
+                <tbody>
+                    {% for row in pager.currentPageResults %}
+                    <tr>
+                        {% set rowValues = listBuilder.buildRow(row, 'html') %}
+                        {% for val in rowValues %}
+                        <td>{% if loop.first %}{% if 'ItemExhibition' != listBuilder.entity %}<span class="checkmark" data-id="{{ row.id }}"></span>{% endif %}{% endif %}{{ val|raw }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
 
-        {% for row in pagination %}
-            {% set holder = row[0] %}
-            {% set place = holder.place %}
-            {# <ul class="list-unstyled"> #}
-            {% if 'nameSort' == sortField %}
-                {# ignore #}
-            {% elseif 'numExhibitionSort' == sortField %}
-                {% set initial = row['numExhibitionSort'] %}
-            {% elseif 'numCatEntrySort' == sortField %}
-                {% set initial = row['numCatEntrySort'] %}
-            {% else %}
-                {% set sortField = 'countryPlaceNameSort' %}
-                {% if holder.placeLabel is not empty %}
-                    {% set initial = holder.placeLabel %}
-                {% endif %}
-            {% endif %}
-            {% if initial != last_initial %}
-                {% if last_initial != null %}
-                    {# </ul> #}
-                {% endif %}
-                {% if 'countryPlaceNameSort' == sortField and last_countryCode != place.countryCode %}
-                    {# <h3>{{ countryName(place.countryCode) }}</h3> #}
-                    {% set last_countryCode = place.countryCode %}
-                {% endif %}
-
-                {% set last_initial = initial %}
-                {# <ul class="list-group"> #}
-            {% endif %}
-            <tr class="listviewrow">
-                <td class="title"><span class="checkmark {% if holder.id in ids %} checked {% endif %}" data-id="{{ holder.id }}"></span>
-                    <a href="{{ path('holder', { 'id' : holder.id }) }}">
-                        <b>{{ holder.name }}</b></a>
-                </td>
-                <td>
-                    {{ row.numBibitemSort }}
-                </td>
-
-            </tr>
-        {% endfor %}
-        </tbody>
-        </table>
-        <div class="navigation">
-            {{ knp_pagination_render(pagination) }}
-        </div>
-    {% else %}
-        No Holding Institutions found
-    {% endif %}
+            <div class="pagerfanta">{{ pagerfanta(pager, 'twitter_bootstrap3', { 'omitFirstPage': true }) }}</div>
+        {% else %}
+            No Holding Institutions found
+        {% endif %}
 </div>

@@ -1,18 +1,12 @@
 <?php
 
 namespace AppBundle\Controller;
-
 use Symfony\Component\HttpFoundation\Request;
-
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-
 use Pagerfanta\Pagerfanta;
-
 use AppBundle\Utils\CsvResponse;
 use AppBundle\Utils\SearchListBuilder;
 use AppBundle\Utils\SearchListPagination;
@@ -48,51 +42,44 @@ extends CrudController
         return $this->buildActiveCountries($qb);
     }
 
+    protected function buildFilterForm()
+    {
+        $exhibitionOrganizerTypes = $this->buildOrganizerTypes();
+        $this->form = $this->createForm(\AppBundle\Filter\ExhibitionFilterType::class, [
+            'choices' => [
+                'country' => array_flip($this->buildCountries()),
+                'exhibition_organizer_type' => array_combine($exhibitionOrganizerTypes, $exhibitionOrganizerTypes),
+            ],
+        ]);
+    }
+
+    protected function buildSaveSearchParams(Request $request, UrlGeneratorInterface $urlGenerator)
+    {
+        $route = str_replace('-save', '-index', $request->get('_route'));
+
+        $this->buildFilterForm();
+
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, 'Exhibition');
+        $filters = $listBuilder->getQueryFilters(true);
+        if (empty($filters)) {
+            return [ $route, [] ];
+        }
+
+        $routeParams = [
+            'filter' => $filters,
+        ];
+
+        return [ $route, $routeParams ];
+    }
+
     /**
      * @Route("/exhibition/save", name="exhibition-save")
      */
-    public function saveSearchActionExhibition(Request $request,
+    public function saveSearchAction(Request $request,
                                      UrlGeneratorInterface $urlGenerator,
                                      UserInterface $user)
     {
-
-        $parametersAsString = $request->get('entity');
-        $parametersAsString = str_replace("/exhibition?", '', $parametersAsString);
-
-
-        parse_str($parametersAsString, $parameters);
-
-
-        $form = $this->createForm(\AppBundle\Form\Type\SaveSearchType::class);
-
-        //$form->get
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-
-            $userAction = new \AppBundle\Entity\UserAction();
-
-            $userAction->setUser($user);
-            $userAction->setRoute($route = 'exhibition');
-            $userAction->setRouteParams($parameters);
-
-            $userAction->setName($data['name']);
-
-            $em = $this->getDoctrine()
-                ->getManager();
-
-            $em->persist($userAction);
-            $em->flush();
-
-            return $this->redirectToRoute($route, $parameters);
-        }
-
-        return $this->render('Search/save.html.twig', [
-            'pageTitle' => $this->get('translator')->trans('Save your query'),
-            'form' => $form->createView(),
-        ]);
+        return $this->handleSaveSearchAction($request, $urlGenerator, $user);
     }
 
     /**
@@ -102,107 +89,27 @@ extends CrudController
                                 UrlGeneratorInterface $urlGenerator,
                                 UserInterface $user = null)
     {
-        // redirect to saved query
-        if ('POST' == $request->getMethod() && !is_null($user)) {
-            // check a useraction was requested
-            $userActionId = $request->request->get('useraction');
-            if (!empty($userActionId)) {
-                $userAction = $this->getDoctrine()
-                    ->getManager()
-                    ->getRepository('AppBundle:UserAction')
-                    ->findOneBy([
-                        'id' => $userActionId,
-                        'user' => $user,
-                        'route' => 'exhibition',
-                    ]);
-
-                if (!is_null($userAction)) {
-                    return $this->redirectToRoute($userAction->getRoute(),
-                                                  $userAction->getRouteParams());
-                }
-            }
+        $response = $this->handleUserAction($request, $user);
+        if (!is_null($response)) {
+            return $response;
         }
-
-
-        $route = $request->get('_route');
-
-        $leftYear = 1905;
-        $rightYear = 1915;
-
-        $organizerTypes = $this->buildOrganizerTypes();
-        $form = $this->form = $this->get('form.factory')->create(\AppBundle\Filter\ExhibitionFilterType::class, [
-            'country_choices' => array_flip($this->buildCountries()),
-            'organizer_type_choices' => array_combine($organizerTypes, $organizerTypes),
-            'ids' => range(0, 9999),
-            'years' => [$leftYear, $rightYear]
-        ]);
-
-
-        // build up stuff to pass along
-        $stringQuery = $form->get('search')->getData();
-        $organizerType = $form->get('exhibition')->get('organizer_type')->getData();
-        $ids = $form->get('exhibition')->get('id')->getData();
-        $countries = $form->get('location')->get('geoname')->getData();
-        $artistGender = $form->get('gender')->getData();
-        $artistNationalities = $form->get('nationality')->getData();
-        $exhibitionStartDate = $form->get('startdate')->getData();
-
-
-        $currIds = [];
-        /*
-        foreach ($result as $exh){
-            array_push($currIds, $exh[0]->getId());
-        }
-        */
-
-        // refactor this --- only reason is because to many get variable
-        if (count($currIds) > 500){
-            $currIds = [];
-        }
-
-        // print_r(($result[0]));
-
-        $requestURI = $request->getRequestUri();
-
+        $this->buildFilterForm();
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, 'Exhibition');
-
         $listPagination = new SearchListPagination($listBuilder);
-
         $page = $request->get('page', 1);
         $listPage = $listPagination->get($this->pageSize, ($page - 1) * $this->pageSize);
-
         $adapter = new SearchListAdapter($listPage);
         $pager = new Pagerfanta($adapter);
         $pager->setMaxPerPage($listPage['limit']);
         $pager->setCurrentPage(intval($listPage['offset'] / $listPage['limit']) + 1);
-
         return $this->render('Exhibition/index.html.twig', [
-            // 'realIds' => $currIds,
             'pageTitle' => $this->get('translator')->trans('Exhibitions'),
-            // 'pagination' => $pagination,
             'pager' => $pager,
-
             'listBuilder' => $listBuilder,
             'form' => $this->form->createView(),
-
-            //'formIds'=> $formIds->createView(),
-            //'realData' => $result,
-            'countryArray' => $this->buildCountries(),
-            'organizerTypesArray' => $organizerTypes,
-            'countries' => $countries,
-            'ids' => $ids,
-            'organizerType' => $organizerType,
-            'stringPart' => $stringQuery,
-            'minStartYear' => $leftYear,
-            'maxStartYear' => $rightYear,
-            'artistGender' => $artistGender,
-            'artistNationalities' => $artistNationalities,
-            'exhibitionStartDate' => $exhibitionStartDate,
-            'requestURI' => $requestURI,
-            'searches' => $this->lookupSearches($user, 'exhibition')
+            'searches' => $this->lookupSearches($user, $request->get('_route'))
         ]);
     }
-
     /**
      * @Route("/exhibition/map", name="exhibition-index-map")
      */
@@ -210,15 +117,31 @@ extends CrudController
                                    UrlGeneratorInterface $urlGenerator,
                                    UserInterface $user = null)
     {
-        $leftYear = 1905;
-        $rightYear = 1915;
-        $organizerTypes = $this->buildOrganizerTypes();
-        $form = $this->form = $this->get('form.factory')->create(\AppBundle\Filter\ExhibitionFilterType::class, [
-            'country_choices' => array_flip($this->buildCountries()),
-            'organizer_type_choices' => array_combine($organizerTypes, $organizerTypes),
-            'ids' => range(0, 9999),
-            'years' => [$leftYear, $rightYear]
-        ]);
+        $this->buildFilterForm();
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'extended', $entity = 'Exhibition');
+        $query = $listBuilder->query();
+        // echo($query->getSQL());
+        $stmt = $query->execute();
+        $renderParams = $this->processMapEntries($stmt, $entity);
+        return $this->render('Map/place-map-index.html.twig', $renderParams + [
+                'filter' => null,
+                'bounds' => [
+                    [ 60, -120 ],
+                    [ -15, 120 ],
+                ],
+                'markerStyle' => 'exhibition-by-place' == 'default',
+            ]);
+    }
+
+
+    /**
+     * @Route("/exhibition/map", name="exhibition-index-map")
+     *
+    public function indexMapAction(Request $request,
+                                   UrlGeneratorInterface $urlGenerator,
+                                   UserInterface $user = null)
+    {
+        $this->buildFilterForm();
 
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'extended', $entity = 'Exhibition');
         $query = $listBuilder->query();
@@ -238,6 +161,8 @@ extends CrudController
             'persons' => [], // $persons,
         ]);
     }
+
+    */
 
     /**
      * @Route("/exhibition/stats", name="exhibition-index-stats")
@@ -263,34 +188,18 @@ extends CrudController
         return new \Symfony\Component\HttpFoundation\Response(implode("\n", $charts));
     }
 
-
+    /*
     // TODO MOVE TO SHARED
     protected function lookupSearches($user)
     {
-        if (is_null($user)) {
-            return [];
-        }
+        $this->buildFilterForm();
 
-        $qb = $this->getDoctrine()
-            ->getManager()
-            ->createQueryBuilder();
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, $entity = 'Exhibition');
 
-        $qb->select('UA')
-            ->from('AppBundle:UserAction', 'UA')
-            ->where("UA.route = 'exhibition'")
-            ->andWhere("UA.user = :user")
-            ->orderBy("UA.createdAt", "DESC")
-            ->setParameter('user', $user)
-        ;
+        $charts = $this->buildExhibitionCharts($request, $urlGenerator, $listBuilder);
 
-        $searches = [];
-
-        foreach ($qb->getQuery()->getResult() as $userAction) {
-            $searches[$userAction->getId()] = $userAction->getName();
-        }
-
-        return $searches;
-    }
+        return new \Symfony\Component\HttpFoundation\Response(implode("\n", $charts));
+    } */
 
     /**
      * @Route("/exhibition/shared.embed/{persons}", name="exhibition-shared-partial")
@@ -475,9 +384,9 @@ extends CrudController
     }
 
     /**
-     * @Route("/exhibition/catalogue/csv/{id}", requirements={"id" = "\d+"}, name="exhibition-catalogue-csv")
+     * @Route("/exhibition/{id}/catalogue/csv", requirements={"id" = "\d+"}, name="exhibition-catalogue-csv")
      */
-    public function detailActionCatalogueCSV(Request $request, $id = null)
+    public function detailActionCatalogueCsv(Request $request, $id = null)
     {
         $routeName = $request->get('_route'); $routeParams = [];
 
@@ -492,38 +401,37 @@ extends CrudController
         if (!isset($exhibition) || $exhibition->getStatus() == -1) {
             return $this->redirectToRoute('exhibition-index');
         }
-
-        $citeProc = $this->instantiateCiteProc($request->getLocale());
-        if ($exhibition->hasInfo()) {
-            // expand the publications
-            $exhibition->buildInfoFull($this->getDoctrine()->getManager(), $citeProc);
-        }
-
 
         $result = $this->findCatalogueEntries($exhibition, $request->get('sort'));
 
         $csvResult = [];
 
-        foreach ($result as $value) {
+        foreach ($result as $catEntry) {
             $innerArray = [];
 
-            $holder = $value;
-
-            array_push($innerArray, $holder->getExhibition()->getTitle(), $holder->person->getFullname(true) );
+            $person = $catEntry->getPerson();
+            array_push($innerArray,
+                       $catEntry->catalogueId,
+                       $catEntry->title,
+                       !is_null($person) ? $person->getFullname(true) : '',
+                       $catEntry->getDisplaylocation(),
+                       $catEntry->getTypeParts(),
+                       $catEntry->getDisplaydate(),
+                       $catEntry->getOwnerFull(),
+                       $catEntry->isForsale() ? 'Y' : '',
+                       $catEntry->getPrice()
+                       );
 
             array_push($csvResult, $innerArray);
         }
 
-        $response = new CSVResponse( $csvResult, 200, explode( ', ', 'Startdate, Enddate, Title, City, Venue, # of Cat. Entries, type' ) );
-        $response->setFilename( "data.csv" );
-        return $response;
-
+        return new CsvResponse($csvResult, 200, explode(', ', 'Cat. No., Title, Person, Room, Type, Creation Date, Owner, For Sale, Price'));
     }
 
     /**
-     * @Route("/exhibition/similars/csv/{id}", requirements={"id" = "\d+"}, name="exhibition-similars-csv")
+     * @Route("/exhibition/{id}/similars/csv", requirements={"id" = "\d+"}, name="exhibition-similars-csv")
      */
-    public function detailActionSimilarsCSV(Request $request, $id = null)
+    public function detailActionSimilarsCsv(Request $request, $id = null)
     {
         $routeName = $request->get('_route'); $routeParams = [];
 
@@ -545,35 +453,45 @@ extends CrudController
             $exhibition->buildInfoFull($this->getDoctrine()->getManager(), $citeProc);
         }
 
-
         $result = $this->findSimilar($exhibition);
 
+        $exhibitionIds = array_keys($result);
+        $exhibitionsByIds = [];
+        if (!empty($exhibitionIds)) {
+            $exhibitions = $this->hydrateExhibitions($exhibitionIds);
+            $exhibitionsByIds = array_combine(
+                array_map(function ($exhibition) { return $exhibition->getId(); }, $exhibitions),
+                $exhibitions
+            );
+        }
+
         $csvResult = [];
-
-        foreach ($result as $key=>$value) {
-
-            if ($value['count'] > 1) {
+        foreach ($result as $id => $value) {
+            if ($value['count'] > 0) {
                 $innerArray = [];
 
-                array_push($innerArray, $value['title'], $value['count'] );
+                $exhibition = $exhibitionsByIds[$id];
+
+                array_push($innerArray,
+                    $exhibition->getStartdate(), $exhibition->getEnddate(), $exhibition->getDisplaydate(),
+                    $exhibition->getTitle(),
+                    $exhibition->getLocation()->getPlaceLabel(),
+                    $exhibition->getLocation()->getName(),
+                    $value['count']
+                );
 
                 array_push($csvResult, $innerArray);
             }
         }
 
-        $response = new CSVResponse( $csvResult, 200, explode( ', ', 'Startdate, Enddate, Title, City, Venue, # of Cat. Entries, type' ) );
-        $response->setFilename( "data.csv" );
-
-        return $response;
+        return new CsvResponse($csvResult, 200, explode(', ', 'Start Date, End Date, Display Date, Title, City, Venue, # of common Artists'));
     }
 
     /**
-     * @Route("/exhibition/artists/csv/{id}", requirements={"id" = "\d+"}, name="exhibition-artists-csv")
+     * @Route("/exhibition/{id}/artists/csv", requirements={"id" = "\d+"}, name="exhibition-artists-csv")
      */
-    public function detailActionArtistsCSV(Request $request, $id = null)
+    public function detailActionArtistsCsv(Request $request, $id = null)
     {
-        $routeName = $request->get('_route'); $routeParams = [];
-
         $repo = $this->getDoctrine()
             ->getRepository('AppBundle:Exhibition');
 
@@ -591,7 +509,6 @@ extends CrudController
             // expand the publications
             $exhibition->buildInfoFull($this->getDoctrine()->getManager(), $citeProc);
         }
-
 
         $catalogueEntries = $this->findCatalogueEntries($exhibition, $request->get('sort'));
 
@@ -608,20 +525,13 @@ extends CrudController
 
         $csvResult = [];
 
-        foreach ($result as $key=>$value) {
-
-            $innerArray = [];
-            $person = $value;
-
-            array_push($innerArray, $person->getFullname(true), $person->getBirthDate(), $person->getDeathDate() );
+        foreach ($result as $key => $person) {
+            array_push($innerArray, $person->getFullname(true), $person->getBirthDate(), $person->getDeathDate());
 
             array_push($csvResult, $innerArray);
         }
 
-        $response = new CSVResponse( $csvResult, 200, explode( ', ', 'Startdate, Enddate, Title, City, Venue, # of Cat. Entries, type' ) );
-        $response->setFilename( "data.csv" );
-        return $response;
-
+        return new CsvResponse($csvResult, 200, explode( ', ', 'Name, Birth Date, Death Date'));
     }
 
 
@@ -630,8 +540,6 @@ extends CrudController
      */
     public function detailAction(Request $request, $id = null)
     {
-        $routeName = $request->get('_route'); $routeParams = [];
-
         $repo = $this->getDoctrine()
                 ->getRepository('AppBundle:Exhibition');
 
@@ -646,7 +554,7 @@ extends CrudController
 
         $locale = $request->getLocale();
         if (in_array($request->get('_route'), [ 'exhibition-jsonld' ])) {
-            return new JsonLdResponse($person->jsonLdSerialize($locale));
+            return new JsonLdResponse($exhibition->jsonLdSerialize($locale));
         }
 
         $citeProc = $this->instantiateCiteProc($request->getLocale());
@@ -658,9 +566,6 @@ extends CrudController
         $catalogueEntries = $this->findCatalogueEntries($exhibition, $request->get('sort'));
 
         $artists = [];
-        $genderSplit = ['M' => 0, 'F' => 0]; // first male, second female
-        $artistsCountries = [];
-
         foreach ($catalogueEntries as $entry) {
             $currPerson = $entry->person;
             array_push($artists, $currPerson);
@@ -668,22 +573,21 @@ extends CrudController
 
         $artists = array_unique($artists, SORT_REGULAR); // remove multiple artists
 
+        $genderSplit = ['M' => 0, 'F' => 0]; // first male, second female
+        $artistsCountries = [];
         foreach ($artists as $artist) {
             $currNationality = $artist->getNationality();
-            if( $artist->getGender() === 'M' ){
+            if ($artist->getGender() === 'M' ){
                 $genderSplit['M'] = $genderSplit['M'] + 1;
-            }else if ( $artist->getGender() === 'F' ){
+            }
+            else if ($artist->getGender() === 'F') {
                 $genderSplit['F'] = $genderSplit['F'] + 1;
             }
 
-            array_push($artistsCountries, $currNationality );
-
+            array_push($artistsCountries, $currNationality);
         }
 
         $artistsCountries = array_unique($artistsCountries); // remove multiple countries
-
-
-
 
         $catalogueStatus = SearchListBuilder::$STATUS_LABELS;
 
@@ -728,6 +632,7 @@ extends CrudController
                     'personsByType' => $personIds,
                 ]);
                 break;
+
             case 'container-countries':
                 $personIds = StatisticsController::exhibitionNationalityPersonIds($em = $this->getDoctrine()->getEntityManager(), $request->get('point'), $id);
 
@@ -742,6 +647,7 @@ extends CrudController
                     'type' => 'person'
                 ]);
                 break;
+
             case 'container-works':
                 $worksIds = StatisticsController::itemExhibitionTypeDistributionFull($em = $this->getDoctrine()->getEntityManager(), $request->get('point'), $id);
 
@@ -757,6 +663,7 @@ extends CrudController
                     'type' => 'works'
                 ]);
                 break;
+
             default:
                 die('Currently not handling chart: ' . $chart);
         }
@@ -816,7 +723,7 @@ extends CrudController
             $count = $counts['count' . $key];
             $percentage = 100.0 * $count / $stats['total' . $key];
             $dataEntry = [
-                'name' => $nationality,
+                'name' => $counts['label'],
                 'y' => (int)$count,
                 'artists' => $counts['countArtists'],
                 'itemExhibition' => $counts['countItemExhibition'],
@@ -861,206 +768,6 @@ extends CrudController
         return $this->render('Exhibition/stats.html.twig', [
             'chart' => implode("\n", $charts),
             'exhibitionId' => $exhibition->getId()
-        ]);
-    }
-
-    public function statsActionDetail($id)
-    {
-        if (!empty($id)) {
-            $repo = $this->getDoctrine()
-                ->getRepository('AppBundle:Exhibition');
-            $routeParams = [ 'id' => $id ];
-            $exhibition = $repo->findOneById($id);
-        }
-
-        if (!isset($exhibition) || $exhibition->getStatus() == -1) {
-            return $this->redirectToRoute('exhibition-index');
-        }
-
-        // display the artists by birth-year
-        $stats = StatisticsController::exhibitionAgeDistribution($em = $this->getDoctrine()->getEntityManager(), $exhibition->getId());
-        $ageCount = & $stats['age_count'];
-
-        $categories = $total = [];
-        for ($age = $stats['min_age']; $age <= $stats['max_age'] && $age < 120; $age++) {
-            $categories[] = $age; // 0 == $age % 5 ? $year : '';
-
-            foreach ([ 'living', 'deceased' ] as $cat) {
-                $total['age_' . $cat][$age] = [
-                    'name' => $age,
-                    'y' => isset($ageCount[$age]) && isset($ageCount[$age][$cat])
-                        ? intval($ageCount[$age][$cat]) : 0,
-                ];
-            }
-        }
-
-        $template = $this->get('twig')->loadTemplate('Statistics/person-exhibition-age.html.twig');
-        $charts = [
-            $template->renderBlock('chart', [
-                'container' => 'container-age',
-                'categories' => json_encode($categories),
-                'age_at_exhibition_living' => json_encode(array_values($total['age_living'])),
-                'age_at_exhibition_deceased' => json_encode(array_values($total['age_deceased'])),
-                'exhibition_id' => $id,
-            ]),
-        ];
-
-        // nationalities of participating artists
-        $stats = StatisticsController::itemExhibitionNationalityDistribution($em, $exhibition->getId());
-        $data = [];
-        $key = 'ItemExhibition'; // alternative is 'Artists'
-        foreach ($stats['nationalities'] as $nationality => $counts) {
-            $count = $counts['count' . $key];
-            $percentage = 100.0 * $count / $stats['total' . $key];
-            $dataEntry = [
-                'name' => $nationality,
-                'y' => (int)$count,
-                'artists' => $counts['countArtists'],
-                'itemExhibition' => $counts['countItemExhibition'],
-            ];
-            if ($percentage < 5) {
-                $dataEntry['dataLabels'] = [ 'enabled' => false ];
-            }
-            $data[] = $dataEntry;
-        }
-
-        $template = $this->get('twig')->loadTemplate('Statistics/itemexhibition-nationality.html.twig');
-        $charts[] = $template->renderBlock('chart', [
-            'container' => 'container-nationality',
-            'totalArtists' => $stats['totalArtists'],
-            'totalItemExhibition' => $stats['totalItemExhibition'],
-            'data' => json_encode($data),
-            'exhibitionId' => $exhibition->getId()
-        ]);
-
-        // type of work
-        $stats = StatisticsController::itemExhibitionTypeDistribution($em, $exhibition->getId());
-        $data = [];
-        foreach ($stats['types'] as $type => $count) {
-            $percentage = 100.0 * $count / $stats['total'];
-            $dataEntry = [
-                'name' => $type,
-                'y' => (int)$count,
-            ];
-            if ($percentage < 5) {
-                $dataEntry['dataLabels'] = [ 'enabled' => false ];
-            }
-            $data[] = $dataEntry;
-        }
-
-        $template = $this->get('twig')->loadTemplate('Statistics/itemexhibition-type.html.twig');
-        $charts[] = $template->renderBlock('chart', [
-            'container' => 'container-type',
-            'total' => $stats['total'],
-            'data' => json_encode($data),
-            'exhibitionId' => $exhibition->getId(),
-        ]);
-
-        // display the static content
-        return $this->render('Exhibition/stats-detail.html.twig', [
-            'chart' => implode("\n", $charts),
-            'exhibitionId' => $exhibition->getId(),
-        ]);
-    }
-
-
-    public function statsActionIndex($ids = null)
-    {
-        if (!empty($id)) {
-            $repo = $this->getDoctrine()
-                ->getRepository('AppBundle:Exhibition');
-            $routeParams = [ 'id' => $id ];
-            $exhibition = $repo->findOneById($id);
-        }
-
-        if (!isset($exhibition) || $exhibition->getStatus() == -1) {
-            return $this->redirectToRoute('exhibition-index');
-        }
-
-        // display the artists by birth-year
-        $stats = StatisticsController::exhibitionAgeDistribution($em = $this->getDoctrine()->getEntityManager(), null, null, null, null, $ids);
-        $ageCount = & $stats['age_count'];
-
-        $categories = $total = [];
-        for ($age = $stats['min_age']; $age <= $stats['max_age'] && $age < 120; $age++) {
-            $categories[] = $age; // 0 == $age % 5 ? $year : '';
-
-            foreach ([ 'living', 'deceased' ] as $cat) {
-                $total['age_' . $cat][$age] = [
-                    'name' => $age,
-                    'y' => isset($ageCount[$age]) && isset($ageCount[$age][$cat])
-                        ? intval($ageCount[$age][$cat]) : 0,
-                ];
-            }
-        }
-
-        $template = $this->get('twig')->loadTemplate('Statistics/person-exhibition-age.html.twig');
-        $charts = [
-            $template->renderBlock('chart', [
-                'container' => 'container-age',
-                'categories' => json_encode($categories),
-                'age_at_exhibition_living' => json_encode(array_values($total['age_living'])),
-                'age_at_exhibition_deceased' => json_encode(array_values($total['age_deceased'])),
-                'exhibition_id' => $id,
-            ]),
-        ];
-
-
-        // nationalities of participating artists
-        $stats = StatisticsController::itemExhibitionNationalityDistribution($em, $exhibition->getId());
-        $data = [];
-        $key = 'ItemExhibition'; // alternative is 'Artists'
-        foreach ($stats['nationalities'] as $nationality => $counts) {
-            $count = $counts['count' . $key];
-            $percentage = 100.0 * $count / $stats['total' . $key];
-            $dataEntry = [
-                'name' => $nationality,
-                'y' => (int)$count,
-                'artists' => $counts['countArtists'],
-                'itemExhibition' => $counts['countItemExhibition'],
-            ];
-            if ($percentage < 5) {
-                $dataEntry['dataLabels'] = [ 'enabled' => false ];
-            }
-            $data[] = $dataEntry;
-        }
-
-        $template = $this->get('twig')->loadTemplate('Statistics/itemexhibition-nationality.html.twig');
-        $charts[] = $template->renderBlock('chart', [
-            'container' => 'container-nationality',
-            'totalArtists' => $stats['totalArtists'],
-            'totalItemExhibition' => $stats['totalItemExhibition'],
-            'data' => json_encode($data),
-            'exhibitionId' => $exhibition->getId()
-        ]);
-
-        // type of work
-        $stats = StatisticsController::itemExhibitionTypeDistribution($em, $exhibition->getId());
-        $data = [];
-        foreach ($stats['types'] as $type => $count) {
-            $percentage = 100.0 * $count / $stats['total'];
-            $dataEntry = [
-                'name' => $type,
-                'y' => (int)$count,
-            ];
-            if ($percentage < 5) {
-                $dataEntry['dataLabels'] = [ 'enabled' => false ];
-            }
-            $data[] = $dataEntry;
-        }
-
-        $template = $this->get('twig')->loadTemplate('Statistics/itemexhibition-type.html.twig');
-        $charts[] = $template->renderBlock('chart', [
-            'container' => 'container-type',
-            'total' => $stats['total'],
-            'data' => json_encode($data),
-            'exhibitionId' => $exhibition->getId()
-        ]);
-
-        // display the static content
-        return $this->render('Exhibition/stats-detail.html.twig', [
-            'chart' => implode("\n", $charts),
-            'exhibitionId' => $exhibition->getId(),
         ]);
     }
 }

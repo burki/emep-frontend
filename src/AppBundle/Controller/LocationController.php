@@ -3,13 +3,20 @@
 namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Intl\Intl;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+
+use Pagerfanta\Pagerfanta;
 
 use AppBundle\Utils\CsvResponse;
-use Symfony\Component\Security\Core\User\UserInterface;
+use AppBundle\Utils\SearchListBuilder;
+use AppBundle\Utils\SearchListPagination;
+use AppBundle\Utils\SearchListAdapter;
 
 
 /**
@@ -18,6 +25,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class LocationController
 extends CrudController
 {
+    use MapBuilderTrait;
+    use StatisticsBuilderTrait;
     use SharingBuilderTrait;
 
     // TODO: share with ExhibitionController
@@ -39,604 +48,234 @@ extends CrudController
         return $this->buildActiveCountries($qb);
     }
 
-    /**
-     * @Route("/location/csv", name="location-csv")
-     */
-    public function indexToCsvAction(Request $request)
+    protected function buildFilterForm($entity = 'Venue')
     {
-        $route = $request->get('_route');
-
-        $qb = $this->getDoctrine()
-            ->getManager()
-            ->createQueryBuilder();
-
-        $qb->select([
-            'L',
-            "CONCAT(COALESCE(C.name, P.countryCode), COALESCE(P.alternateName,P.name),L.name) HIDDEN countryPlaceNameSort",
-            "L.name HIDDEN nameSort",
-            'COUNT(DISTINCT E.id) AS numExhibitionSort',
-            'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-        ])
-            ->from('AppBundle:Location', 'L')
-            ->leftJoin('L.place', 'P')
-            ->leftJoin('P.country', 'C')
-            ->leftJoin('AppBundle:Exhibition', 'E',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'E.location = L AND E.status <> -1')
-            ->leftJoin('AppBundle:ItemExhibition', 'IE',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = E AND IE.title IS NOT NULL')
-            ->where('L.status <> -1 AND 0 = BIT_AND(L.flags, 256)')
-            ->groupBy('L.id')
-            ->orderBy('countryPlaceNameSort')
-        ;
-
-        $types = $this->buildVenueTypes();
-        $form = $this->get('form.factory')->create(\AppBundle\Filter\LocationFilterType::class, [
-            'country_choices' => array_flip($this->buildCountries()),
-            'location_type_choices' => array_combine($types, $types),
-            'ids' => range(0, 9999)
-        ]);
-
-        if ($request->query->has($form->getName())) {
-            // manually bind values from the request
-            $form->submit($request->query->get($form->getName()));
-            // build the query from the given form object
-            $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($form, $qb);
+        if ('Organizer' == $entity) {
+            $venueTypes = $this->buildVenueTypes();
+            $this->form = $this->createForm(\AppBundle\Filter\OrganizerFilterType::class, [
+                'choices' => [
+                    'country' => array_flip($this->buildCountries()),
+                    'location_type' => array_combine($venueTypes, $venueTypes),
+                ],
+            ]);
         }
-
-        $pagination = $this->buildPagination($request, $qb->getQuery(), [
-            // the following leads to wrong display in combination with our
-            // helper.pagination_sortable()
-            // 'defaultSortFieldName' => 'countryPlaceNameSort', 'defaultSortDirection' => 'asc',
-        ]);
-
-        $result = $qb->getQuery()->getResult();
-
-        $csvResult = [];
-
-        foreach ($result as $value) {
-            $innerArray = [];
-
-            // echo ('  |   ');
-
-
-            // print_r( $value[0]->getStartdate() );
-            // echo '  |   ';
-            // print_r( $value[0]->getEnddate() );
-            // echo '  |   ';
-            // print_r( $value[0]->title );
-            // echo '  |   ';
-
-            $location = $value[0];
-            $locationLabel = '';
-            $locationName = '';
-
-            if ($location) {
-                $locationLabel = $value[0]->getPlaceLabel();
-                $locationName = $value[0]->getName();
-            }
-
-            // print_r( $locationLabel );
-            // echo '  |   ';
-            // print_r( $locationName );
-            // echo '  |   ';
-            // print_r( $value['numCatEntrySort'] );
-            // echo '  |   ';
-            // print_r( $value[0]->getOrganizerType() );
-            // echo '  |   ';
-
-            array_push($innerArray, $locationName, $locationLabel, count($value[0]->getExhibitions()), $value['numCatEntrySort'] );
-
-
-            array_push($csvResult, $innerArray);
+        else {
+            $venueTypes = $this->buildVenueTypes();
+            $this->form = $this->createForm(\AppBundle\Filter\LocationFilterType::class, [
+                'choices' => [
+                    'country' => array_flip($this->buildCountries()),
+                    'location_type' => array_combine($venueTypes, $venueTypes),
+                ],
+            ]);
         }
-
-        // print_r($csvResult);
-
-        /* END DATATABLE CREATION LIKE FRONTEND */
-
-
-        $response = new CSVResponse( $csvResult, 200, explode( ', ', 'Startdate, Enddate, Title, City, Venue, # of Cat. Entries, type' ) );
-        $response->setFilename( "data.csv" );
-        return $response;
     }
-
 
     /**
      * @Route("/organizer", name="organizer-index")
+     * @Route("/location", name="location-index")
      */
-    public function indexActionOrganizer(Request $request, UserInterface $user = null)
+    public function indexAction(Request $request,
+                                         UrlGeneratorInterface $urlGenerator,
+                                         UserInterface $user = null)
     {
-
-        // redirect to saved query
-        if ('POST' == $request->getMethod() && !is_null($user)) {
-            // check a useraction was requested
-            $userActionId = $request->request->get('useraction');
-            if (!empty($userActionId)) {
-                $userAction = $this->getDoctrine()
-                    ->getManager()
-                    ->getRepository('AppBundle:UserAction')
-                    ->findOneBy([
-                        'id' => $userActionId,
-                        'user' => $user,
-                        'route' => 'organizer',
-                    ]);
-
-                if (!is_null($userAction)) {
-                    return $this->redirectToRoute($userAction->getRoute(),
-                        $userAction->getRouteParams());
-                }
-            }
+        $response = $this->handleUserAction($request, $user);
+        if (!is_null($response)) {
+            return $response;
         }
 
-        $requestURI =  $request->getRequestUri();
+        $entity = 'organizer-index' == $request->get('_route') ? 'Organizer' : 'Venue';
 
-        $route = $request->get('_route');
+        $this->buildFilterForm($entity);
 
-        $qb = $this->getDoctrine()
-            ->getManager()
-            ->createQueryBuilder();
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, $entity);
+        $listPagination = new SearchListPagination($listBuilder);
+        $page = $request->get('page', 1);
+        $listPage = $listPagination->get($this->pageSize, ($page - 1) * $this->pageSize);
+        $adapter = new SearchListAdapter($listPage);
+        $pager = new Pagerfanta($adapter);
+        $pager->setMaxPerPage($listPage['limit']);
+        $pager->setCurrentPage(intval($listPage['offset'] / $listPage['limit']) + 1);
 
-        $qb->select([
-            'L',
-            "CONCAT(COALESCE(C.name, P.countryCode), COALESCE(P.alternateName,P.name),L.name) HIDDEN countryPlaceNameSort",
-            "L.name HIDDEN nameSort",
-            'COUNT(DISTINCT E.id) AS numExhibitionSort',
-            'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-            "P.name HIDDEN placeSort",
-            "L.type HIDDEN typeSort"
-        ])
-            ->from('AppBundle:Location', 'L')
-            ->leftJoin('L.place', 'P')
-            ->leftJoin('P.country', 'C')
-        ;
+        return $this->render(('organizer-index' == $request->get('_route') ? 'Organizer' : 'Location')
+                             . '/index.html.twig', [
+            'pageTitle' => $this->get('translator')->trans('organizer-index' == $request->get('_route')
+                                                           ? 'Organizing Bodies' : 'Venues'),
+            'pager' => $pager,
 
-        if ('organizer-index' == $route) {
-            $qb
-                ->innerJoin('AppBundle:Exhibition', 'E',
-                    \Doctrine\ORM\Query\Expr\Join::WITH,
-                    'L MEMBER OF E.organizers AND E.status <> -1')
-                ->where('L.status <> -1')
-            ;
-        }
-        else {
-            $qb
-                ->leftJoin('AppBundle:Exhibition', 'E',
-                    \Doctrine\ORM\Query\Expr\Join::WITH,
-                    'E.location = L AND E.status <> -1')
-                ->where('L.status <> -1 AND 0 = BIT_AND(L.flags, 256)')
-            ;
-        }
-
-        $qb
-            ->leftJoin('AppBundle:ItemExhibition', 'IE',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = E AND IE.title IS NOT NULL')
-            ->groupBy('L.id')
-            ->orderBy('countryPlaceNameSort')
-        ;
-
-        $types = $this->buildVenueTypes();
-        $form = $this->get('form.factory')->create(\AppBundle\Filter\LocationFilterType::class, [
-            'country_choices' => array_flip($this->buildCountries()),
-            'location_type_choices' => array_combine($types, $types),
-            'ids' => range(0, 9999)
-        ]);
-
-        if ($request->query->has($form->getName())) {
-            // manually bind values from the request
-            $form->submit($request->query->get($form->getName()));
-            // build the query from the given form object
-            $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($form, $qb);
-        }
-
-        $pagination = $this->buildPagination($request, $qb->getQuery(), [
-            // the following leads to wrong display in combination with our
-            // helper.pagination_sortable()
-            // 'defaultSortFieldName' => 'countryPlaceNameSort', 'defaultSortDirection' => 'asc',
-        ]);
-
-        $locations = $qb->getQuery()->getResult();
-
-        $countries = $form->get('country')->getData();
-        $locationType = $form->get('location_type')->getData();
-        $stringQuery = $form->get('search')->getData();
-        $ids = $form->get('id')->getData();
-
-        $indexDataNumberVenueType = $this->indexDataNumberVenueType($locations);
-        $indexDataNumberCountries = $this->indexDataNumberCountries($locations);
-
-        return $this->render('Organizer/index.html.twig', [
-            'pageTitle' => $this->get('translator')->trans('organizer-index' == $route ? 'Organizing Bodies' : 'Venues'),
-            'pagination' => $pagination,
-            'form' => $form->createView(),
-            'countryArray' => $this->buildCountries(),
-            'organizerTypesArray' => $types,
-            'countries' => $countries,
-            'ids' => $ids,
-            'locationType' => $locationType,
-            'stringPart' => $stringQuery,
-            'locations' => $locations,
-            'indexDataNumberVenueType' => $indexDataNumberVenueType,
-            'indexDataNumberCountries' => $indexDataNumberCountries,
-            'requestURI' =>  $requestURI,
-            'searches' => $this->lookupSearchesOrganizer($user)
+            'listBuilder' => $listBuilder,
+            'form' => $this->form->createView(),
+            'searches' => $this->lookupSearches($user, $request->get('_route'))
         ]);
     }
 
+    /**
+     * @Route("/organizer/map", name="organizer-index-map")
+     * @Route("/location/map", name="location-index-map")
+     */
+    public function indexMapAction(Request $request,
+                                            UrlGeneratorInterface $urlGenerator,
+                                            UserInterface $user = null)
+    {
+        $entity = 'organizer-index-map' == $request->get('_route') ? 'Organizer' : 'Venue';
+
+        $this->buildFilterForm($entity);
+
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'extended', $entity);
+        $query = $listBuilder->query();
+        // echo($query->getSQL());
+
+        $stmt = $query->execute();
+
+        $renderParams = $this->processMapEntries($stmt, $entity);
+
+        return $this->render('Map/place-map-index.html.twig', $renderParams + [
+            'filter' => null,
+            'bounds' => [
+                [ 60, -120 ],
+                [ -15, 120 ],
+            ],
+            'markerStyle' => 'exhibition-by-place' == 'default',
+        ]);
+    }
 
     /**
-     * @Route("/location", name="location-index")
+     * @Route("/organizer/stats", name="organizer-index-stats")
+     * @Route("/location/stats", name="location-index-stats")
      */
-    public function indexAction(Request $request, UserInterface $user = null)
+    public function indexStatsAction(Request $request,
+                                              UrlGeneratorInterface $urlGenerator,
+                                              UserInterface $user = null)
     {
+        $entity = 'organizer-index-stats' == $request->get('_route') ? 'Organizer' : 'Venue';
 
-        // redirect to saved query
-        if ('POST' == $request->getMethod() && !is_null($user)) {
-            // check a useraction was requested
-            $userActionId = $request->request->get('useraction');
-            if (!empty($userActionId)) {
-                $userAction = $this->getDoctrine()
-                    ->getManager()
-                    ->getRepository('AppBundle:UserAction')
-                    ->findOneBy([
-                        'id' => $userActionId,
-                        'user' => $user,
-                        'route' => 'location',
-                    ]);
+        $this->buildFilterForm($entity);
 
-                if (!is_null($userAction)) {
-                    return $this->redirectToRoute($userAction->getRoute(),
-                        $userAction->getRouteParams());
-                }
-            }
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, $entity);
+
+        $charts = $this->buildLocationCharts($request, $urlGenerator, $listBuilder);
+
+        return new \Symfony\Component\HttpFoundation\Response(implode("\n", $charts));
+    }
+
+    protected function buildSaveSearchParams(Request $request, UrlGeneratorInterface $urlGenerator)
+    {
+        $route = str_replace('-save', '-index', $request->get('_route'));
+        $entity = 'organizer-index' == $route ? 'Organizer' : 'Venue';
+
+        $this->buildFilterForm($entity);
+
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, $entity);
+        $filters = $listBuilder->getQueryFilters(true);
+        if (empty($filters)) {
+            return [ $route, [] ];
         }
 
-        $requestURI =  $request->getRequestUri();
+        $routeParams = [
+            'filter' => $filters,
+        ];
 
-        $route = $request->get('_route');
+        return [ $route, $routeParams ];
+    }
 
+    /**
+     * @Route("/location/save", name="location-save")
+     * @Route("/organizer/save", name="organizer-save")
+     */
+    public function saveSearchAction(Request $request,
+                                     UrlGeneratorInterface $urlGenerator,
+                                     UserInterface $user)
+    {
+        return $this->handleSaveSearchAction($request, $urlGenerator, $user);
+    }
+
+
+    protected function getExhibitionIds($location)
+    {
+        // get exhibition-ids both as venue and as organizers
+        $exhibitionIds = [];
+
+        $exhibitions = $location->getExhibitions();
+        if (!is_null($exhibitions)) {
+            $exhibitionIds = array_map(function ($exhibition) { return $exhibition->getId(); }, $exhibitions->toArray());
+        }
+
+        $exhibitions = $location->getOrganizerOf();
+        if (!is_null($exhibitions)) {
+            $exhibitionIds = array_unique(
+                array_merge($exhibitionIds,
+                            array_map(function ($exhibition) { return $exhibition->getId(); }, $exhibitions->toArray())));
+        }
+
+        return $exhibitionIds;
+    }
+
+    protected function getArtistsByExhibitionIds($exhibitionIds)
+    {
+        if (empty($exhibitionIds)) {
+            return [];
+        }
+
+        // artists this venue
         $qb = $this->getDoctrine()
                 ->getManager()
                 ->createQueryBuilder();
 
         $qb->select([
-                'L',
-                "CONCAT(COALESCE(C.name, P.countryCode), COALESCE(P.alternateName,P.name),L.name) HIDDEN countryPlaceNameSort",
-                "L.name HIDDEN nameSort",
+                'P',
                 'COUNT(DISTINCT E.id) AS numExhibitionSort',
                 'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-                "P.name HIDDEN placeSort",
-                "L.type HIDDEN typeSort"
+                "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort"
             ])
-            ->from('AppBundle:Location', 'L')
-            ->leftJoin('L.place', 'P')
-            ->leftJoin('P.country', 'C')
+            ->from('AppBundle:Person', 'P')
+            ->innerJoin('AppBundle:ItemExhibition', 'IE',
+                       \Doctrine\ORM\Query\Expr\Join::WITH,
+                       'IE.person = P AND IE.title IS NOT NULL')
+            ->innerJoin('IE.exhibition', 'E')
+            ->where('E.id IN(:ids) AND E.status <> -1')
+            ->setParameter('ids', $exhibitionIds)
+            ->groupBy('P.id')
+            ->orderBy('nameSort')
             ;
 
-        if ('organizer-index' == $route) {
-            $qb
-                ->innerJoin('AppBundle:Exhibition', 'E',
-                           \Doctrine\ORM\Query\Expr\Join::WITH,
-                           'L MEMBER OF E.organizers AND E.status <> -1')
-                ->where('L.status <> -1')
-                ;
-        }
-        else {
-            $qb
-                ->leftJoin('AppBundle:Exhibition', 'E',
-                           \Doctrine\ORM\Query\Expr\Join::WITH,
-                           'E.location = L AND E.status <> -1')
-                ->where('L.status <> -1 AND 0 = BIT_AND(L.flags, 256)')
-                ;
+        return $qb->getQuery()->getResult();
+    }
+
+    protected function getExhibitionStatsByIds($exhibitionIds) {
+        $exhibitionStats = [];
+
+        if (empty($exhibitionIds)) {
+            return $exhibitionStats;
         }
 
-        $qb
+        // stats
+        $qb = $this->getDoctrine()
+                ->getManager()
+                ->createQueryBuilder();
+        $qb->select([
+                'E.id AS id',
+                'COUNT(DISTINCT IE.id) AS numCatEntrySort',
+                'COUNT(DISTINCT P.id) AS numPersonSort',
+            ])
+            ->from('AppBundle:Exhibition', 'E')
             ->leftJoin('AppBundle:ItemExhibition', 'IE',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'IE.exhibition = E AND IE.title IS NOT NULL')
-            ->groupBy('L.id')
-            ->orderBy('countryPlaceNameSort')
+            ->leftJoin('IE.person', 'P')
+            ->where('E.id IN (:ids) AND E.status <> -1')
+            ->setParameter('ids', $exhibitionIds)
+            ->groupBy('E.id')
             ;
 
-        $types = $this->buildVenueTypes();
-        $form = $this->get('form.factory')->create(\AppBundle\Filter\LocationFilterType::class, [
-            'country_choices' => array_flip($this->buildCountries()),
-            'location_type_choices' => array_combine($types, $types),
-            'ids' => range(0, 9999)
-        ]);
-
-        if ($request->query->has($form->getName())) {
-            // manually bind values from the request
-            $form->submit($request->query->get($form->getName()));
-            // build the query from the given form object
-            $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($form, $qb);
+        foreach ($qb->getQuery()->getResult() as $row) {
+           $exhibitionStats[$row['id']] = $row;
         }
 
-        $pagination = $this->buildPagination($request, $qb->getQuery(), [
-            // the following leads to wrong display in combination with our
-            // helper.pagination_sortable()
-            // 'defaultSortFieldName' => 'countryPlaceNameSort', 'defaultSortDirection' => 'asc',
-        ]);
-
-        $locations = $qb->getQuery()->getResult();
-
-        $countries = $form->get('country')->getData();
-        $locationType = $form->get('location_type')->getData();
-        $stringQuery = $form->get('search')->getData();
-        $ids = $form->get('id')->getData();
-
-        $indexDataNumberVenueType = $this->indexDataNumberVenueType($locations);
-        $indexDataNumberCountries = $this->indexDataNumberCountries($locations);
-
-        return $this->render('Location/index.html.twig', [
-            'pageTitle' => $this->get('translator')->trans('organizer-index' == $route ? 'Organizing Bodies' : 'Venues'),
-            'pagination' => $pagination,
-            'form' => $form->createView(),
-            'countryArray' => $this->buildCountries(),
-            'organizerTypesArray' => $types,
-            'countries' => $countries,
-            'ids' => $ids,
-            'locationType' => $locationType,
-            'stringPart' => $stringQuery,
-            'locations' => $locations,
-            'indexDataNumberVenueType' => $indexDataNumberVenueType,
-            'indexDataNumberCountries' => $indexDataNumberCountries,
-            'requestURI' =>  $requestURI,
-            'searches' => $this->lookupSearches($user)
-        ]);
-    }
-
-
-    // TODO MOVE TO SHARED
-    protected function lookupSearchesOrganizer($user)
-    {
-        if (is_null($user)) {
-            return [];
-        }
-
-        $qb = $this->getDoctrine()
-            ->getManager()
-            ->createQueryBuilder();
-
-        $qb->select('UA')
-            ->from('AppBundle:UserAction', 'UA')
-            ->where("UA.route = 'organizer'")
-            ->andWhere("UA.user = :user")
-            ->orderBy("UA.createdAt", "DESC")
-            ->setParameter('user', $user)
-        ;
-
-        $searches = [];
-
-        foreach ($qb->getQuery()->getResult() as $userAction) {
-            $searches[$userAction->getId()] = $userAction->getName();
-        }
-
-        return $searches;
-    }
-
-    // TODO MOVE TO SHARED
-    protected function lookupSearches($user)
-    {
-        if (is_null($user)) {
-            return [];
-        }
-
-        $qb = $this->getDoctrine()
-            ->getManager()
-            ->createQueryBuilder();
-
-        $qb->select('UA')
-            ->from('AppBundle:UserAction', 'UA')
-            ->where("UA.route = 'location'")
-            ->andWhere("UA.user = :user")
-            ->orderBy("UA.createdAt", "DESC")
-            ->setParameter('user', $user)
-        ;
-
-        $searches = [];
-
-        foreach ($qb->getQuery()->getResult() as $userAction) {
-            $searches[$userAction->getId()] = $userAction->getName();
-        }
-
-        return $searches;
-    }
-
-    /**
-     * @Route("/location/save", name="location-save")
-     */
-    public function saveSearchActionLocation(Request $request,
-                                           UserInterface $user)
-    {
-
-        $parametersAsString = $request->get('entity');
-        $parametersAsString = str_replace("/location?", '', $parametersAsString);
-
-
-        parse_str($parametersAsString, $parameters);
-
-
-        $form = $this->createForm(\AppBundle\Form\Type\SaveSearchType::class);
-
-        //$form->get
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-
-            $userAction = new \AppBundle\Entity\UserAction();
-
-            $userAction->setUser($user);
-            $userAction->setRoute($route = 'location');
-            $userAction->setRouteParams($parameters);
-
-            $userAction->setName($data['name']);
-
-            $em = $this->getDoctrine()
-                ->getManager();
-
-            $em->persist($userAction);
-            $em->flush();
-
-            return $this->redirectToRoute($route, $parameters);
-        }
-
-        return $this->render('Search/save.html.twig', [
-            'pageTitle' => $this->get('translator')->trans('Save your query'),
-            'form' => $form->createView(),
-        ]);
-    }
-
-
-
-    /**
-     * @Route("/organizer/save", name="organizer-save")
-     */
-    public function saveSearchActionOrganizer(Request $request,
-                                             UserInterface $user)
-    {
-
-        $parametersAsString = $request->get('entity');
-        $parametersAsString = str_replace("/organizer?", '', $parametersAsString);
-
-
-        parse_str($parametersAsString, $parameters);
-
-
-        $form = $this->createForm(\AppBundle\Form\Type\SaveSearchType::class);
-
-        //$form->get
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-
-            $userAction = new \AppBundle\Entity\UserAction();
-
-            $userAction->setUser($user);
-            $userAction->setRoute($route = 'organizer');
-            $userAction->setRouteParams($parameters);
-
-            $userAction->setName($data['name']);
-
-            $em = $this->getDoctrine()
-                ->getManager();
-
-            $em->persist($userAction);
-            $em->flush();
-
-            return $this->redirectToRoute($route, $parameters);
-        }
-
-        return $this->render('Search/save.html.twig', [
-            'pageTitle' => $this->get('translator')->trans('Save your query'),
-            'form' => $form->createView(),
-        ]);
-    }
-
-
-    public function indexDataNumberCountries($results)
-    {
-        $countryCodes = [];
-
-        foreach ($results as $result) {
-            $location = $result[0];
-            $place = $location->getPlace();
-            if (!is_null($place)) {
-                $countryCode = $place->getCountryCode();
-            }
-            else {
-                $countryCode = $location->getCountry();
-            }
-
-            array_push($countryCodes, $countryCode);
-        }
-
-        // replacing null values
-        $countryCodes = array_replace($countryCodes,array_fill_keys(array_keys($countryCodes, null),''));
-
-        $valuesTotal = array_count_values($countryCodes);
-
-        $valuesOnly = array_keys($valuesTotal);
-        $countsOnly =  array_values($valuesTotal);
-
-
-        $i = 0;
-        $finalDataJson = '[';
-
-        foreach ($valuesOnly as $val) {
-            $i > 0 ? $finalDataJson .= ", " : '';
-
-            $count = $countsOnly[$i] ;
-
-            $finalDataJson .= '{ name: "' . $val . '", y: '. $count . '} ';
-            $i += 1;
-        }
-        $finalDataJson .= ']';
-
-        return [ $finalDataJson, array_sum($countsOnly) ];
-    }
-
-
-    public function indexDataNumberVenueType($locations)
-    {
-        //$exhibitions = $location->getExhibitions();
-
-        $venueTypes = [];
-
-        foreach ($locations as $location) {
-
-            //print count($entries);
-            //print '   ';
-
-            $currType = (string) $location[0]->getType() == '' ? 'unknown' : (string) $location[0]->getType();
-
-            array_push($venueTypes, (string) $currType );
-
-        }
-
-        $typesTotal = array_count_values ( $venueTypes );
-
-        //$exhibitionPlacesArray = array_keys($exhibitionPlaces);
-
-        // print_r($exhibitionPlacesArray);
-
-        $typesOnly = ( array_keys($typesTotal) );
-        $valuesOnly =  array_values( $typesTotal );
-
-
-        $sumOfAllTypes= array_sum(array_values($typesTotal));
-
-        $i = 0;
-        $finalDataJson = '[';
-
-        foreach ($typesOnly as $place) {
-
-            $i > 0 ? $finalDataJson .= ", " : '';
-
-            $numberOfExhibitions = $valuesOnly[$i] ;
-
-            $finalDataJson .= '{ name: "' .$place. '", y: '. $numberOfExhibitions . '} ';
-            $i += 1;
-        }
-        $finalDataJson .= ']';
-
-
-
-        $returnArray = [$finalDataJson, $sumOfAllTypes];
-
-
-        return $returnArray;
+        return $exhibitionStats;
     }
 
 
     /**
-     * @Route("/location/artists/csv/{id}", requirements={"id" = "\d+"}, name="location-artists-csv")
+     * @Route("/location/{id}/artists/csv", requirements={"id" = "\d+"}, name="location-artists-csv")
      */
     public function detailActionArtists(Request $request, $id = null, $ulan = null, $gnd = null)
     {
@@ -654,79 +293,29 @@ extends CrudController
             return $this->redirectToRoute('location-index');
         }
 
-        $locale = $request->getLocale();
-        if (in_array($request->get('_route'), [ 'location-jsonld' ])) {
-            return new JsonLdResponse($person->jsonLdSerialize($locale));
-        }
+        $exhibitionIds = $this->getExhibitionIds($location);
 
-        // artists this venue
-        $qb = $this->getDoctrine()
-            ->getManager()
-            ->createQueryBuilder();
-
-        $qb->select([
-            'P',
-            'COUNT(DISTINCT E.id) AS numExhibitionSort',
-            'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-            "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort"
-        ])
-            ->from('AppBundle:Person', 'P')
-            ->innerJoin('AppBundle:ItemExhibition', 'IE',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.person = P AND IE.title IS NOT NULL')
-            ->innerJoin('IE.exhibition', 'E')
-            ->where('E.location = :location AND E.status <> -1')
-            ->setParameter('location', $location)
-            ->groupBy('P.id')
-            ->orderBy('nameSort')
-        ;
-        $artists = $qb->getQuery()->getResult();
-
-        // stats
-        $qb = $this->getDoctrine()
-            ->getManager()
-            ->createQueryBuilder();
-        $qb->select([
-            'E.id AS id',
-            'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-            'COUNT(DISTINCT P.id) AS numPersonSort',
-        ])
-            ->from('AppBundle:Exhibition', 'E')
-            ->leftJoin('E.location', 'L')
-            ->leftJoin('AppBundle:ItemExhibition', 'IE',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = E AND IE.title IS NOT NULL')
-            ->leftJoin('IE.person', 'P')
-            ->where('E.location = :location AND E.status <> -1')
-            ->setParameter('location', $location)
-            ->groupBy('E.id')
-        ;
-        $exhibitionStats = [];
-        foreach ($qb->getQuery()->getResult() as $row) {
-            $exhibitionStats[$row['id']] = $row;
-        }
-
-        $result = $artists;
+        $artists = $this->getArtistsByExhibitionIds($exhibitionIds);
 
         $csvResult = [];
 
-        foreach ($result as $key=>$value) {
-
+        foreach ($artists as $key => $value) {
             $artist = $value[0];
 
             $innerArray = [];
-            array_push($innerArray, $artist->getFullName(true), $value['numExhibitionSort'], $value['numCatEntrySort'] );
+            array_push($innerArray,
+                       $artist->getFullName(true),
+                       $value['numExhibitionSort'],
+                       $value['numCatEntrySort'] );
 
             array_push($csvResult, $innerArray);
         }
 
-        $response = new CSVResponse( $csvResult, 200, explode( ', ', 'Startdate, Enddate, Title, City, Venue, # of Cat. Entries, type' ) );
-        $response->setFilename( "data.csv" );
-        return $response;
+        return new CsvResponse($csvResult, 200, explode( ', ', 'Person, # of Exhibitions, # of Cat. Entries'));
     }
 
     /**
-     * @Route("/location/exhibitions/csv/{id}", requirements={"id" = "\d+"}, name="location-exhibitions-csv")
+     * @Route("/location/{id}/exhibitions/csv", requirements={"id" = "\d+"}, name="location-exhibitions-csv")
      */
     public function detailActionExhibitions(Request $request, $id = null, $ulan = null, $gnd = null)
     {
@@ -744,73 +333,22 @@ extends CrudController
             return $this->redirectToRoute('location-index');
         }
 
-        $locale = $request->getLocale();
-        if (in_array($request->get('_route'), [ 'location-jsonld' ])) {
-            return new JsonLdResponse($person->jsonLdSerialize($locale));
-        }
-
-        // artists this venue
-        $qb = $this->getDoctrine()
-            ->getManager()
-            ->createQueryBuilder();
-
-        $qb->select([
-            'P',
-            'COUNT(DISTINCT E.id) AS numExhibitionSort',
-            'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-            "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort"
-        ])
-            ->from('AppBundle:Person', 'P')
-            ->innerJoin('AppBundle:ItemExhibition', 'IE',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.person = P AND IE.title IS NOT NULL')
-            ->innerJoin('IE.exhibition', 'E')
-            ->where('E.location = :location AND E.status <> -1')
-            ->setParameter('location', $location)
-            ->groupBy('P.id')
-            ->orderBy('nameSort')
-        ;
-        $artists = $qb->getQuery()->getResult();
-
-        // stats
-        $qb = $this->getDoctrine()
-            ->getManager()
-            ->createQueryBuilder();
-
-        $qb->select([
-            'E.id AS id',
-            'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-            'COUNT(DISTINCT P.id) AS numPersonSort',
-        ])
-            ->from('AppBundle:Exhibition', 'E')
-            ->leftJoin('E.location', 'L')
-            ->leftJoin('AppBundle:ItemExhibition', 'IE',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = E AND IE.title IS NOT NULL')
-            ->leftJoin('IE.person', 'P')
-            ->where('E.location = :location AND E.status <> -1')
-            ->setParameter('location', $location)
-            ->groupBy('E.id')
-        ;
-        $exhibitionStats = [];
-        foreach ($qb->getQuery()->getResult() as $row) {
-            $exhibitionStats[$row['id']] = $row;
-        }
-
-        $result = $location->getExhibitions();
-
         $csvResult = [];
 
-        foreach ($result as $exhibition) {
+        foreach ($location->getAllExhibitions() as $exhibition) {
             $innerArray = [];
-            array_push($innerArray, $exhibition->getStartdate(), $exhibition->getEnddate(), $exhibition->getLocation()->getPlaceLabel(), $exhibitionStats[$exhibition->getId()]['numCatEntrySort'] );
+            array_push($innerArray,
+                       $exhibition->getStartdate(), $exhibition->getEnddate(), $exhibition->getDisplaydate(),
+                       $exhibition->getTitle(),
+                       $exhibition->getLocation()->getPlaceLabel(),
+                       $exhibition->getLocation()->getName(),
+                       $exhibition->getOrganizerType(),
+                       $exhibitionStats[$exhibition->getId()]['numCatEntrySort']);
 
             array_push($csvResult, $innerArray);
         }
 
-        $response = new CSVResponse( $csvResult, 200, explode( ', ', 'Startdate, Enddate, Title, City, Venue, # of Cat. Entries, type' ) );
-        $response->setFilename( "data.csv" );
-        return $response;
+        return new CsvResponse($csvResult, 200, explode( ', ', 'Start Date, End Date, Display Date, Title, City, Venue, Type of Org. Body, # of Cat. Entries'));
     }
 
     /**
@@ -835,56 +373,13 @@ extends CrudController
 
         $locale = $request->getLocale();
         if (in_array($request->get('_route'), [ 'location-jsonld' ])) {
-            return new JsonLdResponse($person->jsonLdSerialize($locale));
+            return new JsonLdResponse($location->jsonLdSerialize($locale));
         }
 
-        // artists this venue
-        $qb = $this->getDoctrine()
-                ->getManager()
-                ->createQueryBuilder();
+        $exhibitionIds = $this->getExhibitionIds($location);
 
-        $qb->select([
-                'P',
-                'COUNT(DISTINCT E.id) AS numExhibitionSort',
-                'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-                "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort"
-            ])
-            ->from('AppBundle:Person', 'P')
-            ->innerJoin('AppBundle:ItemExhibition', 'IE',
-                       \Doctrine\ORM\Query\Expr\Join::WITH,
-                       'IE.person = P AND IE.title IS NOT NULL')
-            ->innerJoin('IE.exhibition', 'E')
-            ->where('E.location = :location AND E.status <> -1')
-            ->setParameter('location', $location)
-            ->groupBy('P.id')
-            ->orderBy('nameSort')
-            ;
-        $artists = $qb->getQuery()->getResult();
-
-        // stats
-        $qb = $this->getDoctrine()
-                ->getManager()
-                ->createQueryBuilder();
-        $qb->select([
-                'E.id AS id',
-                'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-                'COUNT(DISTINCT P.id) AS numPersonSort',
-            ])
-            ->from('AppBundle:Exhibition', 'E')
-            ->leftJoin('E.location', 'L')
-            ->leftJoin('AppBundle:ItemExhibition', 'IE',
-                       \Doctrine\ORM\Query\Expr\Join::WITH,
-                       'IE.exhibition = E AND IE.title IS NOT NULL')
-            ->leftJoin('IE.person', 'P')
-            ->where('E.location = :location AND E.status <> -1')
-            ->setParameter('location', $location)
-            ->groupBy('E.id')
-            ;
-        $exhibitionStats = [];
-        foreach ($qb->getQuery()->getResult() as $row) {
-           $exhibitionStats[$row['id']] = $row;
-        }
-
+        $artists = $this->getArtistsByExhibitionIds($exhibitionIds);
+        $exhibitionStats = $this->getExhibitionStatsByIds($exhibitionIds);
 
         // get alternative location for the case that the geo is empty
         $qbAlt = $this->getDoctrine()
@@ -892,19 +387,19 @@ extends CrudController
             ->createQueryBuilder();
 
         $qbAlt->select([
-            'L',
-            "L.placeLabel ",
-            "P.latitude",
-            "P.longitude"
-        ])
+                'L',
+                "L.placeLabel",
+                "P.latitude",
+                "P.longitude"
+            ])
             ->from('AppBundle:Location', 'L')
             ->leftJoin('AppBundle:Place', 'P',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'P.name = L.placeLabel')
             ->where('L.id = ' . $id)
-        ;
+            ;
 
-        $place = ($qbAlt->getQuery()->execute());
+        $place = $qbAlt->getQuery()->execute();
 
         $dataNumberOfArtistsPerCountry = $this->detailDataNumberOfArtistsPerCountry($artists);
 
@@ -920,9 +415,9 @@ extends CrudController
             'detailDataNumberItemTypes' => $detailDataNumberItemTypes,
             'pageMeta' => [
                 /*
-                'jsonLd' => $exhibition->jsonLdSerialize($locale),
-                'og' => $this->buildOg($exhibition, $routeName, $routeParams),
-                'twitter' => $this->buildTwitter($exhibition, $routeName, $routeParams),
+                'jsonLd' => $location->jsonLdSerialize($locale),
+                'og' => $this->buildOg($location, $routeName, $routeParams),
+                'twitter' => $this->buildTwitter($location, $routeName, $routeParams),
                 */
             ],
         ]);
@@ -930,7 +425,7 @@ extends CrudController
 
     public function detailDataNumberItemTypes($location)
     {
-        $exhibitions = $location->getExhibitions();
+        $exhibitions = $location->getAllExhibitions();
 
         $types = [];
 
@@ -946,69 +441,37 @@ extends CrudController
         }
 
         $typesTotal = array_count_values($types);
+        arsort($typesTotal);
 
-        $typesOnly = array_keys($typesTotal);
-        $valuesOnly = array_values($typesTotal);
+        $finalData = array_map(function ($key) use ($typesTotal) {
+                return [ 'name' => $key, 'y' => (int)$typesTotal[$key]];
+            },
+            array_keys($typesTotal));
 
+        $sumOfAllTypes = array_sum(array_values($typesTotal));
 
-        $sumOfAllTypes= array_sum(array_values($typesTotal));
-
-        $i = 0;
-        $finalDataJson = '[';
-
-        foreach ($typesOnly as $place) {
-            $i > 0 ? $finalDataJson .= ", " : '';
-
-            $numberOfExhibitions = $valuesOnly[$i] ;
-
-            $finalDataJson .= "{ name: '${place}', y: ${numberOfExhibitions} } ";
-            $i += 1;
-        }
-        $finalDataJson .= ']';
-
-
-        $returnArray = [ $finalDataJson, $sumOfAllTypes ];
-
-
-        return $returnArray;
+        return [ json_encode($finalData), $sumOfAllTypes ];
     }
-
-
-
 
     public function detailDataNumberOfArtistsPerCountry($artists)
     {
         $artistNationalities = [];
 
         foreach ($artists as $artist) {
-            array_push($artistNationalities, (string) $artist[0]->getNationality() );
+            array_push($artistNationalities, (string)$artist[0]->getNationality() );
         }
 
         $artistNationalitiesTotal = array_count_values($artistNationalities);
+        arsort($artistNationalitiesTotal);
 
-        $nationalitiesOnly = array_keys($artistNationalitiesTotal);
-        $valuesOnly = array_values($artistNationalitiesTotal);
-
+        $finalData = array_map(function ($key) use ($artistNationalitiesTotal) {
+                $name = '' === $key ? 'unknown' : Intl::getRegionBundle()->getCountryName($key);
+                return [ 'name' => $name, 'y' => (int)$artistNationalitiesTotal[$key]];
+            },
+            array_keys($artistNationalitiesTotal));
 
         $sumOfAllNationalities = array_sum(array_values($artistNationalitiesTotal));
 
-        $i = 0;
-        $finalDataJson = '[';
-
-        foreach ($nationalitiesOnly as $place) {
-
-            $i > 0 ? $finalDataJson .= ", " : '';
-
-            $numberOfExhibitions = $valuesOnly[$i] ;
-
-            $finalDataJson .= "{ name: '${place}', y: ${numberOfExhibitions} } ";
-            $i += 1;
-        }
-        $finalDataJson .= ']';
-
-
-        $returnArray = [ $finalDataJson, $sumOfAllNationalities, $i ];
-
-        return $returnArray;
+        return [ json_encode($finalData), $sumOfAllNationalities, count(array_keys($artistNationalitiesTotal)) ];
     }
 }

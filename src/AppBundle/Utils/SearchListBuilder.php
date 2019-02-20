@@ -402,9 +402,25 @@ extends ListBuilder
 
             if (!empty($organizerFilters[$key = 'geoname'])) {
                 $this->addGeonameFilter($queryBuilder, [
-                                            'cc' => 'OPL.country_code',
+                                            'cc' => 'PO.country_code',
                                             'tgn' => 'O.place_tgn',
                                         ], $key, $organizerFilters[$key]);
+            }
+        }
+
+        if (array_key_exists('holder', $this->queryFilters)) {
+            $holderFilters = & $this->queryFilters['holder'];
+
+            foreach ([ 'holder' => 'H.id' ] as $key => $field) {
+                $this->addInFilter($queryBuilder, $field, 'holder_' . $key,
+                                   array_key_exists($key,  $holderFilters) ? $holderFilters[$key] : null);
+            }
+
+            if (!empty($holderFilters[$key = 'geoname'])) {
+                $this->addGeonameFilter($queryBuilder, [
+                                            'cc' => 'H.country',
+                                            'tgn' => 'H.place_tgn',
+                                        ], $key, $holderFilters[$key]);
             }
         }
 
@@ -488,6 +504,33 @@ extends ListBuilder
         return sprintf('<a href="%s">%s</a>',
                        $this->urlGenerator->generate('exhibition', [ 'id' => $row['exhibition_id'] ]),
                        $this->formatRowValue($val, [], $format));
+    }
+
+    protected function buildLinkedLocation(&$row, $val, $format, $route_name = 'location')
+    {
+        if ('html' != $format) {
+            return false;
+        }
+
+        if (!empty($row['location_translit'])) {
+            // show translit / translation in brackets instead of original
+            $parts = [ $row['location_translit'] ];
+
+            if (!empty($row['location_alternate'])) {
+                $parts[] = $row['location_alternate'];
+            }
+
+            $val = sprintf('[%s]', join(' : ', $parts));
+        }
+
+        return sprintf('<a href="%s">%s</a>',
+                       $this->urlGenerator->generate($route_name, [ 'id' => $row['location_id'] ]),
+                       $this->formatRowValue($val, [], $format));
+    }
+
+    protected function buildLinkedOrganizer(&$row, $val, $format)
+    {
+        return $this->buildLinkedLocation($row, $val, $format /*, 'organizer' */); // currently use same route
     }
 
     public function buildHeaderRow()
