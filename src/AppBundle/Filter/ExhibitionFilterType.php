@@ -63,12 +63,6 @@ extends CrudFilterType
                     ],
                 ]);
 
-                /*
-                $builder->add('id', Filters\ChoiceFilterType::class, [
-                    'choices' => [ 'select ids' => 'true'] + $options['data']['ids'],
-                    'multiple' => true, */
-
-
                 // copied over from Form/ExhibitionFilterType, find a way to share
                 $builder->add('exhibition', Select2EntityType::class, [
                     'multiple' => true,
@@ -95,69 +89,6 @@ extends CrudFilterType
         };
 
         $builder->add('exhibition', get_class($exhibitionClass), $options);
-
-
-        // QUERYING FOR OTHER MODELS
-
-        // PERSON QUERYS
-
-
-
-        $builder->add('startdate', Filters\DateRangeFilterType::class, [
-                'left_date_options'  => array('years' => range($options['data']['years'][0], $options['data']['years'][1])),
-                'right_date_options' => array('years' => range($options['data']['years'][0], $options['data']['years'][1]))
-            ]
-        );
-
-
-
-        $builder->add('nationality', Filters\ChoiceFilterType::class, [
-            'choices' => [ 'select nationality' => '' ] + $options['data']['country_choices'],
-            'multiple' => true,
-            'apply_filter' => function (QueryInterface $filterQuery, $field, $values) {
-                if (empty($values['value'])) {
-                    return null;
-                }
-
-                $paramName = sprintf('p_%s', str_replace('.', '_', $field));
-
-                // expression that represent the condition
-                $expression = $filterQuery->getExpr()->in('Person.nationality', ':'.$paramName);
-
-                // expression parameters
-                $parameters = [
-                    $paramName => [ $values['value'], \Doctrine\DBAL\Connection::PARAM_STR_ARRAY ],
-                ];
-
-                return $filterQuery->createCondition($expression, $parameters);
-            },
-        ]);
-
-
-        $builder->add('gender', Filters\ChoiceFilterType::class, [
-            'choices' => [
-                'female' => 'F',
-                'male' => 'M',
-            ],
-            'multiple' => true,
-            'apply_filter' => function (QueryInterface $filterQuery, $field, $values) {
-                if (empty($values['value'])) {
-                    return null;
-                }
-
-                $paramName = sprintf('p_%s', str_replace('.', '_', $field));
-
-                // expression that represent the condition
-                $expression = $filterQuery->getExpr()->in('Person.gender', ':'.$paramName);
-
-                // expression parameters
-                $parameters = [
-                    $paramName => [ $values['value'], \Doctrine\DBAL\Connection::PARAM_STR_ARRAY ],
-                ];
-
-                return $filterQuery->createCondition($expression, $parameters);
-            },
-        ]);
     }
 
     public function getBlockPrefix()
