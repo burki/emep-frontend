@@ -57,7 +57,7 @@
         "doctrine/doctrine-bundle": "@stable",
         "doctrine/orm": "@stable",
         "stof/doctrine-extensions-bundle": "~1.2",
-        "beberlei/DoctrineExtensions": "@stable",
+        "beberlei/doctrineextensions": "@stable",
 
         "tetranz/select2entity-bundle": "2.*",
 
