@@ -354,7 +354,7 @@ extends CrudController
             'pageTitle' => $this->get('translator')->trans('Advanced Search'),
             'listBuilder' => $listBuilder,
             'form' => $this->form->createView(),
-            'searches' => $this->lookupSearches($user),
+            'searches' => $this->lookupSearches($user, 'search'),
 
             'charts' => implode("\n", $charts),
         ]);
@@ -396,7 +396,7 @@ extends CrudController
 
             'listBuilder' => $listBuilder,
             'form' => $this->form->createView(),
-            'searches' => $this->lookupSearches($user),
+            'searches' => $this->lookupSearches($user, 'search'),
         ]);
     }
 
@@ -563,7 +563,6 @@ extends CrudController
         $parameters = self::array_filter_recursive($parameters, null, true); // remove empty values
 
         if (array_key_exists('filter', $parameters)) {
-
             // some values must be arrays and not scalar as in Basic Search
             $forceArray = [
                 'location' => [ 'geoname' ],
