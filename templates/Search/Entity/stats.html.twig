@@ -1,0 +1,17 @@
+{% extends 'Search/Entity/index.html.twig' %}
+
+{% import 'Shared/helper.html.twig' as helper %}
+
+{% block head %}
+    {% import 'Shared/highcharts.html.twig' as highcharts %}
+    {{ highcharts.head() }}
+{% endblock %}
+
+{% block content %}
+    {% if subTitle is not empty %}<h2><small>{{ subTitle }}</small></h2>{% endif %}
+
+    {{ charts|raw }}
+    <script src="{{ app.request.basepath }}/js/collapseChart.js"></script>
+
+    {{ helper.show_detailmodal() }}
+{% endblock %}

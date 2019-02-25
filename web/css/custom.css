@@ -784,3 +784,22 @@ td.normal a, .listviewrow, .artist-text {
 .button:hover {
     color: rgba(255,255,255, 0.75)
 }
+
+
+.searchbarcontainer{
+    width: 100%;
+}
+
+.div-block-5 {
+    width: auto;
+    max-width: 100%;
+}
+
+.subfilter-remove{
+
+}
+
+.subfilter-remove:hover{
+    background-color: #c71f59;
+    color: white;
+}

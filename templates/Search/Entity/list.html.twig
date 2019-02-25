@@ -1,0 +1,41 @@
+<div class="listviewrow">
+    {% block content %}
+        {% if pager.currentPageResults is not empty %}
+            <div style="width: 100%; text-align: right;">
+                <div class="count">
+                    {{ pager.currentPageOffsetStart }} - {{ pager.currentPageOffsetEnd }} of {{ pager.getNbResults() }}
+                </div>
+            </div>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    {% for key, label in listBuilder.buildHeaderRow() %}
+                        <th>
+                            {% set sortInfo = listBuilder.sortInfo(key) %}
+                            {% if sortInfo is not empty %}
+                                <a href="{{ sortInfo.action }}"{% if sortInfo.active is not empty %} class="{{ sortInfo.active }}"{% endif %}>{{ label }}</a>
+                            {% else %}
+                                {{ label }}
+                            {% endif %}
+                        </th>
+                    {% endfor %}
+                </tr>
+                </thead>
+                <tbody>
+                {% for row in pager.currentPageResults %}
+                    <tr>
+                        {% set rowValues = listBuilder.buildRow(row, 'html') %}
+                        {% for val in rowValues %}
+                            <td>{% if loop.first %}{% if 'ItemExhibition' != listBuilder.entity %}<span class="checkmark" data-id="{{ row.id }}"></span>{% endif %}{% endif %}{{ val|raw }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="pagerfanta">{{ pagerfanta(pager, 'twitter_bootstrap3', { 'omitFirstPage': true }) }}</div>
+        {% else %}
+            No matching entry. Please adjust your search.
+        {% endif %}
+    {% endblock %}
+</div>

@@ -199,25 +199,40 @@ extends CrudController
 
     /**
      * @Route("/search", name="search")
+     * @Route("/exhibition/search", name="exhibition")
+     * @Route("/location/search", name="location")
+     * @Route("/holder/search", name="holder")
+     * @Route("/person/search", name="person")
+     * @Route("/place/search", name="place")
+     * @Route("/itemExhibition/search", name="itemexhibition")
+     * @Route("/venue/search", name="venue")
+     * @Route("/organizer/search", name="organizer")
      */
     public function searchAction(Request $request,
                                  UrlGeneratorInterface $urlGenerator,
                                  UserInterface $user = null)
     {
+
+        $routeName = $request->get('_route');
+
+
         $response = $this->handleUserAction($request, $user);
         if (!is_null($response)) {
             return $response;
         }
 
-        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator);
+
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator,null, ucfirst($routeName) );
 
         $listPagination = new SearchListPagination($listBuilder);
 
         $page = $request->get('page', 1);
         $listPage = $listPagination->get($this->pageSize, ($page - 1) * $this->pageSize);
 
-        return $this->renderResult($listPage, $listBuilder, $user);
+
+        return $this->renderResult($listPage, $listBuilder, $user, $routeName);
     }
+
 
     protected function buildSaveSearchParams(Request $request, UrlGeneratorInterface $urlGenerator)
     {
@@ -276,13 +291,20 @@ extends CrudController
 
     /**
      * @Route("/search/stats", name="search-stats")
+     * @Route("/exhibition/index/stats", name="exhibition-stats")
+     * @Route("/venue/index/stats", name="venue-stats")
+     * @Route("/person/index/stats", name="person-stats")
+     * @Route("/itemexhibition/index/stats", name="itemExhibition-stats")
+     * @Route("/organizer/index/stats", name="organizer-stats")
      */
     public function statsAction(Request $request,
                                 UrlGeneratorInterface $urlGenerator,
                                 UserInterface $user = null)
     {
+
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator);
         $charts = [];
+
 
         switch ($listBuilder->getEntity()) {
             case 'Exhibition':
@@ -350,23 +372,71 @@ extends CrudController
             $charts[] = 'No matching data found. Please adjust the filters';
         }
 
-        return $this->render('Search/stats.html.twig', [
-            'pageTitle' => $this->get('translator')->trans('Advanced Search'),
+
+        $routeName = $request->get('_route');
+        $tempaltePath = 'Search/stats.html.twig';
+        $entityName = 'search';
+        $type = 'stats';
+        $pageTitle = 'Advanced Search';
+
+        // other path for basic search
+
+
+        switch ($routeName) {
+            case 'exhibition-stats':
+                $tempaltePath = 'Search/Entity/stats.html.twig';
+                $entityName = "exhibition";
+                $pageTitle = 'Exhibitions';
+                break;
+            case 'venue-stats':
+                $tempaltePath = 'Search/Entity/stats.html.twig';
+                $entityName = "venue";
+                $pageTitle = 'Venues';
+                break;
+            case 'person-stats':
+                $tempaltePath = 'Search/Entity/stats.html.twig';
+                $entityName = "person";
+                $pageTitle = 'Artists';
+                break;
+            case 'person-stats':
+                $tempaltePath = 'Search/Entity/stats.html.twig';
+                $entityName = "itemExhibition";
+                $pageTitle = 'Catalogue Entries';
+                break;
+            case 'organizer-stats':
+                $tempaltePath = 'Search/Entity/stats.html.twig';
+                $entityName = "organizer";
+                $pageTitle = 'Organizing Bodies';
+                break;
+        }
+
+
+
+        return $this->render($tempaltePath, [
+            'pageTitle' => $this->get('translator')->trans($pageTitle),
             'listBuilder' => $listBuilder,
             'form' => $this->form->createView(),
-            'searches' => $this->lookupSearches($user, 'search'),
+            'searches' => $this->lookupSearches($user, $entityName),
 
             'charts' => implode("\n", $charts),
+            'entityName' => $entityName,
+            'type' => $type
         ]);
     }
 
     /**
      * @Route("/search/map", name="search-map")
+     * @Route("/exhibition/map/index", name="exhibition-map")
+     * @Route("/venue/map/index", name="venue-map")
+     * @Route("/person/map/index", name="person-map")
+     * @Route("/itemexhibition/map/index", name="itemExhibition-map")
+     * @Route("/organizer/map/index", name="organizer-map")
      */
     public function mapAction(Request $request,
                               UrlGeneratorInterface $urlGenerator,
                               UserInterface $user = null)
     {
+
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'extended');
         if (!in_array($entity = $listBuilder->getEntity(), [ 'Exhibition', 'Venue', 'Organizer', 'Person'])) {
             $routeParams = [
@@ -382,10 +452,51 @@ extends CrudController
 
         $stmt = $query->execute();
 
+
+
+
         $renderParams = $this->processMapEntries($stmt, $entity);
 
-        return $this->render('Search/map.html.twig', $renderParams + [
-            'pageTitle' => $this->get('translator')->trans('Advanced Search'),
+
+        $routeName = $request->get('_route');
+        $templatePath = 'Search/map.html.twig';
+        $entityName = 'search';
+        $type = 'map';
+        $pageTitle = 'Advanced Search';
+
+        // other path for basic search
+
+        switch ($routeName) {
+            case 'exhibition-map':
+                $templatePath = 'Search/Entity/map.html.twig';
+                $entityName = "exhibition";
+                $pageTitle = 'Exhibitions';
+                break;
+            case 'venue-map':
+                $templatePath = 'Search/Entity/map.html.twig';
+                $entityName = "venue";
+                $pageTitle = 'Venues';
+                break;
+            case 'person-map':
+                $templatePath = 'Search/Entity/map.html.twig';
+                $entityName = "person";
+                $pageTitle = 'Artists';
+                break;
+            case 'itemExhibition-map':
+                $templatePath = 'Search/Entity/map.html.twig';
+                $entityName = "itemExhibition";
+                $pageTitle = 'Catalogue Entries';
+                break;
+            case 'organizer-map':
+                $templatePath = 'Search/Entity/map.html.twig';
+                $entityName = "organizer";
+                $pageTitle = 'Organizing Bodies';
+                break;
+        }
+
+
+        return $this->render($templatePath, $renderParams + [
+            'pageTitle' => $this->get('translator')->trans($pageTitle),
             'disableClusteringAtZoom' => 'Person' == $entity ? 7 : 5,
             'showHeatMap' => 'Person' == $entity,
             'markerStyle' => 'Person' == $entity ? 'pie' : 'circle',
@@ -396,7 +507,9 @@ extends CrudController
 
             'listBuilder' => $listBuilder,
             'form' => $this->form->createView(),
-            'searches' => $this->lookupSearches($user, 'search'),
+            'searches' => $this->lookupSearches($user, $entityName),
+            'entityName' => $entityName,
+            'type' => $type
         ]);
     }
 
@@ -531,7 +644,8 @@ extends CrudController
     {
         $connection = $this->getDoctrine()->getEntityManager()->getConnection();
 
-        $entity = $request->get('entity');
+
+        if (!$entity) { $entity = $request->get('entity'); };
         if (!in_array($entity, self::$entities)) {
             if ('search-export' == $request->get('_route') && 'Holder' == $entity) {
                 // Holder has only export functionality
@@ -615,20 +729,67 @@ extends CrudController
         }
     }
 
-    protected function renderResult($listPage, $listBuilder, UserInterface $user = null)
+
+    protected function renderResult($listPage, $listBuilder, UserInterface $user = null, $template = null)
     {
         $adapter = new SearchListAdapter($listPage);
         $pager = new Pagerfanta($adapter);
         $pager->setMaxPerPage($listPage['limit']);
         $pager->setCurrentPage(intval($listPage['offset'] / $listPage['limit']) + 1);
 
-        return $this->render('Search/base.html.twig', [
-            'pageTitle' => $this->get('translator')->trans('Advanced Search'),
+        $templatePath = 'Search/base.html.twig';
+        $entityName = 'search';
+        $pageTitle = 'Advanced Search';
+
+
+
+        switch ($template) {
+            case 'exhibition':
+                $templatePath = 'Search/Entity/index.html.twig';
+                $entityName = 'exhibition';
+                $pageTitle = 'Exhibtions';
+                break;
+            case 'location':
+                $templatePath = 'Search/Entity/index.html.twig';
+                $entityName = 'venue';
+                $pageTitle = 'Venues';
+                break;
+            case 'venue':
+                $templatePath = 'Search/Entity/index.html.twig';
+                $entityName = 'venue';
+                $pageTitle = 'Venues';
+                break;
+            case 'organizer':
+                $templatePath = 'Search/Entity/index.html.twig';
+                $entityName = 'organizer';
+                $pageTitle = 'Organizing Bodies';
+                break;
+            case 'person':
+                $templatePath = 'Search/Entity/index.html.twig';
+                $entityName = 'person';
+                $pageTitle = 'Artists';
+                break;
+            case 'itemExhibition':
+                $templatePath = 'Search/Entity/index.html.twig';
+                $entityName = "itemExhibition";
+                $pageTitle = 'Catalogue Entries';
+                break;
+        }
+
+        if($template === 'exhibition' ){
+         $templatePath = 'Search/Entity/index.html.twig';
+         $entityName = 'exhibition';
+         $pageTitle = 'Exhibtions';
+        }
+
+        return $this->render($templatePath, [
+            'pageTitle' => $this->get('translator')->trans($pageTitle),
             'pager' => $pager,
 
             'listBuilder' => $listBuilder,
             'form' => $this->form->createView(),
             'searches' => $this->lookupSearches($user, 'search'),
+            'entityName' => $entityName
         ]);
     }
 }

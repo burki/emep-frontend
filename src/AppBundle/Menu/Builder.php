@@ -90,7 +90,7 @@ class Builder
         ]);
 
         $menu['Search Lists']->addChild('Venues', [
-            'route' => 'location',
+            'route' => 'venue',
         ]);
 
         $menu['Search Lists']->addChild('Organizing Bodies', [
