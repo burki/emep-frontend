@@ -747,28 +747,28 @@ extends CrudController
             case 'exhibition':
                 $templatePath = 'Search/Entity/index.html.twig';
                 $entityName = 'exhibition';
-                $pageTitle = 'Exhibtions';
+                $pageTitle = 'Exhibitions';
                 break;
+
             case 'location':
-                $templatePath = 'Search/Entity/index.html.twig';
-                $entityName = 'venue';
-                $pageTitle = 'Venues';
-                break;
             case 'venue':
                 $templatePath = 'Search/Entity/index.html.twig';
                 $entityName = 'venue';
                 $pageTitle = 'Venues';
                 break;
+
             case 'organizer':
                 $templatePath = 'Search/Entity/index.html.twig';
                 $entityName = 'organizer';
                 $pageTitle = 'Organizing Bodies';
                 break;
+
             case 'person':
                 $templatePath = 'Search/Entity/index.html.twig';
                 $entityName = 'person';
                 $pageTitle = 'Artists';
                 break;
+
             case 'itemExhibition':
                 $templatePath = 'Search/Entity/index.html.twig';
                 $entityName = "itemExhibition";
@@ -776,10 +776,10 @@ extends CrudController
                 break;
         }
 
-        if($template === 'exhibition' ){
-         $templatePath = 'Search/Entity/index.html.twig';
-         $entityName = 'exhibition';
-         $pageTitle = 'Exhibtions';
+        if ($template === 'exhibition') {
+            $templatePath = 'Search/Entity/index.html.twig';
+            $entityName = 'exhibition';
+            $pageTitle = 'Exhibitions';
         }
 
         return $this->render($templatePath, [
