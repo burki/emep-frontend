@@ -21,11 +21,9 @@
             <span style="margin-right: 20px; margin-top: 7px">Filter by:</span>
 
             {% set entityLabels = {
-                'exhibition': 'Exhibition',
-                'person': 'Artist',
-                'catentry': 'Cat. Entry',
-                'venue': 'Venue',
-                'organizer': 'Organizing Body'
+                'exhibition-range': 'Exhibition Date Range',
+                'person-nationality': 'Artists Nationality',
+                'person-gender': 'Artist Gender'
             } %}
 
             {% for entity,label in entityLabels %}
@@ -37,56 +35,29 @@
 
         <div class="filter-combination-container">
             {% form_theme form 'Search/bootstrap_3_adjusted.html.twig' %}
-            <div id="filter-panel-exhibition" class="collapse filter-panel">
+            <div id="filter-panel-exhibition-range" class="collapse filter-panel">
                 <div class="panel panel-default">
-                    <div class="panel-heading">Filter by Exhibition</div>
+                    <div class="panel-heading">Exhibition Date Range</div>
                     <div class="panel-body">
                         {{ form_row(form.exhibition.date) }}
-                        {{ form_row(form.exhibition.type) }}
-                        {{ form_row(form.exhibition.organizer_type) }}
-                        {{ form_row(form.exhibition.exhibition) }}
                     </div>
                 </div>
             </div>
-            <div id="filter-panel-person" class="collapse filter-panel">
+
+            <div id="filter-panel-person-nationality" class="collapse filter-panel">
                 <div class="panel panel-default">
-                    <div class="panel-heading">Filter by Artist</div>
+                    <div class="panel-heading">Artist Nationality</div>
+                    <div class="panel-body">
+                        {{ form_row(form.person.nationality) }}
+                    </div>
+                </div>
+            </div>
+
+            <div id="filter-panel-person-gender" class="collapse filter-panel">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Artist Gender</div>
                     <div class="panel-body">
                         {{ form_row(form.person.gender) }}
-                        {{ form_row(form.person.nationality) }}
-                        {{ form_row(form.person.birthdate) }}
-                        {{ form_row(form.person.deathdate) }}
-                        {{ form_row(form.person.person) }}
-                    </div>
-                </div>
-            </div>
-            <div id="filter-panel-catentry" class="collapse filter-panel">
-                <div class="panel panel-default">
-                    <div class="panel-heading">Filter by Catalogue Entry</div>
-                    <div class="panel-body">
-                        {{ form_row(form.catentry.type) }}
-                        {{ form_row(form.catentry.forsale) }}
-                        {{ form_row(form.catentry.price_available) }}
-                    </div>
-                </div>
-            </div>
-            <div id="filter-panel-venue" class="collapse filter-panel">
-                <div class="panel panel-default">
-                    <div class="panel-heading">Filter by Venue</div>
-                    <div class="panel-body">
-                        {{ form_row(form.location.geoname) }}
-                        {{ form_row(form.location.type) }}
-                        {{ form_row(form.location.location) }}
-                    </div>
-                </div>
-            </div>
-            <div id="filter-panel-organizer" class="collapse filter-panel">
-                <div class="panel panel-default">
-                    <div class="panel-heading">Filter by Organizing Body</div>
-                    <div class="panel-body">
-                        {#{ form_row(form.organizer.geoname) }#}
-                        {{ form_row(form.organizer.type) }}
-                        {{ form_row(form.organizer.organizer) }}
                     </div>
                 </div>
             </div>
