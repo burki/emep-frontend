@@ -3,7 +3,7 @@
 {% block body %}
     <div class="container-6 w-container">
         <div class="main-stats-container">
-            <h1 class="heading-2">Search lists of</h1>
+            <h1 class="heading-2">Browse</h1>
             <div class="div-block-6">
                 <div class="main-stats-single-container"><a href="{{ path('exhibition-index') }}" class="list-link-menu">Exhibitions</a>
                     <div class="main-stat-number">{{ counts['Exhibition'] }} Exhibitions</div>
@@ -11,23 +11,23 @@
                 <div class="main-stats-single-container"><a href="{{ path('person-index') }}" class="list-link-menu">Artists</a>
                     <div class="main-stat-number">{{ counts['Person'] }} Artists</div>
                 </div>
-                <div class="main-stats-single-container"><a href="#" class="list-link-menu coming-soon">Catalogue Entries</a>
-                    <div class="main-stat-number">coming soon</div>
+                <div class="main-stats-single-container"><a href="{{ path('search-index', { 'entity' : 'ItemExhibition' }) }}" class="list-link-menu coming-soon">Catalogue Entries</a>
+                    <div class="main-stat-number">{{ counts['ItemExhibition'] }} Catalogue Entries</div>
                 </div>
-                <div class="main-stats-single-container"><a href="#" class="list-link-menu coming-soon">Exhibiting Cities</a>
-                    <div class="main-stat-number">coming soon</div>
-                </div>
-                <div class="main-stats-single-container"><a href="{{ path('location-index') }}" class="list-link-menu">Venues</a>
+                <div class="main-stats-single-container"><a href="{{ path('venue-index') }}" class="list-link-menu">Venues</a>
                     <div class="main-stat-number">{{ counts['Venue'] }} Venues</div>
                 </div>
                 <div class="main-stats-single-container"><a href="{{ path('organizer-index') }}" class="list-link-menu">Organizing Bodies</a>
                     <div class="main-stat-number">{{ counts['Organizer'] }} Organizing Bodies</div>
                 </div>
+                <div class="main-stats-single-container"><a href="#" class="list-link-menu coming-soon">Exhibiting Cities</a>
+                    <div class="main-stat-number">coming soon</div>
+                </div>
             </div>
         </div>
 
         <div class="advanced-search-header" style="background-image: url('{{ app.request.basepath }}/img/composition-iv-1911.jpg')">
-            <a href="{{ path('search') }}" class="button w-button">ADVANCED SEARCH</a>
+            <a href="{{ path('search-index') }}" class="button w-button">ADVANCED SEARCH</a>
         </div>
     </div>
 {% endblock %}

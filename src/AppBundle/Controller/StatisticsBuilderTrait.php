@@ -681,8 +681,7 @@ EOT;
 
     function buildLocationCharts($request, $urlGenerator, $listBuilder)
     {
-        $routeName = $request->get('_route');
-        $prefix = preg_match('/^organizer/', $routeName) ? 'organizer' : 'location';
+        $prefix = 'Organizer' ==  $listBuilder->getEntity() ? 'organizer' : 'location';
 
         $charts = [];
 

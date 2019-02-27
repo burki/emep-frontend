@@ -28,7 +28,7 @@
             $('.select2').select2();
 
             {{ helper.checkmark_actions(listBuilder.entity) }}
-            {{ helper.indexform_actions('search-save') }} // needs to be changed
+            {{ helper.indexform_actions(listBuilder.entity|lower ~ '-save') }}
         });
     </script>
 
@@ -40,27 +40,25 @@
     <div class="w-container">
         <h1 class="heading">{{ pageTitle }}</h1>
 
-        {% if entityName|lower == 'exhibition' %}
+        {% if listBuilder.entity == 'Exhibition' %}
             {% embed "Search/Entity/exhibition-filter.html.twig" %}
             {% endembed %}
         {% endif %}
 
-        {% if entityName|lower == 'venue' %}
+        {% if listBuilder.entity == 'Venue' %}
             {% embed "Search/Entity/venue-filter.html.twig" %}
             {% endembed %}
         {% endif %}
 
-        {% if entityName|lower == 'organizer' %}
+        {% if listBuilder.entity == 'Organizer' %}
             {% embed "Search/Entity/organizer-filter.html.twig" %}
             {% endembed %}
         {% endif %}
 
-        {% if entityName|lower == 'person' %}
+        {% if listBuilder.entity == 'Person' %}
             {% embed "Search/Entity/person-filter.html.twig" %}
             {% endembed %}
         {% endif %}
-
-
     </div><!-- .w-container -->
 
     <div class="contentcontainer w-container">
@@ -78,11 +76,12 @@
             <div>
                 <div class="tabsymbols">
 
-                    {% if 'ItemExhibition' != listBuilder.entity %}<div class="advanced-search-settings"><span class="checkbox-filter-button">apply checkbox filter</span></div>{% endif %}
-                    <div class="icontab download-csv"><a title="Download as Excel-File" href="{{ path('search-export', app.request.query.all) }}"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage"></a></div>
+                    {% if 'ItemExhibition' != listBuilder.entity and type=='index' %}
+                    <div class="advanced-search-settings"><span class="checkbox-filter-button">apply checkbox filter</span></div>{% endif %}
+                    <div class="icontab download-csv"><a title="Download as Excel-File" href="{{ path('search-export', { 'entity' : listBuilder.entity }|merge(app.request.query.all)) }}"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage"></a></div>
 
                     {% if app.user  %}
-                        <form action="{{ path(app.request.get('_route'), { 'entity' : entity }) }}" method="POST" style="margin-left: 10px">
+                        <form action="{{ path(app.request.get('_route')) }}" method="POST" style="margin-left: 10px">
                             {% if searches is not empty %}
                                 <select name="useraction" id="saved-searches" class="w-input select-queries" onchange="this.form.submit()">
                                     <option value="">- Select Saved Query -</option>
@@ -97,25 +96,11 @@
                 </div><!-- .tabsymbols -->
 
                 <ul class="nav nav-tabs" role="tablist" >
-                    {% set active = entity == listBuilder.entity %}
-                    {% for entity, label in entities %}
-                        {% if entity|lower ==  entityName|lower %}
-                            {% if active %}
-                                {% set params = { 'entity' : entity } %}
-                            {% else %}
-                                {# so we keep active filters #}
-                                {% set params = app.request.query.all | merge({ 'entity' : entity, 'page' : 1 }) %}
-                            {% endif %}
-                            <li role="presentation" class="{% if type != 'map' and type != 'stats' %}active {% endif %}entries-tab" ><a href="{{ path("#{entityName|lower}", app.request.query.all) }}" aria-controls="entries">{{ label|trans }}</a></li>
-                            <a {% if active %} style="font-weight: bold"{% endif %} href=""></a>
-                        {% endif %}
-                    {% endfor %}
-
-
-                    <li role="presentation" class="{% if type == 'map' %}active {% endif %}entries-tab" ><a href="{{ path( "#{entityName|lower}-map", app.request.query.all) }}" aria-controls="entries">{{ 'Map'|trans }}</a></li>
-                    <li role="presentation" class="{% if type == 'stats' %}active {% endif %}entries-tab" ><a href="{{ path( "#{entityName|lower}-stats", app.request.query.all) }}" aria-controls="entries">{{ 'Statistics'|trans }}</a></li>
-
-
+                    <li role="presentation" class="{% if type != 'map' and type != 'stats' %}active {% endif %}entries-tab" >
+                        <a href="{{ path(listBuilder.entity|lower ~ '-index', app.request.query.all) }}" aria-controls="entries">{{ pageTitle|trans }}</a>
+                    </li>
+                    <li role="presentation" class="{% if type == 'map' %}active {% endif %}entries-tab" ><a href="{{ path(listBuilder.entity|lower ~ '-index-map', app.request.query.all) }}" aria-controls="entries">{{ 'Map'|trans }}</a></li>
+                    <li role="presentation" class="{% if type == 'stats' %}active {% endif %}entries-tab" ><a href="{{ path(listBuilder.entity|lower ~ '-index-stats', app.request.query.all) }}" aria-controls="entries">{{ 'Statistics'|trans }}</a></li>
                 </ul>
             </div>
 
@@ -123,7 +108,6 @@
                 {% embed "Search/Entity/list.html.twig" %}
                 {% endembed %}
             {% endblock %}
-
         </div>
     </div>
 {% endblock %}

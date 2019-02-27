@@ -36,209 +36,96 @@ extends CrudController
         'Organizer',
     ];
 
-    /**
-     *
-     */
-    protected function buildItemExhibitionTypes()
+    private function lookupSettingsFromRequest(Request $request)
     {
-        $conn = $this->getDoctrine()->getEntityManager()->getConnection();
+        $routeName = $request->get('_route');
 
-        $queryBuilder = $conn->createQueryBuilder();
-        $queryBuilder->select('DISTINCT IE.type')
-            ->from('ItemExhibition', 'IE')
-            ->where('IE.type IS NOT NULL')
-            ;
+        $routeParts = explode('-', $routeName, 2);
 
-        $termIds = $queryBuilder->execute()->fetchAll(\PDO::FETCH_COLUMN);
+        $ret = [
+            'base' => $routeParts[0],
+            'view' => str_replace('index-', '', $routeParts[1]),
+        ];
 
-        $queryBuilder = $conn->createQueryBuilder();
-        $queryBuilder->select('T.id, T.name')
-            ->from('Term', 'T')
-            ->where('T.id IN (:ids)')
-            ->setParameter('ids', $termIds, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
-            ->orderBy('T.name')
-            ;
-
-        $types = [];
-
-        foreach ($queryBuilder->execute()->fetchAll() as $row)  {
-            if ('0_unknown' == $row['name']) {
-                continue;
-            }
-            $types[$row['id']] = $row['name'];
+        if ('search' == $ret['base']) {
+            $entity = $request->get('entity');
+            $pageTitle = 'Advanced Search';
         }
+        else {
+            $entity = ucfirst($ret['base']);
 
-        return $types;
-    }
+            switch ($entity) {
+                case 'Person':
+                    $pageTitle = 'Artists';
+                    break;
 
-    /**
-     * Get all countries and places
-     */
-    protected function buildVenueGeonames()
-    {
-        $geonames = [];
+                case 'Organizer':
+                    $pageTitle = 'Organizing Bodies';
+                    break;
 
-        $qb = $this->getDoctrine()
-                ->getManager()
-                ->createQueryBuilder();
-
-        $qb->select([
-                'PL.countryCode',
-                'C.name AS country',
-                'PL.tgn',
-                'COALESCE(PL.alternateName,PL.name) AS name'
-            ])
-            ->distinct()
-            ->from('AppBundle:Location', 'L')
-            ->leftJoin('L.place', 'PL')
-            ->leftJoin('PL.country', 'C')
-            ->where('L.status <> -1 AND 0 = BIT_AND(L.flags, 256) AND PL.countryCode IS NOT NULL')
-            ->orderBy('country, name')
-            ;
-
-        $lastCountryCode = '';
-
-        foreach ($qb->getQuery()->getResult() as $result) {
-            if ($lastCountryCode != $result['countryCode']) {
-                $key = 'cc:' . $result['countryCode'];
-                $geonames[$key] = $result['country'];
-            }
-
-            $key = 'tgn:' . $result['tgn'];
-            $geonames[$key] = "\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0" . $result['name'];
-        }
-
-        return $geonames;
-    }
-
-    /**
-     * Get all countries and places
-     */
-    protected function buildOrganizerGeonames(Request $request, UrlGeneratorInterface $urlGenerator)
-    {
-        $organizerListBuilder = new \AppBundle\Utils\OrganizerListBuilder($conn = $this->getDoctrine()->getEntityManager()->getConnection(), $request, $urlGenerator);
-        $alias = $organizerListBuilder->getAlias();
-
-        $queryBuilder = $conn->createQueryBuilder();
-
-        $queryBuilder->select([
-                'DISTINCT C.cc AS countryCode',
-                'C.name AS country',
-                'P' . $alias . '.tgn',
-                'COALESCE(P' . $alias . '.name_alternate,P' . $alias . '.name) AS name',
-            ])
-            ->from('Location', $alias)
-            ->innerJoin($alias,
-                                'Geoname', 'P' . $alias,
-                                'P' . $alias . '.tgn=' . $alias.'.place_tgn')
-            ->innerJoin('P' . $alias,
-                                'Country', 'C',
-                                'P' . $alias . '.country_code=' . 'C.cc')
-            ->innerJoin($alias,
-                                'ExhibitionLocation', 'EL',
-                                'EL.id_location=' . $alias . '.id AND EL.role = 0')
-            ->innerJoin('EL',
-                                'Exhibition', 'E',
-                                'EL.id_exhibition=E.id AND E.status <> -1')
-            ->orderBy('country, place')
-            ;
-
-        // die($queryBuilder->getSql());
-
-
-        $geonames = [];
-
-
-        $lastCountryCode = '';
-
-        foreach ($queryBuilder->execute()->fetchAll() as $result) {
-            if ($lastCountryCode != $result['countryCode']) {
-                $key = 'cc:' . $result['countryCode'];
-                $geonames[$key] = $result['country'];
-            }
-
-            $key = 'tgn:' . $result['tgn'];
-            $geonames[$key] = "\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0" . $result['name'];
-        }
-
-        return $geonames;
-    }
-
-    /**
-     * Get all countries
-     */
-    protected function buildHolderGeonames()
-    {
-        $geonames = [];
-
-        $qb = $this->getDoctrine()
-                ->getManager()
-                ->createQueryBuilder();
-
-        $qb->select([
-                'H.countryCode',
-                'H.countryCode AS country',
-            ])
-            ->distinct()
-            ->from('AppBundle:Holder', 'H')
-            ->where('H.status <> -1')
-            ->orderBy('country')
-            ;
-
-        $lastCountryCode = '';
-
-        foreach ($qb->getQuery()->getResult() as $result) {
-            if ($lastCountryCode != $result['countryCode']) {
-                $key = 'cc:' . $result['countryCode'];
-                $geonames[$key] = $result['country'];
+                default:
+                    $pageTitle = $entity . 's';
             }
         }
 
-        return $geonames;
+        $ret['entity'] = $entity;
+        $ret['pageTitle'] = $pageTitle;
+
+        return $ret;
     }
 
     /**
-     * @Route("/search", name="search")
-     * @Route("/exhibition/search", name="exhibition-index")
-     * @Route("/location/search", name="location-index")
-     * @Route("/holder/search", name="holder-index")
-     * @Route("/person/search", name="person-index")
-     * @Route("/place/search", name="place-index")
-     * @Route("/itemExhibition/search", name="itemexhibition-index")
-     * @Route("/venue/search", name="venue")
-     * @Route("/organizer/search", name="organizer-index")
+     * @Route("/search", name="search-index")
+     * @Route("/exhibition", name="exhibition-index")
+     * @Route("/person", name="person-index")
+     * @Route("/location", name="venue-index")
+     * @Route("/organizer", name="organizer-index")
      */
     public function searchAction(Request $request,
                                  UrlGeneratorInterface $urlGenerator,
                                  UserInterface $user = null)
     {
-
-
-        $routeName = explode("-", $request->get('_route'))[0];
-
         $response = $this->handleUserAction($request, $user);
         if (!is_null($response)) {
             return $response;
         }
 
+        $settings = $this->lookupSettingsFromRequest($request);
 
-        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator,null, ucfirst($routeName) );
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, null, $settings['entity']);
 
         $listPagination = new SearchListPagination($listBuilder);
 
         $page = $request->get('page', 1);
         $listPage = $listPagination->get($this->pageSize, ($page - 1) * $this->pageSize);
 
+        $adapter = new SearchListAdapter($listPage);
+        $pager = new Pagerfanta($adapter);
+        $pager->setMaxPerPage($listPage['limit']);
+        $pager->setCurrentPage(intval($listPage['offset'] / $listPage['limit']) + 1);
 
-        return $this->renderResult($listPage, $listBuilder, $user, $routeName);
+        $templatePath = 'Search/base.html.twig';
+        if ('search' != $settings['base']) {
+            $templatePath = 'Search/Entity/index.html.twig';
+        }
+
+        return $this->render($templatePath, [
+            'pageTitle' => $this->get('translator')->trans($settings['pageTitle']),
+            'type' => $settings['view'],
+            'pager' => $pager,
+
+            'listBuilder' => $listBuilder,
+            'form' => $this->form->createView(),
+            'searches' => $this->lookupSearches($user, $settings['base']),
+        ]);
     }
-
 
     protected function buildSaveSearchParams(Request $request, UrlGeneratorInterface $urlGenerator)
     {
-        $route = 'search'; // maybe build from $request with a certain string replace pattern;
+        $settings = $this->lookupSettingsFromRequest($request);
+        $route = $settings['base'];
 
-        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator);
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, null, $settings['entity']);
         $filters = $listBuilder->getQueryFilters(true);
         if (empty($filters)) {
             return [ $route, [] ];
@@ -267,7 +154,9 @@ extends CrudController
      */
     public function exportAction(Request $request, UrlGeneratorInterface $urlGenerator)
     {
-        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'extended');
+        $settings = $this->lookupSettingsFromRequest($request);
+
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'extended', $settings['entity']);
         $filters = $listBuilder->getQueryFilters();
 
         set_time_limit(5 * 60); // ItemExhibition is large
@@ -291,20 +180,21 @@ extends CrudController
 
     /**
      * @Route("/search/stats", name="search-stats")
-     * @Route("/exhibition/index/stats", name="exhibition-stats")
-     * @Route("/venue/index/stats", name="venue-stats")
-     * @Route("/person/index/stats", name="person-stats")
-     * @Route("/itemexhibition/index/stats", name="itemExhibition-stats")
-     * @Route("/organizer/index/stats", name="organizer-stats")
+     * @Route("/exhibition/stats", name="exhibition-index-stats")
+     * @Route("/person/stats", name="person-index-stats")
+     * @Route("/location/stats", name="venue-index-stats")
+     * @Route("/organizer/stats", name="organizer-index-stats")
+     * @Route("/itemexhibition/stats", name="itemexhibition-index-stats")
      */
     public function statsAction(Request $request,
                                 UrlGeneratorInterface $urlGenerator,
                                 UserInterface $user = null)
     {
+        $settings = $this->lookupSettingsFromRequest($request);
 
-        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator);
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, $settings['entity']);
+
         $charts = [];
-
 
         switch ($listBuilder->getEntity()) {
             case 'Exhibition':
@@ -318,7 +208,7 @@ extends CrudController
                 break;
 
             case 'ItemExhibition':
-                $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-type');
+                $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-type', $listBuilder->getEntity());
 
                 $query = $listBuilder->query();
                 // echo $query->getSQL();
@@ -334,34 +224,6 @@ extends CrudController
                 break;
 
             case 'Venue':
-                // type
-                $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-type');
-                $query = $listBuilder->query();
-                // echo $query->getSQL();
-
-                $stmt = $query->execute();
-                $renderParams = $this->processLocationType($stmt);
-                if (!empty($renderParams)) {
-                    $template = $this->get('twig')->loadTemplate('Statistics/venue-type-index.html.twig');
-
-                    $charts[] = $template->render($renderParams);
-                }
-
-                // country
-                $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-country');
-                $query = $listBuilder->query();
-                // echo $query->getSQL();
-
-                $stmt = $query->execute();
-                $renderParams = $this->processLocationCountry($stmt);
-                if (!empty($renderParams)) {
-                    $template = $this->get('twig')->loadTemplate('Statistics/venue-country-index.html.twig');
-
-                    $charts[] = $template->render($renderParams);
-                }
-
-                break;
-
             case 'Organizer':
                 $charts = $this->buildLocationCharts($request, $urlGenerator, $listBuilder);
 
@@ -372,79 +234,43 @@ extends CrudController
             $charts[] = 'No matching data found. Please adjust the filters';
         }
 
-
-        $routeName = $request->get('_route');
-        $tempaltePath = 'Search/stats.html.twig';
-        $entityName = 'search';
-        $type = 'stats';
-        $pageTitle = 'Advanced Search';
-
-        // other path for basic search
-
-
-        switch ($routeName) {
-            case 'exhibition-stats':
-                $tempaltePath = 'Search/Entity/stats.html.twig';
-                $entityName = "exhibition";
-                $pageTitle = 'Exhibitions';
-                break;
-            case 'venue-stats':
-                $tempaltePath = 'Search/Entity/stats.html.twig';
-                $entityName = "venue";
-                $pageTitle = 'Venues';
-                break;
-            case 'person-stats':
-                $tempaltePath = 'Search/Entity/stats.html.twig';
-                $entityName = "person";
-                $pageTitle = 'Artists';
-                break;
-            case 'person-stats':
-                $tempaltePath = 'Search/Entity/stats.html.twig';
-                $entityName = "itemExhibition";
-                $pageTitle = 'Catalogue Entries';
-                break;
-            case 'organizer-stats':
-                $tempaltePath = 'Search/Entity/stats.html.twig';
-                $entityName = "organizer";
-                $pageTitle = 'Organizing Bodies';
-                break;
+        $templatePath = 'Search/stats.html.twig';
+        if ('search' != $settings['base']) {
+            $templatePath = 'Search/Entity/stats.html.twig';
         }
 
-
-
-        return $this->render($tempaltePath, [
-            'pageTitle' => $this->get('translator')->trans($pageTitle),
+        return $this->render($templatePath, [
+            'pageTitle' => $this->get('translator')->trans($settings['pageTitle']),
+            'type' => $settings['view'],
             'listBuilder' => $listBuilder,
             'form' => $this->form->createView(),
-            'searches' => $this->lookupSearches($user, $entityName),
+            'searches' => $this->lookupSearches($user, $settings['base']),
 
-            'charts' => implode("\n", $charts),
-            'entityName' => $entityName,
-            'type' => $type
+            'charts' => implode("\n", $charts)
         ]);
     }
 
     /**
      * @Route("/search/map", name="search-map")
-     * @Route("/exhibition/map/index", name="exhibition-map")
-     * @Route("/venue/map/index", name="venue-map")
-     * @Route("/person/map/index", name="person-map")
-     * @Route("/itemexhibition/map/index", name="itemExhibition-map")
-     * @Route("/organizer/map/index", name="organizer-map")
+     * @Route("/exhibition/map", name="exhibition-index-map")
+     * @Route("/person/map", name="person-index-map")
+     * @Route("/location/map", name="venue-index-map")
+     * @Route("/organizer/map", name="organizer-index-map")
      */
     public function mapAction(Request $request,
                               UrlGeneratorInterface $urlGenerator,
                               UserInterface $user = null)
     {
+        $settings = $this->lookupSettingsFromRequest($request);
 
-        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'extended');
-        if (!in_array($entity = $listBuilder->getEntity(), [ 'Exhibition', 'Venue', 'Organizer', 'Person'])) {
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'extended', $settings['entity']);
+        if (!in_array($entity = $listBuilder->getEntity(), [ 'Exhibition', 'Person', 'Venue', 'Organizer'])) {
             $routeParams = [
                 'entity' => $listBuilder->getEntity(),
                 'filter' => $listBuilder->getQueryFilters(),
             ];
 
-            return $this->redirectToRoute('search', $routeParams);
+            return $this->redirectToRoute('search-index', $routeParams);
         }
 
         $query = $listBuilder->query();
@@ -452,51 +278,16 @@ extends CrudController
 
         $stmt = $query->execute();
 
-
-
-
         $renderParams = $this->processMapEntries($stmt, $entity);
 
-
-        $routeName = $request->get('_route');
         $templatePath = 'Search/map.html.twig';
-        $entityName = 'search';
-        $type = 'map';
-        $pageTitle = 'Advanced Search';
-
-        // other path for basic search
-
-        switch ($routeName) {
-            case 'exhibition-map':
-                $templatePath = 'Search/Entity/map.html.twig';
-                $entityName = "exhibition";
-                $pageTitle = 'Exhibitions';
-                break;
-            case 'venue-map':
-                $templatePath = 'Search/Entity/map.html.twig';
-                $entityName = "venue";
-                $pageTitle = 'Venues';
-                break;
-            case 'person-map':
-                $templatePath = 'Search/Entity/map.html.twig';
-                $entityName = "person";
-                $pageTitle = 'Artists';
-                break;
-            case 'itemExhibition-map':
-                $templatePath = 'Search/Entity/map.html.twig';
-                $entityName = "itemExhibition";
-                $pageTitle = 'Catalogue Entries';
-                break;
-            case 'organizer-map':
-                $templatePath = 'Search/Entity/map.html.twig';
-                $entityName = "organizer";
-                $pageTitle = 'Organizing Bodies';
-                break;
+        if ('search' != $settings['base']) {
+            $templatePath = 'Search/Entity/map.html.twig';
         }
 
-
         return $this->render($templatePath, $renderParams + [
-            'pageTitle' => $this->get('translator')->trans($pageTitle),
+            'pageTitle' => $this->get('translator')->trans($settings['pageTitle']),
+            'type' => $settings['view'],
             'disableClusteringAtZoom' => 'Person' == $entity ? 7 : 5,
             'showHeatMap' => 'Person' == $entity,
             'markerStyle' => 'Person' == $entity ? 'pie' : 'circle',
@@ -507,9 +298,7 @@ extends CrudController
 
             'listBuilder' => $listBuilder,
             'form' => $this->form->createView(),
-            'searches' => $this->lookupSearches($user, $entityName),
-            'entityName' => $entityName,
-            'type' => $type
+            'searches' => $this->lookupSearches($user, $settings['base']),
         ]);
     }
 
@@ -519,6 +308,8 @@ extends CrudController
      * @Route("/search/select/organizer", name="search-select-organizer")
      * @Route("/search/select/holder", name="search-select-holder")
      * @Route("/search/select/exhibition", name="search-select-exhibition")
+     *
+     * Builds autocompleters for entity-selection
      */
     public function searchSelectAction(Request $request, UrlGeneratorInterface $urlGenerator)
     {
@@ -642,11 +433,7 @@ extends CrudController
                                               $mode = false,
                                               $entity = null)
     {
-        $connection = $this->getDoctrine()->getEntityManager()->getConnection();
-
-
-        if (!$entity) { $entity = $request->get('entity'); };
-        if (!in_array($entity, self::$entities)) {
+        if (is_null($entity) || !in_array($entity, self::$entities)) {
             if ('search-export' == $request->get('_route') && 'Holder' == $entity) {
                 // Holder has only export functionality
             }
@@ -655,23 +442,7 @@ extends CrudController
             }
         }
 
-        $venueTypes = $this->buildVenueTypes();
-        $exhibitionTypes = [ 'group', 'solo', 'auction' ];
-        $exhibitionOrganizerTypes = $this->buildOrganizerTypes();
-
-        $this->form = $this->createForm(\AppBundle\Form\Type\SearchFilterType::class, [
-            'choices' => [
-                'nationality' => array_flip($this->buildPersonNationalities()),
-                'location_geoname' => array_flip($this->buildVenueGeonames()),
-                'location_type' => array_combine($venueTypes, $venueTypes),
-                'organizer_geoname' => array_flip($this->buildOrganizerGeonames($request, $urlGenerator)),
-                'organizer_type' => array_combine($venueTypes, $venueTypes),
-                'holder_geoname' => array_flip($this->buildHolderGeonames()),
-                'exhibition_type' => array_combine($exhibitionTypes, $exhibitionTypes),
-                'exhibition_organizer_type' => array_combine($exhibitionOrganizerTypes, $exhibitionOrganizerTypes),
-                'itemexhibition_type' => array_flip($this->buildItemExhibitionTypes()),
-            ],
-        ]);
+        $this->form = $this->createSearchForm($request, $urlGenerator);
 
         $parameters = $request->query->all();
         $parameters = self::array_filter_recursive($parameters, null, true); // remove empty values
@@ -701,6 +472,7 @@ extends CrudController
         }
 
         $filters = $this->form->getData();
+        $connection = $this->getDoctrine()->getEntityManager()->getConnection();
 
         switch ($entity) {
             case 'Venue':
@@ -727,69 +499,5 @@ extends CrudController
                 return new \AppBundle\Utils\ExhibitionListBuilder($connection, $request, $urlGenerator, $filters, $mode);
                 break;
         }
-    }
-
-
-    protected function renderResult($listPage, $listBuilder, UserInterface $user = null, $template = null)
-    {
-        $adapter = new SearchListAdapter($listPage);
-        $pager = new Pagerfanta($adapter);
-        $pager->setMaxPerPage($listPage['limit']);
-        $pager->setCurrentPage(intval($listPage['offset'] / $listPage['limit']) + 1);
-
-        $templatePath = 'Search/base.html.twig';
-        $entityName = 'search';
-        $pageTitle = 'Advanced Search';
-
-
-
-        switch ($template) {
-            case 'exhibition':
-                $templatePath = 'Search/Entity/index.html.twig';
-                $entityName = 'exhibition';
-                $pageTitle = 'Exhibitions';
-                break;
-
-            case 'location':
-            case 'venue':
-                $templatePath = 'Search/Entity/index.html.twig';
-                $entityName = 'venue';
-                $pageTitle = 'Venues';
-                break;
-
-            case 'organizer':
-                $templatePath = 'Search/Entity/index.html.twig';
-                $entityName = 'organizer';
-                $pageTitle = 'Organizing Bodies';
-                break;
-
-            case 'person':
-                $templatePath = 'Search/Entity/index.html.twig';
-                $entityName = 'person';
-                $pageTitle = 'Artists';
-                break;
-
-            case 'itemExhibition':
-                $templatePath = 'Search/Entity/index.html.twig';
-                $entityName = "itemExhibition";
-                $pageTitle = 'Catalogue Entries';
-                break;
-        }
-
-        if ($template === 'exhibition') {
-            $templatePath = 'Search/Entity/index.html.twig';
-            $entityName = 'exhibition';
-            $pageTitle = 'Exhibitions';
-        }
-
-        return $this->render($templatePath, [
-            'pageTitle' => $this->get('translator')->trans($pageTitle),
-            'pager' => $pager,
-
-            'listBuilder' => $listBuilder,
-            'form' => $this->form->createView(),
-            'searches' => $this->lookupSearches($user, 'search'),
-            'entityName' => $entityName
-        ]);
     }
 }

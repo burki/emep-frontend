@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *
  */
 class UserController
-extends Controller
+extends CrudController
 {
 
     /**
@@ -63,10 +63,12 @@ extends Controller
         $searches = [];
 
         foreach ($qb->getQuery()->getResult() as $userAction) {
+            $route = $userAction->getRoute();
+
             $searches[$userAction->getId()] = [
                 'name' => $userAction->getName(),
                 'route' => $userAction->getRoute(),
-                'url' => $urlGenerator->generate($userAction->getRoute(),
+                'url' => $urlGenerator->generate($this->expandSaveSearchRoute($route),
                                                  $userAction->getRouteParams()),
             ];
         }

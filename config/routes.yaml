@@ -1,0 +1,24 @@
+# Explicitly state the followin in order for *-index in SearchController to take precedence over detail routes
+SearchController:
+    resource: ../../src/AppBundle/Controller/SearchController.php
+    type: annotation
+
+ExhibitionController:
+    # this one must go after SearchController
+    resource: ../../src/AppBundle/Controller/ExhibitionController.php
+    type: annotation
+    
+PersonController:
+    # this one must go after SearchController
+    resource: ../../src/AppBundle/Controller/PersonController.php
+    type: annotation
+    
+LocationController:
+    # this one must go after SearchController
+    resource: ../../src/AppBundle/Controller/LocationController.php
+    type: annotation
+    
+HolderController:
+    # this one must go after SearchController
+    resource: ../../src/AppBundle/Controller/HolderController.php
+    type: annotation

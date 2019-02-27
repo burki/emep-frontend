@@ -12,7 +12,7 @@ use Symfony\Component\Intl\Intl;
 class PlaceController
 extends CrudController
 {
-    protected $pageSize = 200; // 3000 if we want all on one page
+    protected $pageSize = 200;
 
     protected function buildCountries()
     {
@@ -130,15 +130,15 @@ extends CrudController
             ->createQueryBuilder();
 
         $qb->select([
-            'P',
-            "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort"
-        ])
+                'P',
+                "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort"
+            ])
             ->from('AppBundle:Person', 'P')
             ->where("P.birthPlace = :place OR P.deathPlace = :place")
             ->andWhere('P.status <> -1')
             ->orderBy('P.birthDate')
             ->addOrderBy('nameSort')
-        ;
+            ;
 
         $persons = $qb->getQuery()
             ->setParameter('place', $place)
@@ -148,11 +148,12 @@ extends CrudController
         $qb = $this->getDoctrine()
             ->getManager()
             ->createQueryBuilder();
+
         $qb->select([
-            'E.id AS id',
-            'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-            'COUNT(DISTINCT P.id) AS numPersonSort',
-        ])
+                'E.id AS id',
+                'COUNT(DISTINCT IE.id) AS numCatEntrySort',
+                'COUNT(DISTINCT P.id) AS numPersonSort',
+            ])
             ->from('AppBundle:Exhibition', 'E')
             ->leftJoin('E.location', 'L')
             ->leftJoin('AppBundle:ItemExhibition', 'IE',
@@ -162,41 +163,39 @@ extends CrudController
             ->where('L.place = :place AND E.status <> -1')
             ->setParameter('place', $place)
             ->groupBy('E.id')
-        ;
+            ;
+
         $exhibitionStats = [];
         foreach ($qb->getQuery()->getResult() as $row) {
             $exhibitionStats[$row['id']] = $row;
         }
 
-        $numberOfExhibitions = $this->getNumberOfExhibitions( $id, $tgn, $place->getId() );
+        $numberOfExhibitions = $this->getNumberOfExhibitions($id, $tgn, $place->getId());
         $numberOfVenues = $this->getNumberOfVenues($tgn);
         $numberofArtists = $this->getNumberofArtists($tgn);
 
-        $numberOfArtistsBorn = $this->getNumberArtistsBorn( $tgn );
-        $numberOfArtistsDied = $this->getNumberArtistsDied( $tgn );
+        $numberOfArtistsBorn = $this->getNumberArtistsBorn($tgn);
+        $numberOfArtistsDied = $this->getNumberArtistsDied($tgn);
 
-        $numberOfAllArtists = $this->getAllArtists( $tgn );
+        $numberOfAllArtists = $this->getAllArtists($tgn);
 
-        $numberOfArtistsExhibitioned = $this->getNumberArtistsExhibitioned( $tgn );
+        $numberOfArtistsExhibitioned = $this->getNumberArtistsExhibitioned($tgn);
 
-        $nationalitiesStats = $this->getNumberOfNationalities( $tgn );
+        $nationalitiesStats = $this->getNumberOfNationalities($tgn);
 
-        $genderStats = $this->getGenderSplit( $tgn );
+        $genderStats = $this->getGenderSplit($tgn);
 
-        $exhibtionTypeStats = $this->getStatsExhibitionTypes( $tgn );
+        $exhibitionTypeStats = $this->getStatsExhibitionTypes($tgn);
 
-        $exhibitionTypeStatisticsFormat = $this->arrayToHighChartArray( $exhibtionTypeStats );
+        $exhibitionTypeStatisticsFormat = $this->assoc2NameYArray($exhibitionTypeStats);
 
-        $genderStatsStatisticsFormat = $this->arrayToHighChartArray( $genderStats );
+        $genderStatsStatisticsFormat = $this->assoc2NameYArray($genderStats);
 
-        $exhibitions = $this->getExhibitionsByTgn( $tgn );
+        $exhibitions = $this->getExhibitionsByTgn($tgn);
 
-        $exhibitionsGroupedByYearStats = $this->getExhibitionsGroupedYearByTgn( $tgn );
+        $exhibitionsGroupedByYearStats = $this->getExhibitionsGroupedYearByTgn($tgn);
 
-        $venuesList = $this->getVenuesList( $tgn );
-
-        // print_r('EXHIBITONS: ');
-        // print_r( $exhibitionsGroupedByYearStats );
+        $venuesList = $this->getVenuesList($tgn);
 
         return $this->render('Place/detail.html.twig', [
             'pageTitle' => $place->getNameLocalized($locale),
@@ -207,7 +206,7 @@ extends CrudController
             'numberDied' => $numberOfArtistsDied,
             'numberVenues' => $numberOfVenues,
             'numberExhibitions' => $numberOfExhibitions,
-            'exhibtionTypeStats' => $exhibtionTypeStats,
+            'exhibitionTypeStats' => $exhibitionTypeStats,
             'nationalitiesStats' => $nationalitiesStats,
             'genderStats' => $genderStats,
             'genderStatsStatisticsFormat' => $genderStatsStatisticsFormat,
@@ -354,17 +353,17 @@ extends CrudController
         return count( $artists );
     }
 
-    public function getNumberOfNationalitiesByVenueId( $id ){
-
+    public function getNumberOfNationalitiesByVenueId($id)
+    {
         $qb = $this->getDoctrine()
             ->getManager()
             ->createQueryBuilder();
 
         $qb->select([
-            'P.nationality as nationality',
-            'COUNT (DISTINCT P.id)  AS numArtist',
+                'P.nationality as nationality',
+                'COUNT (DISTINCT P.id)  AS numArtist',
 
-        ])
+            ])
             ->from('AppBundle:Person', 'P')
             ->innerJoin('AppBundle:ItemExhibition', 'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
@@ -374,82 +373,59 @@ extends CrudController
             ->setParameter('location', $id)
             ->groupBy('P.id')
             ->groupBy('P.nationality');
-        // ->setParameter('tgn', $tgn)
         ;
-
-        // print_r($qb->getQuery()->getSQL());
 
         $allNationalities = $qb->getQuery()->getResult();
 
-
         return count($allNationalities);
-
-        // return $this->arrayToHighChartArray($countriesStats);
     }
 
-    public function getTypesAndNumberOfExhibitionsByVenueId( $id ){
-
+    public function getTypesAndNumberOfExhibitionsByVenueId($id)
+    {
         $qb = $this->getDoctrine()
             ->getManager()
             ->createQueryBuilder();
 
         $qb->select([
-            'E.type',
-            'COUNT(DISTINCT E.id) AS numExhibitions'
-        ])
+                'E.type',
+                'COUNT(DISTINCT E.id) AS numExhibitions'
+            ])
             ->from('AppBundle:Exhibition', 'E')
             ->where('E.location = :location AND E.status <> -1')
             ->setParameter('location', $id)
             ->groupBy('E.type');
-        ;
-
-        $exhibitions = $qb->getQuery()->getResult();
+            ;
 
 
-        $exhibitionsType = [];
+        $countExhibitionsByType = [];
 
-        foreach ($exhibitions as $exhibtion){
-            // print_r($exhibtion['type']);
-            $exhibitionsType[ $exhibtion['type'] ] = $exhibtion['numExhibitions'];
+        foreach ($qb->getQuery()->getResult() as $exhibition){
+            $countExhibitionsByType[$exhibition['type']] = $exhibition['numExhibitions'];
         }
 
 
-        return $exhibitionsType;
+        return $countExhibitionsByType;
     }
 
-    public function getNumberOfExhibitionsByVenueId( $id ){
+    public function getNumberOfExhibitionsByVenueId($id)
+    {
 
         $qb = $this->getDoctrine()
             ->getManager()
             ->createQueryBuilder();
 
         $qb->select([
-            'COUNT(DISTINCT E.id) AS numExhibitions'
-        ])
+                'COUNT(E.id) AS numExhibitions'
+            ])
             ->from('AppBundle:Exhibition', 'E')
             ->where('E.location = :location AND E.status <> -1')
             ->setParameter('location', $id)
-        ;
+            ;
 
-        $exhibitions = $qb->getQuery()->getResult();
+        $result = $qb->getQuery()->getResult();
 
-
-
-        return  $exhibitions[0]['numExhibitions'] ;
+        return $result[0]['numExhibitions'] ;
     }
-
-
-
-    /**
-     * END Venue Queries
-     *
-     *
-     *
-     */
-
-
-    //
-
 
     public function getExhibitionsGroupedYearByTgn ( $tgn ){
 
@@ -667,17 +643,6 @@ extends CrudController
         return $this->arrayToHighChartArray($countriesStats);
     }
 
-
-    public function arrayToHighChartArray($array){
-
-        $returnArray = [];
-
-        foreach ($array as $key => $value){
-            array_push($returnArray, ['name' => $key, 'y' => (float)$value ]);
-        }
-
-        return $returnArray;
-    }
 
     public function getGenderSplit( $tgn ){
 
@@ -937,13 +902,6 @@ extends CrudController
         foreach ($exhibitions as $exhibition){
             $exhibitionsReturn[$exhibition['type']] = $exhibition['numExhibitions'];
         }
-
-        // print_r('---- HERE ----');
-        // print_r($exhibitionsReturn);
-
-
-        // print_r('exhibtions: ');
-        // print_r($exhibitions);
 
         return $exhibitionsReturn;
     }

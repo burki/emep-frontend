@@ -53,99 +53,11 @@ extends CrudController
         return $countriesActive;
     }
 
-    protected function buildFilterForm()
-    {
-        $this->form = $this->createForm(\AppBundle\Filter\PersonFilterType::class, [
-            'choices' => [
-                'nationality' => array_flip($this->buildPersonNationalities()),
-            ],
-        ]);
-    }
-
-    /**
-     * @Route("/person", name="person-index")
-     */
-    public function indexAction(Request $request,
-                                UrlGeneratorInterface $urlGenerator,
-                                UserInterface $user = null)
-    {
-        $response = $this->handleUserAction($request, $user);
-        if (!is_null($response)) {
-            return $response;
-        }
-
-        $this->buildFilterForm();
-
-        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, 'Person');
-
-        $listPagination = new SearchListPagination($listBuilder);
-
-        $page = $request->get('page', 1);
-        $listPage = $listPagination->get($this->pageSize, ($page - 1) * $this->pageSize);
-
-        $adapter = new SearchListAdapter($listPage);
-        $pager = new Pagerfanta($adapter);
-        $pager->setMaxPerPage($listPage['limit']);
-        $pager->setCurrentPage(intval($listPage['offset'] / $listPage['limit']) + 1);
-
-        return $this->render('Person/index.html.twig', [
-            'pageTitle' => $this->get('translator')->trans('Artists'),
-            'pager' => $pager,
-
-            'listBuilder' => $listBuilder,
-            'form' => $this->form->createView(),
-            'searches' => $this->lookupSearches($user, $request->get('_route')),
-        ]);
-    }
-
-    /**
-     * @Route("/person/map", name="person-index-map")
-     */
-    public function indexMapAction(Request $request,
-                                   UrlGeneratorInterface $urlGenerator,
-                                   UserInterface $user = null)
-    {
-        $this->buildFilterForm();
-
-        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'extended', $entity = 'Person');
-        $query = $listBuilder->query();
-        // echo($query->getSQL());
-
-        $stmt = $query->execute();
-
-        $renderParams = $this->processMapEntries($stmt, $entity);
-
-        return $this->render('Map/place-map-index.html.twig', $renderParams + [
-            'filter' => null,
-            'bounds' => [
-                [ 60, -120 ],
-                [ -15, 120 ],
-            ],
-            'markerStyle' => 'exhibition-by-place' == 'default',
-        ]);
-    }
-
-    /**
-     * @Route("/person/stats", name="person-index-stats")
-     */
-    public function indexStatsAction(Request $request,
-                                     UrlGeneratorInterface $urlGenerator,
-                                     UserInterface $user = null)
-    {
-        $this->buildFilterForm();
-
-        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, $entity = 'Person');
-
-        $charts = $this->buildPersonCharts($request, $urlGenerator, $listBuilder);
-
-        return new \Symfony\Component\HttpFoundation\Response(implode("\n", $charts));
-    }
-
     protected function buildSaveSearchParams(Request $request, UrlGeneratorInterface $urlGenerator)
     {
         $route = str_replace('-save', '-index', $request->get('_route'));
 
-        $this->buildFilterForm();
+        $this->form = $this->createSearchForm($request, $urlGenerator);
 
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, 'Person');
         $filters = $listBuilder->getQueryFilters(true);
@@ -179,6 +91,7 @@ extends CrudController
         if (!is_null($exhibitions)) {
             $exhibitions = explode(',', $exhibitions);
         }
+
         if (is_null($exhibitions) || count($exhibitions) < 2) {
             throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException("Invalid argument");
         }
@@ -461,9 +374,9 @@ extends CrudController
     }
 
     /**
-     * @Route("/person/ulan/{ulan}", requirements={"ulan" = "[0-9]+"}, name="person-by-ulan")
-     * @Route("/person/gnd/{gnd}", requirements={"gnd" = "[0-9xX]+"}, name="person-by-gnd")
-     * @Route("/person/{id}", requirements={"id" = "\d+"}, name="person")
+     * @Route("/person/ulan/{ulan}", requirements={"ulan"="[0-9]+"}, name="person-by-ulan")
+     * @Route("/person/gnd/{gnd}", requirements={"gnd"="[0-9xX]+"}, name="person-by-gnd")
+     * @Route("/person/{id}", name="person", requirements={"id"="\d+"})
      */
     public function detailAction(Request $request, $id = null, $ulan = null, $gnd = null)
     {

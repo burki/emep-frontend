@@ -10,6 +10,8 @@ use Symfony\Component\Routing\RouteCollectionBuilder;
 class MicroKernel
 extends Kernel
 {
+    const CONFIG_EXTS = '.{yaml}';
+
     /*
      * Set an Environment Variable in Apache Configuration
      *   SetEnv APP_ENVIRONMENT prod
@@ -144,6 +146,10 @@ extends Kernel
         }
 
         // our controllers
-        $routes->mount('/', $routes->import('@AppBundle/Controller', 'annotation'));
+        $confDir = $this->getProjectDir().'/config';
+
+        $routes->import($confDir.'/{routes}/*'.self::CONFIG_EXTS, '/', 'glob');
+        $routes->import($confDir.'/{routes}/'.$this->environment.'/**/*'.self::CONFIG_EXTS, '/', 'glob');
+        $routes->import($confDir.'/{routes}'.self::CONFIG_EXTS, '/', 'glob');
     }
 }

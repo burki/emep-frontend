@@ -253,3 +253,81 @@
     {% endif %}
     <div class="icontab save-query"><img src="{{ app.request.basepath }}/img/save_icon.svg" class="iconimage" title="save your current query"></div>
 {% endmacro %}
+
+{% macro render_active_filters(listBuilder, form, entityLabels) %}
+            {# render active filters #}
+            <div class="additional-filter-container">
+                {% for entity,filters in listBuilder.queryFilters %}
+                    <div class="filter-row"><div class="div-block-5">{{ entityLabels[entity] }}</div></div>
+                    {% for key,val in filters %}
+                        {% set fieldVars = form[entity][key].vars %}
+                        {% set fieldVal = fieldVars.value %}
+                        {% set label = fieldVars.label %}
+                        {% if label is empty %}{% set label = key|humanize %}{% endif %}
+                        {% set relation = 'equal to' %}
+                        {% if fieldVal is iterable and fieldVal|length > 1 %}
+                            {% set relation = 'one of' %}
+                        {% endif %}
+
+                        {% set displayVal = fieldVal %}
+                        {% if fieldVars.choices is not empty %}
+                            {% if fieldVal is not iterable %}
+                                {% set fieldVal = [ fieldVal ] %}
+                            {% endif %}
+                            {% set choiceLabels = []  %}
+                            {% for choiceVal in fieldVal %}
+                                {% set choiceLabel = choiceVal %}
+                                {% set break = false %}
+                                {% for choice in fieldVars.choices if not break %}
+                                    {% if choice.value == choiceVal %}
+                                        {% set choiceLabel = choice.label %}
+                                        {% set break = true %}
+                                    {% endif %}
+                                {% endfor %}
+                                {% set choiceLabels = choiceLabels|merge([ choiceLabel ]) %}
+                            {% endfor %}
+                            {% set displayVal = choiceLabels|join(', ') %}
+                        {% elseif fieldVal is iterable %}
+                            {% if form[entity][key].children|length > 0 %}
+                                {% set relation = 'within the range' %}
+                                {% set displayVal = fieldVal|join('-') %}
+                            {% else %}
+                                {% set displayVal = fieldVal|join('; ') %}
+                            {% endif %}
+                        {% else %}
+                            {{ fieldVal }}
+                        {% endif %}
+
+                        <div class="filter-row">
+                            <div class="div-block-5">
+                                <div class="first-filter-term">
+                                    <div>{{ label }}</div>
+                                </div>
+                                <div class="is_equal_to">
+                                    <div>
+                                        is {{ relation }}
+                                    </div>
+                                </div>
+                                <div class="first-filter-term">
+                                    <div>
+                                        {{ displayVal }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="subfilter-buttons-container">
+                                {% set filtersRemaining = listBuilder.queryFilters(true)|without(entity) %}
+                                {% set filtersEntityRemaining = filters|without(key) %}
+                                {% if filtersEntityRemaining is not empty %}
+                                    {% set filtersRemaining = filtersRemaining|merge({ (entity) : filtersEntityRemaining }) %}
+                                {% endif %}
+                                {% set params = app.request.attributes.get('_route_params')|merge(app.request.query.all|without('filter')) %}
+                                {% if filtersRemaining is not empty %}
+                                    {% set params = params|merge({ 'filter': filtersRemaining }) %}
+                                {% endif %}
+                                <a class="subfilter-remove" href="{{ path(app.request.attributes.get('_route'), params) }}">remove</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+            </div><!-- .additional-filter-container -->
+{% endmacro %}

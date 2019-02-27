@@ -1,5 +1,4 @@
 <form id="search" class="indexForm exhibitionFilterForm indexForm" action="{{ path(app.request.get('_route')) }}" method="GET">
-    <input type="hidden" name="entity" value="{{ listBuilder.entity }}" />
     {% set filter = listBuilder.queryFilters %}
 
     <div class="searchbarcontainer">
@@ -14,8 +13,8 @@
         </div>
     </div>
 
-
     {% block filters %}
+        {#
         <div class="filters-heading" style="margin-top: 25px;">
             <span style="margin-right: 20px; margin-top: 7px">Filter by:</span>
 
@@ -33,9 +32,12 @@
                 </button>
             {% endfor %}
         </div>
+        #}
 
         <div class="filter-combination-container">
             {% form_theme form 'Search/bootstrap_3_adjusted.html.twig' %}
+            <div style="display:none">{{ form_row(form.organizer.organizer) }}{# for checkbox filter #}</div>
+            {#
             <div id="filter-panel-exhibition" class="collapse filter-panel">
                 <div class="panel panel-default">
                     <div class="panel-heading">Filter by Exhibition</div>
@@ -83,89 +85,14 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">Filter by Organizing Body</div>
                     <div class="panel-body">
-                        {#{ form_row(form.organizer.geoname) }#}
                         {{ form_row(form.organizer.type) }}
                         {{ form_row(form.organizer.organizer) }}
                     </div>
                 </div>
             </div>
+            #}
 
-            {# render active filters #}
-            <div class="additional-filter-container">
-                {% for entity,filters in listBuilder.queryFilters %}
-                    <div class="filter-row"><div class="div-block-5">{{ entityLabels[entity] }}</div></div>
-                    {% for key,val in filters %}
-                        {% set fieldVars = form[entity][key].vars %}
-                        {% set fieldVal = fieldVars.value %}
-                        {% set label = fieldVars.label %}
-                        {% if label is empty %}{% set label = key|humanize %}{% endif %}
-                        {% set relation = 'equal to' %}
-                        {% if fieldVal is iterable and fieldVal|length > 1 %}
-                            {% set relation = 'one of' %}
-                        {% endif %}
-
-                        {% set displayVal = fieldVal %}
-                        {% if fieldVars.choices is not empty %}
-                            {% if fieldVal is not iterable %}
-                                {% set fieldVal = [ fieldVal ] %}
-                            {% endif %}
-                            {% set choiceLabels = []  %}
-                            {% for choiceVal in fieldVal %}
-                                {% set choiceLabel = choiceVal %}
-                                {% set break = false %}
-                                {% for choice in fieldVars.choices if not break %}
-                                    {% if choice.value == choiceVal %}
-                                        {% set choiceLabel = choice.label %}
-                                        {% set break = true %}
-                                    {% endif %}
-                                {% endfor %}
-                                {% set choiceLabels = choiceLabels|merge([ choiceLabel ]) %}
-                            {% endfor %}
-                            {% set displayVal = choiceLabels|join(', ') %}
-                        {% elseif fieldVal is iterable %}
-                            {% if form[entity][key].children|length > 0 %}
-                                {% set relation = 'within the range' %}
-                                {% set displayVal = fieldVal|join('-') %}
-                            {% else %}
-                                {% set displayVal = fieldVal|join('; ') %}
-                            {% endif %}
-                        {% else %}
-                            {{ fieldVal }}
-                        {% endif %}
-
-                        <div class="filter-row">
-                            <div class="div-block-5">
-                                <div class="first-filter-term">
-                                    <div>{{ label }}</div>
-                                </div>
-                                <div class="is_equal_to">
-                                    <div>
-                                        is {{ relation }}
-                                    </div>
-                                </div>
-                                <div class="first-filter-term">
-                                    <div>
-                                        {{ displayVal }}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="subfilter-buttons-container">
-                                {% set filtersRemaining = listBuilder.queryFilters(true)|without(entity) %}
-                                {% set filtersEntityRemaining = filters|without(key) %}
-                                {% if filtersEntityRemaining is not empty %}
-                                    {% set filtersRemaining = filtersRemaining|merge({ (entity) : filtersEntityRemaining }) %}
-                                {% endif %}
-                                {% set params = app.request.attributes.get('_route_params')|merge(app.request.query.all|without('filter')) %}
-                                {% if filtersRemaining is not empty %}
-                                    {% set params = params|merge({ 'filter': filtersRemaining }) %}
-                                {% endif %}
-                                <a class="subfilter-remove" href="{{ path(app.request.attributes.get('_route'), params) }}">remove</a>
-                            </div>
-                        </div>
-                    {% endfor %}
-                {% endfor %}
-            </div><!-- .additional-filter-container -->
+            {{ helper.render_active_filters(listBuilder, form, entityLabels) }}
         </div><!-- .filter-combination-container -->
-
     {% endblock %}
 </form>

@@ -70,99 +70,12 @@ extends CrudController
         }
     }
 
-    /**
-     * @Route("/organizer", name="organizer-index")
-     * @Route("/location", name="location-index")
-     */
-    public function indexAction(Request $request,
-                                         UrlGeneratorInterface $urlGenerator,
-                                         UserInterface $user = null)
-    {
-        $response = $this->handleUserAction($request, $user);
-        if (!is_null($response)) {
-            return $response;
-        }
-
-        $entity = 'organizer-index' == $request->get('_route') ? 'Organizer' : 'Venue';
-
-        $this->buildFilterForm($entity);
-
-        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, $entity);
-        $listPagination = new SearchListPagination($listBuilder);
-        $page = $request->get('page', 1);
-        $listPage = $listPagination->get($this->pageSize, ($page - 1) * $this->pageSize);
-        $adapter = new SearchListAdapter($listPage);
-        $pager = new Pagerfanta($adapter);
-        $pager->setMaxPerPage($listPage['limit']);
-        $pager->setCurrentPage(intval($listPage['offset'] / $listPage['limit']) + 1);
-
-        return $this->render(('organizer-index' == $request->get('_route') ? 'Organizer' : 'Location')
-                             . '/index.html.twig', [
-            'pageTitle' => $this->get('translator')->trans('organizer-index' == $request->get('_route')
-                                                           ? 'Organizing Bodies' : 'Venues'),
-            'pager' => $pager,
-
-            'listBuilder' => $listBuilder,
-            'form' => $this->form->createView(),
-            'searches' => $this->lookupSearches($user, $request->get('_route'))
-        ]);
-    }
-
-    /**
-     * @Route("/organizer/map", name="organizer-index-map")
-     * @Route("/location/map", name="location-index-map")
-     */
-    public function indexMapAction(Request $request,
-                                            UrlGeneratorInterface $urlGenerator,
-                                            UserInterface $user = null)
-    {
-        $entity = 'organizer-index-map' == $request->get('_route') ? 'Organizer' : 'Venue';
-
-        $this->buildFilterForm($entity);
-
-        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'extended', $entity);
-        $query = $listBuilder->query();
-        // echo($query->getSQL());
-
-        $stmt = $query->execute();
-
-        $renderParams = $this->processMapEntries($stmt, $entity);
-
-        return $this->render('Map/place-map-index.html.twig', $renderParams + [
-            'filter' => null,
-            'bounds' => [
-                [ 60, -120 ],
-                [ -15, 120 ],
-            ],
-            'markerStyle' => 'exhibition-by-place' == 'default',
-        ]);
-    }
-
-    /**
-     * @Route("/organizer/stats", name="organizer-index-stats")
-     * @Route("/location/stats", name="location-index-stats")
-     */
-    public function indexStatsAction(Request $request,
-                                              UrlGeneratorInterface $urlGenerator,
-                                              UserInterface $user = null)
-    {
-        $entity = 'organizer-index-stats' == $request->get('_route') ? 'Organizer' : 'Venue';
-
-        $this->buildFilterForm($entity);
-
-        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, $entity);
-
-        $charts = $this->buildLocationCharts($request, $urlGenerator, $listBuilder);
-
-        return new \Symfony\Component\HttpFoundation\Response(implode("\n", $charts));
-    }
-
     protected function buildSaveSearchParams(Request $request, UrlGeneratorInterface $urlGenerator)
     {
         $route = str_replace('-save', '-index', $request->get('_route'));
         $entity = 'organizer-index' == $route ? 'Organizer' : 'Venue';
 
-        $this->buildFilterForm($entity);
+        $this->form = $this->createSearchForm($request, $urlGenerator);
 
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, $entity);
         $filters = $listBuilder->getQueryFilters(true);
@@ -178,7 +91,7 @@ extends CrudController
     }
 
     /**
-     * @Route("/location/save", name="location-save")
+     * @Route("/location/save", name="venue-save")
      * @Route("/organizer/save", name="organizer-save")
      */
     public function saveSearchAction(Request $request,
@@ -240,7 +153,8 @@ extends CrudController
         return $qb->getQuery()->getResult();
     }
 
-    protected function getExhibitionStatsByIds($exhibitionIds) {
+    protected function getExhibitionStatsByIds($exhibitionIds)
+    {
         $exhibitionStats = [];
 
         if (empty($exhibitionIds)) {
@@ -290,7 +204,7 @@ extends CrudController
         }
 
         if (!isset($location) || $location->getStatus() == -1) {
-            return $this->redirectToRoute('location-index');
+            return $this->redirectToRoute('venue-index');
         }
 
         $exhibitionIds = $this->getExhibitionIds($location);
@@ -330,7 +244,7 @@ extends CrudController
         }
 
         if (!isset($location) || $location->getStatus() == -1) {
-            return $this->redirectToRoute('location-index');
+            return $this->redirectToRoute('venue-index');
         }
 
         $csvResult = [];
@@ -368,7 +282,7 @@ extends CrudController
         }
 
         if (!isset($location) || $location->getStatus() == -1) {
-            return $this->redirectToRoute('location-index');
+            return $this->redirectToRoute('venue-index');
         }
 
         $locale = $request->getLocale();
