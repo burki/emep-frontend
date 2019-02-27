@@ -82,11 +82,11 @@ class Builder
 
         $menu->addChild('Search Lists', [ 'route' => 'exhibition' ]); // maybe create a view for view data
         $menu['Search Lists']->addChild('Exhibitions', [
-            'route' => 'exhibition',
+            'route' => 'exhibition-index',
         ]);
 
         $menu['Search Lists']->addChild('Artists', [
-            'route' => 'person',
+            'route' => 'person-index',
         ]);
 
         $menu['Search Lists']->addChild('Venues', [
@@ -94,7 +94,7 @@ class Builder
         ]);
 
         $menu['Search Lists']->addChild('Organizing Bodies', [
-            'route' => 'organizer',
+            'route' => 'organizer-index',
         ]);
 
 

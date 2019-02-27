@@ -199,22 +199,22 @@ extends CrudController
 
     /**
      * @Route("/search", name="search")
-     * @Route("/exhibition/search", name="exhibition")
-     * @Route("/location/search", name="location")
-     * @Route("/holder/search", name="holder")
-     * @Route("/person/search", name="person")
-     * @Route("/place/search", name="place")
-     * @Route("/itemExhibition/search", name="itemexhibition")
+     * @Route("/exhibition/search", name="exhibition-index")
+     * @Route("/location/search", name="location-index")
+     * @Route("/holder/search", name="holder-index")
+     * @Route("/person/search", name="person-index")
+     * @Route("/place/search", name="place-index")
+     * @Route("/itemExhibition/search", name="itemexhibition-index")
      * @Route("/venue/search", name="venue")
-     * @Route("/organizer/search", name="organizer")
+     * @Route("/organizer/search", name="organizer-index")
      */
     public function searchAction(Request $request,
                                  UrlGeneratorInterface $urlGenerator,
                                  UserInterface $user = null)
     {
 
-        $routeName = $request->get('_route');
 
+        $routeName = explode("-", $request->get('_route'))[0];
 
         $response = $this->handleUserAction($request, $user);
         if (!is_null($response)) {

@@ -1,7 +1,7 @@
 {% block exhibitions %}
     {% import 'Shared/datatables.html.twig' as datatables %}
     {{ datatables.head() }}
-
+    
     <script src="{{ app.request.basepath }}/js/datatables-mobile.min.js"></script>
 
     <script>
@@ -18,7 +18,7 @@
                     { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "asc", "desc" ] },
-                    { "orderSequence": [ "asc", "desc" ] },
+                    { "orderSequence": [ "desc", "asc" ] },
                     { "orderSequence": [ "desc", "asc" ] }
                 ]
             });
@@ -38,8 +38,9 @@
                 <th class="all">Title</th>
                 <th class="all">City</th>
                 <th class="min-tablet-p">Venue</th>
-                <th class="min-tablet-p">Type of Org. Body</th>
                 <th class="min-tablet-p"># of Cat. Entries</th>
+                <th class="min-tablet-p">Type </th>
+
             </tr>
             </thead>
             <tbody>
@@ -61,7 +62,6 @@
                             {{ exhibition.location.name }}
                         </a>
                     </td>
-                    <td>{{ exhibition.organizerType }}</td>
                     <td>{% if catalogueEntries[exhibition.id] is defined %}
                             {% set count = catalogueEntries[exhibition.id]|length %}
                             {% if count > 0 %}
@@ -72,6 +72,7 @@
                             {% set count = 0 %}
                         {% endif %}
                     </td>
+                    <td>{{ exhibition.organizerType }}</td>
                 </tr>
             {% endfor %}
             </tbody>

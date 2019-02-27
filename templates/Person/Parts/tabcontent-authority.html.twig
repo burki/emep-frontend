@@ -6,7 +6,8 @@
                     <div class="col-sm-12">
                         <h4>
                             {% if person.gnd is not empty %}
-                                <a href="http://d-nb.info/gnd/{{ person.gnd }}" target="_blank">{{ person.gnd }}</a>
+                                <!--{{ 'Integrated Authority File'|trans }}
+                                <br />--><a href="http://d-nb.info/gnd/{{ person.gnd }}" target="_blank">{{ person.gnd }}</a>
                             {% else %}
                                 {{ 'Additional Information'|trans }}
                             {% endif %}

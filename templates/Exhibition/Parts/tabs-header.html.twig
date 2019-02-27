@@ -2,9 +2,9 @@
     <!-- Nav tabs -->
     <div>
         <div class="tabsymbols">
-            <div class="icontab download-csv-catalogue" style="display:none"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage" title="download current data"></div>
-            <div class="icontab download-csv-artists" style="display:none"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage" title="download current data"></div>
-            <div class="icontab download-csv-similars" style="display:none"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage" title="download current data"></div>
+            <div class="icontab download-csv-catalogue" style="display:none"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage" title="download current data as csv"></div>
+            <div class="icontab download-csv-artists" style="display:none"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage" title="download current data as csv"></div>
+            <div class="icontab download-csv-similars" style="display:none"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage" title="download current data as csv"></div>
         </div>
         <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 1em">
             <li role="presentation" class="active"><a href="#information" aria-controls="entries" role="tab" data-toggle="tab">{{ 'Information'|trans }}</a></li>
@@ -21,7 +21,7 @@
 
             {# co-appearnces #}
             {% if similar|length > 0 %}
-                <li role="presentation" class="similars-tab"><a href="#similars" aria-controls="similars" role="tab" data-toggle="tab">{{ 'Similars'|trans }}</a></li>
+                <li role="presentation" class="similars-tab"><a href="#similars" aria-controls="similars" role="tab" data-toggle="tab">{{ 'Exhibitions with Similar Artists'|trans }}</a></li>
             {% endif %}
             {# authority files #}
             <li role="presentation"><a href="#stats" data-url="{{ path('exhibition-stats-partial', { id: exhibition.id }) }}" aria-controls="chronology" role="tab" data-toggle="tab">{{ 'Statistics'|trans }}</a></li>

@@ -24,7 +24,10 @@
                                 (Holding Institution{% if bibitem.holderRefs|length > 1 %}s{% endif %}:
                                 {% for holderRef in bibitem.holderRefs %}
                                     {% set holder = holderRef.holder %}
-                                    <a href="{{ path('holder', { 'id': holder.id }) }}">{{ holder.name }}</a>{% if not loop.last %}, {% endif %}{% endfor %})
+
+                                    {# <a href="{{ path('holder', { 'id': holder.id }) }}">{{ holder.name }}</a>{% if not loop.last %}, {% endif %}
+ #}
+                                {% endfor %})
                             {% endif %}
                             <br/>
                         {% endfor %}

@@ -1,4 +1,5 @@
 <div role="tabpanel" class="tab-pane mappane" id="map">
+
     {% import 'Shared/map-leaflet.html.twig' as map %}
 
     {{ map.head() }}
@@ -8,5 +9,40 @@
     {% import 'Shared/select2.html.twig' as select2 %}
     {{ select2.head() }}
 
-    {{ render_hinclude(url('person-index-map', app.request.query.all), {'default': 'Loading...'}) }}
+    {%  set countriesQuery = '' %}
+    {%  set genderQuery = 'any' %}
+    {%  set stringQuery = 'any' %}
+
+
+    {% if nationalities|length %}
+        {% set countriesQuery = nationalities %}
+    {% endif %}
+
+    {% if gender|length %}
+        {% set genderQuery = gender %}
+    {% endif %}
+
+    {% if stringPart|length %}
+        {% set stringQuery = stringPart %}
+    {% endif %}
+
+    {% set artistBirthDateLeft = 'any' %}
+    {% set artistBirthDateRight = 'any' %}
+
+    {% set artistDeathDateLeft = 'any' %}
+    {% set artistDeathDateRight = 'any' %}
+
+    {% if birthDate['left_date'] %}
+        {% set artistBirthDateLeft = birthDate['left_date']|date('Y-m-d') %}
+        {% set artistBirthDateRight = birthDate['right_date']|date('Y-m-d') %}
+    {% endif %}
+
+    {% if deathDate['left_date'] %}
+        {% set artistDeathDateLeft = deathDate['left_date']|date('Y-m-d') %}
+        {% set artistDeathDateRight = deathDate['right_date']|date('Y-m-d') %}
+    {% endif %}
+
+
+
+    {{ render_hinclude(controller('AppBundle\\Controller\\MapController::birthDeathPlacesIndex', {countriesQuery: countriesQuery, genderQuery: genderQuery, stringQuery: stringQuery, currIds: ids, exhibitionCountries: exhibitionCountries, organizerTypesQuery: organizerTypesQuery, artistBirthDateLeft: artistBirthDateLeft, artistBirthDateRight: artistBirthDateRight, artistDeathDateLeft: artistDeathDateLeft, artistDeathDateRight: artistDeathDateRight}), {'default': 'Loading...'}) }}
 </div>

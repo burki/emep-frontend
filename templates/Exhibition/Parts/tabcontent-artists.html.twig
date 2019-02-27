@@ -11,8 +11,9 @@
                 info: true,
                 "columns": [
                     { "orderSequence": [ "asc", "desc" ] },
-                    { "orderSequence": [ "asc", "desc" ] },
-                    { "orderSequence": [ "asc", "desc" ] }
+                    { "orderSequence": [ "desc", "asc" ] },
+                    { "orderSequence": [ "desc", "asc" ] },
+                    { "orderSequence": [ "desc", "asc" ] }
                 ]
             });
         })
@@ -28,8 +29,10 @@
             <thead>
                 <tr class="listviewheading">
                     <th>Name</th>
+                    <th>Nationality</th>
                     <th>Birth Date</th>
                     <th>Death Date</th>
+                    <th># of Cat. Entries</th>
                 </tr>
             </thead>
 
@@ -40,12 +43,19 @@
                         <a href="{{ path('person', { 'id' : person.id }) }}">{{ person.fullname(true) }}</a>
                     </td>
 
+                    <td>
+                        {{ person.nationality }}
+                    </td>
+
                     <td class="date">
                         {{ person.birthDate|dateincomplete -}}
                     </td>
 
                     <td class="date">
                         {{ person.deathDate|dateincomplete -}}
+                    </td>
+                    <td>
+                        {{ person.catalogueEntries|length }}
                     </td>
                 </tr>
             {% endfor %}

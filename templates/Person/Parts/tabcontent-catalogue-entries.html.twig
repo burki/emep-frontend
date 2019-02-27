@@ -148,9 +148,6 @@
 
 
 
-
-
-
     <div role="tabpanel" class="tab-pane" id="entries">
         {#
           {{ helper.exhibition_itemexhibition_sort_control(exhibition) }}
@@ -166,6 +163,7 @@
             </thead>
             <tbody>
             {% for catalogueEntry in catalogueEntries %}
+                {% set catalogueEntry  = catalogueEntry[0] %}
                 {% set initial = catalogueEntry.person.fullname %}
 
                 {% set addresses = catalogueEntry.person.addressesSeparated(exhibition.id) %}
@@ -201,6 +199,7 @@
             </thead>
             <tbody>
             {% for catalogueEntry in catalogueEntries %}
+                {% set catalogueEntry  = catalogueEntry[0] %}
                 {% set initial = catalogueEntry.person.fullname %}
 
                 {% set addresses = catalogueEntry.person.addressesSeparated(exhibition.id) %}

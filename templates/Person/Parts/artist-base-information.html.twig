@@ -1,4 +1,19 @@
 {# birth place and date #}
+
+    <div class="artist-information-container">
+        <div class="artist-information-label">{{ 'Sex'|trans }}:</div>
+        <div class="artist-information-text">
+            {% if person.gender == "M" %}
+                Male
+            {% elseif person.gender == "F" %}
+                Female
+            {% else %}
+                [unknown]
+            {% endif %}
+
+        </div>
+    </div>
+
 {% set birthPlace = person.birthPlaceInfo(app.request.locale) %}
 {% if birthPlace is not empty or person.birthDate is not empty %}
     <div class="artist-information-container">
@@ -38,11 +53,18 @@
 
 <div class="artist-information-container">
     <div class="artist-information-label">{{ 'Nationality'|trans }}:</div>
-    <div class="artist-information-text">{{ countryArray[person.nationality] -}}
+    <div class="artist-information-text">
+        {% if person.nationality is sameas(false) %}
+            [unknown]
+        {% else %}
+            {{ countryArray[person.nationality] -}}
+        {% endif %}
     </div>
 </div>
 
 {# addresses #}
+
+
 {% set addresses = person.addressesSeparated %}
 {% if addresses is not empty %}
     <div class="artist-information-container">
@@ -62,7 +84,7 @@
     </div>
 {% endif %}
 
-<div class="artist-information-container-quickstat">
+<div class="artist-information-container-qucikstat">
     <div class="artist-information-label">Quickstats</div>
     <div class="statcontainer">
         <div class="artist-information-text-stats">Exhibitions: {{ dataNumberOfExhibitionsPerYear[2] }}</div>

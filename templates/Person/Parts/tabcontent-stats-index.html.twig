@@ -1,7 +1,88 @@
 <div role="tabpanel" class="tab-pane" id="stats">
-    {% import 'Shared/highcharts.html.twig' as highcharts %}
-    {{ highcharts.head() }}
 
-    {{ render_hinclude(url('person-index-stats', app.request.query.all), {'default': 'Loading...'}) }}
+
+    <script src="{{ app.request.basepath }}/vendor/highcharts/highcharts.js"></script>
+    <script src="{{ app.request.basepath }}/vendor/highcharts/modules/exporting.js"></script>
+    <script src="{{ app.request.basepath }}/vendor/highcharts/modules/heatmap.js"></script>
+    <script src="{{ app.request.basepath }}/js/highchart_custom_theme.js"></script>
+
+
+
+
+    {%  set countriesQuery = '' %}
+    {%  set genderQuery = 'any' %}
+    {%  set stringQuery = 'any' %}
+
+
+
+    {% if nationalities|length %}
+        {% set countriesQuery = nationalities %}
+    {% endif %}
+
+    {% if gender|length %}
+        {% set genderQuery = gender %}
+    {% endif %}
+
+    {% if stringPart|length %}
+        {% set stringQuery = stringPart %}
+    {% endif %}
+
+
+    <script>
+        $(document).ready(function() {
+            $('#container-artists-nationality').highcharts({
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie'
+                },
+                title: {
+                    text: ' '
+                },
+                tooltip: {
+                    pointFormat: '{point.y} artists (<b>{point.percentage:.1f}%</b>)'
+                },
+                plotOptions: {
+                    pie: {
+                    }
+                },
+                series: [{
+                    name: 'Country: ',
+                    type: 'pie',
+                    innerSize: '50%',
+                    data: {{ indexDataNumberCountries[0]|raw }}
+                }]
+            });
+        });
+    </script>
+
+
+    <h3 class="chart-header" data-collapse="container-artists-nationality"><span class="chartsymbol">+</span>Artists' Nationality <span class="charttypeTitle">(Pie Chart)</span></h3>
+    <div class="collapse" id="container-artists-nationality" style="width: 100%; height: 400px; margin: 0 auto;"></div>
+
+
+
+    {% set artistBirthDateLeft = 'any' %}
+    {% set artistBirthDateRight = 'any' %}
+
+    {% set artistDeathDateLeft = 'any' %}
+    {% set artistDeathDateRight = 'any' %}
+
+    {% if birthDate['left_date'] %}
+        {% set artistBirthDateLeft = birthDate['left_date']|date('Y-m-d') %}
+        {% set artistBirthDateRight = birthDate['right_date']|date('Y-m-d') %}
+    {% endif %}
+
+    {% if deathDate['left_date'] %}
+        {% set artistDeathDateLeft = deathDate['left_date']|date('Y-m-d') %}
+        {% set artistDeathDateRight = deathDate['right_date']|date('Y-m-d') %}
+    {% endif %}
+
+    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::personByYearActionPart', {countriesQuery: countriesQuery, genderQuery: genderQuery, stringQuery: stringQuery, currIds: ids, exhibitionCountries: exhibitionCountries, organizerTypesQuery: organizerTypesQuery, artistBirthDateLeft: artistBirthDateLeft, artistBirthDateRight: artistBirthDateRight, artistDeathDateLeft: artistDeathDateLeft, artistDeathDateRight: artistDeathDateRight}), {'default': 'Loading... <br/>'}) }}
+    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::personExhibitionAgeActionPart', {countriesQuery: countriesQuery, genderQuery: genderQuery, stringQuery: stringQuery, currIds: ids, exhibitionCountries: exhibitionCountries, organizerTypesQuery: organizerTypesQuery, artistBirthDateLeft: artistBirthDateLeft, artistBirthDateRight: artistBirthDateRight, artistDeathDateLeft: artistDeathDateLeft, artistDeathDateRight: artistDeathDateRight}), {'default': 'Loading... <br/>'}) }}
+    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::exhibitionPerPersonPart', {countriesQuery: countriesQuery, genderQuery: genderQuery, stringQuery: stringQuery, currIds: ids, exhibitionCountries: exhibitionCountries, organizerTypesQuery: organizerTypesQuery, artistBirthDateLeft: artistBirthDateLeft, artistBirthDateRight: artistBirthDateRight, artistDeathDateLeft: artistDeathDateLeft, artistDeathDateRight: artistDeathDateRight}), {'default': 'Loading... <br/>'}) }}
+    {{ render_hinclude(controller('AppBundle\\Controller\\StatisticsController::personsWikipediaPart', {countriesQuery: countriesQuery, genderQuery: genderQuery, stringQuery: stringQuery, currIds: ids, exhibitionCountries: exhibitionCountries, organizerTypesQuery: organizerTypesQuery, artistBirthDateLeft: artistBirthDateLeft, artistBirthDateRight: artistBirthDateRight, artistDeathDateLeft: artistDeathDateLeft, artistDeathDateRight: artistDeathDateRight}), {'default': 'Loading... <br/>'}) }}
     {{ highcharts.clickableChartHeader() }}
+
 </div>

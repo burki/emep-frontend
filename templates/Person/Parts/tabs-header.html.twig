@@ -2,21 +2,30 @@
     <!-- Nav tabs -->
     <div>
         <div class="tabsymbols">
-            <div class="icontab download-csv-exhibition" style="display: none;"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage" title="download current data"></div>
-            <div class="icontab download-csv-coappearances" style="display: none;"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage" title="download current data"></div>
+            <div class="icontab download-csv-exhibition" style="display: none;"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage" title="download current data as csv"></div>
+            <div class="icontab download-csv-coappearances" style="display: none;"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage" title="download current data as csv"></div>
         </div>
         <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 1em">
             <li role="presentation" class="active exhibitions-tab"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">{{ 'Exhibitions'|trans }}</a></li>
             {# co-appearnces #}
+
+            {% if catalogueEntries is not empty %}
+                <li role="presentation" class="cat-entries-tab"><a href="#entries" aria-controls="entries" role="tab" data-toggle="tab">{{ 'Catalogue Entries'|trans }}</a></li>
+            {% endif %}
+
             {% if similar|length > 0 %}
                 <li role="presentation" class="similars-tab"><a href="#similar" aria-controls="similar" role="tab" data-toggle="tab">{{ 'Frequent Co-Appearances'|trans }}</a></li>
             {% endif %}
+
+            <li role="presentation"><a href="#statistics" aria-controls="statistics" role="tab" data-toggle="tab">{{ 'Statistics'|trans }}</a></li>
+
             {# authority files #}
             {% if person.gnd is not empty or person.ulan is not empty %}
                 <li role="presentation"><a href="#authority" aria-controls="authority" role="tab" data-toggle="tab">{{ 'Integrated Authority File'|trans }}</a></li>
             {% endif %}
 
-            <li role="presentation"><a href="#statistics" aria-controls="statistics" role="tab" data-toggle="tab">{{ 'Statistics'|trans }}</a></li>
+
+
         </ul>
 
     </div>

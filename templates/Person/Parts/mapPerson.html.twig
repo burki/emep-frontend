@@ -8,7 +8,6 @@
     {% set birthPlace = person.birthPlaceInfo(app.request.locale) %}
 
 
-
     {% if birthPlace.geo is not empty or deathPlace.geo is not empty %}
         <div id="map" class="col-sm-12" style="width: 100%; min-height: 320px;"></div>
 
@@ -49,7 +48,7 @@
                 {% endif %}
 
                 {% if exhPlace is not empty %}
-                        L.marker([{{ exhPlace }}], { icon: greenIcon }).bindPopup('<strong>exhibition:</strong> <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">{{ exhibition.title }}</a>'),
+                        L.marker([{{ exhPlace }}], { icon: orangeIcon }).bindPopup('<strong>exhibition:</strong> <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">{{ exhibition.title }}</a>'),
                     {% endif %}
                 {% endfor %}
             ]);
