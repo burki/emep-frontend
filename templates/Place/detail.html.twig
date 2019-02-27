@@ -20,6 +20,11 @@
                 {% endfor %}</div>
             <h1 class="heading">{{ place.nameLocalized(app.request.locale) }}</h1>
 
+            <div class="artist_information">
+                {# load helper part#}
+                {% embed "Place/Parts/place-base-information.html.twig" %}
+                {% endembed %}
+            </div>
         </div>
         <div class="maphalf">
             {% embed "Place/Parts/locationMap.html.twig" %}
@@ -44,6 +49,12 @@
                 {% endembed %}
 
                 {% embed "Place/Parts/tabcontent-venues.html.twig" %}
+                {% endembed %}
+
+                {% embed "Place/Parts/tabcontent-exhibitions.html.twig" %}
+                {% endembed %}
+
+                {% embed "Place/Parts/tabcontent-statistics.html.twig" %}
                 {% endembed %}
             </div><!-- .tab-content -->
         </div>

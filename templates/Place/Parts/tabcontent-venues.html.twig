@@ -1,6 +1,5 @@
-    {% set venues = place.venues %}
 
-    {% if venues is not empty %}
+    {% if venuesList is not empty %}
         
     {% import 'Shared/datatables.html.twig' as datatables %}
     {{ datatables.head() }}
@@ -15,6 +14,12 @@
                 "columns": [
                     null,
                     { "orderSequence": [ "desc", "asc" ] },
+                    { "orderSequence": [ "desc", "asc" ] },
+                    { "orderSequence": [ "desc", "asc" ] },
+                    { "orderSequence": [ "desc", "asc" ] },
+                    { "orderSequence": [ "desc", "asc" ] },
+                    { "orderSequence": [ "desc", "asc" ] },
+                    { "orderSequence": [ "desc", "asc" ] },
                 ]
             });
         })
@@ -28,18 +33,26 @@
             <thead>
             <tr>
                 <th>Title</th>
+                <th>Type of Org. Body</th>
                 <th># of Exhibitions</th>
+                <th># of Solo Exhibitions</th>
+                <th># of Group Exhibitions</th>
+                <th># of Artists</th>
+                <th># of Nationalities</th>
+                <th># of Cat. Entries</th>
             </tr>
             </thead>
             <tbody>
-            {% for location in venues %}
-                {% set birthPlace = person.birthPlace %}
+            {% for venue in venuesList %}
                 <tr>
-                    <td><a href="{{ path('location', { 'id' : location.id }) }}"><b>{{ location.name }}</b></a></td>
-                    {% set count = location.exhibitions|length %}
-                    {% set divId = 'exhibitions' ~ location. id %}
-                    {% set numEntries = 0 %}
-                    <td>{{ count }}</td>
+                    <td><a href="{{ path('location', { 'id' : venue['id'] }) }}"><b>{{ venue['name'] }}</b></a></td>
+                    <td>{{ venue.type }}</td>
+                    <td>{{ max( 0, venue['numExhibitions'] ) }}</td>
+                    <td>{{ max( 0, venue['exhibition_types']['solo'] ) }}</td>
+                    <td>{{ max( 0, venue['exhibition_types']['group'] ) }}</td>
+                    <td>{{ max( 0, venue['numArtists'] ) }}</td>
+                    <td>{{ max( 0, venue['numNationalities'] ) }}</td>
+                    <td>{{ max( 0, venue['numItems'] ) }}</td>
                 </tr>
             {% endfor %}
             </tbody>

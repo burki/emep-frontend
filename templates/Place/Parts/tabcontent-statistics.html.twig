@@ -1,0 +1,311 @@
+<div role="tabpanel" class="tab-pane" id="statistics">
+    {% import 'Shared/highcharts.html.twig' as highcharts %}
+    {{ highcharts.head() }}
+
+
+
+    <script type="text/javascript">
+        var chart;
+
+        $(document).ready(function() {
+            $('#container-nationalities-pie').highcharts({
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie'
+                },
+                title: {
+                    text: ' '
+                },
+                tooltip: {
+                    pointFormat: '{point.y} artists from {point.name} (<b>{point.percentage:.1f}%</b>)'
+                },
+                plotOptions: {
+                    pie: {
+                    }
+                },
+                series: [{
+                    name: 'Country: ',
+                    type: 'pie',
+                    innerSize: '50%',
+                    data: {{ nationalitiesStats|json_encode|raw }}
+                    // data: [{"name":"RU","y":44},{"name":"US","y":62},{"name":"IT","y":56},{"name":"FR","y":1152},{"name":"GB","y":38},{"name":"HU","y":14},{"name":"BE","y":63},{"name":"NO","y":9},{"name":"ES","y":30},{"name":"PL","y":14},{"name":"DE","y":36},{"name":"CZ","y":5},{"name":"AT","y":10},{"name":"CH","y":35},{"name":"NL","y":26},{"name":"SE","y":11},{"name":"","y":119},{"name":"DK","y":6},{"name":"IE","y":4},{"name":"AU","y":2},{"name":"UA","y":3},{"name":"FI","y":2},{"name":"DO","y":1},{"name":"PE","y":1},{"name":"RO","y":5},{"name":"LT","y":1},{"name":"TR","y":1},{"name":"CA","y":4},{"name":"GR","y":1},{"name":"MX","y":1},{"name":"UY","y":1},{"name":"PT","y":1},{"name":"BG","y":1},{"name":"BR","y":1}]
+                }]
+            });
+        });
+
+
+
+
+
+
+        $(document).ready(function() {
+            $('#container-exhibtions-bar').highcharts({
+                chart: {
+                    // renderTo: 'container',
+                    zoomType: 'xy'
+                },
+                title: {
+                    text: ''
+                },
+                subtitle: {
+                    text: '{{ numberExhibitions }} exhibitions in total'
+                },
+                xAxis: {
+                    categories: {{ exhibitionsGroupedByYearStats[0]|json_encode|raw  }},
+                    labels: {
+                        rotation: -45,
+                        step: 1, // this will show one label for every year
+                        align: 'right'
+                    }
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: '\n',
+                    }
+                },
+                legend: {
+                    enabled: false
+                },
+                tooltip: {
+                    // headerFormat: '{point.key}',
+                    pointFormat: '{point.y} Exhibitions'
+                },
+
+                series: [
+                    {
+                        type: 'column',
+                        data: {{ exhibitionsGroupedByYearStats[1]|json_encode|raw }}
+                    }
+                ]
+            });
+        });
+
+        /*
+
+        $(document).ready(function() {
+            $('#container-exhibtions-city-bar').highcharts({
+                chart: {
+                    plotBackgroundColor: null,
+                        plotBorderWidth: null,
+                        plotShadow: false,
+                        type: 'pie'
+                },
+                title: {
+                    text: ' '
+                },
+                tooltip: {
+                    pointFormat: '{point.y} Exhibitions (<b>{point.percentage:.1f}%</b>)'
+                },
+                plotOptions: {
+                    pie: {
+                    }
+                },
+                series: [{
+                    name: 'City: ',
+                    type: 'pie',
+                    innerSize: '50%',
+                    data: {{ dataNumberOfExhibitionsPerCity[0]|raw }}
+                }]
+            });
+        });
+
+
+
+
+
+        $(document).ready(function() {
+            $('#container-exhibtions-works-year').highcharts({
+                chart: {
+                    // renderTo: 'container',
+                    zoomType: 'xy'
+                },
+                title: {
+                    text: ''
+                },
+                subtitle: {
+                    text: 'Average: {{ dataNumberOfWorksPerYear[4] }} works per year, {{ dataNumberOfWorksPerYear[2] }} works in total'
+                },
+                xAxis: {
+                    categories: {{ dataNumberOfWorksPerYear[0]|raw  }},
+                    labels: {
+                        rotation: -45,
+                        step: 3, // this will show one label for every quarter
+                        align: 'right'
+                    }
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: '\n',
+                    }
+                },
+                legend: {
+                    enabled: false
+                },
+                tooltip: {
+                    // headerFormat: '{point.key}',
+                    pointFormat: '{point.y} works'
+                },
+                series: [
+                    {
+                        type: 'column',
+                        data: {{ dataNumberOfWorksPerYear[1]|raw }}
+                    }
+                ]
+            });
+
+
+
+            $(document).ready(function() {
+                $('#container-exhibitions-by-type').highcharts({
+                    chart: {
+                        plotBackgroundColor: null,
+                        plotBorderWidth: null,
+                        plotShadow: false,
+                        type: 'pie'
+                    },
+                    title: {
+                        text: ' '
+                    },
+                    tooltip: {
+                        pointFormat: '{point.y} works (<b>{point.percentage:.1f}%</b>)'
+                    },
+                    plotOptions: {
+                        pie: {
+                        }
+                    },
+                    series: [{
+                        name: 'Country: ',
+                        type: 'pie',
+                        innerSize: '50%',
+                        data: {{ exhibitionTypeStatisticsFormat|json_encode|raw }}
+                    }]
+                });
+            });
+
+
+*/
+
+        $(document).ready(function() {
+            $('#container-artists-state').highcharts({
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie'
+                },
+                title: {
+                    text: ' '
+                },
+                tooltip: {
+                    pointFormat: '{point.y} artists (<b>{point.percentage:.1f}%</b>)'
+                },
+                plotOptions: {
+                    pie: {
+                    }
+                },
+                series: [{
+                    name: 'Country: ',
+                    type: 'pie',
+                    innerSize: '50%',
+                    data: [ { name: 'Born in City', y: {{ numberBorn }} }, { name: 'Died in City', y: {{ numberDied }} }, {name: 'Exhibited in City', y: {{ numberOfArtistsExhibitioned[0]['numArtistsExhibited'] }} } ]
+
+
+                }]
+            });
+        });
+
+
+
+            $(document).ready(function() {
+                $('#container-exhibitions-by-type').highcharts({
+                    chart: {
+                        plotBackgroundColor: null,
+                        plotBorderWidth: null,
+                        plotShadow: false,
+                        type: 'pie'
+                    },
+                    title: {
+                        text: ' '
+                    },
+                    tooltip: {
+                        pointFormat: '{point.y} artists (<b>{point.percentage:.1f}%</b>)'
+                    },
+                    plotOptions: {
+                        pie: {
+                        }
+                    },
+                    series: [{
+                        name: 'Country: ',
+                        type: 'pie',
+                        innerSize: '50%',
+                        data: {{ exhibitionTypeStatisticsFormat|json_encode|raw }}
+
+
+                    }]
+                });
+            });
+
+
+
+
+
+            $(document).ready(function() {
+                $('#container-artist-by-gender').highcharts({
+                    chart: {
+                        plotBackgroundColor: null,
+                        plotBorderWidth: null,
+                        plotShadow: false,
+                        type: 'pie'
+                    },
+                    title: {
+                        text: ' '
+                    },
+                    tooltip: {
+                        pointFormat: '{point.y} artists (<b>{point.percentage:.1f}%</b>)'
+                    },
+                    plotOptions: {
+                        pie: {
+                        }
+                    },
+                    series: [{
+                        name: 'Country: ',
+                        type: 'pie',
+                        innerSize: '50%',
+                        data: {{ genderStatsStatisticsFormat|json_encode|raw }}
+                    }]
+                });
+            });
+
+//});
+
+
+
+    </script>
+
+
+    <h3 class="chart-header" data-collapse="container-nationalities-pie"><span class="chartsymbol">+</span>Nationality of Artists<span class="charttypeTitle">(Pie Chart)</span></h3>
+    <div class="collapse" id="container-nationalities-pie" style="width: 100%; height: 400px; margin: 0 auto;"></div>
+
+
+    <h3 class="chart-header" data-collapse="container-exhibitions-by-type"><span class="chartsymbol">+</span>Number of Exhibitions by Type<span class="charttypeTitle">(Pie Chart)</span></h3>
+    <div class="collapse" id="container-exhibitions-by-type" style="width: 100%; height: 400px; margin: 0 auto;"></div>
+
+
+    <h3 class="chart-header" data-collapse="container-exhibtions-bar"><span class="chartsymbol">+</span>Exhibitions by Year<span class="charttypeTitle">(Bar Chart)</span></h3>
+    <div class="collapse" id="container-exhibtions-bar" style="width: 100%; height: 400px; margin: 0 auto;"></div>
+
+
+
+
+    <h3 class="chart-header" data-collapse="container-artists-state"><span class="chartsymbol">+</span>Number of Born, Died, Exhibited<span class="charttypeTitle">(Bar Chart)</span></h3>
+    <div class="collapse" id="container-artists-state" style="width: 100%; height: 400px; margin: 0 auto;"></div>
+
+    <h3 class="chart-header" data-collapse="container-artist-by-gender"><span class="chartsymbol">+</span>Artists by Gender<span class="charttypeTitle">(Pie Chart)</span></h3>
+    <div class="collapse" id="container-artist-by-gender" style="width: 100%; height: 400px; margin: 0 auto;"></div>
+
+    <script src="{{ app.request.basepath }}/js/collapseChart.js"></script>
+</div>

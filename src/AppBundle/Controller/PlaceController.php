@@ -104,7 +104,7 @@ extends CrudController
     public function detailAction(Request $request, $id = null, $tgn = null)
     {
         $placeRepo = $this->getDoctrine()
-                ->getRepository('AppBundle:Place');
+            ->getRepository('AppBundle:Place');
 
         if (!empty($id)) {
             $place = $placeRepo->findOneById($id);
@@ -126,19 +126,19 @@ extends CrudController
         // get the persons associated with this place, currently birthplace / deathplace
         // TODO: places of activity
         $qb = $this->getDoctrine()
-                ->getManager()
-                ->createQueryBuilder();
+            ->getManager()
+            ->createQueryBuilder();
 
         $qb->select([
-                'P',
-                "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort"
-            ])
+            'P',
+            "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort"
+        ])
             ->from('AppBundle:Person', 'P')
             ->where("P.birthPlace = :place OR P.deathPlace = :place")
             ->andWhere('P.status <> -1')
             ->orderBy('P.birthDate')
             ->addOrderBy('nameSort')
-            ;
+        ;
 
         $persons = $qb->getQuery()
             ->setParameter('place', $place)
@@ -146,37 +146,805 @@ extends CrudController
 
         // stats
         $qb = $this->getDoctrine()
-                ->getManager()
-                ->createQueryBuilder();
+            ->getManager()
+            ->createQueryBuilder();
         $qb->select([
-                'E.id AS id',
-                'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-                'COUNT(DISTINCT P.id) AS numPersonSort',
-            ])
+            'E.id AS id',
+            'COUNT(DISTINCT IE.id) AS numCatEntrySort',
+            'COUNT(DISTINCT P.id) AS numPersonSort',
+        ])
             ->from('AppBundle:Exhibition', 'E')
             ->leftJoin('E.location', 'L')
             ->leftJoin('AppBundle:ItemExhibition', 'IE',
-                       \Doctrine\ORM\Query\Expr\Join::WITH,
-                       'IE.exhibition = E AND IE.title IS NOT NULL')
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE.exhibition = E AND IE.title IS NOT NULL')
             ->leftJoin('IE.person', 'P')
             ->where('L.place = :place AND E.status <> -1')
             ->setParameter('place', $place)
             ->groupBy('E.id')
-            ;
+        ;
         $exhibitionStats = [];
         foreach ($qb->getQuery()->getResult() as $row) {
-           $exhibitionStats[$row['id']] = $row;
+            $exhibitionStats[$row['id']] = $row;
         }
+
+        $numberOfExhibitions = $this->getNumberOfExhibitions( $id, $tgn, $place->getId() );
+        $numberOfVenues = $this->getNumberOfVenues($tgn);
+        $numberofArtists = $this->getNumberofArtists($tgn);
+
+        $numberOfArtistsBorn = $this->getNumberArtistsBorn( $tgn );
+        $numberOfArtistsDied = $this->getNumberArtistsDied( $tgn );
+
+        $numberOfAllArtists = $this->getAllArtists( $tgn );
+
+        $numberOfArtistsExhibitioned = $this->getNumberArtistsExhibitioned( $tgn );
+
+        $nationalitiesStats = $this->getNumberOfNationalities( $tgn );
+
+        $genderStats = $this->getGenderSplit( $tgn );
+
+        $exhibtionTypeStats = $this->getStatsExhibitionTypes( $tgn );
+
+        $exhibitionTypeStatisticsFormat = $this->arrayToHighChartArray( $exhibtionTypeStats );
+
+        $genderStatsStatisticsFormat = $this->arrayToHighChartArray( $genderStats );
+
+        $exhibitions = $this->getExhibitionsByTgn( $tgn );
+
+        $exhibitionsGroupedByYearStats = $this->getExhibitionsGroupedYearByTgn( $tgn );
+
+        $venuesList = $this->getVenuesList( $tgn );
+
+        // print_r('EXHIBITONS: ');
+        // print_r( $exhibitionsGroupedByYearStats );
 
         return $this->render('Place/detail.html.twig', [
             'pageTitle' => $place->getNameLocalized($locale),
             'place' => $place,
-            'persons' => $persons,
+            // 'persons' => $persons,
+            'persons' => $numberOfAllArtists,
+            'numberBorn' => $numberOfArtistsBorn,
+            'numberDied' => $numberOfArtistsDied,
+            'numberVenues' => $numberOfVenues,
+            'numberExhibitions' => $numberOfExhibitions,
+            'exhibtionTypeStats' => $exhibtionTypeStats,
+            'nationalitiesStats' => $nationalitiesStats,
+            'genderStats' => $genderStats,
+            'genderStatsStatisticsFormat' => $genderStatsStatisticsFormat,
+            'exhibitionTypeStatisticsFormat' => $exhibitionTypeStatisticsFormat,
+            'numberOfArtistsExhibitioned' => $numberOfArtistsExhibitioned,
+            'exhibitions' => $exhibitions,
+            'exhibitionsGroupedByYearStats' => $exhibitionsGroupedByYearStats,
+            'venuesList' => $venuesList,
             'exhibitionStats' => $exhibitionStats,
             'em' => $this->getDoctrine()->getManager(),
             'pageMeta' => [
                 'jsonLd' => $place->jsonLdSerialize($locale),
             ],
         ]);
+    }
+
+
+    public function getVenuesList( $tgn ){
+
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb->select([
+            'L.id as id',
+            'L.name as name',
+            'L.type as type'
+        ])
+            ->from('AppBundle:Exhibition', 'E')
+            ->leftJoin('E.location', 'L')
+            ->leftJoin('AppBundle:ItemExhibition', 'IE',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE.exhibition = E AND IE.title IS NOT NULL')
+            ->leftJoin('IE.person', 'P')
+            ->where('L.place = :tgn AND E.status <> -1')
+            ->setParameter('tgn', $tgn)
+            ->groupBy('E.id')
+            ->groupBy('L.id')
+        ;
+
+
+
+        $venues = $qb->getQuery()->getResult();
+
+
+        foreach ($venues as $key => $venue){
+            // print_r ('in here');
+            // print_r ($venue['id']);
+            // print_r ($venue['name']);
+
+            $numberOfArtists = $this->getNumberOfArtistsByVenueID( $venue['id'] );
+            $totalNumberOfNationalities = $this->getNumberOfNationalitiesByVenueId( $venue['id'] );
+            $exhibitionsByType = $this->getTypesAndNumberOfExhibitionsByVenueId( $venue['id'] );
+            $totalNumberOfWorks = $this->getTotalNumberOfWorksByVenueId( $venue['id'] );
+            $numberOfExhibitions = $this->getNumberOfExhibitionsByVenueId( $venue['id'] );
+
+
+            $venues[$key]['exhibition_types'] = [];
+
+
+            foreach ($exhibitionsByType as $type => $num){
+                $venues[$key]['exhibition_types'][$type] = $num;
+            }
+
+            $venues[$key]['numArtists'] = $numberOfArtists;
+            $venues[$key]['numNationalities'] = $totalNumberOfNationalities;
+            $venues[$key]['numItems'] = $totalNumberOfWorks;
+            $venues[$key]['numExhibitions'] = $numberOfExhibitions;
+
+            // print_r('NEW ARRAY: ');
+            // print_r($venues[$key]);
+            // print ('<br/>');
+
+
+        }
+
+
+        // there is still a discrepency between this result and when iteration through all exhibitions --> quecked with SQL -- same result
+
+        return $venues;
+    }
+
+
+    /**
+     *
+     * VENUE QUERIES
+     *
+     * @param $id
+     * @return int
+     *
+     */
+
+    public function getTotalNumberOfWorksByVenueId( $id ){
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb->select([
+            'COUNT (DISTINCT IE.id) as numItems',
+            // 'COUNT(DISTINCT E.id) AS numExhibitionSort',
+            // 'COUNT(DISTINCT IE.id) AS numCatEntrySort',
+        ])
+            ->from('AppBundle:Person', 'P')
+            ->innerJoin('AppBundle:ItemExhibition', 'IE',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE.person = P AND IE.title IS NOT NULL')
+            ->innerJoin('IE.exhibition', 'E')
+            ->where('E.location = :location AND E.status <> -1')
+            ->setParameter('location', $id)
+            ->groupBy('IE.id')
+            // ->orderBy('nameSort')
+        ;
+
+        $items = $qb->getQuery()->getResult();
+
+
+        return count( $items );
+    }
+
+    public function getNumberOfArtistsByVenueID( $id ){
+
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb->select([
+            'COUNT (DISTINCT P.id) as numArtists',
+            // 'COUNT(DISTINCT E.id) AS numExhibitionSort',
+            // 'COUNT(DISTINCT IE.id) AS numCatEntrySort',
+        ])
+            ->from('AppBundle:Person', 'P')
+            ->innerJoin('AppBundle:ItemExhibition', 'IE',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE.person = P AND IE.title IS NOT NULL')
+            ->innerJoin('IE.exhibition', 'E')
+            ->where('E.location = :location AND E.status <> -1')
+            ->setParameter('location', $id)
+            ->groupBy('P.id')
+            // ->orderBy('nameSort')
+        ;
+
+        $artists = $qb->getQuery()->getResult();
+
+        return count( $artists );
+    }
+
+    public function getNumberOfNationalitiesByVenueId( $id ){
+
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb->select([
+            'P.nationality as nationality',
+            'COUNT (DISTINCT P.id)  AS numArtist',
+
+        ])
+            ->from('AppBundle:Person', 'P')
+            ->innerJoin('AppBundle:ItemExhibition', 'IE',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE.person = P AND IE.title IS NOT NULL')
+            ->innerJoin('IE.exhibition', 'E')
+            ->where('E.location = :location AND E.status <> -1')
+            ->setParameter('location', $id)
+            ->groupBy('P.id')
+            ->groupBy('P.nationality');
+        // ->setParameter('tgn', $tgn)
+        ;
+
+        // print_r($qb->getQuery()->getSQL());
+
+        $allNationalities = $qb->getQuery()->getResult();
+
+
+        return count($allNationalities);
+
+        // return $this->arrayToHighChartArray($countriesStats);
+    }
+
+    public function getTypesAndNumberOfExhibitionsByVenueId( $id ){
+
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb->select([
+            'E.type',
+            'COUNT(DISTINCT E.id) AS numExhibitions'
+        ])
+            ->from('AppBundle:Exhibition', 'E')
+            ->where('E.location = :location AND E.status <> -1')
+            ->setParameter('location', $id)
+            ->groupBy('E.type');
+        ;
+
+        $exhibitions = $qb->getQuery()->getResult();
+
+
+        $exhibitionsType = [];
+
+        foreach ($exhibitions as $exhibtion){
+            // print_r($exhibtion['type']);
+            $exhibitionsType[ $exhibtion['type'] ] = $exhibtion['numExhibitions'];
+        }
+
+
+        return $exhibitionsType;
+    }
+
+    public function getNumberOfExhibitionsByVenueId( $id ){
+
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb->select([
+            'COUNT(DISTINCT E.id) AS numExhibitions'
+        ])
+            ->from('AppBundle:Exhibition', 'E')
+            ->where('E.location = :location AND E.status <> -1')
+            ->setParameter('location', $id)
+        ;
+
+        $exhibitions = $qb->getQuery()->getResult();
+
+
+
+        return  $exhibitions[0]['numExhibitions'] ;
+    }
+
+
+
+    /**
+     * END Venue Queries
+     *
+     *
+     *
+     */
+
+
+    //
+
+
+    public function getExhibitionsGroupedYearByTgn ( $tgn ){
+
+        // SELECT YEAR(startdate) AS start_year, MONTH(startdate) AS start_month
+
+        $emConfig = $this->getDoctrine()->getManager()->getConfiguration();
+        $emConfig->addCustomDatetimeFunction('YEAR', 'DoctrineExtensions\Query\Mysql\Year');
+        // $emConfig->addCustomDatetimeFunction('MONTH', 'DoctrineExtensions\Query\Mysql\Month');
+        // $emConfig->addCustomDatetimeFunction('DAY', 'DoctrineExtensions\Query\Mysql\Day');
+
+
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+
+        $qb->select([
+            // 'E.id as Id',
+            'YEAR(E.startdate) AS start_year',
+            'COUNT(DISTINCT E.id) AS how_many'
+        ])
+            ->from('AppBundle:Exhibition', 'E')
+            ->leftJoin('E.location', 'L')
+            ->leftJoin('AppBundle:ItemExhibition', 'IE',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE.exhibition = E AND IE.title IS NOT NULL')
+            ->leftJoin('IE.person', 'P')
+            ->where('L.place = :tgn AND E.status <> -1')
+            ->setParameter('tgn', $tgn)
+            ->groupBy('E.id')
+            ->groupBy('start_year');
+        // ->groupBy('E.id')
+        ;
+
+
+        $exhibitions = $qb->getQuery()->getResult();
+
+
+        $xAxis = [];
+        $yAxis = [];
+        foreach ($exhibitions as $exhibition){
+            array_push($xAxis,$exhibition['start_year']);
+            array_push($yAxis, (float)$exhibition['how_many']);
+        }
+
+
+        return [ $xAxis, $yAxis ];
+
+    }
+
+    public function getExhibitionsByTgn ( $tgn ){
+
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+
+        $qb->select([
+            // 'E.id as Id',
+            'E'
+        ])
+            ->from('AppBundle:Exhibition', 'E')
+            ->leftJoin('E.location', 'L')
+            ->leftJoin('AppBundle:ItemExhibition', 'IE',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE.exhibition = E AND IE.title IS NOT NULL')
+            ->leftJoin('IE.person', 'P')
+            ->where('L.place = :tgn AND E.status <> -1')
+            ->setParameter('tgn', $tgn)
+            ->groupBy('E.id');
+        // ->groupBy('E.id')
+        ;
+
+
+
+        $exhibitions = $qb->getQuery()->getResult();
+
+
+        return $exhibitions;
+
+    }
+
+
+    public function getAllArtists( $tgn ){
+        // print 'inside';
+
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb->select([
+            'P',
+            'P.id AS id',
+            "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort",
+            "0 AS exhibited"
+        ])
+            ->from('AppBundle:Exhibition', 'E')
+            ->leftJoin('E.location', 'L')
+            ->leftJoin('AppBundle:ItemExhibition', 'IE',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE.exhibition = E AND IE.title IS NOT NULL')
+            ->leftJoin('AppBundle:Person', 'P',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'P.id = IE.person AND P.id IS NOT NULL')
+            // ->leftJoin('IE.person', 'P')
+            ->where('L.place = :tgn AND P.id IS NOT NULL' )
+            ->groupBy('P.id')
+            ->setParameter('tgn', $tgn)
+        ;
+
+        $artists = $qb->getQuery()->getResult();
+
+        $qb2 = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb2->select([
+            'P',
+            'P.id AS id',
+            "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort",
+            "0 AS exhibited"
+        ])
+            ->from('AppBundle:Person', 'P')
+            ->where('P.birthPlace = :tgn or P.deathPlace = :tgn AND P.id IS NOT NULL')
+            ->setParameter('tgn', $tgn)
+        ;
+
+        $artistsLiving = $qb2->getQuery()->getResult();
+
+        // print_r($artistsLiving[0]);
+
+
+        // print_r($artistsLiving[1]);
+        $allArtists = array_merge($artists, $artistsLiving);
+
+        $allArtists = array_unique ( $allArtists, SORT_REGULAR );
+
+
+        $counter = 0;
+
+        // setting exhibited to true for all exhibiting artists
+        foreach ($artists as $artist){
+
+            $key = array_search($artist['id'], array_column($allArtists, 'id'));
+
+            if($allArtists[$key][id]){
+                $allArtists[$key]['exhibited'] = 1;
+                $counter++;
+            }
+
+        }
+
+        return $allArtists;
+    }
+
+
+    public function getNumberOfNationalities( $tgn ){
+
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb->select([
+            'P.id AS id',
+            'P.nationality as nationality'
+        ])
+            ->from('AppBundle:Exhibition', 'E')
+            ->leftJoin('E.location', 'L')
+            ->leftJoin('AppBundle:ItemExhibition', 'IE',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE.exhibition = E AND IE.title IS NOT NULL')
+            ->leftJoin('AppBundle:Person', 'P',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'P.id = IE.person AND P.id IS NOT NULL')
+            // ->leftJoin('IE.person', 'P')
+            ->where('L.place = :tgn AND P.id IS NOT NULL' )
+            ->groupBy('P.id')
+            ->setParameter('tgn', $tgn)
+        ;
+
+        $artists = $qb->getQuery()->getResult();
+
+        $qb2 = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb2->select([
+            'P.id AS id',
+            'P.nationality as nationality'
+        ])
+            ->from('AppBundle:Person', 'P')
+            ->where('P.birthPlace = :tgn or P.deathPlace = :tgn AND P.id IS NOT NULL')
+            ->setParameter('tgn', $tgn)
+        ;
+
+        $artistsLiving = $qb2->getQuery()->getResult();
+
+        // print_r($artistsLiving[0]);
+
+
+        // print_r($artistsLiving[1]);
+        $allArtists = array_merge($artists, $artistsLiving);
+
+        $allArtists = array_unique ( $allArtists, SORT_REGULAR );
+
+        $countriesOnly = array_column($allArtists, 'nationality');
+
+        $countriesOnly = array_replace($countriesOnly,array_fill_keys(array_keys($countriesOnly, null),'')); // remove null values if existing
+
+        $countriesStats = array_count_values($countriesOnly);
+
+
+
+
+        return $this->arrayToHighChartArray($countriesStats);
+    }
+
+
+    public function arrayToHighChartArray($array){
+
+        $returnArray = [];
+
+        foreach ($array as $key => $value){
+            array_push($returnArray, ['name' => $key, 'y' => (float)$value ]);
+        }
+
+        return $returnArray;
+    }
+
+    public function getGenderSplit( $tgn ){
+
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb->select([
+            'P.id AS id',
+            'P.gender as gender'
+        ])
+            ->from('AppBundle:Exhibition', 'E')
+            ->leftJoin('E.location', 'L')
+            ->leftJoin('AppBundle:ItemExhibition', 'IE',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE.exhibition = E AND IE.title IS NOT NULL')
+            ->leftJoin('AppBundle:Person', 'P',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'P.id = IE.person AND P.id IS NOT NULL')
+            // ->leftJoin('IE.person', 'P')
+            ->where('L.place = :tgn AND P.id IS NOT NULL' )
+            ->groupBy('P.id')
+            ->setParameter('tgn', $tgn)
+        ;
+
+        $artists = $qb->getQuery()->getResult();
+
+        $qb2 = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb2->select([
+            'P.id AS id',
+            'P.gender as gender'
+        ])
+            ->from('AppBundle:Person', 'P')
+            ->where('P.birthPlace = :tgn or P.deathPlace = :tgn AND P.id IS NOT NULL')
+            ->setParameter('tgn', $tgn)
+        ;
+
+        $artistsLiving = $qb2->getQuery()->getResult();
+
+        // print_r($artistsLiving[0]);
+
+
+        // print_r($artistsLiving[1]);
+        $allArtists = array_merge($artists, $artistsLiving);
+        $allArtists = array_unique ( $allArtists, SORT_REGULAR );
+        $gendersOnly = array_column($allArtists, 'gender');
+        $gendersOnly = array_replace($gendersOnly,array_fill_keys(array_keys($gendersOnly, null),'')); // remove null values if existing
+        $genderStats = array_count_values($gendersOnly);
+
+
+        // creating better named keys
+        $genderStats['Male'] =  $genderStats['M'];
+        $genderStats['Female'] =  $genderStats['F'];
+        $genderStats['Undefined'] =  $genderStats[''];
+
+        unset($genderStats['M']);
+        unset($genderStats['F']);
+        unset($genderStats['']);
+
+        // print_r($genderStats);
+
+        return $genderStats;
+    }
+
+    public function getNumberArtistsExhibitioned( $tgn ){
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+
+        $qb->select([
+            'COUNT(DISTINCT P.id) AS numArtistsExhibited',
+        ])
+            ->from('AppBundle:Exhibition', 'E')
+            ->leftJoin('E.location', 'L')
+            ->leftJoin('AppBundle:ItemExhibition', 'IE',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE.exhibition = E AND IE.title IS NOT NULL')
+            ->leftJoin('IE.person', 'P')
+            ->where('L.place = :tgn')
+            ->setParameter('tgn', $tgn)
+        ;
+
+
+        $artists = $qb->getQuery()->getResult();
+
+
+
+        // print_r( $artists );
+
+        return $artists;
+    }
+
+    public function getNumberArtistsBorn( $tgn ){
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+
+        $qb->select([
+            'COUNT(DISTINCT P.id) AS numArtistsBorn',
+        ])
+            ->from('AppBundle:Person', 'P')
+            ->where('P.birthPlace = :tgn')
+            ->setParameter('tgn', $tgn)
+        ;
+
+        $artists = $qb->getQuery()->getResult();
+
+        return $artists[0]['numArtistsBorn'];
+    }
+
+    public function getNumberArtistsDied( $tgn ){
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+
+        $qb->select([
+            'COUNT(DISTINCT P.id) AS numArtistsDied',
+        ])
+            ->from('AppBundle:Person', 'P')
+            ->where('P.deathPlace = :tgn')
+            ->setParameter('tgn', $tgn)
+        ;
+
+        $artists = $qb->getQuery()->getResult();
+
+        // print_r($artists);
+
+        return $artists[0]['numArtistsDied'];
+    }
+
+
+    public function getNumberOfVenues( $tgn ){
+
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb->select([
+            'COUNT(DISTINCT L.id) AS numVenues',
+        ])
+            ->from('AppBundle:Exhibition', 'E')
+            ->leftJoin('E.location', 'L')
+            ->leftJoin('AppBundle:ItemExhibition', 'IE',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE.exhibition = E AND IE.title IS NOT NULL')
+            ->leftJoin('IE.person', 'P')
+            ->where('L.place = :tgn AND E.status <> -1')
+            ->setParameter('tgn', $tgn)
+            ->groupBy('E.id')
+            ->groupBy('L.id')
+        ;
+
+        $venues = $qb->getQuery()->getResult();
+
+
+        // there is still a discrepency between this result and when iteration through all exhibitions --> quecked with SQL -- same result
+
+        return count( $venues );
+    }
+
+    public function getNumberOfArtists($tgn){
+
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb->select([
+            'COUNT(DISTINCT P.id) AS numArtists',
+        ])
+            ->from('AppBundle:Exhibition', 'E')
+            ->leftJoin('E.location', 'L')
+            ->leftJoin('AppBundle:ItemExhibition', 'IE',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE.exhibition = E AND IE.title IS NOT NULL')
+            ->leftJoin('IE.person', 'P')
+            ->where('L.place = :tgn AND E.status <> -1')
+            ->setParameter('tgn', $tgn)
+            ->groupBy('E.id')
+            ->groupBy('L.id')
+        ;
+
+        $artists = $qb->getQuery()->getResult();
+
+
+        //print_r( count($artists) );
+        //print_r( $artists );
+
+    }
+
+
+
+    public function getNumberOfExhibitions ( $id, $tgn, $placeId ){
+
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+
+        $qb->select([
+            'COUNT(DISTINCT E.id) AS numExhibitions',
+        ])
+            ->from('AppBundle:Exhibition', 'E')
+            ->leftJoin('E.location', 'L')
+            ->leftJoin('AppBundle:ItemExhibition', 'IE',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE.exhibition = E AND IE.title IS NOT NULL')
+            ->leftJoin('IE.person', 'P')
+            ->where('L.place = :tgn AND E.status <> -1')
+            ->setParameter('tgn', $tgn)
+            // ->groupBy('E.id')
+        ;
+
+
+
+        $exhibitions = $qb->getQuery()->getResult();
+
+
+        return $exhibitions[0]['numExhibitions'];
+    }
+
+
+    public function getStatsExhibitionTypes ( $tgn ){
+
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+
+        $qb->select([
+            'COUNT(DISTINCT E.id) AS numExhibitions',
+            'E.type'
+        ])
+            ->from('AppBundle:Exhibition', 'E')
+            ->leftJoin('E.location', 'L')
+            ->leftJoin('AppBundle:ItemExhibition', 'IE',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE.exhibition = E AND IE.title IS NOT NULL')
+            ->leftJoin('IE.person', 'P')
+            ->where('L.place = :tgn AND E.status <> -1')
+            ->setParameter('tgn', $tgn)
+            ->groupBy('E.type')
+            // ->groupBy('E.id')
+        ;
+
+
+
+        $exhibitions = $qb->getQuery()->getResult();
+
+        $exhibitionsReturn = [];
+
+        foreach ($exhibitions as $exhibition){
+            $exhibitionsReturn[$exhibition['type']] = $exhibition['numExhibitions'];
+        }
+
+        // print_r('---- HERE ----');
+        // print_r($exhibitionsReturn);
+
+
+        // print_r('exhibtions: ');
+        // print_r($exhibitions);
+
+        return $exhibitionsReturn;
     }
 }
