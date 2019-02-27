@@ -16,12 +16,13 @@
                 searching: false,
                 info: true,
                 "columns": [
+                    { "orderSequence": [ "asc", "desc" ] },
+                    { "orderSequence": [ "asc", "desc" ] },
+                    { "orderSequence": [ "asc", "desc" ] },
+                    { "orderSequence": [ "asc", "desc" ] },
+                    { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "desc", "asc" ] },
-                    { "orderSequence": [ "desc", "asc" ] },
-                    { "orderSequence": [ "desc", "asc" ] },
-                    { "orderSequence": [ "desc", "asc" ] },
-                    {},
-                    {}
+                    { "orderSequence": [ "desc", "asc" ] }
                 ]
             });
         });
@@ -46,10 +47,8 @@
                     var rows = api.rows( {page:'current'} ).nodes();
                     var last= null;
 
-                    api.column(groupColumn, {page:'current'} ).data().each( function ( group, i ) {
+                    api.column(groupColumn, { page: 'current'} ).data().each( function ( group, i ) {
                         if ( last !== group ) {
-
-
                             var splitData =  $.parseHTML( group );
                             var url = $(splitData).data('url');
                             var splitGroup = $(splitData).text();
@@ -71,7 +70,7 @@
             } );
 
 
-            //expand all on load
+            // expand all on load
             $('.collapseRow').removeClass("collapsed");
             $('.plussign').addClass('collapsed');
             $('.minussign').removeClass('collapsed');
@@ -91,7 +90,6 @@
 
 
             $('.catalogue-view-button').on('click', function() {
-
                 // hide
                 $('.list-view-button').removeClass('active');
                 $('#entrytable-list-view').hide();
@@ -100,11 +98,9 @@
                 $('#entrytable').show();
 
                 $('.left-buttons').show();
-
             });
 
             $('.list-view-button').on('click', function() {
-
                 // hide
                 $('.list-view-button').addClass('active');
                 $('#entrytable-list-view').show();
@@ -137,56 +133,43 @@
 
 
                 // console.log($(this).data('name'));
-            } );
+            });
 
-
-        } );
-
-
+        });
     </script>
-
-
-
-
-
 
 
     <div role="tabpanel" class="tab-pane" id="entries">
         {#
           {{ helper.exhibition_itemexhibition_sort_control(exhibition) }}
         #}
-
         <div class="catalogue-entries-data-management">
             <span class="left-buttons"><button class="expand-all">expand all</button><buttton class="collapse-all">collapse all</buttton></span>
             <span class="right-buttons"><span class="cat-entries-button catalogue-view-button active">Catalogue View</span><span class="cat-entries-button list-view-button">List View</span></span>
         </div>
 
-        <table id="entrytable" class="table table-striped table-bordered dataTable listviewcontainer" style="width:100%">
+        <table id="entrytable" class="table table-striped table-bordered dataTable listviewcontainer" style="width: 100%">
             <thead>
             </thead>
             <tbody>
             {% for catalogueEntry in catalogueEntries %}
-                {% set initial = catalogueEntry.person.fullname %}
-
                 {% set addresses = catalogueEntry.person.addressesSeparated(exhibition.id) %}
 
-
                 <tr data-rowname="{{ catalogueEntry.person.fullname(true) }}" data-collapsed="true" class="listviewrow collapsed collapseRow">
-
                     <td>{{ helper.itemexhibition_detail(catalogueEntry) }}</td>
                     <td><span id="person-{{ catalogueEntry.person.id }}" data-url="{% if catalogueEntry.person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : catalogueEntry.person.ulan }) }}{% elseif catalogueEntry.person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : catalogueEntry.person.gnd }) }}{% else %}{{ path('person', { 'id' : catalogueEntry.person.id }) }}{% endif %}"  >{{ catalogueEntry.person.fullname(true) }}</span>
-                        {% if addresses is not empty %}
-                            <span class="small">
+                    {% if addresses is not empty %}
+                        <span class="small">
                         {% for address in addresses %}
                             {{ address['info']|replace({ "\n" : ", " }) }}{% if not loop.last %}; {% endif %}
                         {% endfor %}
-                            </span>
-                        {% endif %}</td>
+                        </span>
+                    {% endif %}
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
-
 
         <table id="entrytable-list-view" class="table table-striped table-bordered dataTable listviewcontainer" style="width:100%; display: none;">
             <thead>
@@ -194,30 +177,25 @@
                 <th>Catalogue Entry</th>
                 <th><span>Artist</span></th>
                 <th class="">Room</th>
-                <th><span>Price</span></th>
+                <th><span>Type</span></th>
                 <th><span>Owner</span></th>
                 <th><span>For Sale</span></th>
+                <th><span>Price</span></th>
             </tr>
             </thead>
             <tbody>
             {% for catalogueEntry in catalogueEntries %}
-                {% set initial = catalogueEntry.person.fullname %}
-
-                {% set addresses = catalogueEntry.person.addressesSeparated(exhibition.id) %}
-
                 <tr class="listviewrow">
-
-                    <td>{{ catalogueEntry.getTitleFull }}</td>
-                    <td><a href="{% if catalogueEntry.person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : catalogueEntry.person.ulan }) }}{% elseif catalogueEntry.person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : catalogueEntry.person.gnd }) }}{% else %}{{ path('person', { 'id' : catalogueEntry.person.id }) }}{% endif %}">{{ catalogueEntry.person.fullname(true) }}</a></td>
+                    <td data-order="{{ catalogueEntry.catalogueIdSortIndex }}">{{ catalogueEntry.titleFull }}</td>
+                    <td data-order="{{ catalogueEntry.person.fullname(false) }}"><a href="{% if catalogueEntry.person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : catalogueEntry.person.ulan }) }}{% elseif catalogueEntry.person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : catalogueEntry.person.gnd }) }}{% else %}{{ path('person', { 'id' : catalogueEntry.person.id }) }}{% endif %}">{{ catalogueEntry.person.fullname(true) }}</a></td>
                     <td>{{ catalogueEntry.displaylocation }}</td>
+                    <td>{{ catalogueEntry.typeParts }}</td>
+                    <td>{{ catalogueEntry.ownerFull }}</td>
+                    <td>{{ catalogueEntry.forsale ? 'Y' : '' }}</td>
                     <td>{{ catalogueEntry.price }}</td>
-                    <td><!--{{ catalogueEntry.owner }}--></td>
-                    <td><!--{{ catalogueEntry.forsale }}--></td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
-
-
     </div><!-- .tab-pane -->
 {% endblock %}
