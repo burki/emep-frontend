@@ -899,20 +899,19 @@ extends CrudController
 
         $allArtists = $qb->getQuery()->getResult();
 
-        $allArtists = array_unique ( $allArtists, SORT_REGULAR );
+        $allArtists = array_unique($allArtists, SORT_REGULAR );
         $gendersOnly = array_column($allArtists, 'gender');
-        $gendersOnly = array_replace($gendersOnly,array_fill_keys(array_keys($gendersOnly, null),'')); // remove null values if existing
+        $gendersOnly = array_replace($gendersOnly,array_fill_keys(array_keys($gendersOnly, null), '')); // remove null values if existing
         $genderStats = array_count_values($gendersOnly);
 
 
         // creating better named keys
-        $genderStats['Male'] =  $genderStats['M'];
-        $genderStats['Female'] =  $genderStats['F'];
-        $genderStats['Undefined'] =  $genderStats[''];
-
-        unset($genderStats['M']);
-        unset($genderStats['F']);
-        unset($genderStats['']);
+        foreach ([ 'M' => 'Male', 'F' => 'Female', '' => 'Undefined' ] as $src => $target) {
+            if (array_key_exists($src, $genderStats)) {
+                $genderStats[$target] = $genderStats[$src];
+                unset($genderStats[$src]);
+            }
+        }
 
         return $genderStats;
     }
