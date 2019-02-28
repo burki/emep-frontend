@@ -1,4 +1,4 @@
-Exhibitions of Modern European Painting 1905-1915 - Frontend
+Database of Modern Exhibitions (DoME) - Frontend
 ============================================================
 
 Installation
@@ -32,3 +32,9 @@ Adjust your web-server configuration to point to web-folder, e.g.
 
 For nice URLs, enable Apache and copy/adjust .htaccess-dist
 - sudo a2enmod rewrite
+
+You can also use the built-in server from PHP
+- cd /path/to/web
+- php -S localhost:8000
+
+And then navigate to http://localhost:8000/app.php/

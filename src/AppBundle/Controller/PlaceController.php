@@ -567,11 +567,11 @@ extends CrudController
         $counter = 0;
 
         // setting exhibited to true for all exhibiting artists
-        foreach ($artists as $artist){
+        foreach ($artists as $artist) {
 
             $key = array_search($artist['id'], array_column($allArtists, 'id'));
 
-            if($allArtists[$key][id]){
+            if ($allArtists[$key]['id']) {
                 $allArtists[$key]['exhibited'] = 1;
                 $counter++;
             }
@@ -629,18 +629,15 @@ extends CrudController
         // print_r($artistsLiving[1]);
         $allArtists = array_merge($artists, $artistsLiving);
 
-        $allArtists = array_unique ( $allArtists, SORT_REGULAR );
+        $allArtists = array_unique($allArtists, SORT_REGULAR);
 
         $countriesOnly = array_column($allArtists, 'nationality');
 
-        $countriesOnly = array_replace($countriesOnly,array_fill_keys(array_keys($countriesOnly, null),'')); // remove null values if existing
+        $countriesOnly = array_replace($countriesOnly, array_fill_keys(array_keys($countriesOnly, null), '')); // remove null values if existing
 
         $countriesStats = array_count_values($countriesOnly);
 
-
-
-
-        return $this->arrayToHighChartArray($countriesStats);
+        return $this->assoc2NameYArray($countriesStats);
     }
 
 
@@ -697,15 +694,12 @@ extends CrudController
 
 
         // creating better named keys
-        $genderStats['Male'] =  $genderStats['M'];
-        $genderStats['Female'] =  $genderStats['F'];
-        $genderStats['Undefined'] =  $genderStats[''];
-
-        unset($genderStats['M']);
-        unset($genderStats['F']);
-        unset($genderStats['']);
-
-        // print_r($genderStats);
+        foreach ([ 'M' => 'Male', 'F' => 'Female', '' => 'Undefined' ] as $src => $target) {
+            if (array_key_exists($src, $genderStats)) {
+                $genderStats[$target] = $genderStats[$src];
+                unset($genderStats[$src]);
+            }
+        }
 
         return $genderStats;
     }
