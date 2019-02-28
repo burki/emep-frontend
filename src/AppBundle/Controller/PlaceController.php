@@ -567,11 +567,11 @@ extends CrudController
         $counter = 0;
 
         // setting exhibited to true for all exhibiting artists
-        foreach ($artists as $artist){
+        foreach ($artists as $artist) {
 
             $key = array_search($artist['id'], array_column($allArtists, 'id'));
 
-            if($allArtists[$key][id]){
+            if ($allArtists[$key]['id']) {
                 $allArtists[$key]['exhibited'] = 1;
                 $counter++;
             }

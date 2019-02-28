@@ -797,11 +797,10 @@ extends CrudController
 
         $exhibitionCities = [];
 
-        foreach ($exhibitions as $exhibition){
-
+        foreach ($exhibitions as $exhibition) {
             $currPlaceLabel = $exhibition->getLocation()->getPlaceLabel();
 
-            if($currPlaceLabel){
+            if ($currPlaceLabel) {
                 array_push($exhibitionCities,  (string) $currPlaceLabel);
             }
 
