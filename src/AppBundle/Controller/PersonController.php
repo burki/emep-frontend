@@ -231,6 +231,7 @@ extends CrudController
         $qb->select([
                 'IE',
                 'E.id',
+                'E.title'
             ])
             ->from('AppBundle:ItemExhibition', 'IE')
             ->innerJoin('AppBundle:Exhibition', 'E',
