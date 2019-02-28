@@ -91,26 +91,25 @@
 
 
             $('.catalogue-view-button').on('click', function() {
-
                 // hide
                 $('.list-view-button').removeClass('active');
-                $('#entrytable-list-view').hide();
+                $('#entrytable-list-view').parent('.dataTables_wrapper').hide();
 
                 $('.catalogue-view-button').addClass('active');
                 $('#entrytable').show();
+                $('#entrytable').parent('.dataTables_wrapper').show();
 
                 $('.left-buttons').show();
-
             });
 
             $('.list-view-button').on('click', function() {
-
                 // hide
                 $('.list-view-button').addClass('active');
                 $('#entrytable-list-view').show();
+                $('#entrytable-list-view').parent('.dataTables_wrapper').show();
 
                 $('.catalogue-view-button').removeClass('active');
-                $('#entrytable').hide();
+                $('#entrytable').parent('.dataTables_wrapper').hide();
 
                 $('.left-buttons').hide();
 
