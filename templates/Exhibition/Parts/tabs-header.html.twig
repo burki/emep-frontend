@@ -19,15 +19,14 @@
                 <li role="presentation" class="artists-tab"><a href="#artists" aria-controls="artists" role="tab" data-toggle="tab">{{ 'Artists'|trans }}</a></li>
             {# {% endif %} #}
 
-            {# co-appearnces #}
+            {# co-appearances #}
             {% if similar|length > 0 %}
                 <li role="presentation" class="similars-tab"><a href="#similars" aria-controls="similars" role="tab" data-toggle="tab">{{ 'Exhibitions with Similar Artists'|trans }}</a></li>
             {% endif %}
+
             {# authority files #}
             <li role="presentation"><a href="#stats" data-url="{{ path('exhibition-stats-partial', { id: exhibition.id }) }}" aria-controls="chronology" role="tab" data-toggle="tab">{{ 'Statistics'|trans }}</a></li>
-
         </ul>
-
     </div>
 
     <script>

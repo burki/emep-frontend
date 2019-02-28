@@ -7,12 +7,11 @@
         </div>
         <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 1em">
             <li role="presentation" class="active exhibitions-tab"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">{{ 'Exhibitions'|trans }}</a></li>
-            {# co-appearnces #}
-
             {% if catalogueEntries is not empty %}
                 <li role="presentation" class="cat-entries-tab"><a href="#entries" aria-controls="entries" role="tab" data-toggle="tab">{{ 'Catalogue Entries'|trans }}</a></li>
             {% endif %}
 
+            {# co-appearances #}
             {% if similar|length > 0 %}
                 <li role="presentation" class="similars-tab"><a href="#similar" aria-controls="similar" role="tab" data-toggle="tab">{{ 'Frequent Co-Appearances'|trans }}</a></li>
             {% endif %}
