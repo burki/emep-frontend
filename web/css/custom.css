@@ -803,3 +803,7 @@ td.normal a, .listviewrow, .artist-text {
     background-color: #c71f59;
     color: white;
 }
+
+#entrytable-list-view_info{
+    margin-right: 20px;
+}
