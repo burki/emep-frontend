@@ -807,3 +807,13 @@ td.normal a, .listviewrow, .artist-text {
 #entrytable-list-view_info{
     margin-right: 20px;
 }
+
+.highcharts-data-table th {
+    height: 25px;
+}
+
+.highcharts-data-table td, .highcharts-data-table tr  {
+    height: 20px!important;
+    padding-right: 20px;
+}
+
