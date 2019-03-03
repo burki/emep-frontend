@@ -10,22 +10,20 @@
             <li role="presentation" class="active"><a href="#information" aria-controls="entries" role="tab" data-toggle="tab">{{ 'Information'|trans }}</a></li>
 
             {% if catalogueEntries is not empty %}
-                <li role="presentation" class="cat-entries-tab"><a href="#entries" aria-controls="entries" role="tab" data-toggle="tab">{{ 'Catalogue Entries'|trans }}</a></li>
-            {% endif %}
+            <li role="presentation" class="cat-entries-tab"><a href="#entries" aria-controls="entries" role="tab" data-toggle="tab">{{ 'Catalogue Entries'|trans }}</a></li>
 
+                {# {% if artists|length > 0 %} #}
+            <li role="presentation" class="artists-tab"><a href="#artists" aria-controls="artists" role="tab" data-toggle="tab">{{ 'Artists'|trans }}</a></li>
+                {# {% endif %} #}
 
+                {# co-appearances #}
+                {% if similar|length > 0 %}
+            <li role="presentation" class="similars-tab"><a href="#similars" aria-controls="similars" role="tab" data-toggle="tab">{{ 'Exhibitions with Similar Artists'|trans }}</a></li>
+                {% endif %}
 
-            {# {% if artists|length > 0 %} #}
-                <li role="presentation" class="artists-tab"><a href="#artists" aria-controls="artists" role="tab" data-toggle="tab">{{ 'Artists'|trans }}</a></li>
-            {# {% endif %} #}
-
-            {# co-appearances #}
-            {% if similar|length > 0 %}
-                <li role="presentation" class="similars-tab"><a href="#similars" aria-controls="similars" role="tab" data-toggle="tab">{{ 'Exhibitions with Similar Artists'|trans }}</a></li>
-            {% endif %}
-
-            {# authority files #}
+                {# statistics #}
             <li role="presentation"><a href="#stats" data-url="{{ path('exhibition-stats-partial', { id: exhibition.id }) }}" aria-controls="chronology" role="tab" data-toggle="tab">{{ 'Statistics'|trans }}</a></li>
+                {% endif %}
         </ul>
     </div>
 
