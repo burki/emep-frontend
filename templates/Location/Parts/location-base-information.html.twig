@@ -50,5 +50,10 @@
         <div class="artist-information-text-stats">Catalogue Entries: {{ detailDataNumberItemTypes[1] }}</div>
         <div class="artist-information-text-stats">Artists: {{ dataNumberOfArtistsPerCountry[1] }}</div>
         <div class="artist-information-text-stats">Nationalities: {{ dataNumberOfArtistsPerCountry[2] }}</div>
+        {% set totalArtists = dataNumberOfArtistsPerCountry[1] %}
+        <div class="artist-information-text-stats">
+            Gender: {{ (genderStats['Female'] / totalArtists * 100) | number_format }} % Female,
+            {{ (genderStats['Male'] / totalArtists * 100) | number_format }} % Male
+        </div>
     </div>
 </div>

@@ -153,6 +153,51 @@ extends CrudController
         return $qb->getQuery()->getResult();
     }
 
+    protected function getGenderSplitByExhId($exhibitionIds)
+    {
+        if (empty($exhibitionIds)) {
+            return [];
+        }
+
+        // artists this venue
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb->select([
+            'P.gender as gender',
+            'COUNT(DISTINCT P.id) AS how_many',
+        ])
+            ->from('AppBundle:Person', 'P')
+            ->innerJoin('AppBundle:ItemExhibition', 'IE',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE.person = P AND IE.title IS NOT NULL')
+            ->innerJoin('IE.exhibition', 'E')
+            ->where('E.id IN(:ids) AND E.status <> -1')
+            ->setParameter('ids', $exhibitionIds)
+            ->groupBy('gender')
+        ;
+
+        $results = $qb->getQuery()->getResult();
+
+        $data = [];
+
+        foreach ($results as $result){
+            $key = 'unknown';
+
+
+            if($result['gender'] == 'M'){
+                $key = 'Male';
+            }else if ($result['gender'] == 'F'){
+                $key = 'Female';
+            }
+
+            $data[$key] = $result['how_many'];
+        }
+
+        return $data;
+    }
+
     protected function getExhibitionStatsByIds($exhibitionIds)
     {
         $exhibitionStats = [];
@@ -319,6 +364,11 @@ extends CrudController
 
         $detailDataNumberItemTypes = $this->detailDataNumberItemTypes($location);
 
+        $genderStats = $this->getGenderSplitByExhId($exhibitionIds);
+
+        $genderStatsStatisticsFormat = PlaceController::assoc2NameYArray($genderStats);
+
+
         return $this->render('Location/detail.html.twig', [
             'pageTitle' => $location->getName(),
             'location' => $location,
@@ -327,6 +377,8 @@ extends CrudController
             'artists' => $artists,
             'dataNumberOfArtistsPerCountry' => $dataNumberOfArtistsPerCountry,
             'detailDataNumberItemTypes' => $detailDataNumberItemTypes,
+            'genderStats' => $genderStats,
+            'genderStatsStatisticsFormat' => $genderStatsStatisticsFormat,
             'pageMeta' => [
                 /*
                 'jsonLd' => $location->jsonLdSerialize($locale),

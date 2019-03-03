@@ -22,6 +22,7 @@
             {%
             set entityLabels = {
                 'exhibition-range': 'Exhibition Date Range',
+                'exhibition-type': 'Exhibition Type',
                 'person-nationality': 'Artists’ Nationality',
                 'person-gender': 'Artists’ Gender'
             }
@@ -43,6 +44,15 @@
                     <div class="panel-heading">Exhibition Date Range</div>
                     <div class="panel-body">
                         {{ form_row(form.exhibition.date) }}
+                    </div>
+                </div>
+            </div>
+
+            <div id="filter-panel-exhibition-type" class="collapse filter-panel">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Exhibition Type</div>
+                    <div class="panel-body">
+                        {{ form_row(form.exhibition.type) }}
                     </div>
                 </div>
             </div>

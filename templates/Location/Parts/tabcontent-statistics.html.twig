@@ -68,6 +68,34 @@
         });
 
 
+        $(document).ready(function() {
+            $('#container-artist-by-gender').highcharts({
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie'
+                },
+                title: {
+                    text: ' '
+                },
+                tooltip: {
+                    pointFormat: '{point.y} artists (<b>{point.percentage:.1f}%</b>)'
+                },
+                plotOptions: {
+                    pie: {
+                    }
+                },
+                series: [{
+                    name: 'Country: ',
+                    type: 'pie',
+                    innerSize: '50%',
+                    data: {{ genderStatsStatisticsFormat|json_encode|raw }}
+                }]
+            });
+        });
+
+
 
     </script>
 
@@ -77,6 +105,8 @@
     <h3 class="chart-header" data-collapse="container-types-work"><span class="chartsymbol">+</span>Types of Exhibited Works<span class="charttypeTitle">(Bar Chart)</span></h3>
     <div class="collapse" id="container-types-work" style="width: 100%; height: 400px; margin: 0 auto;"></div>
 
+    <h3 class="chart-header" data-collapse="container-artist-by-gender"><span class="chartsymbol">+</span>Artists by Gender<span class="charttypeTitle">(Pie Chart)</span></h3>
+    <div class="collapse" id="container-artist-by-gender" style="width: 100%; height: 400px; margin: 0 auto;"></div>
 
 
     <script src="{{ app.request.basepath }}/js/collapseChart.js"></script>
