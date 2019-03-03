@@ -24,7 +24,7 @@ extends Controller
         $connection = $this->getDoctrine()->getEntityManager()->getConnection();
 
         $counts = [];
-        foreach ([ 'ItemExhibition', 'Exhibition', 'Venue', 'Organizer', 'Person' ] as $entity) {
+        foreach ([ 'ItemExhibition' , 'Exhibition', 'Venue', 'Organizer', 'Person' ] as $entity) {
             switch ($entity) {
                 case 'ItemExhibition':
                     $listBuilder = new \AppBundle\Utils\ItemExhibitionListBuilder($connection, $request, $urlGenerator, []);

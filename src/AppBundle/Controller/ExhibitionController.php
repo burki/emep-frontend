@@ -451,6 +451,7 @@ extends CrudController
 
         $artists = array_unique($artists, SORT_REGULAR); // remove multiple artists
 
+
         foreach ($artists as $artist) {
             $currNationality = $artist->getNationality();
             if ($artist->getGender() === 'M' ){
@@ -472,7 +473,8 @@ extends CrudController
 
         $catalogueStatus = SearchListBuilder::$STATUS_LABELS;
 
-        $artistExhibitingInCityStats = $this->assoc2NameYArray($this->artistExhibitingInCityStats($artists));
+        // $artistExhibitingInCityStats = $this->assoc2NameYArray($this->artistExhibitingInCityStats($artists));
+
 
         return $this->render('Exhibition/detail.html.twig', [
             'artists' => $artists,
@@ -489,7 +491,7 @@ extends CrudController
             'genderStatsStatisticsFormat' => $artistsByGenderExhibitionStatistic,
             'nationalitiesStats' => $artistsByNationalityExhibiting,
             'artistCountries' => $artistsCountries,
-            'artistExhibitingInCityStats' => $artistExhibitingInCityStats,
+            // 'artistExhibitingInCityStats' => $artistExhibitingInCityStats,
             'pageMeta' => [
                 /*
                 'jsonLd' => $exhibition->jsonLdSerialize($locale),
@@ -648,6 +650,38 @@ extends CrudController
             'exhibitionId' => $exhibition->getId()
         ]);
 
+        // genderStatsStatisticsFormat
+
+
+        $artistsByGenderExhibitionStatistic = $this->assoc2NameYArray($this->artistsByGenderExhibitionStatistics($exhibition->getId()));
+
+        $template = $this->get('twig')->loadTemplate('Statistics/exhibition-gender-stats.html.twig');
+        $charts[] = $template->renderBlock('chart', [
+            'container' => 'container-artist-by-gender',
+            'data' => $artistsByGenderExhibitionStatistic,
+            'exhibitionId' => $exhibition->getId(),
+        ]);
+
+
+        // using the same template since same data structure
+        $artistsByNationalityExhibiting = $this->artistsNationalityByExhibitionStatistics($exhibition->getId());
+        $charts[] = $template->renderBlock('chart', [
+            'container' => 'container-nationalities-pie',
+            'data' => $artistsByNationalityExhibiting,
+            'exhibitionId' => $exhibition->getId(),
+        ]);
+
+
+
+        $artistExhibitingInCityStats = $this->assoc2NameYArray($this->artistExhibitingInCityStats($this->getArtistsExhibitingAtExhibitionByExhId($exhibition->getId())));
+        $charts[] = $template->renderBlock('chart', [
+            'container' => 'container-exhibiting-pie',
+            'data' => $artistExhibitingInCityStats,
+            'exhibitionId' => $exhibition->getId(),
+        ]);
+
+
+
         // display the static content
         return $this->render('Exhibition/stats.html.twig', [
             'chart' => implode("\n", $charts),
@@ -747,6 +781,8 @@ extends CrudController
             'exhibitionId' => $exhibition->getId(),
         ]);
 
+
+
         // display the static content
         return $this->render('Exhibition/stats-detail.html.twig', [
             'chart' => implode("\n", $charts),
@@ -761,24 +797,71 @@ extends CrudController
      *
      */
 
-    public function artistExhibitingInCityStats($artists){
-
+    public function artistExhibitingInCityStats($artists)
+    {
         $allExhibitedCities = [];
 
-        foreach ( $artists as $artist ){
-            array_push($allExhibitedCities, $this->getCitiesOfExhibitionsOfArtist( $artist->getId() ) );
+
+        $allExhibitedCities[] = $this->getCitiesOfExhibitionsOfArtistByArtistArray($artists);
+
+
+        $citiesExhibited = array_count_values(array_filter($allExhibitedCities[0]));
+
+        return $citiesExhibited;
+    }
+
+
+    public function getCitiesOfExhibitionsOfArtistByArtistArray($artists)
+    {
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb->select([
+            'P'
+        ])
+            ->from('AppBundle:Person', 'P')
+            ->where('P.id IN (:artists) AND P.status <> -1')
+            ->setParameter('artists', $artists );
+
+
+        $persons = $qb->getQuery()->getResult();
+
+        $exhibitionCities = [];
+
+
+        foreach ($persons as $person){
+            $exhibitions = $person->getExhibitions();
+
+
+            foreach ($exhibitions as $exhibition) {
+
+                if($exhibition){
+                    $currLocation = $exhibition->getLocation();
+                    $currPlaceLabel = "";
+
+                    // needs to be checked since location could be empty
+                    if($currLocation){
+                        $currPlaceLabel = $currLocation->getPlaceLabel();
+                    }
+
+
+                    if ($currPlaceLabel) {
+                        array_push($exhibitionCities,  (string)$currPlaceLabel);
+                    }
+                }
+
+
+            }
+
         }
 
 
-        $citiesExhibited = array_count_values ( array_filter($allExhibitedCities[0]) );
-
-
-        return $citiesExhibited;
-
+        return $exhibitionCities;
     }
 
-    public function getCitiesOfExhibitionsOfArtist( $artistId ){
-
+    public function getCitiesOfExhibitionsOfArtist($artistId)
+    {
         $qb = $this->getDoctrine()
             ->getManager()
             ->createQueryBuilder();
@@ -794,52 +877,21 @@ extends CrudController
 
         $exhibitions = $person[0]->getExhibitions();
 
-
         $exhibitionCities = [];
 
         foreach ($exhibitions as $exhibition) {
             $currPlaceLabel = $exhibition->getLocation()->getPlaceLabel();
 
             if ($currPlaceLabel) {
-                array_push($exhibitionCities,  (string) $currPlaceLabel);
+                array_push($exhibitionCities,  (string)$currPlaceLabel);
             }
-
         }
 
         return $exhibitionCities;
     }
 
 
-    public function getNumberOfWorksByArtistId( $id ){
-        $qb = $this->getDoctrine()
-            ->getManager()
-            ->createQueryBuilder();
-
-        $qb->select([
-            'COUNT (DISTINCT IE.id) as numItems',
-            // 'COUNT(DISTINCT E.id) AS numExhibitionSort',
-            // 'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-        ])
-            ->from('AppBundle:Person', 'P')
-            ->innerJoin('AppBundle:ItemExhibition', 'IE',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.person = P AND IE.title IS NOT NULL')
-            ->innerJoin('IE.exhibition', 'E')
-            // ->where('E.location = :location AND E.status <> -1')
-            ->where('P = :artist AND E.status <> -1')
-            ->setParameter('artist', $id)
-            ->groupBy('IE.id')
-            // ->orderBy('nameSort')
-        ;
-
-        $items = $qb->getQuery()->getResult();
-
-
-        return count( $items );
-    }
-
-    public function artistsNationalityByExhibitionStatistics( $exhId ){
-
+    public function getArtistsExhibitingAtExhibitionByExhId($exhId){
         $qb = $this->getDoctrine()
             ->getManager()
             ->createQueryBuilder();
@@ -860,6 +912,36 @@ extends CrudController
             ->groupBy('P.id')
             ->setParameter('exhId', $exhId)
         ;
+
+        $allArtists = $qb->getQuery()->getResult();
+
+        $allArtists = array_unique($allArtists, SORT_REGULAR);
+
+        return $allArtists;
+    }
+
+    public function artistsNationalityByExhibitionStatistics($exhId)
+    {
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb->select([
+                'P.id AS id',
+                'P.nationality as nationality'
+            ])
+            ->from('AppBundle:Exhibition', 'E')
+            ->leftJoin('AppBundle:ItemExhibition', 'IE',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE.exhibition = E AND IE.title IS NOT NULL')
+            ->leftJoin('AppBundle:Person', 'P',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'P.id = IE.person AND P.id IS NOT NULL')
+            // ->leftJoin('IE.person', 'P')
+            ->where('E.id = :exhId AND P.id IS NOT NULL' )
+            ->groupBy('P.id')
+            ->setParameter('exhId', $exhId)
+            ;
 
         $allArtists = $qb->getQuery()->getResult();
 
@@ -894,7 +976,7 @@ extends CrudController
             ->where('E.id = :exhId AND P.id IS NOT NULL' )
             ->groupBy('P.id')
             ->setParameter('exhId', $exhId)
-        ;
+            ;
 
         $allArtists = $qb->getQuery()->getResult();
 
