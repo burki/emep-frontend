@@ -213,7 +213,7 @@
                     <td>{{ catalogueEntry.displaylocation }}</td>
                     <td>{{ catalogueEntry.price }}</td>
                     <td>{{ catalogueEntry.owner }}</td>
-                    <td>{{ catalogueEntry.forsale }}</td>
+                    <td>{{ catalogueEntry.forsale ? 'Y' : '' }}{{ catalogueEntry.forsale == false ? 'N' : '' }}{{ catalogueEntry.forsale == null ? '?' : '' }}</td>
                 </tr>
             {% endfor %}
             </tbody>

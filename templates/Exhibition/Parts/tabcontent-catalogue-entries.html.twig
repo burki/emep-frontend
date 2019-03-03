@@ -193,7 +193,7 @@
                     <td>{{ catalogueEntry.displaylocation }}</td>
                     <td>{{ catalogueEntry.typeParts }}</td>
                     <td>{{ catalogueEntry.ownerFull }}</td>
-                    <td>{{ catalogueEntry.forsale ? 'Y' : '' }}</td>
+                    <td>{{ catalogueEntry.forsale ? 'Y' : '' }}{{ catalogueEntry.forsale == false ? 'N' : '' }}{{ catalogueEntry.forsale == null ? '?' : '' }}</td>
                     <td>{{ catalogueEntry.price }}</td>
                 </tr>
             {% endfor %}
