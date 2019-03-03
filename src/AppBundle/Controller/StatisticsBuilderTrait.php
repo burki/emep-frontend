@@ -127,6 +127,49 @@ trait StatisticsBuilderTrait
         ];
     }
 
+    function processExhibitionGender($stmt){
+
+
+        $total = 0;
+        $stats = [];
+        $frequency_count = [];
+
+        while ($row = $stmt->fetch()) {
+
+            $gender = 'Unknown';
+
+            if($row['person_gender'] == 'M'){
+                $gender = 'Male';
+            }else if ($row['person_gender'] == 'F'){
+                $gender = 'Female';
+            }
+
+            $key = $gender;
+            $how_many = (int)$row['how_many'];
+            $stats[$key] = $how_many;
+            $total += $row['how_many'];
+        }
+
+
+        $data = [];
+
+        foreach ($stats as $gender => $count) {
+            // $percentage = 100.0 * $count / $total;
+            $dataEntry = [
+                'name' => $gender,
+                'y' => (int)$count,
+            ];
+            $data[] = $dataEntry;
+        }
+
+        return [
+            'container' => 'container-gender',
+            'total' => $total,
+            'data' => json_encode($data),
+        ];
+
+    }
+
     function processExhibitionByMonth($stmt)
     {
         $frequency_count = [];
@@ -519,6 +562,22 @@ trait StatisticsBuilderTrait
     function buildExhibitionCharts($request, $urlGenerator, $listBuilder)
     {
         $charts = [];
+
+        // exhibition gender artists
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-gender', $listBuilder->getEntity());
+        $query = $listBuilder->query();
+        // echo $query->getSQL();
+
+        $stmt = $query->execute();
+        $renderParams = $this->processExhibitionGender($stmt);
+
+
+        if (!empty($renderParams)) {
+            $template = $this->get('twig')->loadTemplate('Statistics/exhibition-gender-artists-index.html.twig');
+
+            $charts[] = $template->render($renderParams);
+        }
+
 
         // exhibition country-nationality matrix
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-nationality', $listBuilder->getEntity());

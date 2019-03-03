@@ -156,6 +156,9 @@ extends SearchListBuilder
         if ('stats-nationality' == $this->mode) {
             $this->orders = [ 'default' => [ 'asc' => [ 'countryCode DESC' ] ] ];
         }
+        else if ('stats-gender' == $this->mode) {
+            $this->orders = [ 'default' => [ 'asc' => [ 'person_gender DESC' ] ] ];
+        }
         else if ('stats-by-month' == $this->mode) {
             $this->orders = [ 'default' => [ 'asc' => [ 'start_year', 'start_month' ] ] ];
         }
@@ -239,6 +242,16 @@ extends SearchListBuilder
 
     protected function setSelect($queryBuilder)
     {
+
+        if ('stats-gender' == $this->mode) {
+            $queryBuilder->select([
+                'P.sex as person_gender',
+                'COUNT( DISTINCT P.id) AS how_many',
+            ]);
+
+            return $this;
+        }
+
         if ('stats-nationality' == $this->mode) {
             $queryBuilder->select([
                 'PL.country_code AS countryCode',
@@ -328,6 +341,9 @@ extends SearchListBuilder
         if ('stats-nationality' == $this->mode) {
             $queryBuilder->groupBy('countryCode, nationality');
         }
+        else if ('stats-gender' == $this->mode) {
+            $queryBuilder->groupBy('P.sex');
+        }
         else if ('stats-by-month' == $this->mode) {
             $queryBuilder->groupBy('start_month, start_year');
         }
@@ -360,7 +376,7 @@ extends SearchListBuilder
                                 'Location', 'O',
                                 'O.id=EL.id_location');
 
-        if (array_key_exists('person', $this->queryFilters) || in_array($this->mode, [ 'stats-nationality', 'stats-age' ])) {
+        if (array_key_exists('person', $this->queryFilters) || in_array($this->mode, [ 'stats-nationality', 'stats-age', 'stats-gender' ])) {
             // so we can filter on P.*
             $queryBuilder->join('IE',
                                 'Person', 'P',
