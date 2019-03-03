@@ -212,7 +212,7 @@
                     <!--<td><a href="{% if catalogueEntry.person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : catalogueEntry.person.ulan }) }}{% elseif catalogueEntry.person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : catalogueEntry.person.gnd }) }}{% else %}{{ path('person', { 'id' : catalogueEntry.person.id }) }}{% endif %}">{{ catalogueEntry.person.fullname(true) }}</a></td>-->
                     <td>{{ catalogueEntry.displaylocation }}</td>
                     <td>{{ catalogueEntry.price }}</td>
-                    <td>{{ catalogueEntry.owner }}</td>
+                    <td>{{ catalogueEntry.owner ? catalogueEntry.owner : '?' }}</td>
                     <td>{{ catalogueEntry.forsale ? 'Y' : '' }}{{ catalogueEntry.forsale == false ? 'N' : '' }}{{ catalogueEntry.forsale == null ? '?' : '' }}</td>
                 </tr>
             {% endfor %}

@@ -192,8 +192,8 @@
                     <td data-order="{{ catalogueEntry.person.fullname(false) }}"><a href="{% if catalogueEntry.person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : catalogueEntry.person.ulan }) }}{% elseif catalogueEntry.person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : catalogueEntry.person.gnd }) }}{% else %}{{ path('person', { 'id' : catalogueEntry.person.id }) }}{% endif %}">{{ catalogueEntry.person.fullname(true) }}</a></td>
                     <td>{{ catalogueEntry.displaylocation }}</td>
                     <td>{{ catalogueEntry.typeParts }}</td>
-                    <td>{{ catalogueEntry.ownerFull }}</td>
-                    <td>{{ catalogueEntry.forsale ? 'Y' : '' }}{{ catalogueEntry.forsale == false ? 'N' : '' }}{{ catalogueEntry.forsale == null ? '?' : '' }}</td>
+                    <td>{{ (catalogueEntry.owner or catalogueEntryownerFull) ? (catalogueEntry.ownerFull ? catalogueEntryownerFull : 'Y') : (catalogueEntry.owner == null ? '?' : 'N') }}</td>
+                    <td>{{ catalogueEntry.forsale ? 'Y' : ( catalogueEntry.forsale == null ? '?' : 'N') }}</td>
                     <td>{{ catalogueEntry.price }}</td>
                 </tr>
             {% endfor %}
