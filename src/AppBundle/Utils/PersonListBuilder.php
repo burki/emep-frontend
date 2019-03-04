@@ -35,10 +35,10 @@ extends SearchListBuilder
             'label' => '(Preferred) Nationality',
         ],
         'count_exhibition' => [
-            'label' => 'Number of Exhibitions',
+            'label' => '# of Exhibitions',
         ],
         'count_itemexhibition' => [
-            'label' => 'Number of Cat. Entries',
+            'label' => '# of Cat. Entries',
         ],
     ];
 
@@ -232,10 +232,10 @@ extends SearchListBuilder
                     'label' => 'Wikidata',
                 ],
                 'count_exhibition' => [
-                    'label' => 'Number of Exhibitions',
+                    'label' => '# Exhibitions',
                 ],
                 'count_itemexhibition' => [
-                    'label' => 'Number of Cat. Entries',
+                    'label' => '# Cat. Entries',
                 ],
                 'status' => [
                     'label' => 'Status',

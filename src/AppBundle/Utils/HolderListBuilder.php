@@ -24,7 +24,7 @@ extends SearchListBuilder
         ],
         */
         'count_bibitem' => [
-            'label' => 'Number of Catalogues',
+            'label' => '# of Catalogues',
         ],
     ];
 
@@ -135,7 +135,7 @@ extends SearchListBuilder
                     'label' => 'GND',
                 ],
                 'count_bibitem' => [
-                    'label' => 'Number of Catalogues',
+                    'label' => '# of Catalogues',
                 ],
                 'status' => [
                     'label' => 'Status',

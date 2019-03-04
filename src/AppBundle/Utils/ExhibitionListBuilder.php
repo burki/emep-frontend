@@ -31,10 +31,10 @@ extends SearchListBuilder
             'label' => 'Org. Body',
         ],
         'count_itemexhibition' => [
-            'label' => 'Number of Cat. Entries',
+            'label' => '# of Cat. Entries',
         ],
         'count_person' => [
-            'label' => 'Number of Artists',
+            'label' => '# of Artists',
         ],
     ];
 
@@ -198,10 +198,10 @@ extends SearchListBuilder
                     'label' => 'Org. Body',
                 ],
                 'count_itemexhibition' => [
-                    'label' => 'Number of Cat. Entries',
+                    'label' => '# of Cat. Entries',
                 ],
                 'count_person' => [
-                    'label' => 'Number of Artists',
+                    'label' => '# of Artists',
                 ],
                 'status' => [
                     'label' => 'Status',

@@ -22,10 +22,10 @@ extends SearchListBuilder
             'label' => 'Type',
         ],
         'count_exhibition' => [
-            'label' => 'Number of Exhibitions',
+            'label' => '# of Exhibitions',
         ],
         'count_itemexhibition' => [
-            'label' => 'Number of Cat. Entries',
+            'label' => '# of Cat. Entries',
         ],
     ];
 
@@ -146,10 +146,10 @@ extends SearchListBuilder
                     'label' => 'GND',
                 ],
                 'count_exhibition' => [
-                    'label' => 'Number of Exhibitions',
+                    'label' => '# of Exhibitions',
                 ],
                 'count_itemexhibition' => [
-                    'label' => 'Number of Cat. Entries',
+                    'label' => '# of Cat. Entries',
                 ],
                 'status' => [
                     'label' => 'Status',
