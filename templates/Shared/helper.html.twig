@@ -54,10 +54,12 @@
         {% if catalogueEntry.price is not empty %}<span title="Price as in Catalogue">{{ catalogueEntry.price }}</span>{% endif %}
     </span>
     <div class="small">
+        {# don't show image preview of cat entries #}
+        {#
     {% if catalogueEntry.previewImg is not null %}
         {% set imgUrl = 'https://exhibitions05-15.kugb.univie.ac.at/uploads/' ~ catalogueEntry.previewImg.imgUrl('') %}
         {% set imgCaption = catalogueEntry.previewImg.caption %}
-        <a href="{{ imgUrl }}" data-toggle="lightbox"{% if imgCaption is not empty %} data-footer="{{ imgCaption|escape('html_attr') }}"{% endif %}><i class="glyphicon glyphicon-picture" title="Catalogue Illustration available"></i></a> {% endif %}
+        <a href="{{ imgUrl }}" data-toggle="lightbox"{% if imgCaption is not empty %} data-footer="{{ imgCaption|escape('html_attr') }}"{% endif %}><i class="glyphicon glyphicon-picture" title="Catalogue Illustration available"></i></a> {% endif %} #}
     {{ catalogueEntry.typeParts }}
     {% if catalogueEntry.ownerFull is not empty %}
         <i style="color: #ccc" class="glyphicon glyphicon-user" title="Owner as in Catalogue"></i>

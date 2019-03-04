@@ -230,6 +230,7 @@ extends CrudController
 
         $qb->select([
                 'IE',
+                'IE.id as catId',
                 'E.id',
                 'E.title'
             ])
@@ -238,6 +239,7 @@ extends CrudController
                         \Doctrine\ORM\Query\Expr\Join::WITH,
                         'IE.exhibition = E AND E.status <> -1')
             ->where("IE.person = :person")
+            ->groupBy("IE.id")
             ;
 
         $results = $qb->getQuery()
@@ -245,13 +247,14 @@ extends CrudController
             ->getResult();
 
         $entriesByExhibition = [];
+
         foreach ($results as $result) {
             $catalogueEntry = $result[0];
-            $exhibitionId = $result['id'];
-            if (!array_key_exists($exhibitionId, $entriesByExhibition)) {
-                $entriesByExhibition[$exhibitionId] = [];
+            $catId = $result['catId'];
+            if (!array_key_exists($catId, $entriesByExhibition)) {
+                $entriesByExhibition[$catId] = [];
             }
-            $entriesByExhibition[$exhibitionId][] = $catalogueEntry;
+            $entriesByExhibition[$catId][] = $catalogueEntry;
         }
 
         // TODO: sort each exhibition by catalogueId
