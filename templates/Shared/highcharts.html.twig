@@ -1,7 +1,9 @@
 {% macro head() %}
     <script src="{{ app.request.basepath }}/vendor/highcharts/highcharts.js"></script>
     <script src="{{ app.request.basepath }}/vendor/highcharts/modules/exporting.js"></script>
+    {# currently disable view data table
     <script src="{{ app.request.basepath }}/vendor/highcharts/modules/export-data.js"></script>
+    #}
     <script src="{{ app.request.basepath }}/vendor/highcharts/modules/heatmap.js"></script>
     <script src="{{ app.request.basepath }}/js/highchart_custom_theme.js"></script>
 {% endmacro %}
