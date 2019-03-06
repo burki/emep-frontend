@@ -176,6 +176,9 @@ extends SearchListBuilder
         };
     }
 
+    /*
+     * DEPRECATED: Does not work correctly for Venue with filters
+     */
     protected function buildSelectExhibitionCount()
     {
         return '(SELECT COUNT(*) FROM Exhibition EC WHERE EC.id_location='
@@ -219,7 +222,7 @@ extends SearchListBuilder
             'P' . $this->alias . '.latitude',
             'P' . $this->alias . '.longitude',
             'COUNT(DISTINCT IE.id) AS count_itemexhibition',
-            $this->buildSelectExhibitionCount()
+            'COUNT(DISTINCT E.id) AS count_exhibition',  // $this->buildSelectExhibitionCount(),
         ]);
 
         return $this;
