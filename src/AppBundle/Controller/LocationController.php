@@ -187,9 +187,9 @@ extends CrudController
 
 
             if($result['gender'] == 'M'){
-                $key = 'Male';
+                $key = 'male';
             }else if ($result['gender'] == 'F'){
-                $key = 'Female';
+                $key = 'female';
             }
 
             $data[$key] = $result['how_many'];

@@ -52,8 +52,8 @@
         <div class="artist-information-text-stats">Nationalities: {{ dataNumberOfArtistsPerCountry[2] }}</div>
         {% set totalArtists = dataNumberOfArtistsPerCountry[1] %}
         <div class="artist-information-text-stats">
-            Gender: {{ (genderStats['Female'] / totalArtists * 100) | number_format }} % Female,
-            {{ (genderStats['Male'] / totalArtists * 100) | number_format }} % Male
+            Gender: {{ (genderStats['female'] / totalArtists * 100) | number_format }} % female,
+            {{ (genderStats['male'] / totalArtists * 100) | number_format }} % male
         </div>
     </div>
 </div>

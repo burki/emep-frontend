@@ -135,13 +135,12 @@ trait StatisticsBuilderTrait
         $frequency_count = [];
 
         while ($row = $stmt->fetch()) {
-
-            $gender = 'Unknown';
+            $gender = '[unknown]';
 
             if($row['person_gender'] == 'M'){
-                $gender = 'Male';
+                $gender = 'male';
             }else if ($row['person_gender'] == 'F'){
-                $gender = 'Female';
+                $gender = 'female';
             }
 
             $key = $gender;

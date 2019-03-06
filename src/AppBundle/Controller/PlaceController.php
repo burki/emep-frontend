@@ -694,7 +694,7 @@ extends CrudController
 
 
         // creating better named keys
-        foreach ([ 'M' => 'Male', 'F' => 'Female', '' => 'Undefined' ] as $src => $target) {
+        foreach ([ 'M' => 'male', 'F' => 'female', '' => '[unknown]' ] as $src => $target) {
             if (array_key_exists($src, $genderStats)) {
                 $genderStats[$target] = $genderStats[$src];
                 unset($genderStats[$src]);
