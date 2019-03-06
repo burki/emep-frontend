@@ -3,6 +3,8 @@
 {% import 'Shared/helper.html.twig' as helper %}
 
 {% block head %}
+    {{ parent() }}
+
     {% import 'Shared/highcharts.html.twig' as highcharts %}
     {{ highcharts.head() }}
 {% endblock %}
