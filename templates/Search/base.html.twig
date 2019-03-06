@@ -189,18 +189,16 @@
                             </div>
                         </div>
                         <div class="subfilter-buttons-container">
-                            <div class="subfilter-remove">
-                                {% set filtersRemaining = listBuilder.queryFilters(true)|without(entity) %}
-                                {% set filtersEntityRemaining = filters|without(key) %}
-                                {% if filtersEntityRemaining is not empty %}
-                                    {% set filtersRemaining = filtersRemaining|merge({ (entity) : filtersEntityRemaining }) %}
-                                {% endif %}
-                                {% set params = app.request.attributes.get('_route_params')|merge(app.request.query.all|without('filter')) %}
-                                {% if filtersRemaining is not empty %}
-                                    {% set params = params|merge({ 'filter': filtersRemaining }) %}
-                                {% endif %}
-                                <div><a href="{{ path(app.request.attributes.get('_route'), params) }}">remove</a></div>
-                            </div>
+                            {% set filtersRemaining = listBuilder.queryFilters(true)|without(entity) %}
+                            {% set filtersEntityRemaining = filters|without(key) %}
+                            {% if filtersEntityRemaining is not empty %}
+                                {% set filtersRemaining = filtersRemaining|merge({ (entity) : filtersEntityRemaining }) %}
+                            {% endif %}
+                            {% set params = app.request.attributes.get('_route_params')|merge(app.request.query.all|without('filter')) %}
+                            {% if filtersRemaining is not empty %}
+                                {% set params = params|merge({ 'filter': filtersRemaining }) %}
+                            {% endif %}
+                            <a class="subfilter-remove" href="{{ path(app.request.attributes.get('_route'), params) }}">remove</a>
                         </div>
                     </div>
                         {% endfor %}

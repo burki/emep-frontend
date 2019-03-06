@@ -561,18 +561,10 @@ footer {
     display: none;
 }
 
-.subfilter-remove {
-    cursor: pointer;
-}
-
 
 table a {
     text-decoration: underline!important;
 }
-
-
-
-
 
 
 @media (max-width: 767px) {
@@ -795,8 +787,8 @@ td.normal a, .listviewrow, .artist-text {
     max-width: 100%;
 }
 
-.subfilter-remove{
-
+.subfilter-remove {
+    cursor: pointer;
 }
 
 .subfilter-remove:hover{
@@ -816,4 +808,3 @@ td.normal a, .listviewrow, .artist-text {
     height: 20px!important;
     padding-right: 20px;
 }
-
