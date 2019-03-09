@@ -125,10 +125,14 @@
                 }*/
 
                 // console.log('this: ', $(this));
-                var splitGroup = $(this).data('artist');
+                var splitGroup = $(this).find('.artist-name-row').data('artist-name');
 
 
                 // console.log('.collapseRow[data-rowname="' + splitGroup + '"]');
+
+
+
+                console.log($('.collapseRow[data-rowname="' + splitGroup + '"]') );
 
                 $('.collapseRow[data-rowname="' + splitGroup + '"]').toggleClass('collapsed');
                 $(this).find('.vorzeichen').toggleClass('collapsed');
@@ -159,7 +163,7 @@
 
                 <tr data-rowname="{{ catalogueEntry.person.fullname(true) }}" data-collapsed="true" class="listviewrow collapsed collapseRow">
                     <td>{{ helper.itemexhibition_detail(catalogueEntry) }}</td>
-                    <td><span id="person-{{ catalogueEntry.person.id }}" data-url="{% if catalogueEntry.person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : catalogueEntry.person.ulan }) }}{% elseif catalogueEntry.person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : catalogueEntry.person.gnd }) }}{% else %}{{ path('person', { 'id' : catalogueEntry.person.id }) }}{% endif %}"  >{{ catalogueEntry.person.fullname(true) }}</span>
+                    <td><span id="person-{{ catalogueEntry.person.id }}" class="artist-name-row" data-artist-name="{{ catalogueEntry.person.fullname(true) }}" data-url="{% if catalogueEntry.person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : catalogueEntry.person.ulan }) }}{% elseif catalogueEntry.person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : catalogueEntry.person.gnd }) }}{% else %}{{ path('person', { 'id' : catalogueEntry.person.id }) }}{% endif %}"  >{{ catalogueEntry.person.fullname(true) }}</span>
                     {% if addresses is not empty %}
                         <span class="small">
                         {% for address in addresses %}

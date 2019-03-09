@@ -126,8 +126,9 @@
                 }*/
 
                 // console.log('this: ', $(this));
-                var splitGroup = $(this).data('artist');
+                var splitGroup =  $(this).find('.artist-name-row').data('artist-name');
 
+                console.log(splitGroup);
 
                 // console.log('.collapseRow[data-rowname="' + splitGroup + '"]');
 
@@ -168,10 +169,10 @@
                 {% set addresses = catalogueEntry.person.addressesSeparated(exhibition.id) %}
 
 
-                <tr data-rowname="{{ catalogueEntry.person.fullname(true) }}" data-collapsed="true" class="listviewrow collapsed collapseRow">
+                <tr data-rowname="{{ catalogueEntry.exhibition.title }}" data-collapsed="true" class="listviewrow collapsed collapseRow">
 
                     <td>{{ helper.itemexhibition_detail(catalogueEntry) }}</td>
-                    <td><span id="person-{{ catalogueEntry.exhibition.id }}" data-url="{{ path('exhibition', { 'id' : catalogueEntry.exhibition.id }) }}"  >{{ catalogueEntry.exhibition.title }}</span>
+                    <td><span id="person-{{ catalogueEntry.exhibition.id }}" class="artist-name-row" data-url="{{ path('exhibition', { 'id' : catalogueEntry.exhibition.id }) }}" data-artist-name="{{ catalogueEntry.exhibition.title }}" >{{ catalogueEntry.exhibition.title }}</span>
                         {% if addresses is not empty %}
                             <span class="small">
                         {% for address in addresses %}
