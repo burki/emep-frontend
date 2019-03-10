@@ -247,7 +247,7 @@ extends Controller
     /**
      * Checks if a saved search is requested and if so, looks it up and redirects
      */
-    protected function handleUserAction(Request $request, UserInterface $user = null)
+    protected function handleUserAction(Request $request, UserInterface $user = null, $route)
     {
         if ('POST' == $request->getMethod() && !is_null($user)) {
             // check a useraction was requested
@@ -260,11 +260,12 @@ extends Controller
                     ->findOneBy([
                         'id' => $userActionId,
                         'user' => $user,
-                        'route' => $request->get('_route'),
-                    ]);
+                        'route' => $route,
+                    ])
+                    ;
 
                 if (!is_null($userAction)) {
-                    return $this->redirectToRoute($userAction->getRoute(),
+                    return $this->redirectToRoute($this->expandSaveSearchRoute($userAction->getRoute()),
                                                   $userAction->getRouteParams());
                 }
             }

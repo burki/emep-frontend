@@ -85,12 +85,12 @@ extends CrudController
                                  UrlGeneratorInterface $urlGenerator,
                                  UserInterface $user = null)
     {
-        $response = $this->handleUserAction($request, $user);
+        $settings = $this->lookupSettingsFromRequest($request);
+
+        $response = $this->handleUserAction($request, $user, $settings['base']);
         if (!is_null($response)) {
             return $response;
         }
-
-        $settings = $this->lookupSettingsFromRequest($request);
 
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, null, $settings['entity']);
 
@@ -192,6 +192,11 @@ extends CrudController
     {
         $settings = $this->lookupSettingsFromRequest($request);
 
+        $response = $this->handleUserAction($request, $user, $settings['base']);
+        if (!is_null($response)) {
+            return $response;
+        }
+
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, $settings['entity']);
 
         $charts = [];
@@ -262,6 +267,11 @@ extends CrudController
                               UserInterface $user = null)
     {
         $settings = $this->lookupSettingsFromRequest($request);
+
+        $response = $this->handleUserAction($request, $user, $settings['base']);
+        if (!is_null($response)) {
+            return $response;
+        }
 
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'extended', $settings['entity']);
         if (!in_array($entity = $listBuilder->getEntity(), [ 'Exhibition', 'Person', 'Venue', 'Organizer'])) {
