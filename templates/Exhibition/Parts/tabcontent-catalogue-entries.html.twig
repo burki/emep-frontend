@@ -11,11 +11,10 @@
 
         $( document ).ready(function() {
             $('#entrytable-list-view').DataTable({
-                "dom": 'ilrtp',
+                'dom': 'ilrtp',
                 paging: true,
-                searching: false,
                 info: true,
-                "columns": [
+                'columns': [
                     { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "asc", "desc" ] },
@@ -25,19 +24,16 @@
                     { "orderSequence": [ "desc", "asc" ] }
                 ]
             });
-        });
 
-
-        $(document).ready(function() {
             var groupColumn = 1;
             var table = $('#entrytable').DataTable({
-                "dom": 'ilrtp',
+                'dom': 'ilrtp',
                 paging: false,
                 searching: false,
                 info: true,
                 sortable: false,
                 ordering: false,
-                "columnDefs": [
+                'columnDefs': [
                     { "visible": false, "targets": groupColumn }
                 ],
                 "order": [[ groupColumn, 'asc' ]],

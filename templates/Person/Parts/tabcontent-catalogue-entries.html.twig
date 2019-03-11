@@ -11,23 +11,20 @@
 
         $( document ).ready(function() {
             $('#entrytable-list-view').DataTable({
-                "dom": 'ilrtp',
+                'dom': 'ilrtp',
                 paging: true,
                 searching: false,
                 info: true,
                 "columns": [
-                    { "orderSequence": [ "desc", "asc" ] },
-                    { "orderSequence": [ "desc", "asc" ] },
-                    { "orderSequence": [ "desc", "asc" ] },
-                    { "orderSequence": [ "desc", "asc" ] },
-                    {},
-                    {}
+                    { "orderSequence": [ "asc", "desc" ] },
+                    { "orderSequence": [ "asc", "desc" ] },
+                    { "orderSequence": [ "asc", "desc" ] },
+                    { "orderSequence": [ "asc", "desc" ] },
+                    { "orderSequence": [ "asc", "desc" ] },
+                    { "orderSequence": [ "desc", "asc" ] }
                 ]
             });
-        });
 
-
-        $(document).ready(function() {
             var groupColumn = 1;
             var table = $('#entrytable').DataTable({
                 "dom": 'ilrtp',
@@ -46,18 +43,11 @@
                     var rows = api.rows( {page:'current'} ).nodes();
                     var last= null;
 
-                    api.column(groupColumn, {page:'current'} ).data().each( function ( group, i ) {
+                    api.column(groupColumn, { page:'current' }).data().each( function ( group, i ) {
                         if ( last !== group ) {
-
-
                             var splitData =  $.parseHTML( group );
                             var url = $(splitData).data('url');
                             var splitGroup = $(splitData).text();
-
-
-                            /* $(rows).eq( i ).before(
-                                '<tr class="group groupHeader" data-name="' + splitGroup + '" ><td colspan="5"><span class="minus-collapse vorzeichen collapsed">-</span><span class="minus-collapse vorzeichen">+</span> '+group+'</td></tr>'
-                            ); */
 
                             $(rows).eq( i ).before(
                                 '<tr class="group groupHeader" data-artist="' + splitGroup + '" ><td colspan="5"><h3 class="artist-header"><span class="artistsymbol vorzeichen plussign">+</span><span class="artistsymbol vorzeichen collapsed minussign">-</span>'+group+'<a href="'+url+'" class="charttypeTitle">(view exhibition)</a></h3></td></tr>'
@@ -72,7 +62,7 @@
 
 
             //expand all on load
-            $('.collapseRow').removeClass("collapsed");
+            $('.collapseRow').removeClass('collapsed');
             $('.plussign').addClass('collapsed');
             $('.minussign').removeClass('collapsed');
 
@@ -128,7 +118,7 @@
                 // console.log('this: ', $(this));
                 var splitGroup =  $(this).find('.artist-name-row').data('artist-name');
 
-                console.log(splitGroup);
+                // console.log(splitGroup);
 
                 // console.log('.collapseRow[data-rowname="' + splitGroup + '"]');
 
@@ -139,7 +129,6 @@
                 // console.log($(this).data('name'));
             } );
 
-
         } );
 
 
@@ -149,10 +138,6 @@
 
 
     <div role="tabpanel" class="tab-pane" id="entries">
-        {#
-          {{ helper.exhibition_itemexhibition_sort_control(exhibition) }}
-        #}
-
         <div class="catalogue-entries-data-management">
             <span class="left-buttons"><button class="expand-all">expand all</button><buttton class="collapse-all">collapse all</buttton></span>
             <span class="right-buttons"><span class="cat-entries-button catalogue-view-button active">Catalogue View</span><span class="cat-entries-button list-view-button">List View</span></span>
@@ -167,7 +152,6 @@
                 {% set initial = catalogueEntry.person.fullname %}
 
                 {% set addresses = catalogueEntry.person.addressesSeparated(exhibition.id) %}
-
 
                 <tr data-rowname="{{ catalogueEntry.exhibition.title }}" data-collapsed="true" class="listviewrow collapsed collapseRow">
 
@@ -192,11 +176,12 @@
                 <th>Catalogue Entry</th>
                 <th><span>Exhibition</span></th>
                 <th class="">Room</th>
-                <th><span>Price</span></th>
                 <th><span>Owner</span></th>
                 <th><span>For Sale</span></th>
+                <th><span>Price</span></th>
             </tr>
             </thead>
+
             <tbody>
             {% for catalogueEntry in catalogueEntries %}
                 {% set catalogueEntry  = catalogueEntry[0] %}
@@ -205,21 +190,20 @@
                 {% set addresses = catalogueEntry.person.addressesSeparated(exhibition.id) %}
 
                 <tr class="listviewrow">
-
-
-                    <td>{{ catalogueEntry.getTitleFull }}</td>
-                    <td><a href="{{ path('exhibition', { 'id' : catalogueEntry.exhibition.id }) }}">
-                            <b>{{ catalogueEntry.exhibition.title }}</b> {{ catalogueEntry.exhibition.titleAppend }}</a></td>
-                    <!--<td><a href="{% if catalogueEntry.person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : catalogueEntry.person.ulan }) }}{% elseif catalogueEntry.person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : catalogueEntry.person.gnd }) }}{% else %}{{ path('person', { 'id' : catalogueEntry.person.id }) }}{% endif %}">{{ catalogueEntry.person.fullname(true) }}</a></td>-->
+                    <td data-order="{{ loop.index }}">{{ catalogueEntry.getTitleFull }}</td>
+                    <td>
+                        <a href="{{ path('exhibition', { 'id' : catalogueEntry.exhibition.id }) }}">
+                            <b>{{ catalogueEntry.exhibition.title }}</b> {{ catalogueEntry.exhibition.titleAppend }}
+                        </a>
+                    </td>
                     <td>{{ catalogueEntry.displaylocation }}</td>
-                    <td>{{ catalogueEntry.price }}</td>
                     <td>{{ catalogueEntry.owner ? catalogueEntry.owner : '?' }}</td>
                     <td>{{ catalogueEntry.forsale ? 'Y' : ( catalogueEntry.forsale == null ? '?' : 'N') }}</td>
+                    <td>{{ catalogueEntry.price }}</td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
-
 
     </div><!-- .tab-pane -->
 {% endblock %}
