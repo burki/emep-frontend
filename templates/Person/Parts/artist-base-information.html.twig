@@ -1,19 +1,37 @@
-{# birth place and date #}
-
+{# variantName #}
+{% if person.variantName is not empty %}
     <div class="artist-information-container">
-        <div class="artist-information-label">{{ 'Sex'|trans }}:</div>
+        <div class="artist-information-label">{{ 'Name Variants'|trans }}:</div>
         <div class="artist-information-text">
-            {% if person.gender == "M" %}
+            {{ person.variantName|replace({ "\r": '', "\n": '; ' }) }}
+        </div>
+    </div>
+{% endif %}
+{% if person.variantNameUlan is not empty %}
+    <div class="artist-information-container">
+        <div class="artist-information-label">{{ 'Name Variants (ULAN)'|trans }}:</div>
+        <div class="artist-information-text">
+            {{ person.variantNameUlan|replace({ "\r": '', "\n": '; ' }) }}
+        </div>
+    </div>
+{% endif %}
+
+
+{# gender #}
+    <div class="artist-information-container">
+        <div class="artist-information-label">{{ 'Gender'|trans }}:</div>
+        <div class="artist-information-text">
+            {% if person.gender == 'M' %}
                 male
-            {% elseif person.gender == "F" %}
+            {% elseif person.gender == 'F' %}
                 female
             {% else %}
                 [unknown]
             {% endif %}
-
         </div>
     </div>
 
+{# birth place and date #}
 {% set birthPlace = person.birthPlaceInfo(app.request.locale) %}
 {% if birthPlace is not empty or person.birthDate is not empty %}
     <div class="artist-information-container">

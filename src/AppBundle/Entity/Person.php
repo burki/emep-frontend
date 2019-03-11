@@ -56,11 +56,18 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
     protected $additionalName;
 
     /**
-     * @var string An additional name for a Person, can be used for a middle name.
+     * @var string Additional name forms.
      *
      * @ORM\Column(name="name_variant",nullable=true)
      */
     protected $variantName;
+
+    /**
+     * @var string Additional name forms (ULAN).
+     *
+     * @ORM\Column(name="name_variant_ulan",nullable=true)
+     */
+    protected $variantNameUlan;
 
     /**
      * @var string An award won by or for this item.
@@ -527,6 +534,26 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
     public function getGivenName()
     {
         return $this->givenName;
+    }
+
+    /**
+     * Gets variantName.
+     *
+     * @return string
+     */
+    public function getVariantName()
+    {
+        return $this->variantName;
+    }
+
+    /**
+     * Gets variantNameUlan.
+     *
+     * @return string
+     */
+    public function getVariantNameUlan()
+    {
+        return $this->variantNameUlan;
     }
 
     /**
