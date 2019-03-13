@@ -23,7 +23,7 @@
     </script>
 
 
-    <div role="tabpanel" class="tab-pane" id="artists">
+    <div role="tabpanel" class="tab-pane{% if venuesList|length == 0 and artistsArray|length > 0 %} active{% endif %}" id="artists">
         <table id="artists-table" class="table table-striped table-bordered dataTable">
             <thead>
             <tr>
@@ -67,7 +67,6 @@
                         {% endif %}
                     </td>
                     <td data-order="{{ hasExibitedText }}">{{ hasExibitedText }}</td>
-
                 </tr>
             {% endfor %}
             </tbody>

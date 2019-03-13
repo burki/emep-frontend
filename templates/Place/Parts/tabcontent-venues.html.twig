@@ -27,7 +27,7 @@
 
     {% set childrenByType = place.getChildrenByType(em) %}
 
-    <div role="tabpanel" class="tab-pane active" id="venues">
+    <div role="tabpanel" class="tab-pane{% if venuesList|length > 0 %} active{% endif %}" id="venues">
         <table id="venues-table" class="table table-striped table-bordered dataTable">
             <thead>
             <tr>
