@@ -239,6 +239,10 @@ extends CrudController
                         \Doctrine\ORM\Query\Expr\Join::WITH,
                         'IE.exhibition = E AND E.status <> -1')
             ->where("IE.person = :person")
+            ->orderBy('E.startdate')
+            ->addOrderBy('IE.catalogueSection')
+            ->addOrderBy('IE.catalogueId * 1') // https://stackoverflow.com/a/46096965
+            ->addOrderBy('IE.catalogueId')
             ->groupBy("IE.id")
             ;
 
@@ -256,8 +260,6 @@ extends CrudController
             }
             $entriesByExhibition[$catId][] = $catalogueEntry;
         }
-
-        // TODO: sort each exhibition by catalogueId
 
         return $entriesByExhibition;
     }
