@@ -265,6 +265,10 @@ extends SearchListBuilder
             ];
         }
 
+        $this->rowDescr['title']['buildValue'] = function (&$row, $val, $listBuilder, $key, $format) {
+            return $listBuilder->buildLinkedItemExhibition($row, $val, $format);
+        };
+
         $this->rowDescr['startdate']['buildValue'] = function (&$row, $val, $listBuilder, $key, $format) {
             if (!empty($row['displaydate'])) {
                 return $this->formatRowValue($row['displaydate'], [], $format);

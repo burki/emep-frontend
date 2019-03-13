@@ -407,11 +407,10 @@ extends CrudController
         return new CsvResponse($csvResult, 200, explode( ', ', 'Name, Birth Date, Death Date'));
     }
 
-
     /**
      * @Route("/exhibition/{id}", requirements={"id" = "\d+"}, name="exhibition")
      */
-    public function detailAction(Request $request, $id = null)
+    public function detailAction(Request $request, $id, $itemexhibitionId = null)
     {
         $routeName = $request->get('_route'); $routeParams = [];
 
@@ -502,6 +501,13 @@ extends CrudController
         ]);
     }
 
+    /**
+     * @Route("/exhibition/{id}/{itemexhibitionId}", requirements={"id" = "\d+", "itemexhibitionId" = "\d+"}, name="itemexhibition")
+     */
+    public function detailItemExhibitionAction(Request $request, $id, $itemexhibitionId)
+    {
+        return $this->detailAction($request, $id, $itemexhibitionId);
+    }
 
     /**
      * @Route("/exhibition/{id}/stats/info", requirements={"id" = "\d*"}, name="exhibition-stats-info")

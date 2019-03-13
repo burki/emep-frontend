@@ -6,11 +6,12 @@
             <div class="icontab download-csv-artists" style="display:none"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage" title="download current data"></div>
             <div class="icontab download-csv-similars" style="display:none"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage" title="download current data"></div>
         </div>
+
         <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 1em">
-            <li role="presentation" class="active"><a href="#information" aria-controls="entries" role="tab" data-toggle="tab">{{ 'Information'|trans }}</a></li>
+            <li role="presentation"{% if 'itemexhibition' != app.request.get('_route') %} class="active"{% endif %}><a href="#information" aria-controls="entries" role="tab" data-toggle="tab">{{ 'Information'|trans }}</a></li>
 
             {% if catalogueEntries is not empty %}
-            <li role="presentation" class="cat-entries-tab"><a href="#entries" aria-controls="entries" role="tab" data-toggle="tab">{{ 'Catalogue Entries'|trans }}</a></li>
+            <li role="presentation" class="{% if 'itemexhibition' == app.request.get('_route') %}active {% endif %}cat-entries-tab"><a href="#entries" aria-controls="entries" role="tab" data-toggle="tab">{{ 'Catalogue Entries'|trans }}</a></li>
 
                 {# {% if artists|length > 0 %} #}
             <li role="presentation" class="artists-tab"><a href="#artists" aria-controls="artists" role="tab" data-toggle="tab">{{ 'Artists'|trans }}</a></li>
@@ -63,8 +64,6 @@
             $('.download-csv-similars').hide();
             $('.download-csv-catalogue').hide();
         }
-
-
 
     </script>
 

@@ -1,6 +1,6 @@
 {% block information %}
 
-        <div role="tabpanel" class="tab-pane active" id="information">
+        <div role="tabpanel" class="tab-pane{% if 'itemexhibition' != app.request.get('_route') %} active{% endif %}" id="information">
 
             {% if exhibition.organizingCommittee is empty and exhibition.hours is empty and catalogue is empty and exhibition.cataloguePrice is empty and exhibition.preface is empty and exhibition.catalogueStructure is empty and exhibition.catalogueStructure is empty and exhibition.note is empty and exhibition.hasInfo == false and exhibition.hasInfo == false %}
                 <div class="artist-information-text information-tab">no more information available</div>

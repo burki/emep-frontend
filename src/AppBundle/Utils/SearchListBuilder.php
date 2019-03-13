@@ -508,6 +508,21 @@ extends ListBuilder
                        $this->formatRowValue($val, [], $format));
     }
 
+    protected function buildLinkedItemExhibition(&$row, $val, $format)
+    {
+        if ('html' != $format || empty($val)) {
+            return false;
+        }
+
+        return sprintf('<a href="%s#%s">%s</a>',
+                       $this->urlGenerator->generate('itemexhibition', [
+                            'id' => $row['exhibition_id'],
+                            'itemexhibitionId' => $row['id'],
+                       ]),
+                       $row['id'],
+                       $this->formatRowValue($val, [], $format));
+    }
+
     protected function buildLinkedLocation(&$row, $val, $format, $route_name = 'location')
     {
         if ('html' != $format) {

@@ -141,7 +141,7 @@
     </script>
 
 
-    <div role="tabpanel" class="tab-pane" id="entries">
+    <div role="tabpanel" class="tab-pane{% if 'itemexhibition' == app.request.get('_route') %} active{% endif %}" id="entries">
         {#
           {{ helper.exhibition_itemexhibition_sort_control(exhibition) }}
         #}
@@ -157,7 +157,7 @@
             {% for catalogueEntry in catalogueEntries %}
                 {% set addresses = catalogueEntry.person.addressesSeparated(exhibition.id) %}
 
-                <tr data-rowname="{{ catalogueEntry.person.fullname(true) }}" data-collapsed="true" class="listviewrow collapsed collapseRow">
+                <tr id="{{ catalogueEntry.id }}" data-rowname="{{ catalogueEntry.person.fullname(true) }}" data-collapsed="true" class="listviewrow collapsed collapseRow">
                     <td>{{ helper.itemexhibition_detail(catalogueEntry) }}</td>
                     <td><span id="person-{{ catalogueEntry.person.id }}" class="artist-name-row" data-artist-name="{{ catalogueEntry.person.fullname(true) }}" data-url="{% if catalogueEntry.person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : catalogueEntry.person.ulan }) }}{% elseif catalogueEntry.person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : catalogueEntry.person.gnd }) }}{% else %}{{ path('person', { 'id' : catalogueEntry.person.id }) }}{% endif %}"  >{{ catalogueEntry.person.fullname(true) }}</span>
                     {% if addresses is not empty %}
