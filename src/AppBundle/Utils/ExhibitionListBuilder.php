@@ -417,7 +417,10 @@ extends SearchListBuilder
                                 'Location', 'O',
                                 'O.id=EL.id_location');
 
-        if (array_key_exists('person', $this->queryFilters) || in_array($this->mode, [ 'stats-nationality', 'stats-age', 'stats-gender' ])) {
+        if (array_key_exists('person', $this->queryFilters)
+            || array_key_exists('search', $this->queryFilters)
+            || in_array($this->mode, [ 'stats-nationality', 'stats-age', 'stats-gender' ]))
+        {
             // so we can filter on P.*
             $queryBuilder->join('IE',
                                 'Person', 'P',
@@ -449,6 +452,10 @@ extends SearchListBuilder
             'L.name_translit',
             'L.name_alternate',
             'L.place',
+            'P.lastname',
+            'P.firstname',
+            'P.name_variant',
+            'P.name_variant_ulan',
         ]);
 
         $this->addQueryFilters($queryBuilder);

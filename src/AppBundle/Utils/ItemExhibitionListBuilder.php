@@ -420,10 +420,6 @@ extends SearchListBuilder
             'IE.owner',
             'IE.owner_alternate',
             'IE.displaycreator',
-            'P.lastname',
-            'P.firstname',
-            'P.name_variant',
-            'P.name_variant_ulan',
             'E.title',
             'E.title_short',
             'E.title_translit',
@@ -434,6 +430,10 @@ extends SearchListBuilder
             'L.name_translit',
             'L.name_alternate',
             'L.place',
+            'P.lastname',
+            'P.firstname',
+            'P.name_variant',
+            'P.name_variant_ulan',
         ]);
 
         $this->addQueryFilters($queryBuilder);
