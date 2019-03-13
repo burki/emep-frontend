@@ -13,9 +13,9 @@
             {% if catalogueEntries is not empty %}
             <li role="presentation" class="{% if 'itemexhibition' == app.request.get('_route') %}active {% endif %}cat-entries-tab"><a href="#entries" aria-controls="entries" role="tab" data-toggle="tab">{{ 'Catalogue Entries'|trans }}</a></li>
 
-                {# {% if artists|length > 0 %} #}
+            {# {% if artists|length > 0 %}
             <li role="presentation" class="artists-tab"><a href="#artists" aria-controls="artists" role="tab" data-toggle="tab">{{ 'Artists'|trans }}</a></li>
-                {# {% endif %} #}
+            {% endif %} #}
 
                 {# co-appearances #}
                 {% if similar|length > 0 %}
