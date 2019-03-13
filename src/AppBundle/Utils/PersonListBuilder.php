@@ -278,36 +278,38 @@ extends SearchListBuilder
                 'filter' => $this->getQueryFilters(true),
             ];
 
-            $this->rowDescr['count_exhibition']['buildValue']
-                = function (&$row, $val, $listBuilder, $key, $format) use ($routeParams) {
-                    if ('html' != $format) {
-                        return false;
-                    }
+            if (empty($routeParams['filter']['search'])) {
+                $this->rowDescr['count_exhibition']['buildValue']
+                    = function (&$row, $val, $listBuilder, $key, $format) use ($routeParams) {
+                        if ('html' != $format) {
+                            return false;
+                        }
 
-                    $routeParams['filter']['person']['person'] = [ $row['person_id'] ];
+                        $routeParams['filter']['person']['person'] = [ $row['person_id'] ];
 
-                    return sprintf('<a href="%s">%s</a>',
-                                   $this->urlGenerator->generate('search-index', $routeParams),
-                                   $this->formatRowValue($val, [], $format));
-                };
+                        return sprintf('<a href="%s">%s</a>',
+                                       $this->urlGenerator->generate('search-index', $routeParams),
+                                       $this->formatRowValue($val, [], $format));
+                    };
 
-            $routeParams = [
-                'entity' => 'ItemExhibition',
-                'filter' => $this->getQueryFilters(true),
-            ];
+                $routeParams = [
+                    'entity' => 'ItemExhibition',
+                    'filter' => $this->getQueryFilters(true),
+                ];
 
-            $this->rowDescr['count_itemexhibition']['buildValue']
-                = function (&$row, $val, $listBuilder, $key, $format) use ($routeParams) {
-                    if ('html' != $format) {
-                        return false;
-                    }
+                $this->rowDescr['count_itemexhibition']['buildValue']
+                    = function (&$row, $val, $listBuilder, $key, $format) use ($routeParams) {
+                        if ('html' != $format) {
+                            return false;
+                        }
 
-                    $routeParams['filter']['person']['person'] = [ $row['person_id'] ];
+                        $routeParams['filter']['person']['person'] = [ $row['person_id'] ];
 
-                    return sprintf('<a href="%s">%s</a>',
-                                   $this->urlGenerator->generate('search-index', $routeParams),
-                                   $this->formatRowValue($val, [], $format));
-                };
+                        return sprintf('<a href="%s">%s</a>',
+                                       $this->urlGenerator->generate('search-index', $routeParams),
+                                       $this->formatRowValue($val, [], $format));
+                    };
+            }
         }
     }
 
