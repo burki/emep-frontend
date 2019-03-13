@@ -14,9 +14,11 @@
         </div>
         <div class="artist-information-text-stats"># of Nationalities: {{ nationalitiesStats|length }}</div>
         {% set totalArtists = persons|length %}
+        {% if totalArtists > 0 %}
         <div class="artist-information-text-stats">
             Gender: {{ (genderStats['female'] / totalArtists * 100) | number_format }} % female,
             {{ (genderStats['male'] / totalArtists * 100) | number_format }} % male
         </div>
+        {% endif %}
     </div>
 </div>
