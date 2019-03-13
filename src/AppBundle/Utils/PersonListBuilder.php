@@ -271,6 +271,44 @@ extends SearchListBuilder
 
                 return $listBuilder->buildLinkedValue($val, 'place-by-tgn', [ 'tgn' => $row[$key_tgn] ], $format);
             };
+
+        if (empty($mode)) {
+            $routeParams = [
+                'entity' => 'Exhibition',
+                'filter' => $this->getQueryFilters(true),
+            ];
+
+            $this->rowDescr['count_exhibition']['buildValue']
+                = function (&$row, $val, $listBuilder, $key, $format) use ($routeParams) {
+                    if ('html' != $format) {
+                        return false;
+                    }
+
+                    $routeParams['filter']['person']['person'] = [ $row['person_id'] ];
+
+                    return sprintf('<a href="%s">%s</a>',
+                                   $this->urlGenerator->generate('search-index', $routeParams),
+                                   $this->formatRowValue($val, [], $format));
+                };
+
+            $routeParams = [
+                'entity' => 'ItemExhibition',
+                'filter' => $this->getQueryFilters(true),
+            ];
+
+            $this->rowDescr['count_itemexhibition']['buildValue']
+                = function (&$row, $val, $listBuilder, $key, $format) use ($routeParams) {
+                    if ('html' != $format) {
+                        return false;
+                    }
+
+                    $routeParams['filter']['person']['person'] = [ $row['person_id'] ];
+
+                    return sprintf('<a href="%s">%s</a>',
+                                   $this->urlGenerator->generate('search-index', $routeParams),
+                                   $this->formatRowValue($val, [], $format));
+                };
+        }
     }
 
     protected function setSelect($queryBuilder)

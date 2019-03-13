@@ -174,6 +174,48 @@ extends SearchListBuilder
 
             return $listBuilder->buildLinkedValue($val, 'place-by-tgn', [ 'tgn' => $row['place_tgn'] ], $format);
         };
+
+        if (empty($mode)) {
+            $routeParams = [
+                'entity' => 'Exhibition',
+                'filter' => $this->getQueryFilters(true),
+            ];
+
+            $this->rowDescr['count_exhibition']['buildValue']
+                = function (&$row, $val, $listBuilder, $key, $format) use ($routeParams) {
+                    if ('html' != $format) {
+                        return false;
+                    }
+
+                    $key = 'Organizer' == $this->getEntity() ? 'organizer' : 'location';
+
+                    $routeParams['filter'][$key][$key] = [ $row['id'] ];
+
+                    return sprintf('<a href="%s">%s</a>',
+                                   $this->urlGenerator->generate('search-index', $routeParams),
+                                   $this->formatRowValue($val, [], $format));
+                };
+
+            $routeParams = [
+                'entity' => 'ItemExhibition',
+                'filter' => $this->getQueryFilters(true),
+            ];
+
+            $this->rowDescr['count_itemexhibition']['buildValue']
+                = function (&$row, $val, $listBuilder, $key, $format) use ($routeParams, $entity) {
+                    if ('html' != $format) {
+                        return false;
+                    }
+
+                    $key = 'Organizer' == $this->getEntity() ? 'organizer' : 'location';
+
+                    $routeParams['filter'][$key][$key] = [ $row['id'] ];
+
+                    return sprintf('<a href="%s">%s</a>',
+                                   $this->urlGenerator->generate('search-index', $routeParams),
+                                   $this->formatRowValue($val, [], $format));
+                };
+        }
     }
 
     /*

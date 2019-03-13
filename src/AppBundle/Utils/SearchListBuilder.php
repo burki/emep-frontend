@@ -215,11 +215,13 @@ extends ListBuilder
         }
 
         $ret = $this->queryFilters;
-        array_walk_recursive($ret, function (&$item, $key) {
-            if (is_object($item)) {
-                $item = $item->getId();
-            }
-        });
+        if (is_array($ret)) {
+            array_walk_recursive($ret, function (&$item, $key) {
+                if (is_object($item)) {
+                    $item = $item->getId();
+                }
+            });
+        }
 
         return $ret;
     }

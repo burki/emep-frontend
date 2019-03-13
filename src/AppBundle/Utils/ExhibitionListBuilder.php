@@ -238,6 +238,47 @@ extends SearchListBuilder
         $this->rowDescr['location']['buildValue'] = function (&$row, $val, $listBuilder, $key, $format) {
             return $listBuilder->buildLinkedLocation($row, $val, $format);
         };
+
+
+        if (empty($mode)) {
+            $routeParams = [
+                'entity' => 'ItemExhibition',
+                'filter' => $this->getQueryFilters(true),
+            ];
+
+            $this->rowDescr['count_itemexhibition']['buildValue']
+                = function (&$row, $val, $listBuilder, $key, $format) use ($routeParams) {
+                    if ('html' != $format) {
+                        return false;
+                    }
+
+                    $routeParams['filter']['exhibition']['exhibition'] = [ $row['exhibition_id'] ];
+
+                    return sprintf('<a href="%s">%s</a>',
+                                   $this->urlGenerator->generate('search-index', $routeParams),
+                                   $this->formatRowValue($val, [], $format));
+                };
+
+            $routeParams = [
+                'entity' => 'Person',
+                'filter' => $this->getQueryFilters(true),
+            ];
+
+            $this->rowDescr['count_person']['buildValue']
+                = function (&$row, $val, $listBuilder, $key, $format) use ($routeParams) {
+                    if ('html' != $format) {
+                        return false;
+                    }
+
+                    $routeParams['filter'] = $listBuilder->getQueryFilters(true);
+
+                    $routeParams['filter']['exhibition']['exhibition'] = [ $row['exhibition_id'] ];
+
+                    return sprintf('<a href="%s">%s</a>',
+                                   $this->urlGenerator->generate('search-index', $routeParams),
+                                   $this->formatRowValue($val, [], $format));
+                };
+        }
     }
 
     protected function setSelect($queryBuilder)
