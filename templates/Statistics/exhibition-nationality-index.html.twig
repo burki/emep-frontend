@@ -13,11 +13,18 @@
                     text: " "
                 },
                 xAxis: {
-                    categories: {{ nationalities|json_encode|raw }}
+                    categories: {{ nationalities|json_encode|raw }},
+                    title: {
+                        enabled: true,
+                        text: 'Artists’ Nationality'
+                    }
                 },
                 yAxis: {
                     categories: {{ countries|json_encode|raw }},
-                    title: null
+                    title: {
+                        enabled: true,
+                        text: 'Exhibiting Country'
+                    }
                 },
                 colorAxis: {
                     min: 0,
