@@ -185,7 +185,7 @@ trait StatisticsBuilderTrait
         }
         $max_year = $min_year;
 
-        $data = $scatter_data = $scatter_categories = [];
+        $data = $data_yearly = $categories = $scatter_data = $scatter_categories = [];
 
         $keys = array_keys($frequency_count);
         if (empty($keys)) {
@@ -201,9 +201,14 @@ trait StatisticsBuilderTrait
             $categories[] = sprintf('%04d-%02d',
                                     $year = intval($i / 100), $month = $i % 100);
 
+            if (!array_key_exists($year, $data_yearly)) {
+                $data_yearly[$year] = 0;
+            }
+
             $count = array_key_exists($key, $frequency_count) ? $frequency_count[$key] : 0;
             $sum += $count;
             $data[] = $count;
+            $data_yearly[$year] += $count;
 
             if ($count > 0) {
                 $max_year = $year;
@@ -224,14 +229,19 @@ trait StatisticsBuilderTrait
             }
         }
 
+
         $scatter_categories = range($min_year, $max_year);
 
         $data_avg = round(1.0 * $sum / count($data), 1);
+        $data_avg_yearly = round(1.0 * $sum / count(array_keys($data_yearly)), 1);
 
         return [
             'data_avg' => $data_avg,
             'categories' => json_encode($categories),
             'data' => json_encode($data),
+            'data_avg_yearly' => $data_avg_yearly,
+            'categories_yearly' => json_encode(array_keys($data_yearly)),
+            'data_yearly' => json_encode(array_values($data_yearly)),
             'scatter_data' => json_encode($scatter_data),
             'scatter_categories' => json_encode($scatter_categories),
         ];
