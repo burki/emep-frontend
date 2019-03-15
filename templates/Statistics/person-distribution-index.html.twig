@@ -36,12 +36,12 @@
                 pointFormat: '{point.y} Artists with {point.x} exhibitions'
             },
             series: [
-            {
-                type: 'column',
-                data: {{ data|raw }},
-                pointStart: 1,
-                pointWidth: 10
-            }
+                {
+                    type: 'column',
+                    data: {{ data|raw }},
+                    pointStart: {{ min }},
+                    pointWidth: 10
+                }
             ]
         });
     });

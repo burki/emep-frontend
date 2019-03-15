@@ -431,6 +431,7 @@ trait StatisticsBuilderTrait
                 }
                 ++$frequency_count[$how_many];
             }
+
             ksort($frequency_count);
             $keys = array_keys($frequency_count);
             $min = $keys[0]; $max = $keys[count($keys) - 1];
@@ -461,6 +462,8 @@ trait StatisticsBuilderTrait
         // display the static content
         return [
             'data' => json_encode($data['exhibition']),
+            'min' => $min,
+            'max' => $max,
             'data_median' => $data_median['exhibition'],
         ];
     }
