@@ -575,13 +575,9 @@ extends ListBuilder
         return htmlspecialchars($val, ENT_COMPAT, 'utf-8');
     }
 
-    protected function formatPrice($val, $currency)
+    protected function buildCurrencySymbol($currency)
     {
         static $currencies = null;
-
-        if (empty($val) || empty($currency)) {
-            return $val;
-        }
 
         if (is_null($currencies)) {
             $currencies = [];
@@ -604,7 +600,17 @@ extends ListBuilder
         $symbol = array_key_exists($currency, $currencies)
             ? $currencies[$currency] : $currency;
 
-        return $symbol . "\xC2\xA0" . $val;
+        return $symbol;
+    }
+
+    protected function formatPrice($val, $currency)
+    {
+
+        if (empty($val) || empty($currency)) {
+            return $val;
+        }
+
+        return $this->buildCurrencySymbol($currency) . "\xC2\xA0" . $val;
     }
 
     public function buildRow($row, $format = 'plain')

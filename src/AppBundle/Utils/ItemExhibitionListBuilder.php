@@ -232,6 +232,9 @@ extends SearchListBuilder
                 'forsale' => [
                     'label' => 'For Sale',
                 ],
+                'currency' => [
+                    'label' => 'Currency',
+                ],
                 'price' => [
                     'label' => 'Price',
                 ],
@@ -307,6 +310,17 @@ extends SearchListBuilder
             return $this->formatRowValue($val, [], $format);
         };
 
+        if (array_key_exists('currency', $this->rowDescr)) {
+            $this->rowDescr['currency']['buildValue'] = function (&$row, $val, $listBuilder, $key, $format) {
+                if (empty($row['price'])) {
+                    return '';
+                }
+
+                return $this->formatRowValue($this->buildCurrencySymbol($val), [], $format);
+            };
+        }
+
+        /*
         if (array_key_exists('price', $this->rowDescr)) {
             $this->rowDescr['price']['buildValue'] = function (&$row, $val, $listBuilder, $key, $format) {
                 if (!empty($val)) {
@@ -315,6 +329,7 @@ extends SearchListBuilder
                 }
             };
         }
+        */
     }
 
     protected function setSelect($queryBuilder)
