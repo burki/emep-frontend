@@ -44,26 +44,26 @@
 
         "symfony/asset": "^4.2",
         "symfony/assetic-bundle": "dev-master as 2.8.3",
-        "leafo/scssphp": "@stable",
+        "leafo/scssphp": "^0.7",
 
-        "lexik/form-filter-bundle": "@stable",
-        "knplabs/knp-paginator-bundle": "@stable",
+        "lexik/form-filter-bundle": "^5.0",
+        "knplabs/knp-paginator-bundle": "^3.0",
 
-        "cocur/slugify": "@stable",
+        "cocur/slugify": "^3.2",
         "twig/twig": "1.*",
-        "twig/extensions": "@stable",
+        "twig/extensions": "^1.5",
         "liip/url-auto-converter-bundle": "dev-master",
 
-        "doctrine/doctrine-bundle": "@stable",
-        "doctrine/orm": "@stable",
+        "doctrine/doctrine-bundle": "^1.10",
         "stof/doctrine-extensions-bundle": "~1.2",
         "beberlei/doctrineextensions": "@stable",
+        "scienta/doctrine-json-functions": "^4.0",
 
         "tetranz/select2entity-bundle": "2.*",
 
         "wikimedia/utfnormal": "^2.0",
 
-        "semsol/arc2": "@stable",
+        "semsol/arc2": "^2.4",
         "easyrdf/easyrdf": "@stable",
         "seboettg/citeproc-php": "dev-name-as-sort-order-fix#bf446dc",
         "fale/isbn": "3.*",
