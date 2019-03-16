@@ -487,10 +487,9 @@ extends CrudController
                 'P.id AS id',
                 "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort",
                 "0 AS exhibited",
-                "JSON_CONTAINS(P.addresses, :placeTgn) = 1 AS active",
             ])
             ->from('AppBundle:Person', 'P')
-            ->where('P.id <> -1 AND (P.birthPlace = :tgn or P.deathPlace = :tgn OR JSON_CONTAINS(P.addresses, :placeTgn) = 1)')
+            ->where('P.status <> -1 AND (P.birthPlace = :tgn or P.deathPlace = :tgn OR JSON_CONTAINS(P.addresses, :placeTgn) = 1)')
             ->setParameter('tgn', $tgn)
             ->setParameter('placeTgn', sprintf('{"place_tgn": "%s"}', $tgn))
             ;
