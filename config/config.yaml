@@ -87,9 +87,13 @@ doctrine:
                 IF: DoctrineExtensions\Query\Mysql\IfElse
                 REPLACE: DoctrineExtensions\Query\Mysql\Replace
                 REGEXP: DoctrineExtensions\Query\Mysql\Regexp
+                JSON_CONTAINS: Scienta\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonContains
             numeric_functions:
                 MATCH: DoctrineExtensions\Query\Mysql\MatchAgainst
                 RAND: DoctrineExtensions\Query\Mysql\Rand
+            datetime_functions:
+                YEAR: DoctrineExtensions\Query\Mysql\Year
+                
         metadata_cache_driver: '%database.cache_driver%'
         result_cache_driver: '%database.cache_driver%'
         query_cache_driver: '%database.cache_driver%'

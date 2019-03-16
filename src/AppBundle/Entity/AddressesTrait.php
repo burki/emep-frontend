@@ -11,7 +11,7 @@ trait AddressesTrait
 {
     static $ADDRESS_KEYS = [
         'from', 'until', 'id_exhibition', 'note',
-        'address', 'place',
+        'address', 'place', 'place_tgn',
         'street', 'zip', 'country',
         'geo',
     ];
@@ -41,7 +41,7 @@ trait AddressesTrait
      *
      *
      */
-    function buildAddresses($entries, $showCountry = false, $filterExhibition = null)
+    function buildAddresses($entries, $showCountry = false, $filterExhibition = null, $linkPlace = false)
     {
         $addresses = self::splitAddresses($entries);
         if (empty($addresses)) {
@@ -79,9 +79,19 @@ trait AddressesTrait
                 $parts = [];
                 foreach ($keys as $key) {
                     if (!empty($addresses[$key][$i])) {
-                        $parts[] = $addresses[$key][$i];
+                        if ($linkPlace && 'place' == $key && !empty($addresses['place_tgn'][$i])) {
+                            $parts[] = sprintf('<a href="%%basepath%%/place/tgn/%s">%s</a>',
+                                               $addresses['place_tgn'][$i],
+                                               htmlspecialchars($addresses[$key][$i], ENT_COMPAT, 'utf-8'));
+                        }
+                        else {
+                            $parts[] = $linkPlace
+                                ? htmlspecialchars($addresses[$key][$i], ENT_COMPAT, 'utf-8')
+                                : $addresses[$key][$i];
+                        }
                     }
                 }
+
                 if (!empty($parts)) {
                     $lines[] = join(', ', $parts);
                 }

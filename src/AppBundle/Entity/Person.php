@@ -667,9 +667,9 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
      *
      * @return array
      */
-    public function getAddressesSeparated($filterExhibition = null)
+    public function getAddressesSeparated($filterExhibition = null, $linkPlace = false)
     {
-        return $this->buildAddresses($this->addresses, false, $filterExhibition);
+        return $this->buildAddresses($this->addresses, false, $filterExhibition, $linkPlace);
     }
 
     private static function buildPlaceInfo($place, $locale)

@@ -83,12 +83,13 @@
 {# addresses #}
 
 
-{% set addresses = person.addressesSeparated %}
+{% set addresses = person.addressesSeparated(null, true) %}
 {% if addresses is not empty %}
     <div class="artist-information-container">
         <div class="artist-information-label">{{ 'Places of Activity'|trans }}:</div>
-        <div class="artist-information-text">{% for address in addresses %}
-                {{ address['info']|replace({ "\n" : ", " }) }}<br />
+        <div class="artist-information-text">
+            {% for address in addresses %}
+                {{ address['info']|replace({ "%basepath%" : app.request.basepath })|replace({ "\n" : ", " })|raw }}<br />
             {% endfor %}
         </div>
     </div>
