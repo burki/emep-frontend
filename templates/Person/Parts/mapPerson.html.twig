@@ -11,8 +11,6 @@
         <div id="map" class="col-sm-12" style="width: 100%; min-height: 320px;"></div>
 
         <script>
-
-
             function adjustMapSize() {
                 /*
                 $('#map').height(function(index, height) {
@@ -28,11 +26,13 @@
             var birthAndDeath =  L.featureGroup([
                 {% if birthPlace.geo is not empty %}
                     L.marker([ {{ birthPlace.geo }} ], { icon: violetIcon })
+                        .bindTooltip({{ birthPlace['name']|json_encode|raw }}, { className: 'my-tooltip' })
                         .bindPopup('<strong>Birth Place:</strong> {% if birthPlace['tgn'] is not empty %}<a href="{{ path('place-by-tgn', { 'tgn': birthPlace['tgn']}) }}">{% endif %}{{ birthPlace['name'] }}{% if deathPlace['tgn'] is not empty %}</a>{% endif %}', { className: 'my-tooltip'}),
                 {% endif %}
 
                 {% if deathPlace.geo is not empty %}
                 L.marker([ {{ deathPlace.geo }} ], { icon: blackIcon })
+                    .bindTooltip({{ deathPlace['name']|json_encode|raw }}, { className: 'my-tooltip' })
                     .bindPopup('<strong>Death Place:</strong> {% if deathPlace['tgn'] is not empty %}<a href="{{ path('place-by-tgn', { 'tgn': deathPlace['tgn']}) }}">{% endif %}{{ deathPlace['name'] }}{% if deathPlace['tgn'] is not empty %}</a>{% endif %}', { className: 'my-tooltip'})
                 {% endif %}
             ]);
@@ -41,13 +41,15 @@
             // layer with exhibitions of artist
             var actions = L.featureGroup([
                 {% for exhibition in person.exhibitions %}
-                {% set exhPlace = exhibition.location.geo %}
-                {% if exhPlace is empty %}
-                    {% set exhPlace = exhibition.location.place.geo %}
-                {% endif %}
+                    {% set exhGeo = exhibition.location.geo %}
+                    {% if exhGeo is empty %}
+                        {% set exhGeo = exhibition.location.place.geo %}
+                    {% endif %}
 
-                {% if exhPlace is not empty %}
-                        L.marker([{{ exhPlace }}], { icon: orangeIcon }).bindPopup('<strong>Exhibition:</strong> <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">{{ exhibition.title }}</a>'),
+                    {% if exhGeo is not empty %}
+                        L.marker([{{ exhGeo }}], { icon: orangeIcon })
+                        {% if exhibition.location.place is not empty %}.bindTooltip({{ exhibition.location.place.name|json_encode|raw }}, { className: 'my-tooltip' }){% endif %}
+                        .bindPopup('<strong>Exhibition:</strong> <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">{{ exhibition.title }}</a>'),
                     {% endif %}
                 {% endfor %}
             ]);
@@ -95,14 +97,11 @@
                 "Birth and Death places": birthAndDeath
             };
 
-
-
             L.control.layers(birthAndDeathOverlay, overlayExhibitionsOverlay).addTo(map);
-
         </script>
 
         <script>
-            var baseUrlMarkerImg = "/data/vendor/leaflet-color-markers/img/";
+            var baseUrlMarkerImg = "{{ app.request.basepath }}/vendor/leaflet-color-markers/img/";
             var violetIcon = new L.Icon({
                 iconUrl: baseUrlMarkerImg + 'marker-icon-2x-violet.png',
                 shadowUrl: baseUrlMarkerImg + 'marker-shadow.png',
