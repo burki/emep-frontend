@@ -243,8 +243,11 @@ extends CrudController
         $sortPersonFirst = 'person' == $sort || $exhibition->isSortedByPerson();
 
         usort($results, function ($a, $b) use ($sortPersonFirst) {
-            $sortPartsA = [ $a->catalogueSection . ' ' . $a->catalogueId, $a->getPerson()->getFullname() ];
-            $sortPartsB = [ $b->catalogueSection . ' ' . $b->catalogueId, $b->getPerson()->getFullname() ];
+            $personA = $a->getPerson();
+            $personB = $b->getPerson();
+
+            $sortPartsA = [ $a->catalogueSection . ' ' . $a->catalogueId, $personA != null ? $a->getPerson()->getFullname() : '' ];
+            $sortPartsB = [ $b->catalogueSection . ' ' . $b->catalogueId, $personB != null ? $b->getPerson()->getFullname() : '' ];
             if ($sortPersonFirst) {
                 $sortPartsA = array_reverse($sortPartsA);
                 $sortPartsB = array_reverse($sortPartsB);
@@ -452,11 +455,15 @@ extends CrudController
 
 
         foreach ($artists as $artist) {
+            if (is_null($artist)) {
+                continue;
+            }
+            
             $currNationality = $artist->getNationality();
-            if ($artist->getGender() === 'M' ){
+            if ($artist->getGender() === 'M') {
                 $genderSplit['M'] = $genderSplit['M'] + 1;
             }
-            else if ($artist->getGender() === 'F'){
+            else if ($artist->getGender() === 'F') {
                 $genderSplit['F'] = $genderSplit['F'] + 1;
             }
 
