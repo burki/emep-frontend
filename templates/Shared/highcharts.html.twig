@@ -1,11 +1,58 @@
 {% macro head() %}
     <script src="{{ app.request.basepath }}/vendor/highcharts/highcharts.js"></script>
     <script src="{{ app.request.basepath }}/vendor/highcharts/modules/exporting.js"></script>
-    {# currently disable view data table
     <script src="{{ app.request.basepath }}/vendor/highcharts/modules/export-data.js"></script>
-    #}
     <script src="{{ app.request.basepath }}/vendor/highcharts/modules/heatmap.js"></script>
     <script src="{{ app.request.basepath }}/js/highchart_custom_theme.js"></script>
+{% endmacro %}
+
+{% macro disableDataExport() %}
+    {# see https://www.highcharts.com/forum/viewtopic.php?t=34774 #}
+                buttons: {
+                    contextButton: {
+                        menuItems: [
+                            {
+                                textKey: 'printChart',
+                                onclick: function () {
+                                    this.print();
+                                }
+                            },
+                            {
+                                separator: true
+                            },
+                            {
+                                textKey: 'downloadPNG',
+                                onclick: function () {
+                                    this.exportChart();
+                                }
+                            },
+                            {
+                                textKey: 'downloadJPEG',
+                                onclick: function () {
+                                    this.exportChart({
+                                        type: 'image/jpeg'
+                                    });
+                                }
+                            },
+                            {
+                                textKey: 'downloadPDF',
+                                onclick: function () {
+                                    this.exportChart({
+                                        type: 'application/pdf'
+                                    });
+                                }
+                            },
+                            {
+                                textKey: 'downloadSVG',
+                                onclick: function () {
+                                    this.exportChart({
+                                        type: 'image/svg+xml'
+                                    });
+                                }
+                            }
+                        ]
+                    }
+                }
 {% endmacro %}
 
 {% macro clickableChartHeader() %}

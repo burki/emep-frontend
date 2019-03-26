@@ -1,3 +1,5 @@
+    {% import 'Shared/highcharts.html.twig' as highcharts %}
+
     <h3 class="chart-header" data-collapse="container-exhibitions-year-bar"><span class="chartsymbol">+</span>Exhibitions by Year<span class="charttypeTitle">(Bar Chart)</span></h3>
     <div class="collapse" id="container-exhibitions-year-bar" style="width: 100%; height: 400px; margin: 0 auto;"></div>
 
@@ -10,7 +12,6 @@
     <script type="text/javascript">
         $('#container-exhibitions-year-bar').highcharts({
             chart: {
-                // renderTo: 'container',
                 zoomType: 'xy'
             },
             title: {
@@ -20,10 +21,13 @@
                 text: 'Average: {{ data_avg_yearly }} exhibitions per year'
             },
             xAxis: {
+                title: {
+                    enabled: false, // only for export-data.js
+                    text: 'Year'
+                },
                 categories: {{ categories_yearly|raw }},
                 labels: {
                     rotation: -45,
-                    step: 3, // this will show one label for every quarter
                     align: 'right'
                 }
             },
@@ -37,11 +41,11 @@
                 enabled: false
             },
             tooltip: {
-                // headerFormat: '{point.key}',
                 pointFormat: '{point.y} Exhibitions'
             },
             series: [
                 {
+                    name: 'Number of Exhibitions',
                     type: 'column',
                     data: {{ data_yearly|raw }}
                 }
@@ -50,7 +54,6 @@
 
         $('#container-exhibitions-bar').highcharts({
             chart: {
-                // renderTo: 'container',
                 zoomType: 'xy'
             },
             title: {
@@ -60,6 +63,10 @@
                 text: 'Average: {{ data_avg }} exhibitions per month'
             },
             xAxis: {
+                title: {
+                    enabled: false, // only for export-data.js
+                    text: 'Year-Month'
+                },
                 categories: {{ categories|raw }},
                 labels: {
                     rotation: -45,
@@ -82,6 +89,7 @@
             },
             series: [
                 {
+                    name: 'Number of Exhibitions',
                     type: 'column',
                     data: {{ data|raw }}
                 }
@@ -99,28 +107,35 @@
             },
 
             xAxis: {
+                title: {
+                    enabled: false, // only for export-data.js
+                    text: 'Month'
+                },
                 categories: ['Jan','Feb','Mar','Apr','May','Jun','Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             },
 
             yAxis: {
-                categories: {{ scatter_categories|raw }},
+                categories: {{ scatter_categories|raw }}
             },
 
             tooltip: {
-                    formatter: function() {
-                        // console.log(this);
-                        return '<b>'
-                            + this.point.count
-                            + ' exhibitions '
-                            + ' in '
-                            + this.x + ' ' + this.point.year
-                            + '</b>';
-                    }
-                },
+                formatter: function() {
+                    return '<b>'
+                        + this.point.count
+                        + ' exhibitions '
+                        + ' in '
+                        + this.x + ' ' + this.point.year
+                        + '</b>';
+                }
+            },
 
             series: [{
-                name: 'Exhibitions',
+                name: 'Year',
                 data: {{ scatter_data|raw }}
-            }]
+            }],
+
+            exporting: {
+                {{ highcharts.disableDataExport() }}
+            }
         });
     </script>

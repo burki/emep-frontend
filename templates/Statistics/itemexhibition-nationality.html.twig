@@ -30,11 +30,6 @@
         },
         plotOptions: {
             pie: {
-                /*
-                startAngle: -90,
-                endAngle: 90,
-                center: ['50%', '50%']
-                */
             },
             series: {
                 stacking: 'normal',
@@ -42,7 +37,7 @@
                 groupPadding: 0,
                 pointPadding: 0,
                 events: {
-                click: function (event) {
+                    click: function (event) {
                         var url = '{{ path('exhibition-stats-info', { 'id': exhibitionId }) }}?chart=container-countries';
                         url += '&series=' + encodeURIComponent(this.name);
                         url += '&point=' + encodeURIComponent(event.point.name);
@@ -54,7 +49,7 @@
             },
         },
         series: [{
-            name: 'Nationalities',
+            name: 'Number of Catalogue Entries',
             type: 'pie',
             innerSize: '50%',
             data: {{ data|raw }}

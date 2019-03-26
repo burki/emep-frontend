@@ -1,17 +1,8 @@
 <div role="tabpanel" class="tab-pane" id="statistics">
-
-    <script src="{{ app.request.basepath }}/vendor/highcharts/highcharts.js"></script>
-    <script src="{{ app.request.basepath }}/vendor/highcharts/modules/exporting.js"></script>
-    <script src="{{ app.request.basepath }}/vendor/highcharts/modules/heatmap.js"></script>
-    <script src="{{ app.request.basepath }}/js/hinclude.js"></script>
-    <script src="{{ app.request.basepath }}/js/highchart_custom_theme.js"></script>
-
-
-
+    {% import 'Shared/highcharts.html.twig' as highcharts %}
+    {{ highcharts.head() }}
 
     <script type="text/javascript">
-        var chart;
-
         $(document).ready(function() {
             $('#container-artist-nationalites').highcharts({
                 chart: {
@@ -31,16 +22,13 @@
                     }
                 },
                 series: [{
-                    name: 'City: ',
+                    name: 'Number of Artists',
                     type: 'pie',
                     innerSize: '50%',
                     data: {{ dataNumberOfArtistsPerCountry[0]|raw }}
                 }]
             });
-        });
 
-
-        $(document).ready(function() {
             $('#container-types-work').highcharts({
                 chart: {
                     plotBackgroundColor: null,
@@ -52,23 +40,20 @@
                     text: ' '
                 },
                 tooltip: {
-                    pointFormat: '{point.y} works (<b>{point.percentage:.1f}%</b>)'
+                    pointFormat: '{point.y} catalogue entries (<b>{point.percentage:.1f}%</b>)'
                 },
                 plotOptions: {
                     pie: {
                     }
                 },
                 series: [{
-                    name: 'City: ',
+                    name: 'Number of Catalogue Entries',
                     type: 'pie',
                     innerSize: '50%',
                     data: {{ detailDataNumberItemTypes[0]|raw }}
                 }]
             });
-        });
 
-
-        $(document).ready(function() {
             $('#container-artist-by-gender').highcharts({
                 chart: {
                     plotBackgroundColor: null,
@@ -87,7 +72,7 @@
                     }
                 },
                 series: [{
-                    name: 'Country: ',
+                    name: 'Number of Artists',
                     type: 'pie',
                     innerSize: '50%',
                     data: {{ genderStatsStatisticsFormat|json_encode|raw }}
@@ -96,10 +81,10 @@
         });
     </script>
 
-    <h3 class="chart-header" data-collapse="container-artist-nationalites"><span class="chartsymbol">+</span>Nationalities of Artists<span class="charttypeTitle">(Bar Chart)</span></h3>
+    <h3 class="chart-header" data-collapse="container-artist-nationalites"><span class="chartsymbol">+</span>Artists’ Nationality<span class="charttypeTitle">(Bar Chart)</span></h3>
     <div class="collapse" id="container-artist-nationalites" style="width: 100%; height: 400px; margin: 0 auto;"></div>
 
-    <h3 class="chart-header" data-collapse="container-artist-by-gender"><span class="chartsymbol">+</span>Gender of Artists<span class="charttypeTitle">(Pie Chart)</span></h3>
+    <h3 class="chart-header" data-collapse="container-artist-by-gender"><span class="chartsymbol">+</span>Gender Distribution<span class="charttypeTitle">(Pie Chart)</span></h3>
     <div class="collapse" id="container-artist-by-gender" style="width: 100%; height: 400px; margin: 0 auto;"></div>
 
     <h3 class="chart-header" data-collapse="container-types-work"><span class="chartsymbol">+</span>Types of Exhibited Works<span class="charttypeTitle">(Bar Chart)</span></h3>

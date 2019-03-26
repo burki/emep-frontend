@@ -22,15 +22,13 @@
                     }
                 },
                 series: [{
-                    name: 'Country: ',
+                    name: 'Number of Exhibitions',
                     type: 'pie',
                     innerSize: '50%',
                     data: {{ nationalitiesStats|json_encode|raw }}
                 }]
             });
-        });
 
-        $(document).ready(function() {
             $('#container-exhibitions-bar').highcharts({
                 chart: {
                     // renderTo: 'container',
@@ -43,6 +41,10 @@
                     text: '{{ numberExhibitions }} exhibitions in total'
                 },
                 xAxis: {
+                    title: {
+                        enabled: false, // only for export-data.js
+                        text: 'Year'
+                    },
                     categories: {{ exhibitionsGroupedByYearStats[0]|json_encode|raw  }},
                     labels: {
                         rotation: -45,
@@ -63,16 +65,13 @@
                     // headerFormat: '{point.key}',
                     pointFormat: '{point.y} Exhibitions'
                 },
-                series: [
-                    {
-                        type: 'column',
-                        data: {{ exhibitionsGroupedByYearStats[1]|json_encode|raw }}
-                    }
-                ]
+                series: [{
+                    name: 'Number of Exhibitions',
+                    type: 'column',
+                    data: {{ exhibitionsGroupedByYearStats[1]|json_encode|raw }}
+                }]
             });
-        });
 
-        $(document).ready(function() {
             $('#container-artists-state').highcharts({
                 chart: {
                     plotBackgroundColor: null,
@@ -91,16 +90,13 @@
                     }
                 },
                 series: [{
-                    name: 'Country: ',
+                    name: 'Number of Artists',
                     type: 'pie',
                     innerSize: '50%',
                     data: [ { name: 'Born in City', y: {{ numberBorn }} }, { name: 'Died in City', y: {{ numberDied }} }, {name: 'Exhibited in City', y: {{ numberOfArtistsExhibitioned[0]['numArtistsExhibited'] }} } ]
                 }]
             });
-        });
 
-
-        $(document).ready(function() {
             $('#container-exhibitions-by-type').highcharts({
                 chart: {
                     plotBackgroundColor: null,
@@ -119,15 +115,13 @@
                     }
                 },
                 series: [{
-                    name: 'Country: ',
+                    name: 'Number of Exhibitions',
                     type: 'pie',
                     innerSize: '50%',
                     data: {{ exhibitionTypeStatisticsFormat|json_encode|raw }}
                 }]
             });
-        });
 
-        $(document).ready(function() {
             $('#container-artist-by-gender').highcharts({
                 chart: {
                     plotBackgroundColor: null,
@@ -146,7 +140,7 @@
                     }
                 },
                 series: [{
-                    name: 'Country: ',
+                    name: 'Number of Artists',
                     type: 'pie',
                     innerSize: '50%',
                     data: {{ genderStatsStatisticsFormat|json_encode|raw }}
@@ -161,10 +155,10 @@
     <h3 class="chart-header" data-collapse="container-exhibitions-bar"><span class="chartsymbol">+</span>Exhibitions by Year<span class="charttypeTitle">(Bar Chart)</span></h3>
     <div class="collapse" id="container-exhibitions-bar" style="width: 100%; height: 400px; margin: 0 auto;"></div>
 
-    <h3 class="chart-header" data-collapse="container-nationalities-pie"><span class="chartsymbol">+</span>Nationality of Artists<span class="charttypeTitle">(Pie Chart)</span></h3>
+    <h3 class="chart-header" data-collapse="container-nationalities-pie"><span class="chartsymbol">+</span>Artists’ Nationality<span class="charttypeTitle">(Pie Chart)</span></h3>
     <div class="collapse" id="container-nationalities-pie" style="width: 100%; height: 400px; margin: 0 auto;"></div>
 
-    <h3 class="chart-header" data-collapse="container-artist-by-gender"><span class="chartsymbol">+</span>Gender of Artists<span class="charttypeTitle">(Pie Chart)</span></h3>
+    <h3 class="chart-header" data-collapse="container-artist-by-gender"><span class="chartsymbol">+</span>Gender Distribution<span class="charttypeTitle">(Pie Chart)</span></h3>
     <div class="collapse" id="container-artist-by-gender" style="width: 100%; height: 400px; margin: 0 auto;"></div>
 
     <h3 class="chart-header" data-collapse="container-artists-state"><span class="chartsymbol">+</span>Number of Born, Died, Exhibited<span class="charttypeTitle">(Bar Chart)</span></h3>

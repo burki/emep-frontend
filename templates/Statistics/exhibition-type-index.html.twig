@@ -17,11 +17,6 @@
             },
             plotOptions: {
                 pie: {
-                    /*
-                    startAngle: -90,
-                    endAngle: 90,
-                    center: ['50%', '50%']
-                    */
                 },
                 series: {
                     stacking: 'normal',
@@ -41,7 +36,7 @@
                 },
             },
             series: [{
-                name: 'Type of Work',
+                name: 'Number of Catalogue Entries',
                 type: 'pie',
                 innerSize: '50%',
                 data: {{ data|raw }}
@@ -50,5 +45,5 @@
     });
 </script>
 
-<h3 class="chart-header" data-collapse="{{ container|raw }}"><span class="chartsymbol">+</span>Types of Work as in Catalogue<span class="charttypeTitle">(Pie Chart)</span></h3>
+<h3 class="chart-header" data-collapse="{{ container|raw }}"><span class="chartsymbol">+</span>Types of Work<span class="charttypeTitle">(Pie Chart)</span></h3>
 <div class="collapse"  id="{{ container|raw }}" style="width: 100%;  height: 400px; margin: 0 auto"></div>

@@ -29,12 +29,6 @@
         },
         plotOptions: {
             pie: {
-
-                /*
-                startAngle: -90,
-                endAngle: 90,
-                center: ['50%', '50%']
-                */
             },
             series: {
                 stacking: 'normal',
@@ -42,19 +36,19 @@
                 groupPadding: 0,
                 pointPadding: 0,
                 events: {
-                click: function (event) {
-                    var url = '{{ path('exhibition-stats-info', { 'id': exhibitionId }) }}?chart=container-works';
-                    url += '&series=' + encodeURIComponent(this.name);
-                    url += '&point=' + encodeURIComponent(event.point.name);
+                    click: function (event) {
+                        var url = '{{ path('exhibition-stats-info', { 'id': exhibitionId }) }}?chart=container-works';
+                        url += '&series=' + encodeURIComponent(this.name);
+                        url += '&point=' + encodeURIComponent(event.point.name);
 
-                    $('#detailModal').modal('show');
-                    $('#detailModal').find(".modal-body").load(url);
+                        $('#detailModal').modal('show');
+                        $('#detailModal').find(".modal-body").load(url);
                     }
                 }
             },
         },
         series: [{
-            name: 'Type of Work',
+            name: 'Number of Catalogue Entries',
             type: 'pie',
             innerSize: '50%',
             data: {{ data|raw }}
@@ -63,6 +57,5 @@
 {% endblock %}
 
 {% block body %}
-    <!--<h1>Age of Artists at Exhibition</h1>-->
     <div id="container" style="width: 100%; height: 400px; margin: 0 auto"></div>
 {% endblock %}

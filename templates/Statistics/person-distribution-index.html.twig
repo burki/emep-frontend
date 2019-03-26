@@ -14,7 +14,6 @@
             xAxis: {
                 min: 1,
                 type: 'logarithmic',
-                // max: 150,
                 minorTickInterval: 0.1,
                 title: {
                     text: 'Number of Exhibitions'
@@ -37,6 +36,7 @@
             },
             series: [
                 {
+                    name: 'Number of Artists',
                     type: 'column',
                     data: {{ data|raw }},
                     pointStart: {{ min }},

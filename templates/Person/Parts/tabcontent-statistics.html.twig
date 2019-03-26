@@ -3,12 +3,9 @@
     {{ highcharts.head() }}
 
     <script type="text/javascript">
-        var chart;
-
         $(document).ready(function() {
             $('#container-exhibitions-bar').highcharts({
                 chart: {
-                    // renderTo: 'container',
                     zoomType: 'xy'
                 },
                 title: {
@@ -18,10 +15,13 @@
                     text: 'Average: {{ dataNumberOfExhibitionsPerYear[4] }} exhibitions per year, {{ dataNumberOfExhibitionsPerYear[2] }} exhibitions in total'
                 },
                 xAxis: {
+                    title: {
+                        enabled: false, // only for export-data.js
+                        text: 'Year'
+                    },
                     categories: {{ dataNumberOfExhibitionsPerYear[0]|raw  }},
                     labels: {
                         rotation: -45,
-                        step: 3, // this will show one label for every quarter
                         align: 'right'
                     }
                 },
@@ -38,17 +38,13 @@
                     // headerFormat: '{point.key}',
                     pointFormat: '{point.y} Exhibitions'
                 },
-
-                series: [
-                    {
-                        type: 'column',
-                        data: {{ dataNumberOfExhibitionsPerYear[1]|raw }}
-                    }
-                ]
+                series: [{
+                    name: 'Number of Exhibitions',
+                    type: 'column',
+                    data: {{ dataNumberOfExhibitionsPerYear[1]|raw }}
+                }]
             });
-        });
 
-        $(document).ready(function() {
             $('#container-exhibitions-city-bar').highcharts({
                 chart: {
                     plotBackgroundColor: null,
@@ -67,16 +63,13 @@
                     }
                 },
                 series: [{
-                    name: 'City: ',
+                    name: 'Number of Exhibitions',
                     type: 'pie',
                     innerSize: '50%',
                     data: {{ dataNumberOfExhibitionsPerCity[0]|raw }}
                 }]
             });
-        });
 
-
-        $(document).ready(function() {
             $('#container-exhibitions-country-pie').highcharts({
                 chart: {
                     plotBackgroundColor: null,
@@ -95,32 +88,31 @@
                     }
                 },
                 series: [{
-                    name: 'Country: ',
+                    name: 'Number of Exhibitions',
                     type: 'pie',
                     innerSize: '50%',
                     data: {{ dataNumberOfExhibitionsPerCountry[0]|raw }}
                 }]
             });
-        });
 
-
-        $(document).ready(function() {
             $('#container-exhibitions-works-year').highcharts({
                 chart: {
-                    // renderTo: 'container',
                     zoomType: 'xy'
                 },
                 title: {
                     text: ''
                 },
                 subtitle: {
-                    text: 'Average: {{ dataNumberOfWorksPerYear[4] }} works per year, {{ dataNumberOfWorksPerYear[2] }} works in total'
+                    text: 'Average: {{ dataNumberOfWorksPerYear[4] }} catalogue entries per year, {{ dataNumberOfWorksPerYear[2] }} catalogue entries in total'
                 },
                 xAxis: {
+                    title: {
+                        enabled: false, // only for export-data.js
+                        text: 'Year'
+                    },
                     categories: {{ dataNumberOfWorksPerYear[0]|raw  }},
                     labels: {
                         rotation: -45,
-                        step: 3, // this will show one label for every quarter
                         align: 'right'
                     }
                 },
@@ -134,79 +126,69 @@
                     enabled: false
                 },
                 tooltip: {
-                    // headerFormat: '{point.key}',
-                    pointFormat: '{point.y} works'
+                    pointFormat: '{point.y} catalogue entries'
                 },
-                series: [
-                    {
-                        type: 'column',
-                        data: {{ dataNumberOfWorksPerYear[1]|raw }}
+                series: [{
+                    name: 'Number of Catalogue Entries',
+                    type: 'column',
+                    data: {{ dataNumberOfWorksPerYear[1]|raw }}
+                }]
+            });
+
+            $('#container-works-by-type').highcharts({
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie'
+                },
+                title: {
+                    text: ' '
+                },
+                tooltip: {
+                    pointFormat: '{point.y} catalogue entries (<b>{point.percentage:.1f}%</b>)'
+                },
+                plotOptions: {
+                    pie: {
                     }
-                ]
+                },
+                series: [{
+                    name: 'Catalogue Entries',
+                    type: 'pie',
+                    innerSize: '50%',
+                    data: {{ dataNumberOfWorksPerType[0]|raw }}
+                }]
             });
 
-            $(document).ready(function() {
-                $('#container-works-by-type').highcharts({
-                    chart: {
-                        plotBackgroundColor: null,
-                        plotBorderWidth: null,
-                        plotShadow: false,
-                        type: 'pie'
-                    },
-                    title: {
-                        text: ' '
-                    },
-                    tooltip: {
-                        pointFormat: '{point.y} works (<b>{point.percentage:.1f}%</b>)'
-                    },
-                    plotOptions: {
-                        pie: {
-                        }
-                    },
-                    series: [{
-                        name: 'Country: ',
-                        type: 'pie',
-                        innerSize: '50%',
-                        data: {{ dataNumberOfWorksPerType[0]|raw }}
-                    }]
-                });
-            });
-
-
-            $(document).ready(function() {
-                $('#container-exhibitions-by-org').highcharts({
-                    chart: {
-                        plotBackgroundColor: null,
-                        plotBorderWidth: null,
-                        plotShadow: false,
-                        type: 'pie'
-                    },
-                    title: {
-                        text: ' '
-                    },
-                    tooltip: {
-                        pointFormat: '{point.y} org. bodies (<b>{point.percentage:.1f}%</b>)'
-                    },
-                    plotOptions: {
-                        pie: {
-                        }
-                    },
-                    series: [{
-                        name: 'Country: ',
-                        type: 'pie',
-                        innerSize: '50%',
-                        data: {{ dataNumberOfExhibitionsPerOrgBody[0]|raw }}
-                    }]
-                });
+            $('#container-exhibitions-by-org').highcharts({
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie'
+                },
+                title: {
+                    text: ' '
+                },
+                tooltip: {
+                    pointFormat: '{point.y} org. bodies (<b>{point.percentage:.1f}%</b>)'
+                },
+                plotOptions: {
+                    pie: {
+                    }
+                },
+                series: [{
+                    name: 'Number of Exhibitions',
+                    type: 'pie',
+                    innerSize: '50%',
+                    data: {{ dataNumberOfExhibitionsPerOrgBody[0]|raw }}
+                }]
             });
         });
-
     </script>
-
 
     <h3 class="chart-header" data-collapse="container-exhibitions-bar"><span class="chartsymbol">+</span>Exhibitions by Year<span class="charttypeTitle">(Bar Chart)</span></h3>
     <div class="collapse" id="container-exhibitions-bar" style="width: 100%; height: 400px; margin: 0 auto;"></div>
-
 
     <h3 class="chart-header" data-collapse="container-exhibitions-city-bar"><span class="chartsymbol">+</span>Exhibitions by City<span class="charttypeTitle">(Pie Chart)</span></h3>
     <div class="collapse" id="container-exhibitions-city-bar" style="width: 100%; height: 400px; margin: 0 auto;"></div>
@@ -217,10 +199,10 @@
     <h3 class="chart-header" data-collapse="container-exhibitions-by-org"><span class="chartsymbol">+</span>Exhibitions by Type of Organizing Body<span class="charttypeTitle">(Pie Chart)</span></h3>
     <div class="collapse" id="container-exhibitions-by-org" style="width: 100%; height: 400px; margin: 0 auto;"></div>
 
-    <h3 class="chart-header" data-collapse="container-works-by-type"><span class="chartsymbol">+</span>Works by Type<span class="charttypeTitle">(Pie Chart)</span></h3>
+    <h3 class="chart-header" data-collapse="container-works-by-type"><span class="chartsymbol">+</span>Catalogue Entries by Type<span class="charttypeTitle">(Pie Chart)</span></h3>
     <div class="collapse" id="container-works-by-type" style="width: 100%; height: 400px; margin: 0 auto;"></div>
 
-    <h3 class="chart-header" data-collapse="container-exhibitions-works-year"><span class="chartsymbol">+</span>Works by Year<span class="charttypeTitle">(Bar Chart)</span></h3>
+    <h3 class="chart-header" data-collapse="container-exhibitions-works-year"><span class="chartsymbol">+</span>Catalogue Entries by Year<span class="charttypeTitle">(Bar Chart)</span></h3>
     <div class="collapse" id="container-exhibitions-works-year" style="width: 100%; height: 400px; margin: 0 auto;"></div>
 
     <script src="{{ app.request.basepath }}/js/collapseChart.js"></script>

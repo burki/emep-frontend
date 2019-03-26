@@ -1,7 +1,7 @@
 <div class="artist-information-container-quickstat">
     <div class="artist-information-label">Quickstats</div>
     <div class="statcontainer">
-        <div class="artist-information-text-stats"># of Exhibition: {{ numberExhibitions }}</div>
+        <div class="artist-information-text-stats"># of Exhibitions: {{ numberExhibitions }}</div>
         <div class="artist-information-text-stats">Exhibition Types:
             {%  for key,value in exhibitionTypeStats  %}
                 {{ key }}: {{ (value/numberExhibitions * 100) | number_format }} %

@@ -1,9 +1,9 @@
+    {% import 'Shared/highcharts.html.twig' as highcharts %}
     <script type="text/javascript">
     $(document).ready(function() {
-        new Highcharts.Chart({
+        $('#container-wikipedia').highcharts({
             chart: {
                 type: 'scatter',
-                renderTo: 'container-wikipedia',
                 zoomType: 'xy'
             },
             title: {
@@ -66,18 +66,20 @@
                 turboThreshold: 5000,
                 data: {{ data|raw }},
                 color: 'rgba(128, 133, 233, .7)'
-            }]
+            }],
+            exporting: {
+                {{ highcharts.disableDataExport() }}
+            }
         });
     });
     </script>
 
 
-    <h3 class="chart-header" data-collapse="container-wikipedia"><span class="chartsymbol">+</span>Wikipedia Statistics<span class="charttypeTitle">(Scatter Plot)</span></h3>
+    <h3 class="chart-header" data-collapse="container-wikipedia"><span class="chartsymbol">+</span>Popularity according to Wikipedia<span class="charttypeTitle">(Scatter Plot)</span></h3>
     <div class="collapse" id="container-wikipedia" style="width: 100%; height: 400px; margin: auto;"></div>
     {#
     <h2>Artists</h2>
     {% for person in persons %}
         {{ person.name }}: {{ person.y }} page views ({{ person.num }} exh.)<br />
     {% endfor %}
-
     #}

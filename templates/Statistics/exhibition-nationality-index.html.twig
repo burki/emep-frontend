@@ -1,61 +1,64 @@
+    {% import 'Shared/highcharts.html.twig' as highcharts %}
+
     <h3 class="chart-header" data-collapse="container-country"><span class="chartsymbol">+</span>Artists’ Nationality by Exhibiting Country<span class="charttypeTitle">(Matrix in %)</span></h3>
     <div class="collapse" id="container-country" style="width: 100%; margin: 0;"></div>
     <script type="text/javascript">
-        //$(document).ready(function() {
-            Highcharts.chart('container-country', {
-                chart: {
-                    type: 'heatmap',
-                    marginTop: 40,
-                    marginBottom: 80,
-                    plotBorderWidth: 1
-                },
+        Highcharts.chart('container-country', {
+            chart: {
+                type: 'heatmap',
+                marginTop: 40,
+                marginBottom: 80,
+                plotBorderWidth: 1
+            },
+            title: {
+                text: " "
+            },
+            xAxis: {
+                categories: {{ nationalities|json_encode|raw }},
                 title: {
-                    text: " "
-                },
-                xAxis: {
-                    categories: {{ nationalities|json_encode|raw }},
-                    title: {
-                        enabled: true,
-                        text: 'Artists’ Nationality'
-                    }
-                },
-                yAxis: {
-                    categories: {{ countries|json_encode|raw }},
-                    title: {
-                        enabled: true,
-                        text: 'Exhibiting Country'
-                    }
-                },
-                colorAxis: {
-                    min: 0,
-                    minColor: '#FFFFFF',
-                    maxColor: Highcharts.getOptions().colors[0]
-                },
-                legend: {
-                    align: 'right',
-                    layout: 'vertical',
-                    margin: 0,
-                    verticalAlign: 'top',
-                    y: 25,
-                    symbolHeight: 280
-                },
-                tooltip: {
-                    formatter: function () {
-                        return  'In exhibitions in ' + this.series.yAxis.categories[this.point.y]
-                            + ', ' + this.point.total + ' catalogue entries (' + Highcharts.numberFormat(this.point.value, 1) + '%)  '
-                            + ' are from ' + this.series.xAxis.categories[this.point.x] + '-artists';
-                    }
-                },
-                series: [{
-                    name: 'Sales per employee',
-                    borderWidth: 1,
-                    data: {{ data|json_encode|raw }},
-                    dataLabels: {
-                        format: '{point.value:.1f}',
-                        enabled: true,
-                        color: '#000000'
-                    }
-                }]
-            });
-        // });
+                    enabled: true,
+                    text: 'Artists’ Nationality'
+                }
+            },
+            yAxis: {
+                categories: {{ countries|json_encode|raw }},
+                title: {
+                    enabled: true,
+                    text: 'Exhibiting Country'
+                }
+            },
+            colorAxis: {
+                min: 0,
+                minColor: '#FFFFFF',
+                maxColor: Highcharts.getOptions().colors[0]
+            },
+            legend: {
+                align: 'right',
+                layout: 'vertical',
+                margin: 0,
+                verticalAlign: 'top',
+                y: 25,
+                symbolHeight: 280
+            },
+            tooltip: {
+                formatter: function () {
+                    return  'In exhibitions in ' + this.series.yAxis.categories[this.point.y]
+                        + ', ' + this.point.total + ' catalogue entries (' + Highcharts.numberFormat(this.point.value, 1) + '%)  '
+                        + ' are from ' + this.series.xAxis.categories[this.point.x] + '-artists';
+                }
+            },
+            series: [{
+                name: 'Nationality of Artists',
+                borderWidth: 1,
+                data: {{ data|json_encode|raw }},
+                dataLabels: {
+                    format: '{point.value:.1f}',
+                    enabled: true,
+                    color: '#000000'
+                }
+            }],
+            exporting: {
+                {{ highcharts.disableDataExport() }}
+            }
+        });
     </script>

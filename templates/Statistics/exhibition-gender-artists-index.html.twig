@@ -21,12 +21,6 @@
         },
         plotOptions: {
             pie: {
-
-                /*
-                startAngle: -90,
-                endAngle: 90,
-                center: ['50%', '50%']
-                */
             },
             series: {
                 stacking: 'normal',
@@ -46,11 +40,10 @@
             },
         },
         series: [{
-            name: 'Type of Work',
+            name: 'Number of Artists',
             type: 'pie',
             innerSize: '50%',
             data: {{ data|raw }}
         }]
     });
 </script>
-

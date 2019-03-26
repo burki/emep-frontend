@@ -19,7 +19,6 @@
                 chart: {
                     renderTo: '{{ container|raw }}',
                     defaultSeriesType: 'column'
-                    /*, margin: [ 50, 50, 100, 80] */
                 },
                 title: {
                     text: ' '
@@ -30,6 +29,10 @@
                 },
                 */
                 xAxis: {
+                    title: {
+                        enabled: false, // only for export-data.js
+                        text: 'Age'
+                    },
                     categories: {{ categories|raw }},
                     labels: {
                         rotation: 0,
@@ -53,7 +56,7 @@
                         // console.log(this);
                         return '<b>'
                             + Highcharts.numberFormat(this.y, 0)
-                            + ('Age (Deceased Artist)' == this.series.name ? ' deceased' : ' living')
+                            + ('Exhibition Appearances (Deceased)' == this.series.name ? ' deceased' : ' living')
                             + ' persons exhibiting at age '
                             + this.point.name
                             + '</b>';
@@ -80,7 +83,7 @@
                 series: [
                     {
                         yAxis: 0,
-                        name: 'Age (Living Artist)',
+                        name: 'Exhibition Appearances (Living)',
                         data: {{ age_at_exhibition_living|raw }},
                         stack: 'age',
                         borderColor: '#3683BA',
@@ -90,7 +93,7 @@
                     },
                     {
                         yAxis: 0,
-                        name: 'Age (Deceased Artist)',
+                        name: 'Exhibition Appearances (Deceased)',
                         data: {{ age_at_exhibition_deceased|raw }},
                         stack: 'age'
                     }
