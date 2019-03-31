@@ -221,17 +221,17 @@ extends CrudController
         return $jaccardIndex;
     }
 
-    protected function findCatalogueEntries($person)
+    protected function findCatalogueEntries($person, $groupByExhibition = false)
     {
-        // get the catalogue entries by exhibition
+        // get the catalogue entries
         $qb = $this->getDoctrine()
                 ->getManager()
                 ->createQueryBuilder();
 
         $qb->select([
                 'IE',
-                'IE.id as catId',
-                'E.id',
+                'IE.id AS catId',
+                'E.id AS exhibitionId',
                 'E.title'
             ])
             ->from('AppBundle:ItemExhibition', 'IE')
@@ -248,20 +248,21 @@ extends CrudController
 
         $results = $qb->getQuery()
             ->setParameter('person', $person)
-            ->getResult();
+            ->getResult()
+            ;
 
-        $entriesByExhibition = [];
+        $entries = [];
 
         foreach ($results as $result) {
             $catalogueEntry = $result[0];
-            $catId = $result['catId'];
-            if (!array_key_exists($catId, $entriesByExhibition)) {
-                $entriesByExhibition[$catId] = [];
+            $key = $result[$groupByExhibition ? 'exhibitionId' : 'catId'];
+            if (!array_key_exists($key, $entries)) {
+                $entries[$key] = [];
             }
-            $entriesByExhibition[$catId][] = $catalogueEntry;
+            $entries[$key][] = $catalogueEntry;
         }
 
-        return $entriesByExhibition;
+        return $entries;
     }
 
     /**
@@ -354,24 +355,22 @@ extends CrudController
 
         $person = $persons[0];
 
-        $result = $person->getExhibitions(-1);
-
         $csvResult = [];
 
-        $catalogueEntries = $this->findCatalogueEntries($person);
+        $catalogueEntries = $this->findCatalogueEntries($person, true);
 
-        foreach ($result as $key => $value) {
-            $exhibition = $value;
+        $result = $person->getExhibitions(-1);
 
-            $innerArray = [];
-
-            array_push($innerArray,
-                       $exhibition->getStartdate(), $exhibition->getEnddate(), $exhibition->getDisplaydate(),
-                       $exhibition->getTitle(),
-                       $exhibition->getLocation()->getPlaceLabel(),
-                       $exhibition->getLocation()->getName(),
-                       $exhibition->getOrganizerType(),
-                       count($catalogueEntries[$exhibition->getId()]));
+        foreach ($result as $exhibition) {
+            $innerArray = [
+                $exhibition->getStartdate(), $exhibition->getEnddate(), $exhibition->getDisplaydate(),
+                $exhibition->getTitle(),
+                $exhibition->getLocation()->getPlaceLabel(),
+                $exhibition->getLocation()->getName(),
+                $exhibition->getOrganizerType(),
+                array_key_exists($exhibition->getId(), $catalogueEntries)
+                 ? count($catalogueEntries[$exhibition->getId()]) : 0
+            ];
 
             array_push($csvResult, $innerArray);
         }
@@ -441,7 +440,7 @@ extends CrudController
             'pageTitle' => $person->getFullname(true), // TODO: lifespan in brackets
             'person' => $person,
             'showWorks' => !empty($_SESSION['user']),
-            'catalogueEntries' => $this->findCatalogueEntries($person),
+            'catalogueEntries' => $catEntries,
             'similar' => $this->findSimilar($person),
             'currentPageId' => $id,
             'countryArray' => $this->buildCountries(),

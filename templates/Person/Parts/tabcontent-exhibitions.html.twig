@@ -1,7 +1,7 @@
 {% block exhibitions %}
     {% import 'Shared/datatables.html.twig' as datatables %}
     {{ datatables.head() }}
-    
+
     <script src="{{ app.request.basepath }}/js/datatables-mobile.min.js"></script>
 
     <script>
@@ -25,10 +25,6 @@
         })
     </script>
 
-
-
-
-
     <div role="tabpanel" class="tab-pane active" id="home">
 
         <table id="exhibitions" class="table table-striped table-bordered dataTable listviewcontainer">
@@ -44,7 +40,7 @@
             </tr>
             </thead>
             <tbody>
-            {% for exhibition in person.exhibitions %}
+            {% for exhibition in person.getExhibitions(-1) %}
 
                 {% set exhPlace = exhibition.location.place %}
 
