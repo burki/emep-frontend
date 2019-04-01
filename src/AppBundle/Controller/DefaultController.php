@@ -52,8 +52,30 @@ extends Controller
             $counts[$entity] = $listPagination->getTotal();
         }
 
+        $client = BlogController::instantiateWpApiClient();
+
+        if (false !== $client) {
+            try {
+                $posts = $client->posts()->get(null, [
+                    'per_page' => 3,
+                ]);
+
+                foreach ($posts as $key=>$post){
+                    $mediaId = $post['featured_media'];
+                    $media = $client->media()->get($mediaId);
+                    $mediaUrl = $media['media_details']['sizes']['onepress-small'];
+                    $posts[$key]['media_url'] = $mediaUrl;
+                }
+            }
+            catch (\Exception $e) {
+                // var_dump($e);
+                ; // ignore
+            }
+        }
+
         return $this->render('Default/index.html.twig', [
             'counts' => $counts,
+            'posts' => $posts
         ]);
     }
 

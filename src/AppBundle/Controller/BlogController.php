@@ -13,7 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 class BlogController
 extends Controller
 {
-    protected function instantiateWpApiClient()
+    public function instantiateWpApiClient()
     {
         /* check if we have settings for wp-rest */
         $url = $this->container->hasParameter('app.wp-rest.url')
