@@ -36,7 +36,7 @@
             {% for post in posts %}
                 {#{ dump(post) }#}
                 <a href="{{ path('blog', { 'slug': post['slug'] }) }}" class="blog-post-single-container">
-                    <div class="blog-image" style="background-image: url('{{ post['media_url']|raw }}')"></div>
+                    <div class="blog-image" style="background-image: url('{{ post['media_url']['source_url'] }}')"></div>
                     <div class="blog-text-container">
                         <div class="blog-categories">{{ date(post['date'])|date('d.m.Y')}}</div>
                         <h3 class="blog-header">{{ post['title']['rendered']|raw }}</h3>

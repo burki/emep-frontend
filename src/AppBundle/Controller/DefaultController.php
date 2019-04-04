@@ -16,6 +16,25 @@ use AppBundle\Utils\SearchListPagination;
 class DefaultController
 extends Controller
 {
+    protected function instantiateWpApiClient()
+    {
+        /* check if we have settings for wp-rest */
+        $url = $this->container->hasParameter('app.wp-rest.url')
+            ? $this->getParameter('app.wp-rest.url') : null;
+
+        if (empty($url)) {
+            return false;
+        }
+
+        $client = new \Vnn\WpApiClient\WpClient(
+            new \Vnn\WpApiClient\Http\GuzzleAdapter(new \GuzzleHttp\Client()),
+                $url);
+        $client->setCredentials(new \Vnn\WpApiClient\Auth\WpBasicAuth($this->getParameter('app.wp-rest.user'),
+                                                                      $this->getParameter('app.wp-rest.password')));
+
+        return $client;
+    }
+
     /**
      * @Route("/", name="home")
      */
@@ -52,7 +71,7 @@ extends Controller
             $counts[$entity] = $listPagination->getTotal();
         }
 
-        $client = BlogController::instantiateWpApiClient();
+        $client = $this->instantiateWpApiClient();
 
         if (false !== $client) {
             try {

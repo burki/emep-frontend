@@ -11,31 +11,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
  *
  */
 class BlogController
-extends Controller
+extends DefaultController
 {
-    public function instantiateWpApiClient()
-    {
-        /* check if we have settings for wp-rest */
-        $url = $this->container->hasParameter('app.wp-rest.url')
-            ? $this->getParameter('app.wp-rest.url') : null;
-
-        if (empty($url)) {
-            return false;
-        }
-
-        $client = new \Vnn\WpApiClient\WpClient(
-            new \Vnn\WpApiClient\Http\GuzzleAdapter(new \GuzzleHttp\Client()),
-                $url);
-        $client->setCredentials(new \Vnn\WpApiClient\Auth\WpBasicAuth($this->getParameter('app.wp-rest.user'),
-                                                                      $this->getParameter('app.wp-rest.password')));
-
-        return $client;
-    }
-
     /**
      * @Route("/blog", name="blog-index")
      */
-    public function indexAction(Request $request)
+    public function blogIndexAction(Request $request)
     {
 
         $posts = [];
@@ -66,7 +47,7 @@ extends Controller
     /**
      * @Route("/blog/{slug}", name="blog")
      */
-    public function detailAction(Request $request, $slug)
+    public function blogDetailAction(Request $request, $slug)
     {
         $client = $this->instantiateWpApiClient();
 
