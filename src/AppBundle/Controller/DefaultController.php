@@ -73,13 +73,14 @@ extends Controller
 
         $client = $this->instantiateWpApiClient();
 
+        $posts = [];
         if (false !== $client) {
             try {
                 $posts = $client->posts()->get(null, [
                     'per_page' => 3,
                 ]);
 
-                foreach ($posts as $key=>$post){
+                foreach ($posts as $key => $post){
                     $mediaId = $post['featured_media'];
                     $media = $client->media()->get($mediaId);
                     $mediaUrl = $media['media_details']['sizes']['onepress-small'];

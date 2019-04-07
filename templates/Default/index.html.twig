@@ -30,9 +30,9 @@
             <a href="{{ path('search-index') }}" class="button w-button">ADVANCED SEARCH</a>
         </div>
 
+        {% if posts is not empty %}
         <h1 class="heading-2">Latest Blog Posts</h1>
         <div class="blog-posts-container">
-
             {% for post in posts %}
                 {#{ dump(post) }#}
                 <a href="{{ path('blog', { 'slug': post['slug'] }) }}" class="blog-post-single-container">
@@ -44,7 +44,7 @@
                     </div>
                 </a>
             {% endfor %}
-
         </div>
+        {% endif %}
     </div>
 {% endblock %}
