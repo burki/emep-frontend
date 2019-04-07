@@ -26,7 +26,12 @@
                     type: 'pie',
                     innerSize: '50%',
                     data: {{ nationalitiesStats|json_encode|raw }}
-                }]
+                }],
+                exporting: {
+                    csv: {
+                        {{ highcharts.pieChartCategoryHeader('Nationality') }}
+                    }
+                }
             });
 
             $('#container-exhibitions-bar').highcharts({
@@ -108,7 +113,7 @@
                     text: ' '
                 },
                 tooltip: {
-                    pointFormat: '{point.y} artists (<b>{point.percentage:.1f}%</b>)'
+                    pointFormat: '{point.y} exhibitions (<b>{point.percentage:.1f}%</b>)'
                 },
                 plotOptions: {
                     pie: {
@@ -144,7 +149,12 @@
                     type: 'pie',
                     innerSize: '50%',
                     data: {{ genderStatsStatisticsFormat|json_encode|raw }}
-                }]
+                }],
+                exporting: {
+                    csv: {
+                        {{ highcharts.pieChartCategoryHeader('Gender') }}
+                    }
+                }
             });
         });
     </script>

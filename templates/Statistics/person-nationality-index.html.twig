@@ -1,3 +1,4 @@
+{% import 'Shared/highcharts.html.twig' as highcharts %}
     <script>
         $(document).ready(function() {
             $('#container-artists-nationality').highcharts({
@@ -22,7 +23,12 @@
                     type: 'pie',
                     innerSize: '50%',
                     data: {{ data|raw }}
-                }]
+                }],
+                exporting: {
+                    csv: {
+                        {{ highcharts.pieChartCategoryHeader('Nationality') }}
+                    }
+                }
             });
         });
     </script>

@@ -93,7 +93,7 @@ trait StatisticsBuilderTrait
         $maxNationality = 16;
         $xCategories = array_keys($nationalities);
         if (count($xCategories) > $maxNationality) {
-            $xCategories = array_merge(array_slice($xCategories, 0, $maxNationality - 1 ),
+            $xCategories = array_merge(array_slice($xCategories, 0, $maxNationality - 1),
                                        [ 'unknown', 'other' ]);
         }
 
@@ -335,7 +335,7 @@ trait StatisticsBuilderTrait
 
         foreach ($stats as $type => $count) {
             if (empty($type)) {
-                $type = 'unknown';
+                $type = '[not set]';
             }
 
             $percentage = 100.0 * $count / $total;
@@ -343,9 +343,11 @@ trait StatisticsBuilderTrait
                 'name' => $type,
                 'y' => (int)$count,
             ];
+
             if ($percentage < 5) {
                 $dataEntry['dataLabels'] = [ 'enabled' => false ];
             }
+
             $data[] = $dataEntry;
         }
 
@@ -485,6 +487,7 @@ trait StatisticsBuilderTrait
             if (empty($row['additional'])) {
                 continue;
             }
+
             $how_many = $row['count_exhibition'];
             $additional = json_decode($row['additional'], true);
             if (array_key_exists('wikistats', $additional)
@@ -520,7 +523,7 @@ trait StatisticsBuilderTrait
         $data = [];
         while ($row = $stmt->fetch()) {
             if (empty($row['type'])) {
-                $name = 'empty';
+                $name = '[not set]';
             }
             else if ('0_unknown' == $row['type']) {
                 $name = 'unknown';
@@ -546,7 +549,7 @@ trait StatisticsBuilderTrait
         $data = [];
         while ($row = $stmt->fetch()) {
             $data[] = [
-                'name' => empty($row['type']) ? 'empty' : $row['type'],
+                'name' => empty($row['type']) ? '[not set]' : $row['type'],
                 'y' => (int)$row['how_many'],
             ];
         }
@@ -561,7 +564,7 @@ trait StatisticsBuilderTrait
         $data = [];
         while ($row = $stmt->fetch()) {
             $data[] = [
-                'name' => empty($row['country_code']) ? 'empty' : $row['country_code'],
+                'name' => empty($row['country_code']) ? '[not set]' : $row['country_code'],
                 'y' => (int)$row['how_many'],
             ];
         }

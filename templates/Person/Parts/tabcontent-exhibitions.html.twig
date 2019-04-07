@@ -58,8 +58,8 @@
                             {{ exhibition.location.name }}
                         </a>
                     </td>
-                    <td>{% if catalogueEntries[exhibition.id] is defined %}
-                            {% set count = catalogueEntries[exhibition.id]|length %}
+                    <td>{% if catalogueEntriesByExhibition[exhibition.id] is defined %}
+                            {% set count = catalogueEntriesByExhibition[exhibition.id]|length %}
                             {% if count > 0 %}
                                 {% set divId = 'entries' ~ exhibition.id %}
                                 {{ count }}

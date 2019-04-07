@@ -67,7 +67,12 @@
                     type: 'pie',
                     innerSize: '50%',
                     data: {{ dataNumberOfExhibitionsPerCity[0]|raw }}
-                }]
+                }],
+                exporting: {
+                    csv: {
+                        {{ highcharts.pieChartCategoryHeader('City') }}
+                    }
+                }
             });
 
             $('#container-exhibitions-country-pie').highcharts({
@@ -92,7 +97,12 @@
                     type: 'pie',
                     innerSize: '50%',
                     data: {{ dataNumberOfExhibitionsPerCountry[0]|raw }}
-                }]
+                }],
+                exporting: {
+                    csv: {
+                        {{ highcharts.pieChartCategoryHeader('Country') }}
+                    }
+                }
             });
 
             $('#container-exhibitions-works-year').highcharts({
@@ -157,7 +167,12 @@
                     type: 'pie',
                     innerSize: '50%',
                     data: {{ dataNumberOfWorksPerType[0]|raw }}
-                }]
+                }],
+                exporting: {
+                    csv: {
+                        {{ highcharts.pieChartCategoryHeader('Type') }}
+                    }
+                }
             });
 
             $('#container-exhibitions-by-org').highcharts({
@@ -182,7 +197,12 @@
                     type: 'pie',
                     innerSize: '50%',
                     data: {{ dataNumberOfExhibitionsPerOrgBody[0]|raw }}
-                }]
+                }],
+                exporting: {
+                    csv: {
+                        {{ highcharts.pieChartCategoryHeader('Type') }}
+                    }
+                }
             });
         });
     </script>

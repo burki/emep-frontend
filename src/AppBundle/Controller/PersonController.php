@@ -441,6 +441,7 @@ extends CrudController
             'person' => $person,
             'showWorks' => !empty($_SESSION['user']),
             'catalogueEntries' => $catEntries,
+            'catalogueEntriesByExhibition' => $this->findCatalogueEntries($person, true),
             'similar' => $this->findSimilar($person),
             'currentPageId' => $id,
             'countryArray' => $this->buildCountries(),

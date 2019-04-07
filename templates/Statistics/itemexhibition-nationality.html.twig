@@ -13,6 +13,7 @@
 
 {# chart seperated so we can reuse it in per exhibition stats #}
 {% block chart %}
+    {% import 'Shared/highcharts.html.twig' as highcharts %}
     Highcharts.chart('{{ container|raw }}', {
         chart: {
             plotBackgroundColor: null,
@@ -43,7 +44,7 @@
                         url += '&point=' + encodeURIComponent(event.point.name);
 
                         $('#detailModal').modal('show');
-                        $('#detailModal').find(".modal-body").load(url);
+                        $('#detailModal').find('.modal-body').load(url);
                     }
                 }
             },
@@ -54,7 +55,11 @@
             innerSize: '50%',
             data: {{ data|raw }}
         }],
-
+        exporting: {
+            csv: {
+                {{ highcharts.pieChartCategoryHeader('Nationality') }}
+            }
+        }
     });
 {% endblock %}
 

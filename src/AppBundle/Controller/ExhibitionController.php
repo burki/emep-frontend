@@ -458,7 +458,7 @@ extends CrudController
             if (is_null($artist)) {
                 continue;
             }
-            
+
             $currNationality = $artist->getNationality();
             if ($artist->getGender() === 'M') {
                 $genderSplit['M'] = $genderSplit['M'] + 1;
@@ -664,8 +664,6 @@ extends CrudController
         ]);
 
         // genderStatsStatisticsFormat
-
-
         $artistsByGenderExhibitionStatistic = $this->assoc2NameYArray($this->artistsByGenderExhibitionStatistics($exhibition->getId()));
 
         $template = $this->get('twig')->loadTemplate('Statistics/exhibition-gender-stats.html.twig');
@@ -675,8 +673,7 @@ extends CrudController
             'exhibitionId' => $exhibition->getId(),
         ]);
 
-
-        // using the same template since same data structure
+        $template = $this->get('twig')->loadTemplate('Statistics/exhibition-nationality-stats.html.twig');
         $artistsByNationalityExhibiting = $this->artistsNationalityByExhibitionStatistics($exhibition->getId());
         $charts[] = $template->renderBlock('chart', [
             'container' => 'container-nationalities-pie',
@@ -684,16 +681,13 @@ extends CrudController
             'exhibitionId' => $exhibition->getId(),
         ]);
 
-
-
+        $template = $this->get('twig')->loadTemplate('Statistics/exhibition-city-stats.html.twig');
         $artistExhibitingInCityStats = $this->assoc2NameYArray($this->artistExhibitingInCityStats($this->getArtistsExhibitingAtExhibitionByExhId($exhibition->getId())));
         $charts[] = $template->renderBlock('chart', [
             'container' => 'container-exhibiting-pie',
             'data' => $artistExhibitingInCityStats,
             'exhibitionId' => $exhibition->getId(),
         ]);
-
-
 
         // display the static content
         return $this->render('Exhibition/stats.html.twig', [

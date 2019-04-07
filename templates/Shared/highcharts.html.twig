@@ -6,6 +6,17 @@
     <script src="{{ app.request.basepath }}/js/highchart_custom_theme.js"></script>
 {% endmacro %}
 
+{% macro pieChartCategoryHeader(label) %}
+        // To change the column header use: columnHeaderFormatter function: jsfiddle.net/BlackLabel/9hotb6wu
+        columnHeaderFormatter: function(item, key) {
+            if (item instanceof Highcharts.Series) {
+                return item.name;
+            }
+
+            return '{{ label }}';
+        }
+{% endmacro %}
+
 {% macro disableDataExport() %}
     {# see https://www.highcharts.com/forum/viewtopic.php?t=34774 #}
                 buttons: {
