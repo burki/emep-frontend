@@ -112,6 +112,13 @@ implements \JsonSerializable, JsonLdSerializable
     private $nameTransliterated;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="name_alternate", type="text", nullable=true)
+     */
+    private $nameAlternate;
+
+    /**
      * @var string URL of the item.
      *
      * @Assert\Url
@@ -293,7 +300,6 @@ implements \JsonSerializable, JsonLdSerializable
 
         return $this;
     }
-
 
     /**
      * Sets description.

@@ -253,6 +253,8 @@ extends SearchListBuilder
             'SQL_CALC_FOUND_ROWS ' . $this->alias . '.id',
             $this->alias . '.id AS location_id',
             $this->alias . '.name AS location',
+            $this->alias . '.name_alternate AS location_alternate',
+            $this->alias . '.name_translit AS location_translit',
             $this->alias . '.place AS place',
             $this->alias . '.place_tgn AS place_tgn',
             'P' . $this->alias . '.country_code AS country_code',
