@@ -241,9 +241,16 @@ class ItemExhibition
         return $this->price;
     }
 
+    /**
+     * Returns true / false or null (unknown)
+     */
     public function isForsale()
     {
-        return !is_null($this->forsale) && 'Y' === $this->forsale;
+        if (is_null($this->forsale)) {
+            return null;
+        }
+
+        return 'Y' === $this->forsale;
     }
 
     public function getType()

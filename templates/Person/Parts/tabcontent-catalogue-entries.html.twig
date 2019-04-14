@@ -182,7 +182,7 @@
                     </td>
                     <td>{{ catalogueEntry.displaylocation }}</td>
                     <td>{{ catalogueEntry.owner ? catalogueEntry.owner : '?' }}</td>
-                    <td>{{ catalogueEntry.forsale ? 'Y' : ( catalogueEntry.forsale == null ? '?' : 'N') }}</td>
+                    <td>{{ catalogueEntry.forsale ? 'Y' : ( catalogueEntry.forsale is same as (false) ? 'N' : '?') }}</td>
                     <td>{{ catalogueEntry.price }}</td>
                 </tr>
             {% endfor %}
