@@ -219,6 +219,9 @@ extends SearchListBuilder
                 'deathplace' => [
                     'label' => 'Place of Death',
                 ],
+                'gender' => [
+                    'label' => 'Gender',
+                ],
                 'nationality' => [
                     'label' => '(Primary) Nationality',
                 ],
