@@ -203,7 +203,6 @@ extends CrudController
         ]);
     }
 
-
     public function getVenuesList($tgn)
     {
         $qb = $this->getDoctrine()
@@ -227,11 +226,10 @@ extends CrudController
             ->groupBy('L.id')
             ;
 
-
         $venues = $qb->getQuery()->getResult();
 
         foreach ($venues as $key => $venue){
-            $numberOfArtists = $this->getNumberOfArtistsByVenueID($venue['id']);
+            $numberOfArtists = $this->getNumberOfArtistsByVenueId($venue['id']);
             $totalNumberOfNationalities = $this->getNumberOfNationalitiesByVenueId($venue['id']);
             $exhibitionsByType = $this->getTypesAndNumberOfExhibitionsByVenueId($venue['id']);
             $totalNumberOfWorks = $this->getTotalNumberOfWorksByVenueId($venue['id']);
@@ -292,7 +290,7 @@ extends CrudController
         return count($items);
     }
 
-    public function getNumberOfArtistsByVenueID($id)
+    public function getNumberOfArtistsByVenueId($id)
     {
         $qb = $this->getDoctrine()
             ->getManager()
@@ -516,8 +514,8 @@ extends CrudController
         return $allArtists;
     }
 
-
-    public function getNumberOfNationalities( $tgn ){
+    public function getNumberOfNationalities($tgn)
+    {
 
         $qb = $this->getDoctrine()
             ->getManager()
@@ -564,7 +562,7 @@ extends CrudController
 
         $countriesOnly = array_column($allArtists, 'nationality');
 
-        $countriesOnly = array_replace($countriesOnly, array_fill_keys(array_keys($countriesOnly, null), '')); // remove null values if existing
+        $countriesOnly = array_replace($countriesOnly, array_fill_keys(array_keys($countriesOnly, null), '[unknown]')); // remove null values if existing
 
         $countriesStats = array_count_values($countriesOnly);
 
@@ -631,7 +629,8 @@ extends CrudController
         return $genderStats;
     }
 
-    public function getNumberArtistsExhibitioned( $tgn ){
+    public function getNumberArtistsExhibitioned($tgn)
+    {
         $qb = $this->getDoctrine()
             ->getManager()
             ->createQueryBuilder();

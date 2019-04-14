@@ -98,7 +98,11 @@
                     name: 'Number of Artists',
                     type: 'pie',
                     innerSize: '50%',
-                    data: [ { name: 'Born in City', y: {{ numberBorn }} }, { name: 'Died in City', y: {{ numberDied }} }, {name: 'Exhibited in City', y: {{ numberOfArtistsExhibitioned[0]['numArtistsExhibited'] }} } ]
+                    data: [
+                        { name: 'Born in City', y: {{ numberBorn }} },
+                        { name: 'Died in City', y: {{ numberDied }} },
+                        { name: 'Exhibited in City', y: {{ numberOfArtistsExhibitioned[0]['numArtistsExhibited'] }} }
+                    ]
                 }]
             });
 
@@ -124,7 +128,12 @@
                     type: 'pie',
                     innerSize: '50%',
                     data: {{ exhibitionTypeStatisticsFormat|json_encode|raw }}
-                }]
+                }],
+                exporting: {
+                    csv: {
+                        {{ highcharts.pieChartCategoryHeader('Type') }}
+                    }
+                }
             });
 
             $('#container-artist-by-gender').highcharts({
