@@ -26,26 +26,10 @@
             text: '{{ total }} catalogue entries'
         },
         tooltip: {
-            pointFormat: '<b>{point.percentage:.1f}%</b> ({point.y} cat. entries)'
+            pointFormat: '{point.y} cat. entries (<b>{point.percentage:.1f}%</b>)'
         },
         plotOptions: {
             pie: {
-            },
-            series: {
-                stacking: 'normal',
-                borderWidth: 1,
-                groupPadding: 0,
-                pointPadding: 0,
-                events: {
-                    click: function (event) {
-                        var url = '{{ path('exhibition-stats-info', { 'id': exhibitionId }) }}?chart=container-works';
-                        url += '&series=' + encodeURIComponent(this.name);
-                        url += '&point=' + encodeURIComponent(event.point.name);
-
-                        $('#detailModal').modal('show');
-                        $('#detailModal').find(".modal-body").load(url);
-                    }
-                }
             },
         },
         series: [{

@@ -14,6 +14,7 @@
 {# chart seperated so we can reuse it in per exhibition stats #}
 {% block chart %}
     {% import 'Shared/highcharts.html.twig' as highcharts %}
+
     Highcharts.chart('{{ container|raw }}', {
         chart: {
             plotBackgroundColor: null,
@@ -27,7 +28,7 @@
             text: '{{ totalArtists }} artists / {{ totalItemExhibition }} catalogue entries'
         },
         tooltip: {
-            pointFormat: '<b>{point.percentage:.1f}%</b> ({point.itemExhibition} cat. entries by {point.artists} artists)'
+            pointFormat: '{point.itemExhibition} cat. entries by {point.artists} artists (<b>{point.percentage:.1f}%</b>)'
         },
         plotOptions: {
             pie: {
@@ -47,7 +48,7 @@
                         $('#detailModal').find('.modal-body').load(url);
                     }
                 }
-            },
+            }
         },
         series: [{
             name: 'Number of Catalogue Entries',

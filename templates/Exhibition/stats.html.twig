@@ -22,8 +22,10 @@
     <h3 class="chart-header" data-collapse="container-nationality"><span class="chartsymbol">+</span>Catalogue Entries by Nationality<span class="charttypeTitle">(Pie Chart)</span></h3>
     <div class="collapse" id="container-nationality" style="width: 60%; height: auto; margin: 0;"></div>
 
+    {% if app.request.attributes.get('_route') != 'exhibition-stats-partial' %}
     {% import 'Shared/highcharts.html.twig' as highcharts %}
     {{ highcharts.head() }}
+    {% endif %}
     <script src="{{ app.request.basepath }}/js/collapseChart.js"></script>
 
 

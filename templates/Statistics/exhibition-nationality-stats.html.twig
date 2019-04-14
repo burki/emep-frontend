@@ -14,12 +14,11 @@
 {% block chart %}
     {% import 'Shared/highcharts.html.twig' as highcharts %}
 
-    $('#{{ container|raw }}').highcharts({
+    Highcharts.chart('{{ container|raw }}', {
         chart: {
             plotBackgroundColor: null,
-            plotBorderWidth: null,
-            plotShadow: false,
-            type: 'pie'
+            plotBorderWidth: 0,
+            plotShadow: false
         },
         title: {
             text: ' '
@@ -29,7 +28,7 @@
         },
         plotOptions: {
             pie: {
-            }
+            },
         },
         series: [{
             name: 'Number of Artists',

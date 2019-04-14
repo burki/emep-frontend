@@ -15,7 +15,6 @@ use AppBundle\Utils\SearchListBuilder;
 use AppBundle\Utils\SearchListPagination;
 use AppBundle\Utils\SearchListAdapter;
 
-
 /**
  *
  */
@@ -586,6 +585,18 @@ extends CrudController
             return $this->redirectToRoute('exhibition-index');
         }
 
+        $charts = [];
+
+        // genderStatsStatisticsFormat
+        $artistsByGenderExhibitionStatistic = $this->assoc2NameYArray($this->artistsByGenderExhibitionStatistics($exhibition->getId()));
+
+        $template = $this->get('twig')->loadTemplate('Statistics/exhibition-gender-stats.html.twig');
+        $charts[] = $template->renderBlock('chart', [
+            'container' => 'container-artist-by-gender',
+            'data' => $artistsByGenderExhibitionStatistic,
+            'exhibitionId' => $exhibition->getId(),
+        ]);
+
         // display the artists by birth-year
         $stats = StatisticsController::exhibitionAgeDistribution($em = $this->getDoctrine()->getEntityManager(), $exhibition->getId());
         $ageCount = & $stats['age_count'];
@@ -604,43 +615,33 @@ extends CrudController
         }
 
         $template = $this->get('twig')->loadTemplate('Statistics/person-exhibition-age.html.twig');
-        $charts = [
-            $template->renderBlock('chart', [
+        $charts[] = $template->renderBlock('chart', [
                 'container' => 'container-age',
                 'categories' => json_encode($categories),
                 'age_at_exhibition_living' => json_encode(array_values($total['age_living'])),
                 'age_at_exhibition_deceased' => json_encode(array_values($total['age_deceased'])),
                 'exhibition_id' => $id,
-            ]),
-        ];
-
-        // nationalities of participating artists
-        $stats = StatisticsController::itemExhibitionNationalityDistribution($em, $exhibition->getId());
-        $data = [];
-        $key = 'ItemExhibition'; // alternative is 'Artists'
-        foreach ($stats['nationalities'] as $nationality => $counts) {
-            $count = $counts['count' . $key];
-            $percentage = 100.0 * $count / $stats['total' . $key];
-            $dataEntry = [
-                'name' => $nationality,
-                'y' => (int)$count,
-                'artists' => $counts['countArtists'],
-                'itemExhibition' => $counts['countItemExhibition'],
-            ];
-            if ($percentage < 5) {
-                $dataEntry['dataLabels'] = [ 'enabled' => false ];
-            }
-            $data[] = $dataEntry;
-        }
-        $template = $this->get('twig')->loadTemplate('Statistics/itemexhibition-nationality.html.twig');
-        $charts[] = $template->renderBlock('chart', [
-            'container' => 'container-nationality',
-            'totalArtists' => $stats['totalArtists'],
-            'totalItemExhibition' => $stats['totalItemExhibition'],
-            'data' => json_encode($data),
         ]);
 
-        // type of work
+        // artists' nationality
+        $artistsByNationalityExhibiting = $this->artistsNationalityByExhibitionStatistics($exhibition->getId());
+        $template = $this->get('twig')->loadTemplate('Statistics/exhibition-nationality-stats.html.twig');
+        $charts[] = $template->renderBlock('chart', [
+            'container' => 'container-nationalities-pie',
+            'data' => $artistsByNationalityExhibiting,
+            'exhibitionId' => $exhibition->getId(),
+        ]);
+
+        // exhibiting cities of artists
+        $template = $this->get('twig')->loadTemplate('Statistics/exhibition-city-stats.html.twig');
+        $artistExhibitingInCityStats = $this->assoc2NameYArray($this->artistExhibitingInCityStats($this->getArtistsExhibitingAtExhibitionByExhId($exhibition->getId())));
+        $charts[] = $template->renderBlock('chart', [
+            'container' => 'container-exhibiting-pie',
+            'data' => $artistExhibitingInCityStats,
+            'exhibitionId' => $exhibition->getId(),
+        ]);
+
+        // types of work
         $stats = StatisticsController::itemExhibitionTypeDistribution($em, $exhibition->getId());
         $data = [];
         foreach ($stats['types'] as $type => $count) {
@@ -663,30 +664,30 @@ extends CrudController
             'exhibitionId' => $exhibition->getId()
         ]);
 
-        // genderStatsStatisticsFormat
-        $artistsByGenderExhibitionStatistic = $this->assoc2NameYArray($this->artistsByGenderExhibitionStatistics($exhibition->getId()));
-
-        $template = $this->get('twig')->loadTemplate('Statistics/exhibition-gender-stats.html.twig');
+        // cat. entries by nationality of participating artists
+        $stats = StatisticsController::itemExhibitionNationalityDistribution($em, $exhibition->getId());
+        $data = [];
+        $key = 'ItemExhibition'; // alternative is 'Artists'
+        foreach ($stats['nationalities'] as $nationality => $counts) {
+            $count = $counts['count' . $key];
+            $percentage = 100.0 * $count / $stats['total' . $key];
+            $dataEntry = [
+                'name' => 'XX' == $nationality ? '[unknown]' : $nationality,
+                'y' => (int)$count,
+                'artists' => $counts['countArtists'],
+                'itemExhibition' => $counts['countItemExhibition'],
+            ];
+            if ($percentage < 5) {
+                $dataEntry['dataLabels'] = [ 'enabled' => false ];
+            }
+            $data[] = $dataEntry;
+        }
+        $template = $this->get('twig')->loadTemplate('Statistics/itemexhibition-nationality.html.twig');
         $charts[] = $template->renderBlock('chart', [
-            'container' => 'container-artist-by-gender',
-            'data' => $artistsByGenderExhibitionStatistic,
-            'exhibitionId' => $exhibition->getId(),
-        ]);
-
-        $template = $this->get('twig')->loadTemplate('Statistics/exhibition-nationality-stats.html.twig');
-        $artistsByNationalityExhibiting = $this->artistsNationalityByExhibitionStatistics($exhibition->getId());
-        $charts[] = $template->renderBlock('chart', [
-            'container' => 'container-nationalities-pie',
-            'data' => $artistsByNationalityExhibiting,
-            'exhibitionId' => $exhibition->getId(),
-        ]);
-
-        $template = $this->get('twig')->loadTemplate('Statistics/exhibition-city-stats.html.twig');
-        $artistExhibitingInCityStats = $this->assoc2NameYArray($this->artistExhibitingInCityStats($this->getArtistsExhibitingAtExhibitionByExhId($exhibition->getId())));
-        $charts[] = $template->renderBlock('chart', [
-            'container' => 'container-exhibiting-pie',
-            'data' => $artistExhibitingInCityStats,
-            'exhibitionId' => $exhibition->getId(),
+            'container' => 'container-nationality',
+            'totalArtists' => $stats['totalArtists'],
+            'totalItemExhibition' => $stats['totalItemExhibition'],
+            'data' => json_encode($data),
         ]);
 
         // display the static content
@@ -803,7 +804,6 @@ extends CrudController
      * ARTIST FUNCTIONS
      *
      */
-
     public function artistExhibitingInCityStats($artists)
     {
         $allExhibitedCities = [];
@@ -811,12 +811,10 @@ extends CrudController
 
         $allExhibitedCities[] = $this->getCitiesOfExhibitionsOfArtistByArtistArray($artists);
 
-
         $citiesExhibited = array_count_values(array_filter($allExhibitedCities[0]));
 
         return $citiesExhibited;
     }
-
 
     public function getCitiesOfExhibitionsOfArtistByArtistArray($artists)
     {
@@ -825,25 +823,22 @@ extends CrudController
             ->createQueryBuilder();
 
         $qb->select([
-            'P'
-        ])
+                'P'
+            ])
             ->from('AppBundle:Person', 'P')
             ->where('P.id IN (:artists) AND P.status <> -1')
-            ->setParameter('artists', $artists );
-
+            ->setParameter('artists', $artists )
+            ;
 
         $persons = $qb->getQuery()->getResult();
 
         $exhibitionCities = [];
 
-
         foreach ($persons as $person){
             $exhibitions = $person->getExhibitions();
 
-
             foreach ($exhibitions as $exhibition) {
-
-                if($exhibition){
+                if ($exhibition){
                     $currLocation = $exhibition->getLocation();
                     $currPlaceLabel = "";
 
@@ -857,12 +852,8 @@ extends CrudController
                         array_push($exhibitionCities,  (string)$currPlaceLabel);
                     }
                 }
-
-
             }
-
         }
-
 
         return $exhibitionCities;
     }
@@ -874,8 +865,8 @@ extends CrudController
             ->createQueryBuilder();
 
         $qb->select([
-            'P'
-        ])
+                'P'
+            ])
             ->from('AppBundle:Person', 'P')
             ->where('P.id = :artist AND P.status <> -1')
             ->setParameter('artist', $artistId );
@@ -904,9 +895,9 @@ extends CrudController
             ->createQueryBuilder();
 
         $qb->select([
-            'P.id AS id',
-            'P.nationality as nationality'
-        ])
+                'P.id AS id',
+                'P.nationality as nationality'
+            ])
             ->from('AppBundle:Exhibition', 'E')
             ->leftJoin('AppBundle:ItemExhibition', 'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
@@ -918,7 +909,7 @@ extends CrudController
             ->where('E.id = :exhId AND P.id IS NOT NULL' )
             ->groupBy('P.id')
             ->setParameter('exhId', $exhId)
-        ;
+            ;
 
         $allArtists = $qb->getQuery()->getResult();
 
@@ -944,8 +935,7 @@ extends CrudController
             ->leftJoin('AppBundle:Person', 'P',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'P.id = IE.person AND P.id IS NOT NULL')
-            // ->leftJoin('IE.person', 'P')
-            ->where('E.id = :exhId AND P.id IS NOT NULL' )
+            ->where('E.id = :exhId AND P.id IS NOT NULL AND P.status <> -1' )
             ->groupBy('P.id')
             ->setParameter('exhId', $exhId)
             ;
@@ -956,7 +946,7 @@ extends CrudController
 
         $countriesOnly = array_column($allArtists, 'nationality');
 
-        $countriesOnly = array_replace($countriesOnly, array_fill_keys(array_keys($countriesOnly, null), '')); // remove null values if existing
+        $countriesOnly = array_replace($countriesOnly, array_fill_keys(array_keys($countriesOnly, null), '[unknown]')); // remove null values if existing
 
         $countriesStats = array_count_values($countriesOnly);
 
@@ -991,7 +981,6 @@ extends CrudController
         $gendersOnly = array_column($allArtists, 'gender');
         $gendersOnly = array_replace($gendersOnly,array_fill_keys(array_keys($gendersOnly, null), '')); // remove null values if existing
         $genderStats = array_count_values($gendersOnly);
-
 
         // creating better named keys
         foreach ([ 'M' => 'male', 'F' => 'female', '' => '[unknown]' ] as $src => $target) {
