@@ -78,8 +78,7 @@ class Builder
         ]);
         $menu->setChildrenAttributes([ 'id' => 'menu-main', 'class' => 'nav-menu w-nav-menu', 'role' => 'navigation' ]);
 
-        $menu->addChild('Home', [ 'route' => 'home' ]); // maybe create a view for view data
-
+        // $menu->addChild('Home', [ 'route' => 'home' ]);
 
         $menu->addChild($toplevel = 'Browse', [ 'route' => 'exhibition-index' ]); // maybe create a view for view data
 
@@ -101,6 +100,7 @@ class Builder
 
         $menu->addChild('Advanced Search', [ 'route' => 'search-index' ]);
 
+        $menu->addChild('Blog', [ 'route' => 'blog-index' ]);
 
         $menu->addChild('Info', [ 'route' => 'project' ]); // maybe create a view for view data
 
@@ -119,8 +119,6 @@ class Builder
         $menu['Info']->addChild('Holding Institutions', [
             'route' => 'holder',
         ]);
-
-        $menu->addChild('Blog', [ 'route' => 'blog-index' ]);
 
         $menu->addChild('My Data', [ 'route' => 'my-data' ]);
 
