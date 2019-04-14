@@ -28,7 +28,7 @@
                     <th>Nationality</th>
                     <th>Birth Date</th>
                     <th>Death Date</th>
-                    <th>Total # of Cat. Entries</th>
+                    <th># of Cat. Entries</th>
                 </tr>
             </thead>
 
@@ -52,7 +52,7 @@
                     </td>
 
                     <td>
-                        {{ person.catalogueEntries|length }}
+                        {{ catalogueEntriesByPersonCount[person.id] }}
                     </td>
                 </tr>
             {% endfor %}

@@ -440,19 +440,23 @@ extends CrudController
         }
 
         $catalogueEntries = $this->findCatalogueEntries($exhibition, $request->get('sort'));
-
-        $artists = [];
-        $genderSplit = ['M' => 0, 'F' => 0]; // first male, second female
-        $artistsCountries = [];
-
+        $artists = []; $catalogueEntriesByPersonCount = [];
         foreach ($catalogueEntries as $entry) {
-            $currPerson = $entry->person;
-            array_push($artists, $currPerson);
+            $person = $entry->person;
+            if (!is_null($person)) {
+                $personId = $person->getId();
+                if (!array_key_exists($personId, $catalogueEntriesByPersonCount)) {
+                    $catalogueEntriesByPersonCount[$personId] = 0;
+                    array_push($artists, $person);
+                }
+                ++$catalogueEntriesByPersonCount[$personId];
+            }
         }
 
         $artists = array_unique($artists, SORT_REGULAR); // remove multiple artists
 
-
+        $artistsCountries = [];
+        $genderSplit = ['M' => 0, 'F' => 0]; // first male, second female
         foreach ($artists as $artist) {
             if (is_null($artist)) {
                 continue;
@@ -466,11 +470,10 @@ extends CrudController
                 $genderSplit['F'] = $genderSplit['F'] + 1;
             }
 
-            array_push($artistsCountries, $currNationality );
+            array_push($artistsCountries, $currNationality);
         }
 
         $artistsCountries = array_unique($artistsCountries); // remove multiple countries
-
 
         $artistsByGenderExhibitionStatistic = $this->assoc2NameYArray($this->artistsByGenderExhibitionStatistics($exhibition->getId()));
 
@@ -480,7 +483,6 @@ extends CrudController
 
         // $artistExhibitingInCityStats = $this->assoc2NameYArray($this->artistExhibitingInCityStats($artists));
 
-
         return $this->render('Exhibition/detail.html.twig', [
             'artists' => $artists,
             'pageTitle' => $exhibition->title, // TODO: dates in brackets
@@ -488,6 +490,7 @@ extends CrudController
             'catalogue' => $exhibition->findBibitem($this->getDoctrine()->getManager(), 1),
             'citeProc' => $citeProc,
             'catalogueEntries' => $catalogueEntries,
+            'catalogueEntriesByPersonCount' => $catalogueEntriesByPersonCount,
             'showWorks' => !empty($_SESSION['user']),
             'similar' => $this->findSimilar($exhibition),
             'currentPageId' => $id,
