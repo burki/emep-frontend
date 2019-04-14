@@ -39,6 +39,16 @@ extends DefaultController
             return $this->redirectToRoute('home');
         }
 
+
+        foreach ($posts as $key => $post){
+            $mediaId = $post['featured_media'];
+            if (!empty($mediaId)) {
+                $media = $client->media()->get($mediaId);
+                $mediaUrl = $media['media_details']['sizes']['onepress-small'];
+                $posts[$key]['media_url'] = $mediaUrl;
+            }
+        }
+
         return $this->render('Blog/index.html.twig', [
             'posts' => $posts,
         ]);
@@ -71,6 +81,19 @@ extends DefaultController
 
         if (is_null($post)) {
             return $this->redirectToRoute('blog-index');
+        }
+
+        if (!empty($post['featured_media'])) {
+            $media = $client->media()->get($post['featured_media']);
+            if (!empty($media['media_details']['sizes']['onepress-small'])) {
+                $post['media_url'] = $media['media_details']['sizes']['onepress-small'];
+            }
+
+            $post['content']['rendered'] = preg_replace_callback("#(<span class='easy-footnote'><a href='(.*?)'\s*title='(.*?)'>)#",
+                                                                 function ($matches) {
+                                                                    return sprintf('<a data-toggle="tooltip" href="#" title="%s">',
+                                                                                  $matches[3]);
+                                                                 }, $post['content']['rendered']);
         }
 
         return $this->render('Blog/detail.html.twig', [

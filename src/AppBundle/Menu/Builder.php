@@ -120,6 +120,8 @@ class Builder
             'route' => 'holder',
         ]);
 
+        $menu->addChild('Blog', [ 'route' => 'blog-index' ]);
+
         $menu->addChild('My Data', [ 'route' => 'my-data' ]);
 
         return $menu;

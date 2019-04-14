@@ -3,14 +3,23 @@
 {% import 'Shared/helper.html.twig' as helper %}
 
 {% block body %}
-    <h1 class="heading">Blog</h1>
+    <div class="w-container">
+        <h2 class="heading small">Blog</h2>
+    </div>
+    <div class="contentcontainer container-5 w-container">
+        <div class="entry-content">
 
     {% for post in posts %}
-        {#{ dump(post) }#}
-        <h3><a href="{{ path('blog', { 'slug': post['slug'] }) }}">{{ post['title']['rendered']|raw }}</a></h3>
+        <h3 style="font-size: 14px; clear: left">{{ date(post['date'])|date('d.m.Y')}}
+            <a href="{{ path('blog', { 'slug': post['slug'] }) }}">{{ post['title']['rendered']|raw }}</a>
+        </h3>
         <div>
-            {{ date(post['date'])|date('d.m.Y')}}
+            {% if post['media_url'] is not empty %}
+            <div class="blog-image-left" style="background-image: url('{{ post['media_url']['source_url'] }}')"></div>
+            {% endif %}
             {{ post['excerpt']['rendered']|raw }}
         </div>
     {% endfor %}
+        </div>
+    </div>
 {% endblock %}

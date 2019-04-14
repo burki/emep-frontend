@@ -2,14 +2,54 @@
 
 {% import 'Shared/helper.html.twig' as helper %}
 
-{% block body %}
-    <h1 class="heading"><a href="{{ path('blog-index') }}">Blog</a></h1>
+{% block head %}
+    <style>
+        .tooltip {
+            font-family: inherit;
+            border-radius: 0;
+        }
 
-    <h2>{{ post['title']['rendered']|raw }}</h2>
-    <div>
-        {{ date(post['date'])|date('d.m.Y')}}
+        .tooltip.top, .tooltip.bottom {
+            padding: 0px 0;
+        }
+
+        .tooltip-inner {
+            text-align: left;
+            max-width: 400px;
+            color: black;
+            background-color: white;
+            border-radius: 0;
+        }
+
+        .tooltip.in {
+            opacity: 1;
+            filter:alpha(opacity=100);
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="w-container">
+        <h2 class="heading small">
+            {{ post['title']['rendered']|raw }}<br />
+            <small>{{ date(post['date'])|date('d.m.Y')}}</small>
+
+        </h2>
     </div>
-    <div>
-    {{ post['content']['rendered']|raw }}
+    <div class="contentcontainer container-5 w-container">
+        <div class="entry-content">
+            {% if post['media_url'] is not empty %}
+                <img src="{{ post['media_url']['source_url'] }}" style="max-width: 100%; height: auto; margin-bottom: 1em;" />
+            {% endif %}
+            {{ post['content']['rendered']|raw }}
+            <script>
+                $(function () {
+                    $('[data-toggle="tooltip"]').tooltip({
+                        html: true,
+                        placement: 'auto bottom'
+                    });
+                });
+            </script>
+        </div>
     </div>
 {% endblock %}
