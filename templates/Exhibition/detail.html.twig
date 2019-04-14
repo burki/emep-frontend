@@ -52,12 +52,10 @@
             var moretext = "Show more >";
             var lesstext = "Show less";
 
-
             $('.more').each(function() {
                 var content = $(this).html();
 
                 if (content.length > showChar) {
-
                     var c = content.substr(0, showChar);
                     var h = content.substr(showChar, content.length - showChar);
 
@@ -67,13 +65,13 @@
                 }
             });
 
-            $(".morelink").click(function() {
-                if ($(this).hasClass("less")) {
-                    $(this).removeClass("less");
+            $('.morelink').click(function() {
+                if ($(this).hasClass('less')) {
+                    $(this).removeClass('less');
                     $(this).html(moretext);
                 }
                 else {
-                    $(this).addClass("less");
+                    $(this).addClass('less');
                     $(this).html(lesstext);
                 }
                 $(this).parent().prev().toggle();
@@ -88,17 +86,16 @@
     .morecontent span {
         display: none;
     }
+
     .morelink {
         display: block;
     }
     </style>
 
-
     {{ map.head() }}
 {% endblock %}
 
 {% block body %}
-
     <div class="contentcontainer nopadding w-container">
         <div class="lefthalf">
             <div class="subheader">exhibition</div>
@@ -122,10 +119,7 @@
 
 
     <div class="contentcontainer w-container">
-
-
         <div class="listviewrow">
-
             {# tabs headers #}
             {% embed "Exhibition/Parts/tabs-header.html.twig" %}
             {% endembed %}
@@ -150,57 +144,11 @@
                 {% embed "Exhibition/Parts/tabcontent-statistics.html.twig" %}
                 {% endembed %}
 
-                {#% embed "Exhibition/Parts/tabcontent-artists.html.twig" %}
-                {% endembed %#}
+                {% embed "Exhibition/Parts/tabcontent-artists.html.twig" %}
+                {% endembed %}
             </div><!-- .tab-content -->
         </div>
     </div>
-
-
-
-    {# currently not in use
-
-    <div class="row">
-        <div class="col-sm-8">
-
-
-
-
-            {% if showWorks and exhibition.items is not empty %}
-            <h3>Works</h3>
-                <div class="gallery" style="margin-bottom: 2em">
-                {% for item in exhibition.items %}
-                <a href="{{ path('item', { 'id' : item.id }) }}">
-                {% set preview = item.previewImg %}
-                {% if preview is not null %}
-                    {% set imgUrl = 'https://exhibitions05-15.kugb.univie.ac.at/uploads/' ~  preview.imgUrl('preview') %}
-                {% else %}
-                    {% set imgUrl = app.request.basepath ~ '/img/placeholder-image.jpg' %}
-                {% endif %}
-                <img src="{{ imgUrl }}" />
-                <div class="caption">
-                {% if item.creators is not empty %}
-                    {% for creator in item.creators %}{{ creator.fullname }}{% endfor %}
-                {% endif %}
-                {{ item.title }}
-
-                {% if item.displaydate is not empty %}
-                    {{ item.displaydate }}
-                {% else %}
-                    ({{ item.earliestdate|dateincomplete }}<!-- - {{  item.latestdate|dateincomplete  }}-->})
-                {% endif %}
-                </div>
-                </a>
-                {% endfor %}
-            </div>
-            {% endif %}
-
-
-        </div>
-    </div><!-- .row -->
-    #}
-
-
 
     <!-- Modal for shared Artists -->
     <div id="detailModal" class="modal fade" role="dialog">

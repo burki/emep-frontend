@@ -13,9 +13,9 @@
             {% if catalogueEntries is not empty %}
             <li role="presentation" class="{% if 'itemexhibition' == app.request.get('_route') %}active {% endif %}cat-entries-tab"><a href="#entries" aria-controls="entries" role="tab" data-toggle="tab">{{ 'Catalogue Entries'|trans }}</a></li>
 
-            {# {% if artists|length > 0 %}
+                {% if artists|length > 0 %}
             <li role="presentation" class="artists-tab"><a href="#artists" aria-controls="artists" role="tab" data-toggle="tab">{{ 'Artists'|trans }}</a></li>
-            {% endif %} #}
+                {% endif %}
 
                 {# co-appearances #}
                 {% if similar|length > 0 %}
@@ -24,12 +24,11 @@
 
                 {# statistics #}
             <li role="presentation"><a href="#stats" data-url="{{ path('exhibition-stats-partial', { id: exhibition.id }) }}" aria-controls="chronology" role="tab" data-toggle="tab">{{ 'Statistics'|trans }}</a></li>
-                {% endif %}
+            {% endif %}
         </ul>
     </div>
 
     <script>
-
         $('.download-csv-catalogue').on('click', function() {
             window.location.href =  "{{ path('exhibition-catalogue-csv', { 'id': exhibition.getId() }) }}";
         });
@@ -42,17 +41,23 @@
             window.location.href =  "{{ path('exhibition-similars-csv', { 'id': exhibition.getId() }) }}";
         });
 
-
-
         // make the right export button visible
         $( document ).ready(function() {
             //hide all export buttons
             hideAll();
 
             setInterval(function() {
-                if( $('.artists-tab').hasClass('active') ){ hideAll(); $('.download-csv-artists').show(); }
-                else if( $('.similars-tab').hasClass('active') ){ hideAll(); $('.download-csv-similars').show(); }
-                else if( $('.cat-entries-tab').hasClass('active') ){ hideAll(); $('.download-csv-catalogue').show(); }
+                if ($('.artists-tab').hasClass('active')){
+                    hideAll();
+                    $('.download-csv-artists').show();
+                }
+                else if ($('.similars-tab').hasClass('active')){
+                    hideAll();
+                    $('.download-csv-similars').show();
+                }
+                else if ($('.cat-entries-tab').hasClass('active')) {
+                    hideAll(); $('.download-csv-catalogue').show();
+                }
                 else {
                     hideAll();
                 }
@@ -64,7 +69,5 @@
             $('.download-csv-similars').hide();
             $('.download-csv-catalogue').hide();
         }
-
     </script>
-
 {% endblock %}

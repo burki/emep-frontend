@@ -7,8 +7,8 @@
             display: none;
         }
     </style>
-    <script>
 
+    <script>
         $( document ).ready(function() {
             $('#entrytable-list-view').DataTable({
                 'dom': 'ilrtp',
@@ -43,21 +43,15 @@
                     var rows = api.rows( {page:'current'} ).nodes();
                     var last= null;
 
-                    api.column(groupColumn, { page: 'current'} ).data().each( function ( group, i ) {
-                        if ( last !== group ) {
+                    api.column(groupColumn, { page: 'current'} ).data().each(function (group, i) {
+                        if (last !== group) {
                             var splitData =  $.parseHTML( group );
                             var url = $(splitData).data('url');
                             var splitGroup = $(splitData).text();
 
-
-                            /* $(rows).eq( i ).before(
-                                '<tr class="group groupHeader" data-name="' + splitGroup + '" ><td colspan="5"><span class="minus-collapse vorzeichen collapsed">-</span><span class="minus-collapse vorzeichen">+</span> '+group+'</td></tr>'
-                            ); */
-
                             $(rows).eq( i ).before(
                                 '<tr class="group groupHeader" data-artist="' + splitGroup + '" ><td colspan="5"><h3 class="artist-header"><span class="artistsymbol vorzeichen plussign">+</span><span class="artistsymbol vorzeichen collapsed minussign">-</span>'+group+'<a href="'+url+'" class="charttypeTitle">(view artist profile)</a></h3></td></tr>'
                             );
-
 
                             last = group;
                         }
@@ -65,25 +59,22 @@
                 }
             } );
 
-
             // expand all on load
-            $('.collapseRow').removeClass("collapsed");
+            $('.collapseRow').removeClass('collapsed');
             $('.plussign').addClass('collapsed');
             $('.minussign').removeClass('collapsed');
 
-
             $('.expand-all').on('click', function() {
-                $('.collapseRow').removeClass("collapsed");
+                $('.collapseRow').removeClass('collapsed');
                 $('.plussign').addClass('collapsed');
                 $('.minussign').removeClass('collapsed');
             });
 
             $('.collapse-all').on('click', function() {
-                $('.collapseRow').addClass("collapsed");
+                $('.collapseRow').addClass('collapsed');
                 $('.plussign').removeClass('collapsed');
                 $('.minussign').addClass('collapsed');
             });
-
 
             $('.catalogue-view-button').on('click', function() {
                 // hide
@@ -107,7 +98,6 @@
                 $('#entrytable').parent('.dataTables_wrapper').hide();
 
                 $('.left-buttons').hide();
-
             });
 
             // Order by the grouping
@@ -123,28 +113,17 @@
                 // console.log('this: ', $(this));
                 var splitGroup = $(this).find('.artist-name-row').data('artist-name');
 
-
                 // console.log('.collapseRow[data-rowname="' + splitGroup + '"]');
-
-
-
-                console.log($('.collapseRow[data-rowname="' + splitGroup + '"]') );
 
                 $('.collapseRow[data-rowname="' + splitGroup + '"]').toggleClass('collapsed');
                 $(this).find('.vorzeichen').toggleClass('collapsed');
 
-
                 // console.log($(this).data('name'));
             });
-
         });
     </script>
 
-
     <div role="tabpanel" class="tab-pane{% if 'itemexhibition' == app.request.get('_route') %} active{% endif %}" id="entries">
-        {#
-          {{ helper.exhibition_itemexhibition_sort_control(exhibition) }}
-        #}
         <div class="catalogue-entries-data-management">
             <span class="left-buttons"><button class="expand-all">expand all</button><buttton class="collapse-all">collapse all</buttton></span>
             <span class="right-buttons"><span class="cat-entries-button catalogue-view-button active">Catalogue View</span><span class="cat-entries-button list-view-button">List View</span></span>
