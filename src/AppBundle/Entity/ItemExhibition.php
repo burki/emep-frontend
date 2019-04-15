@@ -278,6 +278,7 @@ class ItemExhibition
             if ($img->getStatus() == -1) {
                 continue;
             }
+
             if ('preview00' == $img->getName()) {
                 return $img;
             }
