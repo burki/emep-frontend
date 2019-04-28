@@ -3,7 +3,9 @@
 namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Intl\Intl;
 
 /**
@@ -41,7 +43,7 @@ extends CrudController
     }
 
     /**
-     * @Route("/place", name="place-index")
+     * @Route("/place", name="place-inhabited")
      */
     public function indexAction(Request $request)
     {
@@ -96,6 +98,36 @@ extends CrudController
             'form' => $form->createView(),
         ]);
     }
+
+    protected function buildSaveSearchParams(Request $request, UrlGeneratorInterface $urlGenerator)
+    {
+        $route = str_replace('-save', '-index', $request->get('_route'));
+
+        $this->form = $this->createSearchForm($request, $urlGenerator);
+
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, false, 'Place');
+        $filters = $listBuilder->getQueryFilters(true);
+        if (empty($filters)) {
+            return [ $route, [] ];
+        }
+
+        $routeParams = [
+            'filter' => $filters,
+        ];
+
+        return [ $route, $routeParams ];
+    }
+
+    /**
+     * @Route("/place/save", name="place-save")
+     */
+    public function saveSearchAction(Request $request,
+                                     UrlGeneratorInterface $urlGenerator,
+                                     UserInterface $user)
+    {
+        return $this->handleSaveSearchAction($request, $urlGenerator, $user);
+    }
+
 
     /**
      * @Route("/place/{id}", requirements={"id" = "\d+"}, name="place")

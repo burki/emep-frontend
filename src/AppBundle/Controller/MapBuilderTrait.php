@@ -19,7 +19,7 @@ trait MapBuilderTrait
 
         return \AppBundle\Utils\Formatter::daterangeIncomplete($row['startdate'], $row['enddate']);
     }
-    
+
     function processMapEntries($stmt, $entity)
     {
         $maxDisplay = 'Person' == $entity ? 15 : 10;
@@ -117,7 +117,7 @@ trait MapBuilderTrait
             }
         }
         else {
-            // Exhibition / Venue
+            // Exhibition / Venue / Place
             $values = [];
             $values_country = [];
             $subTitle = 'Exhibition' == $entity ? 'Exhibitions' : 'Venues';
@@ -126,6 +126,7 @@ trait MapBuilderTrait
                 if (empty($row['location_geo']) && $row['longitude'] == 0 && $row['latitude'] == 0) {
                     continue;
                 }
+
                 $key = $row['latitude'] . ':' . $row['longitude'];
                 if (!empty($row['location_geo'])) {
                     list($latitude, $longitude) = preg_split('/\s*,\s*/', $row['location_geo'], 2);
@@ -172,12 +173,17 @@ trait MapBuilderTrait
                                 $this->buildDisplayDate($row)
                         );
                 }
+                else if ('Place' == $entity) {
+                    $values[$key]['count_exhibition'] = $row['count_exhibition'];
+                }
             }
 
             $values_final = [];
             foreach ($values as $key => $value) {
-                $count_entries = count($value['exhibitions']);
-                if ($count_entries <= $maxDisplay) {
+                $count_entries = array_key_exists('count_exhibition', $value)
+                    ? (int)$value['count_exhibition'] : count($value['exhibitions']);
+
+                if (count($value['exhibitions']) <= $maxDisplay) {
                     $entry_list = implode('<br />', $value['exhibitions']);
                 }
                 else {
@@ -188,7 +194,7 @@ trait MapBuilderTrait
                     $value['latitude'], $value['longitude'],
                     $value['place'],
                     $entry_list,
-                    count($value['exhibitions']),
+                    $count_entries,
                 ];
             }
         }

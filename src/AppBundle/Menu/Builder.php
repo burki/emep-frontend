@@ -98,6 +98,10 @@ class Builder
             'route' => 'organizer-index',
         ]);
 
+        $menu[$toplevel]->addChild('Exhibiting Cities', [
+            'route' => 'place-index',
+        ]);
+
         $menu->addChild('Advanced Search', [ 'route' => 'search-index' ]);
 
         $menu->addChild('Blog', [ 'route' => 'blog-index' ]);

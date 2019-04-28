@@ -792,15 +792,12 @@ extends CrudController
             'exhibitionId' => $exhibition->getId(),
         ]);
 
-
-
         // display the static content
         return $this->render('Exhibition/stats-detail.html.twig', [
             'chart' => implode("\n", $charts),
             'exhibitionId' => $exhibition->getId(),
         ]);
     }
-
 
     /**
      *
@@ -809,12 +806,9 @@ extends CrudController
      */
     public function artistExhibitingInCityStats($artists)
     {
-        $allExhibitedCities = [];
+        $allExhibitedCities = $this->getCitiesOfExhibitionsOfArtistByArtistArray($artists);
 
-
-        $allExhibitedCities[] = $this->getCitiesOfExhibitionsOfArtistByArtistArray($artists);
-
-        $citiesExhibited = array_count_values(array_filter($allExhibitedCities[0]));
+        $citiesExhibited = array_count_values(array_filter($allExhibitedCities));
 
         return $citiesExhibited;
     }
@@ -891,8 +885,8 @@ extends CrudController
         return $exhibitionCities;
     }
 
-
-    public function getArtistsExhibitingAtExhibitionByExhId($exhId){
+    public function getArtistsExhibitingAtExhibitionByExhId($exhId)
+    {
         $qb = $this->getDoctrine()
             ->getManager()
             ->createQueryBuilder();
@@ -956,8 +950,8 @@ extends CrudController
         return $this->assoc2NameYArray($countriesStats);
     }
 
-    protected function artistsByGenderExhibitionStatistics($exhId) {
-
+    protected function artistsByGenderExhibitionStatistics($exhId)
+    {
         $qb = $this->getDoctrine()
             ->getManager()
             ->createQueryBuilder();

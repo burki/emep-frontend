@@ -249,7 +249,7 @@
                     <div class="advanced-search-settings"><a href="{{ path('search-stats', app.request.query.all) }}"><span class="checkbox-filter-button">Show Statistics</a></span></a></div>
                 {% endif %}
 
-                {% if 'search-index' == app.request.get('_route') and 'ItemExhibition' != listBuilder.entity %}<div class="advanced-search-settings"><span class="checkbox-filter-button">apply checkbox filter</span></div>{% endif %}
+                {% if 'search-index' == app.request.get('_route') and 'ItemExhibition' != listBuilder.entity and 'Place' != listBuilder.entity %}<div class="advanced-search-settings"><span class="checkbox-filter-button">apply checkbox filter</span></div>{% endif %}
                 <div class="icontab download-csv"><a title="Download as Excel-File" href="{{ path('search-export', app.request.query.all) }}"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage"></a></div>
 
                 {% if app.user  %}

@@ -59,6 +59,11 @@
             {% embed "Search/Entity/person-filter.html.twig" %}
             {% endembed %}
         {% endif %}
+
+        {% if listBuilder.entity == 'Place' %}
+            {% embed "Search/Entity/place-filter.html.twig" %}
+            {% endembed %}
+        {% endif %}
     </div><!-- .w-container -->
 
     <div class="contentcontainer w-container">
@@ -76,7 +81,7 @@
             <div>
                 <div class="tabsymbols">
 
-                    {% if 'ItemExhibition' != listBuilder.entity and type=='index' %}
+                    {% if 'ItemExhibition' != listBuilder.entity and 'Place' != listBuilder.entity and type=='index' %}
                     <div class="advanced-search-settings"><span class="checkbox-filter-button">apply checkbox filter</span></div>{% endif %}
                     <div class="icontab download-csv"><a title="Download as Excel-File" href="{{ path('search-export', { 'entity' : listBuilder.entity }|merge(app.request.query.all)) }}"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage"></a></div>
 
@@ -100,7 +105,9 @@
                         <a href="{{ path(listBuilder.entity|lower ~ '-index', app.request.query.all) }}" aria-controls="entries">{{ pageTitle|trans }}</a>
                     </li>
                     <li role="presentation" class="{% if type == 'map' %}active {% endif %}entries-tab" ><a href="{{ path(listBuilder.entity|lower ~ '-index-map', app.request.query.all) }}" aria-controls="entries">{{ 'Map'|trans }}</a></li>
+                    {% if 'Place' != listBuilder.entity %}
                     <li role="presentation" class="{% if type == 'stats' %}active {% endif %}entries-tab" ><a href="{{ path(listBuilder.entity|lower ~ '-index-stats', app.request.query.all) }}" aria-controls="entries">{{ 'Statistics'|trans }}</a></li>
+                    {% endif %}
                 </ul>
             </div>
 

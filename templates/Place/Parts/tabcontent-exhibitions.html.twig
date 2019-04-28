@@ -14,8 +14,8 @@
                     { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "asc", "desc" ] },
                     // { "orderSequence": [ "asc", "desc" ] },
-                    // { "orderSequence": [ "desc", "asc" ] },
-                    { "orderSequence": [ "desc", "asc" ] },
+                    { "orderSequence": [ "asc", "desc" ] },
+                    { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "desc", "asc" ] }
                 ]
             });
@@ -31,8 +31,8 @@
                 <th>Title</th>
                 <!--
                 <th>City</th>
-                <th>Venue</th>
                 -->
+                <th>Venue</th>
                 <th>Type of Org. Body</th>
                 <th># of Cat. Entries</th>
             </tr>
@@ -52,12 +52,12 @@
                             {{ exhibition.location.placeLabel }}
                         </a>
                     </td>
+                    -->
                     <td class="normal">
                         <a href="{{ path('location', { 'id' : exhibition.location.id }) }}">
                             {{ exhibition.location.name }}
                         </a>
                     </td>
-                    -->
                     <td>{{ exhibition.organizerType }}</td>
                     <td>
                         {{ exhibitionStats[exhibition.id].numCatEntrySort }}

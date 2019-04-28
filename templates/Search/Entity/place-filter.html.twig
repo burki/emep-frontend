@@ -1,0 +1,23 @@
+<form id="search" class="indexForm exhibitionFilterForm indexForm" action="{{ path(app.request.get('_route')) }}" method="GET">
+    {% set filter = listBuilder.queryFilters %}
+
+    <div class="searchbarcontainer">
+        <div class="searchbarinputcontainer">
+            <input class="text-field-class w-input search-input input-text-search" type="text" name="filter[search]" value="{{ filter.search }}" placeholder="search" />
+            {#{ form_widget(form.place.geoname) }}
+            {{ form_widget(form.location.type) }#}
+        </div>
+
+        <div class="searchbuttoncontainer">
+            <button type="submit" id="filter_submit" name="filter[submit]" class="submit-button w-button submit-filter-visible">Search</button>
+        </div>
+    </div>
+
+    {% block filters %}
+        <div class="filter-combination-container">
+            {% form_theme form 'Search/bootstrap_3_adjusted.html.twig' %}
+            <div style="display:none">{{ form_row(form.location.location) }}{# for checkbox filter #}</div>
+            {{ helper.render_active_filters(listBuilder, form, entityLabels) }}
+        </div><!-- .filter-combination-container -->
+    {% endblock %}
+</form>

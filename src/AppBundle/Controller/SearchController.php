@@ -34,6 +34,7 @@ extends CrudController
         'ItemExhibition',
         'Venue',
         'Organizer',
+        'Place',
     ];
 
     private function lookupSettingsFromRequest(Request $request)
@@ -63,6 +64,10 @@ extends CrudController
                     $pageTitle = 'Organizing Bodies';
                     break;
 
+                case 'Place':
+                    $pageTitle = 'Exhibiting Cities';
+                    break;
+
                 default:
                     $pageTitle = $entity . 's';
             }
@@ -80,6 +85,7 @@ extends CrudController
      * @Route("/person", name="person-index")
      * @Route("/location", name="venue-index")
      * @Route("/organizer", name="organizer-index")
+     * @Route("/place/exhibiting", name="place-index")
      */
     public function searchAction(Request $request,
                                  UrlGeneratorInterface $urlGenerator,
@@ -185,6 +191,7 @@ extends CrudController
      * @Route("/location/stats", name="venue-index-stats")
      * @Route("/organizer/stats", name="organizer-index-stats")
      * @Route("/itemexhibition/stats", name="itemexhibition-index-stats")
+     * @Route("/place/exhibiting/stats", name="place-index-stats")
      */
     public function statsAction(Request $request,
                                 UrlGeneratorInterface $urlGenerator,
@@ -261,6 +268,7 @@ extends CrudController
      * @Route("/person/map", name="person-index-map")
      * @Route("/location/map", name="venue-index-map")
      * @Route("/organizer/map", name="organizer-index-map")
+     * @Route("/place/exhibiting/map", name="place-index-map")
      */
     public function mapAction(Request $request,
                               UrlGeneratorInterface $urlGenerator,
@@ -274,7 +282,7 @@ extends CrudController
         }
 
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'extended', $settings['entity']);
-        if (!in_array($entity = $listBuilder->getEntity(), [ 'Exhibition', 'Person', 'Venue', 'Organizer'])) {
+        if (!in_array($entity = $listBuilder->getEntity(), [ 'Exhibition', 'Person', 'Venue', 'Organizer', 'Place' ])) {
             $routeParams = [
                 'entity' => $listBuilder->getEntity(),
                 'filter' => $listBuilder->getQueryFilters(),
@@ -503,6 +511,10 @@ extends CrudController
 
             case 'ItemExhibition':
                 return new \AppBundle\Utils\ItemExhibitionListBuilder($connection, $request, $urlGenerator, $filters, $mode);
+
+            case 'Place':
+                return new \AppBundle\Utils\PlaceListBuilder($connection, $request, $urlGenerator, $filters, $mode);
+                break;
 
             case 'Exhibition':
             default:

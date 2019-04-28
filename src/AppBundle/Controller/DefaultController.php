@@ -43,7 +43,7 @@ extends Controller
         $connection = $this->getDoctrine()->getEntityManager()->getConnection();
 
         $counts = [];
-        foreach ([ 'ItemExhibition' , 'Exhibition', 'Venue', 'Organizer', 'Person' ] as $entity) {
+        foreach ([ 'ItemExhibition' , 'Exhibition', 'Venue', 'Organizer', 'Person', 'Place' ] as $entity) {
             switch ($entity) {
                 case 'ItemExhibition':
                     $listBuilder = new \AppBundle\Utils\ItemExhibitionListBuilder($connection, $request, $urlGenerator, []);
@@ -63,6 +63,10 @@ extends Controller
 
                 case 'Person':
                     $listBuilder = new \AppBundle\Utils\PersonListBuilder($connection, $request, $urlGenerator, []);
+                    break;
+
+                case 'Place':
+                    $listBuilder = new \AppBundle\Utils\PlaceListBuilder($connection, $request, $urlGenerator, []);
                     break;
             }
 
