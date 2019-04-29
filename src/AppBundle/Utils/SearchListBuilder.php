@@ -17,6 +17,7 @@ extends ListBuilder
     const STATUS_PENDING = -10;
     const STATUS_COMPLETED = -3;
     const STATUS_PROOFREAD = -2;
+    const STATUS_PROOFREAD_NEW = -4;
     const STATUS_PENDINGIMG = -5;
 
     static $STATUS_LABELS = [
@@ -24,6 +25,7 @@ extends ListBuilder
         self::STATUS_EDIT => 'in progress',
         self::STATUS_COMPLETED => 'completed',
         self::STATUS_PROOFREAD => 'proof read',
+        self::STATUS_PROOFREAD_NEW => 'proof read',
         self::STATUS_PENDINGIMG => 'pictures pending',
         self::STATUS_PUBLISHED => 'published',
     ];
