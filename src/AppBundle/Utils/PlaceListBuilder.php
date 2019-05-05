@@ -32,59 +32,59 @@ extends SearchListBuilder
     var $orders = [
         'place' => [
             'asc' => [
-                'PL.name',
+                'COALESCE(PL.name_alternate, PL.name)',
                 'PL.tgn',
             ],
             'desc' => [
-                'PL.name DESC',
+                'COALESCE(PL.name_alternate, PL.name) DESC',
                 'PL.tgn DESC',
             ],
         ],
         'country' => [
             'asc' => [
                 'C.name',
-                'PL.name',
+                'COALESCE(PL.name_alternate, PL.name)',
                 'PL.tgn',
             ],
             'desc' => [
                 'C.name DESC',
-                'PL.name DESC',
+                'COALESCE(PL.name_alternate, PL.name) DESC',
                 'PL.tgn DESC',
             ],
         ],
         'count_location' => [
             'desc' => [
                 'count_location DESC',
-                'PL.name',
+                'COALESCE(PL.name_alternate, PL.name)',
                 'PL.tgn',
             ],
             'asc' => [
                 'count_location',
-                'PL.name',
+                'COALESCE(PL.name_alternate, PL.name)',
                 'PL.tgn',
             ],
         ],
         'count_exhibition' => [
             'desc' => [
                 'count_exhibition DESC',
-                'PL.name',
+                'COALESCE(PL.name_alternate, PL.name)',
                 'PL.tgn',
             ],
             'asc' => [
                 'count_exhibition',
-                'PL.name',
+                'COALESCE(PL.name_alternate, PL.name)',
                 'PL.tgn',
             ],
         ],
         'count_itemexhibition' => [
             'desc' => [
                 'count_itemexhibition DESC',
-                'PL.name',
+                'COALESCE(PL.name_alternate, PL.name)',
                 'PL.tgn',
             ],
             'asc' => [
                 'count_itemexhibition',
-                'PL.name',
+                'COALESCE(PL.name_alternate, PL.name)',
                 'PL.tgn',
             ],
         ],
@@ -209,7 +209,7 @@ extends SearchListBuilder
         $queryBuilder->select([
             'SQL_CALC_FOUND_ROWS ' . $this->alias . '.tgn',
             $this->alias . '.tgn AS place_id',
-            $this->alias . '.name AS place',
+            'COALESCE(' . $this->alias . '.name_alternate, ' . $this->alias . '.name) AS place',
             $this->alias . '.tgn AS place_tgn',
             $this->alias . '.country_code AS country_code',
             'C.name AS country',
