@@ -567,7 +567,7 @@ implements \JsonSerializable, JsonLdSerializable
 
         return $this->exhibitions->filter(
             function ($entity) {
-               return -1 != $entity->getStatus();
+               return $entity->checkStatus(-1);
             }
         );
     }
@@ -591,7 +591,7 @@ implements \JsonSerializable, JsonLdSerializable
 
         return $this->organizerOf->filter(
             function ($entity) use ($skip) {
-                return -1 != $entity->getStatus() && !in_array($entity->getId(), $skip);
+                return $entity->checkStatus(-1) && !in_array($entity->getId(), $skip);
             }
         );
     }

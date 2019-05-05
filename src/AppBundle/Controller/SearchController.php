@@ -395,7 +395,7 @@ extends CrudController
 
                     $queryBuilder
                         ->from('Exhibition', 'E')
-                        ->andWhere('E.status <> -1')
+                        ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
                         ->select("E.id AS id, E.title AS text, E.startdate, E.enddate, E.displaydate")
                         ;
                     break;

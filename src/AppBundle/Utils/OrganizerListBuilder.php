@@ -97,7 +97,7 @@ extends LocationListBuilder
                                 'EL.id_location=' . $this->alias . '.id AND EL.role = 0');
         $queryBuilder->innerJoin('EL',
                                 'Exhibition', 'E',
-                                'EL.id_exhibition=E.id AND E.status <> -1');
+                                'EL.id_exhibition=E.id AND ' . $this->buildExhibitionVisibleCondition('E'));
     }
 
     protected function buildSelectExhibitionCount()

@@ -126,7 +126,8 @@ extends ContainerAwareCommand
             ])
             ->from('AppBundle:Person', 'P')
             ->leftJoin('P.exhibitions', 'E')
-            ->where('P.status <> -1 AND E.status <> -1')
+            ->where('P.status <> -1')
+            ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->groupBy('P.id') // for Count
             ->having('numExhibitionSort >= 2')
             ->orderBy('numExhibitionSort', 'DESC')
@@ -214,7 +215,7 @@ extends ContainerAwareCommand
             ->leftJoin('P.country', 'C')
             ->innerJoin('AppBundle:Exhibition', 'E',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
-                       'E.location = L AND E.status <> -1')
+                       'E.location = L AND ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->innerJoin('AppBundle:ItemExhibition', 'IE',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'IE.exhibition = E AND IE.title IS NOT NULL')

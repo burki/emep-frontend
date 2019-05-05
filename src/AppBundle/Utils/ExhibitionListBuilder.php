@@ -434,7 +434,7 @@ extends SearchListBuilder
 
     protected function setFilter($queryBuilder)
     {
-        $queryBuilder->andWhere('E.status <> -1');
+        $queryBuilder->andWhere($this->buildExhibitionVisibleCondition('E'));
 
         if ('stats-by-month' == $this->mode) {
             $queryBuilder->andWhere('MONTH(E.startdate) <> 0');

@@ -40,7 +40,7 @@ extends DefaultController
         }
 
 
-        foreach ($posts as $key => $post){
+        foreach ($posts as $key => $post) {
             $mediaId = $post['featured_media'];
             if (!empty($mediaId)) {
                 $media = $client->media()->get($mediaId);

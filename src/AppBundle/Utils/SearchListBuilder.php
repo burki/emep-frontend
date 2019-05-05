@@ -16,16 +16,16 @@ extends ListBuilder
 
     const STATUS_PENDING = -10;
     const STATUS_COMPLETED = -3;
-    const STATUS_PROOFREAD = -2;
-    const STATUS_PROOFREAD_NEW = -4;
+    const STATUS_PROOFREAD = -4;
     const STATUS_PENDINGIMG = -5;
+
+    const STATUS_INTERNALONLY = -2;
 
     static $STATUS_LABELS = [
         self::STATUS_PENDING => 'pending',
         self::STATUS_EDIT => 'in progress',
         self::STATUS_COMPLETED => 'completed',
         self::STATUS_PROOFREAD => 'proof read',
-        self::STATUS_PROOFREAD_NEW => 'proof read',
         self::STATUS_PENDINGIMG => 'pictures pending',
         self::STATUS_PUBLISHED => 'published',
     ];
@@ -44,12 +44,21 @@ extends ListBuilder
             if (is_array($value)) {
                 $value = self::array_walk_recursive_delete($value, $callback, $userdata);
             }
+
             if ($callback($value, $key, $userdata)) {
                 unset($array[$key]);
             }
         }
 
         return $array;
+    }
+
+    static function exhibitionVisibleCondition($alias = 'Exhibition')
+    {
+        return sprintf('%s.status NOT BETWEEN %d AND %d',
+                       $alias,
+                       min(self::STATUS_INTERNALONLY, self::STATUS_DELETED),
+                       max(self::STATUS_INTERNALONLY, self::STATUS_DELETED));
     }
 
     var $request = null;
@@ -637,5 +646,10 @@ extends ListBuilder
         }
 
         return $ret;
+    }
+
+    protected function buildExhibitionVisibleCondition($alias = 'Exhibition')
+    {
+        return self::exhibitionVisibleCondition($alias);
     }
 }

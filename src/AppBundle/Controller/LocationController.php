@@ -101,7 +101,6 @@ extends CrudController
         return $this->handleSaveSearchAction($request, $urlGenerator, $user);
     }
 
-
     protected function getExhibitionIds($location)
     {
         // get exhibition-ids both as venue and as organizers
@@ -144,7 +143,8 @@ extends CrudController
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'IE.person = P AND IE.title IS NOT NULL')
             ->innerJoin('IE.exhibition', 'E')
-            ->where('E.id IN(:ids) AND E.status <> -1')
+            ->where('E.id IN(:ids)')
+            ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('ids', $exhibitionIds)
             ->groupBy('P.id')
             ->orderBy('nameSort')
@@ -173,7 +173,8 @@ extends CrudController
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'IE.person = P AND IE.title IS NOT NULL')
             ->innerJoin('IE.exhibition', 'E')
-            ->where('E.id IN(:ids) AND E.status <> -1')
+            ->where('E.id IN(:ids)')
+            ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('ids', $exhibitionIds)
             ->groupBy('gender')
         ;
@@ -182,13 +183,14 @@ extends CrudController
 
         $data = [];
 
-        foreach ($results as $result){
+        foreach ($results as $result) {
             $key = 'unknown';
 
 
-            if($result['gender'] == 'M'){
+            if ($result['gender'] == 'M') {
                 $key = 'male';
-            }else if ($result['gender'] == 'F'){
+            }
+            else if ($result['gender'] == 'F') {
                 $key = 'female';
             }
 
@@ -220,7 +222,8 @@ extends CrudController
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'IE.exhibition = E AND IE.title IS NOT NULL')
             ->leftJoin('IE.person', 'P')
-            ->where('E.id IN (:ids) AND E.status <> -1')
+            ->where('E.id IN (:ids)')
+            ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('ids', $exhibitionIds)
             ->groupBy('E.id')
             ;
@@ -367,7 +370,6 @@ extends CrudController
         $genderStats = $this->getGenderSplitByExhId($exhibitionIds);
 
         $genderStatsStatisticsFormat = PlaceController::assoc2NameYArray($genderStats);
-
 
         return $this->render('Location/detail.html.twig', [
             'pageTitle' => $location->getName(),

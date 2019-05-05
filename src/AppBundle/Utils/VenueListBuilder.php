@@ -28,7 +28,7 @@ extends LocationListBuilder
             // so we can filter on O.*
             $queryBuilder->innerJoin('E',
                                     'ExhibitionLocation', 'EL',
-                                    'EL.id_exhibition=E.id AND E.status <> -1');
+                                    'EL.id_exhibition=E.id AND ' . $this->buildExhibitionVisibleCondition('E'));
             $queryBuilder->innerJoin('EL',
                                     'Location', 'O',
                                     'EL.id_location=O.id AND EL.role = 0');

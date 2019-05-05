@@ -48,7 +48,7 @@ extends AbstractType
                     $orExpressions = [];
                     // build a matching REGEX
                     $counter = 0;
-                    foreach ($orWords as $currValues){
+                    foreach ($orWords as $currValues) {
                         $words = preg_split('/\,?\s+/', trim($currValues));
                         if (count($words) > 0) {
                             $andParts = [];

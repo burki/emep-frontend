@@ -437,7 +437,8 @@ extends SearchListBuilder
         }
 
         $queryBuilder->leftJoin('P',
-                                '(SELECT ItemExhibition.* FROM ItemExhibition INNER JOIN Exhibition ON ItemExhibition.id_exhibition=Exhibition.id AND Exhibition.status <> -1)', 'IE',
+                                '(SELECT ItemExhibition.* FROM ItemExhibition'
+                                . ' INNER JOIN Exhibition ON ItemExhibition.id_exhibition=Exhibition.id AND ' . $this->buildExhibitionVisibleCondition('Exhibition') . ')', 'IE',
                                 'IE.id_person=P.id AND (IE.title IS NOT NULL OR IE.id_item IS NULL)');
 
         if (array_key_exists('exhibition', $this->queryFilters)
@@ -447,7 +448,8 @@ extends SearchListBuilder
             // so we can filter on E.*
             $queryBuilder->leftJoin('IE',
                                     'Exhibition', 'E',
-                                    'E.id=IE.id_exhibition AND E.status <> -1 AND (IE.title IS NOT NULL OR IE.id_item IS NULL)');
+                                    'E.id=IE.id_exhibition AND ' . $this->buildExhibitionVisibleCondition('E')
+                                    . ' AND (IE.title IS NOT NULL OR IE.id_item IS NULL)');
 
             if (array_key_exists('location', $this->queryFilters)) {
                 // so we can filter on L.*
@@ -463,7 +465,7 @@ extends SearchListBuilder
                 // so we can filter on O.*
                 $queryBuilder->innerJoin('E',
                                         'ExhibitionLocation', 'EL',
-                                        'EL.id_exhibition=E.id AND E.status <> -1');
+                                        'EL.id_exhibition=E.id AND ' . $this->buildExhibitionVisibleCondition('E'));
                 $queryBuilder->innerJoin('EL',
                                         'Location', 'O',
                                         'EL.id_location=O.id AND EL.role = 0');

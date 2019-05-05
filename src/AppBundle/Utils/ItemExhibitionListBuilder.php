@@ -403,7 +403,7 @@ extends SearchListBuilder
                                 'P.id=IE.id_person AND P.status <> -1');
         $queryBuilder->join('IE',
                                 'Exhibition', 'E',
-                                'E.id=IE.id_exhibition AND E.status <> -1');
+                                'E.id=IE.id_exhibition AND ' . $this->buildExhibitionVisibleCondition('E'));
         $queryBuilder->leftJoin('IE',
                                 'Term', 'TypeTerm',
                                 'IE.type=TypeTerm.id');

@@ -38,7 +38,8 @@ extends CrudController
             ->from('AppBundle:Exhibition', 'E')
             ->leftJoin('E.location', 'L')
             ->leftJoin('L.place', 'P')
-            ->where('E.status <> -1 AND P.countryCode IS NOT NULL')
+            ->where(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
+            ->andWhere('P.countryCode IS NOT NULL')
             ;
 
         return $this->buildActiveCountries($qb);
@@ -130,7 +131,7 @@ extends CrudController
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'IE2.person = P2 AND P2.id=:person2')
             ->setParameters([ 'person1' => $persons[0], 'person2' => $persons[1] ])
-            ->where('E.status <> -1')
+            ->where(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->groupBy('E.id')
             ->orderBy('dateSort')
             ;
@@ -168,7 +169,8 @@ extends CrudController
 
         $querystr = "SELECT DISTINCT id_person, id_exhibition"
                   . " FROM ItemExhibition"
-                  . " INNER JOIN Exhibition ON ItemExhibition.id_exhibition = Exhibition.id AND Exhibition.status <> -1"
+                  . " INNER JOIN Exhibition ON ItemExhibition.id_exhibition = Exhibition.id"
+                  . " AND " . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('Exhibition')
                   . " WHERE id_person IN (" . join(', ', $personIds) . ')'
                   . " AND id_exhibition <> " . $entity->getId()
                   . " ORDER BY id_exhibition";
@@ -187,7 +189,8 @@ extends CrudController
         if (count($exhibitionIds) > 0) {
             $querystr = "SELECT Exhibition.title AS title, id_exhibition, COUNT(DISTINCT id_person) AS num_artists"
                       . " FROM ItemExhibition"
-                      . " LEFT OUTER JOIN Exhibition ON ItemExhibition.id_exhibition=Exhibition.id AND Exhibition.status <> -1"
+                      . " LEFT OUTER JOIN Exhibition ON ItemExhibition.id_exhibition=Exhibition.id"
+                      . " AND " . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('Exhibition')
                       . " WHERE id_exhibition IN (" . join(', ', $exhibitionIds) . ')'
                       . " GROUP BY id_exhibition";
             $stmt = $dbconn->query($querystr);
@@ -273,7 +276,7 @@ extends CrudController
             $exhibition = $repo->findOneById($id);
         }
 
-        if (!isset($exhibition) || $exhibition->getStatus() == -1) {
+        if (!isset($exhibition) || !$exhibition->checkStatus(-1)) {
             return $this->redirectToRoute('exhibition-index');
         }
 
@@ -318,7 +321,7 @@ extends CrudController
             $exhibition = $repo->findOneById($id);
         }
 
-        if (!isset($exhibition) || $exhibition->getStatus() == -1) {
+        if (!isset($exhibition) || !$exhibition->checkStatus(1)) {
             return $this->redirectToRoute('exhibition-index');
         }
 
@@ -375,7 +378,7 @@ extends CrudController
             $exhibition = $repo->findOneById($id);
         }
 
-        if (!isset($exhibition) || $exhibition->getStatus() == -1) {
+        if (!isset($exhibition) || !$exhibition->checkStatus(-1)) {
             return $this->redirectToRoute('exhibition-index');
         }
 
@@ -424,7 +427,7 @@ extends CrudController
             $exhibition = $repo->findOneById($id);
         }
 
-        if (!isset($exhibition) || $exhibition->getStatus() == -1) {
+        if (!isset($exhibition) || !$exhibition->checkStatus(-1)) {
             return $this->redirectToRoute('exhibition-index');
         }
 
@@ -584,7 +587,7 @@ extends CrudController
             $exhibition = $repo->findOneById($id);
         }
 
-        if (!isset($exhibition) || $exhibition->getStatus() == -1) {
+        if (!isset($exhibition) || !$exhibition->checkStatus(-1)) {
             return $this->redirectToRoute('exhibition-index');
         }
 
@@ -709,7 +712,7 @@ extends CrudController
             $exhibition = $repo->findOneById($id);
         }
 
-        if (!isset($exhibition) || $exhibition->getStatus() == -1) {
+        if (!isset($exhibition) || !$exhibition->checkStatus(-1)) {
             return $this->redirectToRoute('exhibition-index');
         }
 
@@ -831,16 +834,16 @@ extends CrudController
 
         $exhibitionCities = [];
 
-        foreach ($persons as $person){
+        foreach ($persons as $person) {
             $exhibitions = $person->getExhibitions();
 
             foreach ($exhibitions as $exhibition) {
-                if ($exhibition){
+                if ($exhibition) {
                     $currLocation = $exhibition->getLocation();
                     $currPlaceLabel = "";
 
                     // needs to be checked since location could be empty
-                    if($currLocation){
+                    if ($currLocation) {
                         $currPlaceLabel = $currLocation->getPlaceLabel();
                     }
 

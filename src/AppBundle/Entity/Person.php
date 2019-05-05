@@ -1093,7 +1093,8 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
 
         return $this->exhibitions->filter(
             function ($entity) use ($ignoreStatus) {
-               return is_null($ignoreStatus) || $entity->getStatus() <> $ignoreStatus;
+               return is_null($ignoreStatus)
+                    || $entity->checkStatus($ignoreStatus);
             }
         );
     }

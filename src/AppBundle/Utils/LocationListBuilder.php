@@ -226,7 +226,7 @@ extends SearchListBuilder
     protected function buildSelectExhibitionCount()
     {
         return '(SELECT COUNT(*) FROM Exhibition EC WHERE EC.id_location='
-            . $this->alias . '.id AND EC.status <> -1) AS count_exhibition';
+            . $this->alias . '.id AND ' . $this->buildExhibitionVisibleCondition('EC') . ') AS count_exhibition';
     }
 
     protected function setSelect($queryBuilder)
@@ -285,7 +285,7 @@ extends SearchListBuilder
     {
         $queryBuilder->leftJoin($this->alias,
                                 'Exhibition', 'E',
-                                'E.id_location=' . $this->alias . '.id AND E.status <> -1');
+                                'E.id_location=' . $this->alias . '.id AND ' . $this->buildExhibitionVisibleCondition('E'));
     }
 
     protected function setJoin($queryBuilder)

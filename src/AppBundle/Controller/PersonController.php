@@ -237,7 +237,8 @@ extends CrudController
             ->from('AppBundle:ItemExhibition', 'IE')
             ->innerJoin('AppBundle:Exhibition', 'E',
                         \Doctrine\ORM\Query\Expr\Join::WITH,
-                        'IE.exhibition = E AND E.status <> -1')
+                        'IE.exhibition = E AND '
+                        . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->where("IE.person = :person")
             ->orderBy('E.startdate')
             ->addOrderBy('IE.catalogueSection')
@@ -631,12 +632,12 @@ extends CrudController
 
         if (!empty($yearsArray)) {
             $min = $yearsArray[0];
-            $max = $yearsArray[ (count($exhibitionYear)-1) ];
-        }else{
+            $max = $yearsArray[ (count($exhibitionYear) -1 ) ];
+        }
+        else {
             $min = 0;
             $max = 0;
         }
-
 
         $arrayWithoutGaps = [];
 

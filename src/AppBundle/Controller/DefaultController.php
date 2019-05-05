@@ -84,7 +84,7 @@ extends Controller
                     'per_page' => 3,
                 ]);
 
-                foreach ($posts as $key => $post){
+                foreach ($posts as $key => $post) {
                     $mediaId = $post['featured_media'];
                     $media = $client->media()->get($mediaId);
                     $mediaUrl = $media['media_details']['sizes']['onepress-small'];

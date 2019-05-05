@@ -127,9 +127,8 @@ trait StatisticsBuilderTrait
         ];
     }
 
-    function processExhibitionGender($stmt){
-
-
+    function processExhibitionGender($stmt)
+    {
         $total = 0;
         $stats = [];
         $frequency_count = [];
@@ -137,9 +136,10 @@ trait StatisticsBuilderTrait
         while ($row = $stmt->fetch()) {
             $gender = '[unknown]';
 
-            if($row['person_gender'] == 'M'){
+            if ($row['person_gender'] == 'M') {
                 $gender = 'male';
-            }else if ($row['person_gender'] == 'F'){
+            }
+            else if ($row['person_gender'] == 'F') {
                 $gender = 'female';
             }
 

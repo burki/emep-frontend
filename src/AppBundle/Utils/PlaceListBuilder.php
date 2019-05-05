@@ -256,7 +256,7 @@ extends SearchListBuilder
 
         $queryBuilder->innerJoin('L',
                                 'Exhibition', 'E',
-                                'E.id_location=L.id AND E.status <> -1');
+                                'E.id_location=L.id AND ' . $this->buildExhibitionVisibleCondition('E'));
 
         $queryBuilder->leftJoin('E',
                                 'ItemExhibition', 'IE',

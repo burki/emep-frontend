@@ -29,10 +29,10 @@ extends Controller
         }
 
         if ($shortOrLongQuery === 'long') {
-            return " AND Exhibition.status <> -1";
+            return " AND " . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('Exhibition');
         }
 
-        return " AND E.status <> -1";
+        return " AND " . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E');
     }
 
     public function getStringQueryForLocations($query, $shortOrLongQuery)
@@ -189,10 +189,10 @@ extends Controller
         }
 
         if ($shortOrLongQuery === 'long') {
-            return " AND Exhibition.status <> -1 ";
+            return " AND " . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('Exhibition');
         }
 
-        return " AND E.status <> -1";
+        return " AND " . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E');
     }
 
 
@@ -311,8 +311,8 @@ extends Controller
             $pos = array_search('true', $currIds);
             unset($currIds[$pos]);
 
-            if($where === ''){
-                $where = 'WHERE Exhibition.id <> -1 ';
+            if ($where === '') {
+                $where = 'WHERE ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('Exhibition');
             }
 
             $where .= StatisticsController::getStringQueryForExhibitionIds($currIds, 'long');
@@ -341,10 +341,8 @@ extends Controller
         ];
     }
 
-
-
-
-    public static function exhibitionLocationDistribution($em, $currIds = []){
+    public static function exhibitionLocationDistribution($em, $currIds = [])
+    {
         $dbconn = $em->getConnection();
 
         $where = '';
@@ -354,8 +352,8 @@ extends Controller
             $pos = array_search('true', $currIds);
             unset($currIds[$pos]);
 
-            if($where === ''){
-                $where = 'WHERE Exhibition.id <> -1 ';
+            if ($where === '') {
+                $where = 'WHERE ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('Exhibition');
             }
 
             $where .= StatisticsController::getStringQueryForExhibitionIds($currIds, 'long');
@@ -395,15 +393,15 @@ extends Controller
 
         $where = !is_null($exhibitionId)
             ? sprintf('WHERE ItemExhibition.id_exhibition=%d', intval($exhibitionId))
-            : 'WHERE ItemExhibition.id <> -1 AND TypeTerm.id > 0 ';
+            : 'WHERE TypeTerm.id > 0 ';
 
         if (in_array("true", $currIds)) {
             // remove true statement from ids
             $pos = array_search('true', $currIds);
             unset($currIds[$pos]);
 
-            if($where === ''){
-                $where = 'WHERE ItemExhibition.id <> -1 AND TypeTerm.id > 0 ';
+            if ($where === '') {
+                $where = 'WHERE TypeTerm.id > 0 ';
             }
 
             $where .= StatisticsController::getStringQueryForItemExhibitionIds($currIds, 'long');
@@ -614,8 +612,8 @@ EOT;
             $pos = array_search('true', $currIds);
             unset($currIds[$pos]);
 
-            if($where === ''){
-                $where = 'WHERE Exhibition.id <> -1 ';
+            if ($where === '') {
+                $where = 'WHERE ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('Exhibition');
             }
 
             $where .= StatisticsController::getStringQueryForPersonIds($currIds, 'long');
@@ -627,8 +625,8 @@ EOT;
             $pos = array_search('true', $currIdsExh);
             unset($currIdsExh[$pos]);
 
-            if($where === ''){
-                $where = 'WHERE Exhibition.id <> -1 ';
+            if ($where === '') {
+                $where = 'WHERE ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('Exhibition');
             }
 
             $where .= StatisticsController::getStringQueryForExhibitionIds($currIdsExh, 'long');
@@ -685,8 +683,8 @@ EOT;
             $pos = array_search('true', $currIds);
             unset($currIds[$pos]);
 
-            if($where === ''){
-                $where = 'WHERE Exhibition.id <> -1 ';
+            if ($where === '') {
+                $where = 'WHERE ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('Exhibition');
             }
 
             $where .= StatisticsController::getStringQueryForExhibitionIds($currIds, 'long');
@@ -708,9 +706,10 @@ EOT;
         $male = 0;
         $female = 0;
         while ($row = $stmt->fetch()) {
-            if($row['sex'] === 'M'){
+            if ($row['sex'] === 'M') {
                 $male = $row['how_many'];
-            }else if ($row['sex'] === 'F') {
+            }
+            else if ($row['sex'] === 'F') {
                 $female = $row['how_many'];
             }
 
@@ -1018,7 +1017,7 @@ EOT;
                             . ' INNER JOIN ItemExhibition ON ItemExhibition.id_exhibition=Exhibition.id'
                             . ' INNER JOIN Item ON Item.id=ItemExhibition.id_item AND Item.id <> -1' . $collectionCondition
                             . " WHERE"
-                            . " Exhibition.status <> -1"
+                            . " " . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('Exhibition')
                           . ' GROUP BY Geoname.tgn'
                           . ' ORDER BY Geoname.country_code, place'
                           ;
@@ -1031,7 +1030,7 @@ EOT;
                             . ' INNER JOIN ItemExhibition ON ItemExhibition.id_exhibition=Exhibition.id'
                             . ' INNER JOIN Item ON Item.id=ItemExhibition.id_item AND Item.id <> -1' . $collectionCondition
                             . " WHERE"
-                            . " Exhibition.status <> -1"
+                            . " " . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('Exhibition')
                           . ' GROUP BY Geoname.tgn'
                           . ' ORDER BY Geoname.country_code, place'
                           ;
@@ -1044,7 +1043,7 @@ EOT;
                             . ' INNER JOIN ItemExhibition ON ItemExhibition.id_exhibition=Exhibition.id'
                             . ' INNER JOIN Item ON Item.id=ItemExhibition.id_item AND Item.id <> -1' . $collectionCondition
                             . " WHERE"
-                            . " Exhibition.status <> -1"
+                            . " " . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('Exhibition')
                           . ' GROUP BY Geoname.tgn'
                           . ' ORDER BY Geoname.country_code, place'
                           ;
@@ -1082,7 +1081,7 @@ EOT;
                     . ' LEFT OUTER JOIN Term ON Item.style=Term.id'
                     . ' INNER JOIN ItemPerson ON Item.id=ItemPerson.id_item'
                     . ' INNER JOIN Person ON ItemPerson.id_person=Person.id AND Person.status <> -1'
-                    . " WHERE Exhibition.status <> -1"
+                    . " WHERE " . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('Exhibition')
                   . ' ORDER BY Geoname.country_code, place, place_tgn, Person.id, exhibition_id'
                   ;
 
@@ -1132,7 +1131,7 @@ EOT;
                     . ' LEFT OUTER JOIN Term ON Item.style=Term.id'
                     . ' INNER JOIN ItemPerson ON Item.id=ItemPerson.id_item'
                     . ' INNER JOIN Person ON ItemPerson.id_person=Person.id AND Person.status <> -1'
-                    . " WHERE Exhibition.status <> -1"
+                    . " WHERE " . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('Exhibition')
                   . ' ORDER BY year, Person.id, exhibition_id'
                   ;
 
@@ -1215,7 +1214,8 @@ EOT;
 
         if ($countriesQuery === 'any') {
             $countryQueryString = $fallbackModel. ".status <> -1";
-        }else{
+        }
+        else {
             $countryQueryString = $countryModelString . "." . $countryCode . " IN(" . $countryQueryString . ")";
         }
 
@@ -1373,8 +1373,8 @@ EOT;
             ->leftJoin('AppBundle:Person', 'P',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'P = IE.person')
-            ->where('E.status <> -1')
-            ->where('L.status <> -1')
+            ->where(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
+            ->andWhere('L.status <> -1')
             ->andWhere($countryQueryString)
             ->groupBy('P.id,Pl.countryCode')
             ->orderBy('C.name', 'DESC')

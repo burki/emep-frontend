@@ -101,7 +101,8 @@ extends Controller
         $em = $this->getDoctrine()
             ->getManager();
         $result = $em->createQuery("SELECT DISTINCT E.organizerType AS type FROM AppBundle:Exhibition E"
-            . " WHERE E.status <> -1 AND E.organizerType <> ''"
+            . " WHERE " . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E')
+            . " AND E.organizerType <> ''"
             . " ORDER BY type")
             ->getScalarResult();
 
@@ -176,7 +177,7 @@ extends Controller
                                 'EL.id_location=' . $alias . '.id AND EL.role = 0')
             ->innerJoin('EL',
                                 'Exhibition', 'E',
-                                'EL.id_exhibition=E.id AND E.status <> -1')
+                                'EL.id_exhibition=E.id AND ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->orderBy('country, place')
             ;
 
@@ -549,7 +550,8 @@ extends Controller
         return $hydrationQuery->getResult();
     }
 
-    protected  function hydrateWorks($ids, $preserveOrder = false){
+    protected  function hydrateWorks($ids, $preserveOrder = false)
+    {
         // hydrate with doctrine entity
         $qb = $this->getDoctrine()
             ->getManager()

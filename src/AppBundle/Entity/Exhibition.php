@@ -493,6 +493,16 @@ class Exhibition
         return 0 <> ($this->flags & self::FLAGS_CATIDBYARTIST);
     }
 
+    public function checkStatus($ignore)
+    {
+        if (-1 == $ignore) {
+            // also ignore -2: INTERNAL_ONLINE
+            return $this->status <> -1 && $this->status <> -2;
+        }
+
+        return $this->status <> $ignore;
+    }
+
     /* make private properties public through a generic __get / __set */
     public function __get($name)
     {

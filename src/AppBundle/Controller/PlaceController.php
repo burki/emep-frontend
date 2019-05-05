@@ -65,7 +65,7 @@ extends CrudController
                        'L.place = P')
             ->leftJoin('AppBundle:Exhibition', 'E',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
-                       'E.location = L AND E.status <> -1')
+                       'E.location = L AND ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->leftJoin('AppBundle:ItemExhibition', 'IE',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'IE.exhibition = E AND IE.title IS NOT NULL')
@@ -171,7 +171,8 @@ extends CrudController
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'IE.exhibition = E AND IE.title IS NOT NULL')
             ->leftJoin('IE.person', 'P')
-            ->where('L.place = :place AND E.status <> -1')
+            ->where('L.place = :place')
+            ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('place', $place)
             ->groupBy('E.id')
             ;
@@ -252,7 +253,8 @@ extends CrudController
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'IE.exhibition = E AND IE.title IS NOT NULL')
             ->leftJoin('IE.person', 'P')
-            ->where('L.place = :tgn AND E.status <> -1')
+            ->where('L.place = :tgn')
+            ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('tgn', $tgn)
             ->groupBy('E.id')
             ->groupBy('L.id')
@@ -260,7 +262,7 @@ extends CrudController
 
         $venues = $qb->getQuery()->getResult();
 
-        foreach ($venues as $key => $venue){
+        foreach ($venues as $key => $venue) {
             $numberOfArtists = $this->getNumberOfArtistsByVenueId($venue['id']);
             $totalNumberOfNationalities = $this->getNumberOfNationalitiesByVenueId($venue['id']);
             $exhibitionsByType = $this->getTypesAndNumberOfExhibitionsByVenueId($venue['id']);
@@ -269,7 +271,7 @@ extends CrudController
 
             $venues[$key]['exhibition_types'] = [];
 
-            foreach ($exhibitionsByType as $type => $num){
+            foreach ($exhibitionsByType as $type => $num) {
                 $venues[$key]['exhibition_types'][$type] = $num;
             }
 
@@ -311,7 +313,8 @@ extends CrudController
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'IE.person = P AND IE.title IS NOT NULL')
             ->innerJoin('IE.exhibition', 'E')
-            ->where('E.location = :location AND E.status <> -1')
+            ->where('E.location = :location')
+            ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('location', $id)
             ->groupBy('IE.id')
             // ->orderBy('nameSort')
@@ -338,7 +341,8 @@ extends CrudController
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'IE.person = P AND IE.title IS NOT NULL')
             ->innerJoin('IE.exhibition', 'E')
-            ->where('E.location = :location AND E.status <> -1')
+            ->where('E.location = :location')
+            ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('location', $id)
             ->groupBy('P.id')
             // ->orderBy('nameSort')
@@ -365,7 +369,8 @@ extends CrudController
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'IE.person = P AND IE.title IS NOT NULL')
             ->innerJoin('IE.exhibition', 'E')
-            ->where('E.location = :location AND E.status <> -1')
+            ->where('E.location = :location')
+            ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('location', $id)
             ->groupBy('P.id')
             ->groupBy('P.nationality');
@@ -387,14 +392,15 @@ extends CrudController
                 'COUNT(DISTINCT E.id) AS numExhibitions'
             ])
             ->from('AppBundle:Exhibition', 'E')
-            ->where('E.location = :location AND E.status <> -1')
+            ->where('E.location = :location')
+            ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('location', $id)
             ->groupBy('E.type');
             ;
 
         $countExhibitionsByType = [];
 
-        foreach ($qb->getQuery()->getResult() as $exhibition){
+        foreach ($qb->getQuery()->getResult() as $exhibition) {
             $countExhibitionsByType[$exhibition['type']] = $exhibition['numExhibitions'];
         }
 
@@ -412,7 +418,8 @@ extends CrudController
                 'COUNT(E.id) AS numExhibitions'
             ])
             ->from('AppBundle:Exhibition', 'E')
-            ->where('E.location = :location AND E.status <> -1')
+            ->where('E.location = :location')
+            ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('location', $id)
             ;
 
@@ -438,7 +445,8 @@ extends CrudController
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'IE.exhibition = E AND IE.title IS NOT NULL')
             ->leftJoin('IE.person', 'P')
-            ->where('L.place = :tgn AND E.status <> -1')
+            ->where('L.place = :tgn')
+            ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('tgn', $tgn)
             ->groupBy('E.id')
             ->groupBy('start_year');
@@ -471,7 +479,8 @@ extends CrudController
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'IE.exhibition = E AND IE.title IS NOT NULL')
             ->leftJoin('IE.person', 'P')
-            ->where('L.place = :tgn AND E.status <> -1')
+            ->where('L.place = :tgn')
+            ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('tgn', $tgn)
             ->groupBy('E.id');
             ;
@@ -758,7 +767,8 @@ extends CrudController
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'IE.exhibition = E AND IE.title IS NOT NULL')
             ->leftJoin('IE.person', 'P')
-            ->where('L.place = :tgn AND E.status <> -1')
+            ->where('L.place = :tgn')
+            ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('tgn', $tgn)
             ->groupBy('E.id')
             ->groupBy('L.id')
@@ -788,7 +798,8 @@ extends CrudController
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'IE.exhibition = E AND IE.title IS NOT NULL')
             ->leftJoin('IE.person', 'P')
-            ->where('L.place = :tgn AND L.status <> -1 AND E.status <> -1')
+            ->where('L.place = :tgn AND L.status <> -1')
+            ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('tgn', $tgn)
             ->groupBy('E.id')
             ->groupBy('L.id')
@@ -815,7 +826,8 @@ extends CrudController
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'IE.exhibition = E AND IE.title IS NOT NULL')
             ->leftJoin('IE.person', 'P')
-            ->where('L.place = :tgn AND E.status <> -1')
+            ->where('L.place = :tgn')
+            ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('tgn', $tgn)
             // ->groupBy('E.id')
             ;
@@ -825,7 +837,6 @@ extends CrudController
 
         return $exhibitions[0]['numExhibitions'];
     }
-
 
     public function getStatsExhibitionTypes($tgn)
     {
@@ -843,7 +854,8 @@ extends CrudController
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'IE.exhibition = E AND IE.title IS NOT NULL')
             ->leftJoin('IE.person', 'P')
-            ->where('L.place = :tgn AND E.status <> -1')
+            ->where('L.place = :tgn')
+            ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('tgn', $tgn)
             ->groupBy('E.type')
             // ->groupBy('E.id')
@@ -853,7 +865,7 @@ extends CrudController
 
         $exhibitionsReturn = [];
 
-        foreach ($exhibitions as $exhibition){
+        foreach ($exhibitions as $exhibition) {
             $exhibitionsReturn[$exhibition['type']] = $exhibition['numExhibitions'];
         }
 
