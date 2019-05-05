@@ -354,10 +354,18 @@ extends Controller
 
         foreach ($queryBuilder->execute()->fetchAll() as $row)  {
             if ('0_unknown' == $row['name']) {
+                $types[$row['id']] = 'unknown';
                 continue;
             }
+
+            if ('other medium' == $row['name']) {
+                $types = [ - $row['id'] => '- exclude ' . $row['name'] . ' -' ] + $types;
+            }
+
             $types[$row['id']] = $row['name'];
         }
+
+        asort($types); // so 'unknown' shows up in correct position
 
         return $types;
     }

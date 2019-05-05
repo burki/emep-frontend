@@ -300,18 +300,51 @@ extends ListBuilder
             }
 
             if (is_scalar($filterValues)) {
-                $queryBuilder->andWhere(sprintf('%s = %s',
-                                                $field, ':' . $key))
-                    ->setParameter($key, $filterValues);
+                if ($filterValues < 0) {
+                    // negate
+                    $queryBuilder->andWhere(sprintf('%s <> %s',
+                                                    $field, ':' . $key))
+                        ->setParameter($key, - $filterValues);
+                }
+                else {
+                    $queryBuilder->andWhere(sprintf('%s = %s',
+                                                    $field, ':' . $key))
+                        ->setParameter($key, $filterValues);
+                }
             }
             else {
-                $queryBuilder->andWhere(sprintf('%s IN (%s)',
-                                                $field, ':' . $key))
-                    ->setParameter($key,
-                                   array_map(function ($val) {
-                                        return is_object($val) ? $val->getId() : $val;
-                                    }, $filterValues),
-                                   \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);
+                $negated = array_filter($filterValues, function ($val) {
+                    $v = is_object($val) ? $val->getId() : $val;
+
+                    return $v < 0;
+                });
+
+                $filterValues = array_filter($filterValues, function ($val) {
+                    $v = is_object($val) ? $val->getId() : $val;
+
+                    return $v >= 0;
+                });
+
+                if (count($filterValues) > 0) {
+                    $queryBuilder->andWhere(sprintf('%s IN (%s)',
+                                                    $field, ':' . $key))
+                        ->setParameter($key,
+                                       array_map(function ($val) {
+                                            return is_object($val) ? $val->getId() : $val;
+                                        }, $filterValues),
+                                       \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);
+                }
+
+                if (count($negated) > 0) {
+                    $key = 'not_' . $key;
+                    $queryBuilder->andWhere(sprintf('%s NOT IN (%s)',
+                                                    $field, ':' . $key))
+                        ->setParameter($key,
+                                       array_map(function ($val) {
+                                            return - (is_object($val) ? $val->getId() : $val);
+                                        }, $negated),
+                                       \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);
+                }
             }
         }
     }
