@@ -79,6 +79,20 @@ extends LocationListBuilder
                 'O.id',
             ],
         ],
+        'count_person' => [
+            'desc' => [
+                'count_person DESC',
+                'O.place',
+                'O.name',
+                'O.id',
+            ],
+            'asc' => [
+                'count_person',
+                'O.place',
+                'O.name',
+                'O.id',
+            ],
+        ],
     ];
 
     /**
@@ -98,11 +112,6 @@ extends LocationListBuilder
         $queryBuilder->innerJoin('EL',
                                 'Exhibition', 'E',
                                 'EL.id_exhibition=E.id AND ' . $this->buildExhibitionVisibleCondition('E'));
-    }
-
-    protected function buildSelectExhibitionCount()
-    {
-        return 'COUNT(DISTINCT E.id) AS count_exhibition';
     }
 
     protected function setFilter($queryBuilder)

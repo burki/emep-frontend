@@ -27,6 +27,9 @@ extends SearchListBuilder
         'count_itemexhibition' => [
             'label' => '# of Cat. Entries',
         ],
+        'count_person' => [
+            'label' => '# of Artists',
+        ],
     ];
 
     var $orders = [
@@ -98,6 +101,20 @@ extends SearchListBuilder
                 'L.id',
             ],
         ],
+        'count_person' => [
+            'desc' => [
+                'count_person DESC',
+                'L.place',
+                'L.name',
+                'L.id',
+            ],
+            'asc' => [
+                'count_person',
+                'L.place',
+                'L.name',
+                'L.id',
+            ],
+        ],
     ];
 
     public function __construct(\Doctrine\DBAL\Connection $connection,
@@ -150,6 +167,9 @@ extends SearchListBuilder
                 ],
                 'count_itemexhibition' => [
                     'label' => '# of Cat. Entries',
+                ],
+                'count_person' => [
+                    'label' => '# of Artists',
                 ],
                 'status' => [
                     'label' => 'Status',
@@ -216,17 +236,24 @@ extends SearchListBuilder
                                        $this->urlGenerator->generate('search-index', $routeParams),
                                        $this->formatRowValue($val, [], $format));
                     };
+
+                $routeParams['entity'] = 'Person';
+                $this->rowDescr['count_person']['buildValue']
+                    = function (&$row, $val, $listBuilder, $key, $format) use ($routeParams, $entity) {
+                        if ('html' != $format) {
+                            return false;
+                        }
+
+                        $key = 'Organizer' == $this->getEntity() ? 'organizer' : 'location';
+
+                        $routeParams['filter'][$key][$key] = [ $row['id'] ];
+
+                        return sprintf('<a href="%s">%s</a>',
+                                       $this->urlGenerator->generate('search-index', $routeParams),
+                                       $this->formatRowValue($val, [], $format));
+                    };
             }
         }
-    }
-
-    /*
-     * DEPRECATED: Does not work correctly for Venue with filters
-     */
-    protected function buildSelectExhibitionCount()
-    {
-        return '(SELECT COUNT(*) FROM Exhibition EC WHERE EC.id_location='
-            . $this->alias . '.id AND ' . $this->buildExhibitionVisibleCondition('EC') . ') AS count_exhibition';
     }
 
     protected function setSelect($queryBuilder)
@@ -267,8 +294,9 @@ extends SearchListBuilder
             $this->alias . '.place_geo',
             'P' . $this->alias . '.latitude',
             'P' . $this->alias . '.longitude',
+            'COUNT(DISTINCT E.id) AS count_exhibition',
             'COUNT(DISTINCT IE.id) AS count_itemexhibition',
-            'COUNT(DISTINCT E.id) AS count_exhibition',  // $this->buildSelectExhibitionCount(),
+            'COUNT(DISTINCT IE.id_person) AS count_person',
         ]);
 
         return $this;
