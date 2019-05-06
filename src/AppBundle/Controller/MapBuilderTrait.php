@@ -128,6 +128,7 @@ trait MapBuilderTrait
                 }
 
                 $key = $row['latitude'] . ':' . $row['longitude'];
+
                 if (!empty($row['location_geo'])) {
                     list($latitude, $longitude) = preg_split('/\s*,\s*/', $row['location_geo'], 2);
                     $key = $latitude . ':' . $longitude;
@@ -142,16 +143,25 @@ trait MapBuilderTrait
                         'latitude' => (double)$latitude,
                         'longitude' => (double)$longitude,
                         'place' => sprintf('<a href="%s">%s</a>',
-                                           htmlspecialchars($this->generateUrl('place-by-tgn', [
+                                           $place_url = htmlspecialchars($this->generateUrl('place-by-tgn', [
                                                 'tgn' => $row['place_tgn'],
                                            ])),
                                            htmlspecialchars($row['place'])),
-                        'exhibitions' => [],
+                        'entries' => [],
+                        'url_more' => '',
                     ];
+
+                    if (in_array($entity, [ 'Venue' ])) {
+                        $values[$key]['url_more'] = $place_url . '#venues';
+                    }
+                    /* TODO: Org. Body Tab on Place */
+                    else if (in_array($entity, [ 'Exhibition' ])) {
+                        $values[$key]['url_more'] = $place_url . '#exhibitions';
+                    }
                 }
 
                 if (in_array($entity, [ 'Venue', 'Organizer' ])) {
-                    $values[$key]['exhibitions'][] =
+                    $values[$key]['entries'][] =
                         sprintf('<a href="%s">%s</a>',
                                 htmlspecialchars($this->generateUrl('location', [
                                     'id' => $row['location_id'],
@@ -160,7 +170,7 @@ trait MapBuilderTrait
                         );
                 }
                 else if ('Exhibition' == $entity) {
-                    $values[$key]['exhibitions'][] =
+                    $values[$key]['entries'][] =
                         sprintf('<a href="%s">%s</a> at <a href="%s">%s</a> (%s)',
                                 htmlspecialchars($this->generateUrl('exhibition', [
                                     'id' => $row['exhibition_id'],
@@ -181,15 +191,23 @@ trait MapBuilderTrait
             $values_final = [];
             foreach ($values as $key => $value) {
                 $count_entries = array_key_exists('count_exhibition', $value)
-                    ? (int)$value['count_exhibition'] : count($value['exhibitions']);
+                    ? (int)$value['count_exhibition'] : count($value['entries']);
 
-                if (count($value['exhibitions']) <= $maxDisplay) {
-                    $entry_list = implode('<br />', $value['exhibitions']);
+                if (count($value['entries']) <= $maxDisplay) {
+                    $entry_list = implode('<br />', $value['entries']);
                 }
                 else {
-                    $entry_list = implode('<br />', array_slice($value['exhibitions'], 0, $maxDisplay - 1))
-                                . sprintf('<br />... (%d more)', $count_entries - $maxDisplay);
+                    $more = sprintf('%d more', $count_entries - $maxDisplay);
+
+                    if (!empty($value['url_more'])) {
+                        $more = sprintf('<a href="%s">%s</a>',
+                                        $value['url_more'], $more);
+                    }
+
+                    $entry_list = implode('<br />', array_slice($value['entries'], 0, $maxDisplay - 1))
+                                . sprintf('<br />... (%s)', $more);
                 }
+
                 $values_final[] = [
                     $value['latitude'], $value['longitude'],
                     $value['place'],

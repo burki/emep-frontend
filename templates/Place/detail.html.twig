@@ -41,9 +41,6 @@
             {% endembed %}
 
             <div class="tab-content">
-                {#{% embed "Shared/Parts/tabcontent-exhibitions.html.twig" %}
-                {% endembed %}#}
-
                 {% set artistsArray = persons %}
                 {% embed "Place/Parts/tabcontent-artists.html.twig" %}
                 {% endembed %}
@@ -60,21 +57,5 @@
         </div>
     </div>
 
-    {#
-    <div class="col-sm-4 sidebar">
-        <div class="container-fluid box">
-            <div class="row box-color-title">
-                <div class="col-sm-12">
-                    <h4>
-                        {% if place.tgn is not empty %}
-                        {{ 'Getty Thesaurus of Geographic Names'|trans }}
-                        <br /><a href="http://vocab.getty.edu/page/tgn/{{ place.tgn }}" target="_blank">{{ place.tgn }}</a>
-                        {% else %}
-                        {{ 'Additional Information'|trans }}
-                        {% endif %}
-                    </h4>
-                </div>
-            </div>
-    </div>
-    #}
+    {{ helper.active_tab_from_hash() }}
 {% endblock %}
