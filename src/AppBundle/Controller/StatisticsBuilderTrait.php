@@ -149,7 +149,6 @@ trait StatisticsBuilderTrait
             $total += $row['how_many'];
         }
 
-
         $data = [];
 
         foreach ($stats as $gender => $count) {
@@ -586,13 +585,11 @@ trait StatisticsBuilderTrait
         $stmt = $query->execute();
         $renderParams = $this->processExhibitionGender($stmt);
 
-
         if (!empty($renderParams)) {
             $template = $this->get('twig')->loadTemplate('Statistics/exhibition-gender-artists-index.html.twig');
 
             $charts[] = $template->render($renderParams);
         }
-
 
         // exhibition country-nationality matrix
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-nationality', $listBuilder->getEntity());

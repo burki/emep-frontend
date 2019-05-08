@@ -19,20 +19,15 @@
             },
             plotOptions: {
                 pie: {
-                    /*
-                    startAngle: -90,
-                    endAngle: 90,
-                    center: ['50%', '50%']
-                    */
                 },
                 series: {
                     stacking: 'normal',
                     borderWidth: 1,
                     groupPadding: 0,
-                    pointPadding: 0,
+                    pointPadding: 0 /*,
                     events: {
                         click: function (event) {
-                            var url = '{{ path('exhibition-stats-info', { 'id': exhibitionId }) }}?chart=container-works';
+                            var url = '{{ path('exhibition-stats-info', { 'id': exhibitionId }) }}?chart={{ container|raw }}';
                             url += '&series=' + encodeURIComponent(this.name);
                             url += '&point=' + encodeURIComponent(event.point.name);
 
@@ -40,6 +35,7 @@
                             $('#detailModal').find(".modal-body").load(url);
                         }
                     }
+                    */
                 },
             },
             series: [{

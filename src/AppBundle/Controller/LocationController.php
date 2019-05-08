@@ -141,7 +141,7 @@ extends CrudController
             ->from('AppBundle:Person', 'P')
             ->innerJoin('AppBundle:ItemExhibition', 'IE',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
-                       'IE.person = P AND IE.title IS NOT NULL')
+                       'IE.person = P AND (IE.title IS NOT NULL OR IE.item IS NULL)')
             ->innerJoin('IE.exhibition', 'E')
             ->where('E.id IN(:ids)')
             ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
@@ -171,7 +171,7 @@ extends CrudController
             ->from('AppBundle:Person', 'P')
             ->innerJoin('AppBundle:ItemExhibition', 'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.person = P AND IE.title IS NOT NULL')
+                'IE.person = P AND (IE.title IS NOT NULL OR IE.item IS NULL)')
             ->innerJoin('IE.exhibition', 'E')
             ->where('E.id IN(:ids)')
             ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
@@ -220,7 +220,7 @@ extends CrudController
             ->from('AppBundle:Exhibition', 'E')
             ->leftJoin('AppBundle:ItemExhibition', 'IE',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
-                       'IE.exhibition = E AND IE.title IS NOT NULL')
+                       'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
             ->leftJoin('IE.person', 'P')
             ->where('E.id IN (:ids)')
             ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
@@ -343,26 +343,6 @@ extends CrudController
         $artists = $this->getArtistsByExhibitionIds($exhibitionIds);
         $exhibitionStats = $this->getExhibitionStatsByIds($exhibitionIds);
 
-        // get alternative location for the case that the geo is empty
-        $qbAlt = $this->getDoctrine()
-            ->getManager()
-            ->createQueryBuilder();
-
-        $qbAlt->select([
-                'L',
-                "L.placeLabel",
-                "P.latitude",
-                "P.longitude"
-            ])
-            ->from('AppBundle:Location', 'L')
-            ->leftJoin('AppBundle:Place', 'P',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'P.name = L.placeLabel')
-            ->where('L.id = ' . $id)
-            ;
-
-        $place = $qbAlt->getQuery()->execute();
-
         $dataNumberOfArtistsPerCountry = $this->detailDataNumberOfArtistsPerCountry($artists);
 
         $detailDataNumberItemTypes = $this->detailDataNumberItemTypes($location);
@@ -374,7 +354,6 @@ extends CrudController
         return $this->render('Location/detail.html.twig', [
             'pageTitle' => $location->getName(),
             'location' => $location,
-            'altPlace' => $place[0],
             'exhibitionStats' => $exhibitionStats,
             'artists' => $artists,
             'dataNumberOfArtistsPerCountry' => $dataNumberOfArtistsPerCountry,
@@ -391,7 +370,7 @@ extends CrudController
         ]);
     }
 
-    public function detailDataNumberItemTypes($location)
+    private function detailDataNumberItemTypes($location)
     {
         $exhibitions = $location->getAllExhibitions();
 
@@ -421,13 +400,11 @@ extends CrudController
         return [ json_encode($finalData), $sumOfAllTypes ];
     }
 
-    public function detailDataNumberOfArtistsPerCountry($artists)
+    private function detailDataNumberOfArtistsPerCountry($artists)
     {
         $artistNationalities = [];
 
-        foreach ($artists as $artist) {
-            array_push($artistNationalities, (string)$artist[0]->getNationality() );
-        }
+        $artistNationalities = array_map(function ($artist) { return (string)$artist[0]->getNationality(); }, $artists);
 
         $artistNationalitiesTotal = array_count_values($artistNationalities);
         arsort($artistNationalitiesTotal);
@@ -438,8 +415,6 @@ extends CrudController
             },
             array_keys($artistNationalitiesTotal));
 
-        $sumOfAllNationalities = array_sum(array_values($artistNationalitiesTotal));
-
-        return [ json_encode($finalData), $sumOfAllNationalities, count(array_keys($artistNationalitiesTotal)) ];
+        return [ json_encode($finalData), count($artists), count(array_keys($artistNationalitiesTotal)) ];
     }
 }

@@ -1,6 +1,7 @@
 {% import 'Shared/highcharts.html.twig' as highcharts %}
+
     <h3 class="chart-header" data-collapse="{{ container|raw }}"><span class="chartsymbol">+</span>Types of Organizing Bodies<span class="charttypeTitle">(Pie Chart)</span></h3>
-    <div class="collapse"  id="{{ container|raw }}" style="width: 100%;  height: 400px; margin: 0 auto"></div>
+    <div class="collapse" id="{{ container|raw }}" style="width: 100%; height: 400px; margin: 0 auto"></div>
 
     <script type="text/javascript">
         $('#{{ container|raw }}').highcharts({
@@ -25,10 +26,10 @@
                     stacking: 'normal',
                     borderWidth: 1,
                     groupPadding: 0,
-                    pointPadding: 0,
+                    pointPadding: 0 /*,
                     events: {
                         click: function (event) {
-                            var url = '{{ path('exhibition-stats-info', { 'id': exhibitionId }) }}?chart=container-works';
+                            var url = '{{ path('exhibition-stats-info', { 'id': exhibitionId }) }}?chart={{ container|raw }}';
                             url += '&series=' + encodeURIComponent(this.name);
                             url += '&point=' + encodeURIComponent(event.point.name);
 
@@ -36,6 +37,7 @@
                             $('#detailModal').find(".modal-body").load(url);
                         }
                     }
+                    */
                 },
             },
             series: [{

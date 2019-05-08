@@ -3,8 +3,6 @@
         {% set geo = location.geo %}
     {% elseif location.place.geo is not empty %}
         {% set geo = location.place.geo %}
-    {% elseif altPlace.latitude is not empty %}
-        {% set geo = "#{altPlace.latitude}, #{altPlace.longitude}" %}
     {% endif %}
 
     {% if geo is not empty %}

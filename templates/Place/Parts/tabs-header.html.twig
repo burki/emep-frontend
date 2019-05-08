@@ -7,6 +7,7 @@
             <div class="icontab"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage"></div>
             -->
         </div>
+
         <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 1em">
             {% set venues = place.venues %}
             {% if venues|length > 0 %}
@@ -15,17 +16,13 @@
 
             {% if exhibitions|length > 0 %}
             <li role="presentation"><a href="#exhibitions" aria-controls="exhibitions" role="tab" data-toggle="tab">{{ 'Exhibitions'|trans }}</a></li>
-        {% endif %}
-        
+            {% endif %}
+
             {% if persons|length > 0 %}
-                <li role="presentation"{% if venuesList|length == 0 %} class="active"{% endif %}><a href="#artists" aria-controls="similar" role="tab" data-toggle="tab">{{ 'Artists'|trans }}</a></li>
+            <li role="presentation"{% if venuesList|length == 0 %} class="active"{% endif %}><a href="#artists" aria-controls="similar" role="tab" data-toggle="tab">{{ 'Artists'|trans }}</a></li>
             {% endif %}
 
             <li role="presentation"><a href="#statistics" aria-controls="statistics" role="tab" data-toggle="tab">{{ 'Statistics'|trans }}</a></li>
-
-            {# authority files #}
         </ul>
-
     </div>
-
 {% endblock %}

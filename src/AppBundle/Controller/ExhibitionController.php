@@ -234,7 +234,7 @@ extends CrudController
             ->from('AppBundle:ItemExhibition', 'IE')
             ->leftJoin('IE.person', 'P')
             ->where("IE.exhibition = :exhibition")
-            ->andWhere('IE.title IS NOT NULL')
+            ->andWhere('IE.title IS NOT NULL OR IE.item IS NULL')
             ;
 
         $results = $qb->getQuery()
@@ -382,12 +382,6 @@ extends CrudController
             return $this->redirectToRoute('exhibition-index');
         }
 
-        $citeProc = $this->instantiateCiteProc($request->getLocale());
-        if ($exhibition->hasInfo()) {
-            // expand the publications
-            $exhibition->buildInfoFull($this->getDoctrine()->getManager(), $citeProc);
-        }
-
         $catalogueEntries = $this->findCatalogueEntries($exhibition, $request->get('sort'));
 
         $artists = [];
@@ -395,18 +389,13 @@ extends CrudController
         foreach ($catalogueEntries as $entry) {
             $currPerson = $entry->person;
             if (!in_array($currPerson, $artists)) {
-                array_push($artists, $currPerson );
+                array_push($artists, $currPerson);
             }
         }
 
-        $result = $artists;
-
         $csvResult = [];
-
-        foreach ($result as $key => $person) {
-            array_push($innerArray, $person->getFullname(true), $person->getBirthDate(), $person->getDeathDate());
-
-            array_push($csvResult, $innerArray);
+        foreach ($artists as $person) {
+            array_push($csvResult, [ $person->getFullname(true), $person->getBirthDate(), $person->getDeathDate() ]);
         }
 
         return new CsvResponse($csvResult, 200, explode( ', ', 'Name, Birth Date, Death Date'));
@@ -540,6 +529,7 @@ extends CrudController
                 ]);
                 break;
 
+            /*
             case 'container-countries':
                 $personIds = StatisticsController::exhibitionNationalityPersonIds($em = $this->getDoctrine()->getEntityManager(), $request->get('point'), $id);
 
@@ -554,19 +544,7 @@ extends CrudController
                 ]);
                 break;
 
-            case 'container-works':
-                $worksIds = StatisticsController::itemExhibitionTypeDistributionFull($em = $this->getDoctrine()->getEntityManager(), $request->get('point'), $id);
-
-                foreach ($worksIds as $type => $ids) {
-                    $worksIds[$type] = $this->hydrateWorks($ids);
-                }
-
-                return $this->render('Shared/modal.html.twig', [
-                    'heading' => 'Works in Catalogue with type of ' . $request->get('point'),
-                    'elements' => $worksIds,
-                    'type' => 'works'
-                ]);
-                break;
+            */
 
             default:
                 die('Currently not handling chart: ' . $chart);
@@ -622,11 +600,11 @@ extends CrudController
 
         $template = $this->get('twig')->loadTemplate('Statistics/person-exhibition-age.html.twig');
         $charts[] = $template->renderBlock('chart', [
-                'container' => 'container-age',
-                'categories' => json_encode($categories),
-                'age_at_exhibition_living' => json_encode(array_values($total['age_living'])),
-                'age_at_exhibition_deceased' => json_encode(array_values($total['age_deceased'])),
-                'exhibition_id' => $id,
+            'container' => 'container-age',
+            'categories' => json_encode($categories),
+            'age_at_exhibition_living' => json_encode(array_values($total['age_living'])),
+            'age_at_exhibition_deceased' => json_encode(array_values($total['age_deceased'])),
+            'exhibition_id' => $id,
         ]);
 
         // artists' nationality
@@ -901,7 +879,7 @@ extends CrudController
             ->from('AppBundle:Exhibition', 'E')
             ->leftJoin('AppBundle:ItemExhibition', 'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = E AND IE.title IS NOT NULL')
+                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
             ->leftJoin('AppBundle:Person', 'P',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'P.id = IE.person AND P.id IS NOT NULL')
@@ -931,7 +909,7 @@ extends CrudController
             ->from('AppBundle:Exhibition', 'E')
             ->leftJoin('AppBundle:ItemExhibition', 'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = E AND IE.title IS NOT NULL')
+                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
             ->leftJoin('AppBundle:Person', 'P',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'P.id = IE.person AND P.id IS NOT NULL')
@@ -966,7 +944,7 @@ extends CrudController
             ->from('AppBundle:Exhibition', 'E')
             ->leftJoin('AppBundle:ItemExhibition', 'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = E AND IE.title IS NOT NULL')
+                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
             ->leftJoin('AppBundle:Person', 'P',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'P.id = IE.person AND P.id IS NOT NULL')

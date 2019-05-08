@@ -62,8 +62,10 @@
                 {% embed "Location/Parts/tabcontent-authority.html.twig" %}
                 {% endembed %}
 
-                {% embed "Location/Parts/tabcontent-statistics.html.twig" %}
-                {% endembed %}
+                {% if artists|length > 0 %}
+                    {% embed "Location/Parts/tabcontent-statistics.html.twig" %}
+                    {% endembed %}
+                {% endif %}
             </div><!-- .tab-content -->
         </div><!-- .listviewrow -->
     </div><!-- .contentcontainer -->

@@ -218,7 +218,7 @@ extends ContainerAwareCommand
                        'E.location = L AND ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->innerJoin('AppBundle:ItemExhibition', 'IE',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
-                       'IE.exhibition = E AND IE.title IS NOT NULL')
+                       'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
             ->where('L.status <> -1')
             ->groupBy('L.id')
             ->having('numExhibitionSort >= 1')

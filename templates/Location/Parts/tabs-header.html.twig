@@ -23,8 +23,9 @@
                 <li role="presentation"><a href="#authority" aria-controls="authority" role="tab" data-toggle="tab">{{ 'Integrated Authority File'|trans }}</a></li>
             {% endif %}
 
+            {% if artists|length > 0 %}
             <li role="presentation"><a href="#statistics" aria-controls="authority" role="tab" data-toggle="tab">{{ 'Statistics'|trans }}</a></li>
-
+            {% endif %}
         </ul>
 
     </div>

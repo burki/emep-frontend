@@ -50,7 +50,10 @@
                             var splitGroup = $(splitData).text();
 
                             $(rows).eq( i ).before(
-                                '<tr class="group groupHeader" data-artist="' + splitGroup + '" ><td colspan="5"><h3 class="artist-header"><span class="artistsymbol vorzeichen plussign">+</span><span class="artistsymbol vorzeichen collapsed minussign">-</span>'+group+'<a href="'+url+'" class="charttypeTitle">(view artist profile)</a></h3></td></tr>'
+                                '<tr class="group groupHeader" data-artist="' + splitGroup + '"><td colspan="5"><h3 class="artist-header"><span class="artistsymbol vorzeichen plussign">+</span><span class="artistsymbol vorzeichen collapsed minussign">-</span>'
+                                + group
+                                + ('' != url ? '<a href="' + url + '" class="charttypeTitle">(view artist profile)</a>' : '')
+                                + '</h3></td></tr>'
                             );
 
                             last = group;
@@ -138,7 +141,7 @@
 
                 <tr id="{{ catalogueEntry.id }}" data-rowname="{{ catalogueEntry.person.fullname(true) }}" data-collapsed="true" class="listviewrow collapsed collapseRow">
                     <td>{{ helper.itemexhibition_detail(catalogueEntry) }}</td>
-                    <td><span id="person-{{ catalogueEntry.person.id }}" class="artist-name-row" data-artist-name="{{ catalogueEntry.person.fullname(true) }}" data-url="{% if catalogueEntry.person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : catalogueEntry.person.ulan }) }}{% elseif catalogueEntry.person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : catalogueEntry.person.gnd }) }}{% else %}{{ path('person', { 'id' : catalogueEntry.person.id }) }}{% endif %}"  >{{ catalogueEntry.person.fullname(true) }}</span>
+                    <td><span id="person-{{ catalogueEntry.person.id }}" class="artist-name-row" data-artist-name="{{ catalogueEntry.person.fullname(true) }}" data-url="{% if catalogueEntry.person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : catalogueEntry.person.ulan }) }}{% elseif catalogueEntry.person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : catalogueEntry.person.gnd }) }}{% elseif catalogueEntry.person.id is not empty %}{{ path('person', { 'id' : catalogueEntry.person.id }) }}{% endif %}">{{ catalogueEntry.person.fullname(true) }}</span>
                     {% if addresses is not empty %}
                         <span class="small">
                         {% for address in addresses %}

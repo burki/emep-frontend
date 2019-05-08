@@ -3,41 +3,22 @@
 {% import 'Shared/helper.html.twig' as helper %}
 
 {% block body %}
-
-
     <div class="w-container">
-
         <h1 class="heading">{{ 'Places' | trans }}</h1>
 
-
         <div class="searchbarcontainer w-form">
-
             <form class="filter places-filter" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
                 <div class="searchbarinputcontainer">
                     {{ form_rest(form) }}
                 </div>
-                <div class="searchbuttoncontainer"><input type="submit" name="submit-filter" value="Search" class="submit-button w-button">
-                </div>
+                <div class="searchbuttoncontainer"><input type="submit" name="submit-filter" value="Search" class="submit-button w-button"></div>
             </form>
         </div>
     </div>
 
-
-
-
     <div class="contentcontainer w-container">
         <div class="col-sm-12">
         {% if pagination.getTotalItemCount > 0 %}
-        {# helper.pagination_count(pagination) #}
-
-        <!--<div class="sort-control">
-            {% set sortField = app.request.get('sort') %}
-            Sort by:
-            {{ helper.pagination_sortable(pagination, 'Name', 'nameSort') }}
-            {{ helper.pagination_sortable(pagination, 'Country', 'countrySort') }}
-            {{ helper.pagination_sortable(pagination, '# Exhibitions', 'numExhibitionSort', 'desc') }}
-            {{ helper.pagination_sortable(pagination, '# Cat. Entries', 'numCatEntrySort', 'desc') }}
-        </div>-->
 
         <table id="exhibitions" class="table table-striped table-bordered dataTable listviewcontainer">
             <thead>
@@ -54,24 +35,6 @@
         {% set last_initial = '' %}
         {% for row in pagination %}
             {% set place = row[0] %}
-            {% if 'countrySort' == sortField %}
-                {% set initial = countryName(place.countryCode) %}
-            {% elseif 'numExhibitionSort' == sortField %}
-                {% set initial = row['numExhibitionSort'] %}
-            {% elseif 'numCatEntrySort' == sortField %}
-                {% set initial = row['numCatEntrySort'] %}
-            {% else %}
-                {% set initial = slugify.slugify(place.nameLocalized(app.request.locale)|first)|upper %}
-            {% endif %}
-            {% if initial != last_initial %}
-                {% if last_initial != '' %}
-            {# </ul> #}
-                {% endif %}
-            {# <h2 class="artist-first-letter">{{ initial }} </h2> #}
-            {% set last_initial = initial %}
-            {# <ul class="list-group"> #}
-            {% endif %}
-
 
             <tr class="listviewrow">
                 <td class="title">
@@ -82,31 +45,25 @@
                     {{ countryName(place.countryCode) }}
                 </td>
 
-                {% set count = row['numExhibitionSort'] %}
                 <td class="normal">
-                    {{ count }}
+                    {{ row['numExhibitionSort'] }}
                 </td>
 
-                {% set countEntries = row['numCatEntrySort'] %}
                 <td class="normal">
-                    {{ countEntries }}
+                    {{ row['numCatEntrySort'] }}
                 </td>
-
             </tr>
-
-
         {% endfor %}
             </tbody>
+
         </table>
-        {# </ul> #}
             {# display navigation #}
             <div class="navigation">
                 {{ knp_pagination_render(pagination) }}
             </div>
         {% else %}
-            No places found
+            No matching places found
         {% endif %}
         </div>
-
     </div><!-- .row -->
 {% endblock %}
