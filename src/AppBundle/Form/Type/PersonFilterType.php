@@ -53,7 +53,7 @@ extends AbstractType
             'primary_key' => 'id',
             'text_property' => 'fullName',
             'minimum_input_length' => 2,
-            'page_limit' => 10,
+            'page_limit' => 30,
             'allow_clear' => false,
             'delay' => 25,
             'cache' => true,

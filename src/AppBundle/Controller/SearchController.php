@@ -416,10 +416,15 @@ extends CrudController
             $queryBuilder
                 ->orderBy('text');
 
-            // TODO: set from $request
+
+            $maxResult = intval($request->get('page_limit'));
+            if ($maxResult <= 0) {
+                $maxResult = 10;
+            }
+
             $queryBuilder
-                ->setFirstResult(0)
-                ->setMaxResults(10);
+                ->setFirstResult(0) // TODO: set from $request
+                ->setMaxResults($maxResult);
 
             $data = $queryBuilder->execute()->fetchAll();
 
