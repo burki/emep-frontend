@@ -317,14 +317,28 @@ class ItemExhibition
         return implode(' ', $parts);
     }
 
-    public function getTypeParts()
+    public function getTypeName()
     {
-        $typeParts = [];
+        $ret = '';
 
         if (!is_null($this->type)) {
             $type =  $this->type->getName();
             if ('0_unknown' != $type) {
-                $typeParts[] = $type;
+                $ret = $type;
+            }
+        }
+
+        return $ret;
+    }
+
+    public function getTypeParts($includeTypeName = true)
+    {
+        $typeParts = [];
+
+        if ($includeTypeName) {
+            $typeName = $this->getTypeName();
+            if (!empty($typeName)) {
+                $typeParts[] = $typeName;
             }
         }
 

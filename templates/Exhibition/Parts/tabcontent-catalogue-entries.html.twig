@@ -19,6 +19,7 @@
                     { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "asc", "desc" ] },
+                    {},
                     { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "desc", "asc" ] },
                     { "orderSequence": [ "desc", "asc" ] }
@@ -162,6 +163,7 @@
                 <th><span>Artist</span></th>
                 <th class="">Room</th>
                 <th><span>Type</span></th>
+                <th><span>Additional</span></th>
                 <th><span>Owner</span></th>
                 <th><span>For Sale</span></th>
                 <th><span>Price</span></th>
@@ -173,7 +175,8 @@
                     <td data-order="{{ catalogueEntry.catalogueIdSortIndex }}">{{ catalogueEntry.titleFull }}</td>
                     <td data-order="{{ catalogueEntry.person.fullname(false) }}"><a href="{% if catalogueEntry.person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : catalogueEntry.person.ulan }) }}{% elseif catalogueEntry.person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : catalogueEntry.person.gnd }) }}{% else %}{{ path('person', { 'id' : catalogueEntry.person.id }) }}{% endif %}">{{ catalogueEntry.person.fullname(true) }}</a></td>
                     <td>{{ catalogueEntry.displaylocation }}</td>
-                    <td>{{ catalogueEntry.typeParts }}</td>
+                    <td>{{ catalogueEntry.typeName }}</td>
+                    <td>{{ catalogueEntry.getTypeParts(false) }}</td>
                     <td>{{ (catalogueEntry.owner or catalogueEntryownerFull) ? (catalogueEntry.ownerFull ? catalogueEntryownerFull : 'Y') : (catalogueEntry.owner == null ? '?' : 'N') }}</td>
                     <td>{{ catalogueEntry.forsale ? 'Y' : ( catalogueEntry.forsale is same as (false) ? 'N' : '?') }}</td>
                     <td>{{ catalogueEntry.price }}</td>

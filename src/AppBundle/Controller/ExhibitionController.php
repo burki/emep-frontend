@@ -285,25 +285,24 @@ extends CrudController
         $csvResult = [];
 
         foreach ($result as $catEntry) {
-            $innerArray = [];
-
             $person = $catEntry->getPerson();
-            array_push($innerArray,
-                       $catEntry->catalogueId,
-                       $catEntry->title,
-                       !is_null($person) ? $person->getFullname(true) : '',
-                       $catEntry->getDisplaylocation(),
-                       $catEntry->getTypeParts(),
-                       $catEntry->getDisplaydate(),
-                       $catEntry->getOwnerFull(),
-                       $catEntry->isForsale() ? 'Y' : '',
-                       $catEntry->getPrice()
-                       );
 
-            array_push($csvResult, $innerArray);
+            $csvResult[] = [
+                $catEntry->catalogueId,
+                $catEntry->title,
+                !is_null($person) ? $person->getFullname(true) : '',
+                $catEntry->getDisplaylocation(),
+                $catEntry->getTypeName(),
+                $catEntry->getTypeParts(false),
+                $catEntry->getDisplaydate(),
+                $catEntry->getOwnerFull(),
+                $catEntry->isForsale() ? 'Y' : '',
+                $catEntry->getPrice()
+            ];
         }
 
-        return new CsvResponse($csvResult, 200, explode(', ', 'Cat. No., Title, Person, Room, Type, Creation Date, Owner, For Sale, Price'));
+        return new CsvResponse($csvResult, 200,
+                               explode(', ', 'Cat. No., Title, Person, Room, Type, Additional, Creation Date, Owner, For Sale, Price'));
     }
 
     /**
