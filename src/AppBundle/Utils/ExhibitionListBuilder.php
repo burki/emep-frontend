@@ -424,9 +424,9 @@ extends SearchListBuilder
             || in_array($this->mode, [ 'stats-nationality', 'stats-age', 'stats-gender' ]))
         {
             // so we can filter on P.*
-            $queryBuilder->join('IE',
-                                'Person', 'P',
-                                'P.id=IE.id_person AND P.status <> -1');
+            $queryBuilder->leftJoin('IE',
+                                    'Person', 'P',
+                                    'P.id=IE.id_person AND P.status <> -1');
         }
 
         return $this;
