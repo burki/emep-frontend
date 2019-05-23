@@ -100,6 +100,10 @@ trait StatisticsBuilderTrait
         $valuesFinal = [];
         $y = 0;
         foreach ($statsByCountry as $cc => $stats) {
+            if (0 == $stats['totalItemExhibition']) {
+                continue;
+            }
+
             $values = [];
             foreach ($stats['countByNationality'] as $nationality => $counts) {
                 $x = array_search('XX' === $nationality ? 'unknown' : $nationality, $xCategories);
