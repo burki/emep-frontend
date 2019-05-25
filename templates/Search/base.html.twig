@@ -281,6 +281,7 @@
                     <tr>
                         {% for key, label in listBuilder.buildHeaderRow() %}
                         <th>
+                            {% if loop.first %}{% if 'ItemExhibition' != listBuilder.entity %}<span class="checkmark" data-id="{{ -1 }}" title="Deselect all"></span>{% endif %}{% endif %}
                             {% set sortInfo = listBuilder.sortInfo(key) %}
                             {% if sortInfo is not empty %}
                                 <a href="{{ sortInfo.action }}"{% if sortInfo.active is not empty %} class="{{ sortInfo.active }}"{% endif %}>{{ label }}</a>

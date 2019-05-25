@@ -220,21 +220,29 @@
 
     $('.checkmark').on('click', function() {
         var currId = $(this).data('id');
-        var index = active.indexOf(currId);
-        if ($(this).hasClass('checked')) {
-            // remove
-            if (index > -1) {
-                active.splice(index, 1);
-            }
+        if (-1 == currId) {
+            $('.checkmark.checked').removeClass('checked');
+            // deselect all
+            active = [];
         }
         else {
-            // add
-            if (index == -1) {
-                active.push(currId);
+            var index = active.indexOf(currId);
+            if ($(this).hasClass('checked')) {
+                // remove
+                if (index > -1) {
+                    active.splice(index, 1);
+                }
             }
+            else {
+                // add
+                if (index == -1) {
+                    active.push(currId);
+                }
+            }
+
+            $(this).toggleClass('checked');
         }
 
-        $(this).toggleClass('checked');
 
         Cookies.set('{{ entity }}', active);
     });
