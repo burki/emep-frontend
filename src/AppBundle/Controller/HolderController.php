@@ -58,7 +58,9 @@ extends CrudController
                                 UrlGeneratorInterface $urlGenerator,
                                 UserInterface $user = null)
     {
-        $response = $this->handleUserAction($request, $user);
+        $settings = $this->lookupSettingsFromRequest($request);
+
+        $response = $this->handleUserAction($request, $user, $settings['base']);
         if (!is_null($response)) {
             return $response;
         }

@@ -36,6 +36,7 @@ extends Controller
                 }
             }
         }
+
         unset($value); // kill the reference
 
         return $array;
@@ -244,6 +245,53 @@ extends Controller
 
         return $ret;
     }
+
+    protected function lookupSettingsFromRequest(Request $request)
+    {
+        $routeName = $request->get('_route');
+
+        $routeParts = explode('-', $routeName, 2);
+
+        $ret = [
+            'base' => $routeParts[0],
+            'view' => str_replace('index-', '', $routeParts[1]),
+        ];
+
+        if ('search' == $ret['base']) {
+            $entity = $request->get('entity');
+            $pageTitle = 'Advanced Search';
+        }
+        else {
+            $entity = ucfirst($ret['base']);
+
+            switch ($entity) {
+                case 'Person':
+                    $pageTitle = 'Artists';
+                    break;
+
+                case 'Organizer':
+                    $pageTitle = 'Organizing Bodies';
+                    break;
+
+                case 'Place':
+                    $pageTitle = 'Exhibiting Cities';
+                    break;
+
+                case 'Holder':
+                    $pageTitle = 'Holding Institutions';
+                    break;
+
+                default:
+                    $pageTitle = $entity . 's';
+            }
+        }
+
+        $ret['entity'] = $entity;
+        $ret['pageTitle'] = $pageTitle;
+
+        return $ret;
+    }
+
 
     /**
      * Checks if a saved search is requested and if so, looks it up and redirects
