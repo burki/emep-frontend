@@ -9,14 +9,15 @@
                 paging: true,
                 searching: false,
                 info: true,
-                order: [[ 1, "asc" ]],
+                order: [[ 0, "asc" ]],
                 "columns": [
-                    { "orderable": false},
                     { "orderSequence": [ "asc", "desc" ] },
-                    { "orderSequence": [ "desc", "asc" ] },
-                    { "orderSequence": [ "desc", "asc" ] },
-                    { "orderSequence": [ "desc", "asc" ] },
+                    { "orderSequence": [ "asc", "desc" ] },
+                    { "orderSequence": [ "asc", "desc" ] },
+                    { "orderSequence": [ "asc", "desc" ] },
+                    { "orderSequence": [ "desc", "asc" ] } {#,
                     { "orderSequence": [ "desc", "asc" ] }
+                    #}
                 ]
             });
         })
@@ -33,18 +34,15 @@
                 <th>City</th>
                 <th>Venue</th>
                 <th># of Cat. Entries</th>
-                <th>Type</th>
-
+                {# <th>Type</th> #}
             </tr>
             </thead>
             <tbody>
             {% for exhibition in location.getOrganizerOf(true) %}
-
-
                 {% set exhPlace = exhibition.location.place %}
 
                 <tr class="listviewrow">
-                    <td class="date"><b>{{ helper.exhibition_period(exhibition) }}</b></td>
+                    <td class="date" data-order="{{ exhibition.startdate }}"><b>{{ helper.exhibition_period(exhibition) }}</b></td>
                     <td class="title"><a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
                             <b>{{ exhibition.title }}</b> {{ exhibition.titleAppend }}</a></td>
                     <td class="normal">
@@ -60,13 +58,10 @@
                     <td>
                         {{ exhibitionStats[exhibition.id].numCatEntrySort }}
                     </td>
-                    <td>{{ exhibition.organizerType }}</td>
+                    {# <td>{{ exhibition.organizerType }}</td> #}
                 </tr>
             {% endfor %}
             </tbody>
         </table>
-        {# <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}"><b>{{ exhibition.title }}</b>{{ exhibition.titleAppend }}</a>{% if exhibitionStats[ exhibition.id ] is defined and exhibitionStats[exhibition.id].numCatEntrySort > 0 -%}, {{ exhibitionStats[exhibition.id].numCatEntrySort }} entr. by {{ exhibitionStats[exhibition.id].numPersonSort }} art.{% endif %} #}
-
-
     </div><!-- .tab-pane -->
 {% endblock %}
