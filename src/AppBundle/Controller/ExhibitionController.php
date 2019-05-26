@@ -474,11 +474,17 @@ extends CrudController
 
         // $artistExhibitingInCityStats = $this->assoc2NameYArray($this->artistExhibitingInCityStats($artists));
 
+        $catalogues = $exhibition->findBibitem($em = $this->getDoctrine()->getManager(), 1);
+        // expand the notes
+        foreach ($catalogues as $catalogue) {
+            $catalogue->buildInfoFull($em, $citeProc);
+        }
+
         return $this->render('Exhibition/detail.html.twig', [
             'artists' => $artists,
             'pageTitle' => $exhibition->title, // TODO: dates in brackets
             'exhibition' => $exhibition,
-            'catalogue' => $exhibition->findBibitem($this->getDoctrine()->getManager(), 1),
+            'catalogue' => $catalogues,
             'citeProc' => $citeProc,
             'catalogueEntries' => $catalogueEntries,
             'catalogueEntriesByPersonCount' => $catalogueEntriesByPersonCount,

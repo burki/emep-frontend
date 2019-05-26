@@ -9,6 +9,13 @@ use Gedmo\Mapping\Annotation as Gedmo; // alias for Gedmo extensions annotations
 
 use Symfony\Component\Validator\Constraints as Assert;
 
+if (!function_exists('mb_ucfirst') && function_exists('mb_substr')) {
+    function mb_ucfirst($string) {
+        $string = mb_strtoupper(mb_substr($string, 0, 1)) . mb_substr($string, 1);
+        return $string;
+    }
+}
+
 /**
  * Bibliographic Item
  *
@@ -23,6 +30,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Bibitem
 implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSerializable */
 {
+    use InfoTrait;
+    
     /**
      * Build a list of normalized ISBNs of the book.
      *
@@ -45,12 +54,14 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
                     $isbn13 = 13 == $type
                         ? $matches[1]
                         : $isbnUtil->translate->to13($matches[1]);
+
                     if (true === $hyphens) {
                         $isbn13 = $isbnUtil->hyphens->fixHyphens($isbn13);
                     }
                     else if (false === $hyphens) {
                         $isbn13 = $isbnUtil->hyphens->removeHyphens($isbn13);
                     }
+
                     if (!in_array($isbn13, $normalized)) {
                         $normalized[] = $isbn13;
                     }
@@ -85,16 +96,19 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
             else if (false === $hyphens) {
                 $isbn10 = $isbnUtil->hyphens->removeHyphens($isbn10);
             }
+
             $variants[] = $isbn10;
         }
 
         $isbn13 = 13 == $type ? $isbn : $isbnUtil->translate->to13($isbn);
+
         if (true === $hyphens) {
             $isbn13 = $isbnUtil->hyphens->fixHyphens($isbn13);
         }
         else if (false === $hyphens) {
             $isbn13 = $isbnUtil->hyphens->removeHyphens($isbn13);
         }
+
         $variants[] = $isbn13;
 
         return $variants;
@@ -118,8 +132,8 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
 
     /**
      * @var string The type of the Bibliographic Item (as in Zotero)
-     * @ORM\Column(name="type", type="string", nullable=true)
      *
+     * @ORM\Column(name="type", type="string", nullable=true)
      */
     protected $itemType;
 
@@ -202,6 +216,20 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
     protected $numberOfPages;
 
     /**
+     * @var string The printer of the book
+     *
+     * @ORM\Column(name="printer", type="string", nullable=true)
+     */
+    protected $printer;
+
+    /**
+     * @var
+     *
+     * @ORM\Column(name="info", type="json_array", nullable=true)
+     */
+    protected $info;
+
+    /**
      * @var string The isbn of the book
      *
      * @ORM\Column(type="string", nullable=true)
@@ -245,6 +273,13 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
      * @ORM\Column(nullable=true)
      */
     protected $url;
+
+    /**
+     * @var string Public note.
+     *
+     * @ORM\Column(nullable=true)
+     */
+    protected $note;
 
     /**
      * @var ArrayCollection<BibitemExhibition> The exhibition reference.
@@ -619,6 +654,30 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
     }
 
     /**
+     * Sets printer.
+     *
+     * @param string $printer
+     *
+     * @return $this
+     */
+    public function setPrinter($printer = null)
+    {
+        $this->printer = $printer;
+
+        return $this;
+    }
+
+    /**
+     * Gets printer.
+     *
+     * @return string
+     */
+    public function getPrinter()
+    {
+        return $this->printer;
+    }
+
+    /**
      * Sets the DOI of the publication.
      *
      * @param string $doi
@@ -845,7 +904,17 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
         return $this->url;
     }
 
-    public function renderCitationAsHtml($citeProc, $purgeSeparator = false, $mode = null)
+    /**
+     * Gets note.
+     *
+     * @return string
+     */
+    public function getNote()
+    {
+        return $this->note;
+    }
+
+    public function renderCitationAsHtml($citeProc, $extended = false, $mode = null)
     {
         $data = json_decode(json_encode($this->jsonSerialize()));
         // var_dump($data);
@@ -856,32 +925,36 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
            http://stackoverflow.com/a/1530819/2114681
         */
         $ret = preg_replace('/style="([^"]*)vertical\-align\:\s*super;([^"]*)"/',
-                            'style="\1vertical-align: top; font-size: 66%;\2"', $ret);
+                            'style="\1vertical-align: super; font-size: 66%;\2"', $ret);
 
-        if ($purgeSeparator) {
-            if (preg_match('/, <span class="citeproc\-in">/', $ret, $matches)) {
-                $ret = preg_replace('/, (<span class="citeproc\-in">)/', '\1', $ret);
-            }
-            else if (preg_match('/, <span class="citeproc\-volumes">/', $ret, $matches)) {
-                $ret = preg_replace('/, (<span class="citeproc\-volumes">)/', '\1', $ret);
-            }
-            else if (preg_match('/, <span class="citeproc\-book\-series">/', $ret, $matches)) {
-                $ret = preg_replace('/, (<span class="citeproc\-book\-series">)/', '\1', $ret);
-            }
-            else if (preg_match('/, <span class="citeproc\-place">/', $ret, $matches)) {
-                $ret = preg_replace('/, (<span class="citeproc\-place">)/', '\1', $ret);
-            }
-            else if (preg_match('/, <span class="citeproc\-date">/', $ret, $matches)) {
-                $ret = preg_replace('/, (<span class="citeproc\-date">)/', '\1', $ret);
-            }
+        if ($extended) {
+            // make links clickable
             $ret = preg_replace_callback('/(<span class="citeproc\-URL">&lt;)(.*?)(&gt;)/',
                 function ($matches) {
                     return $matches[1]
-                    . sprintf('<a href="%s" target="_blank">%s</a>',
+                        . sprintf('<a href="%s" target="_blank">%s</a>',
                               $matches[2], $matches[2])
                     . $matches[3];
                 },
                 $ret);
+
+            $append = [];
+
+            if (!empty($this->printer)) {
+                $append[] = 'printed by: ' . $this->printer;
+            }
+
+            if (!empty($this->numberOfPages)) {
+                $append[] = 'nr. of pages: ' . $this->numberOfPages;
+            }
+
+            if (!empty($this->note)) {
+                $append[] = $this->note;
+            }
+
+            if (!empty($append)) {
+                $ret .= htmlspecialchars(mb_ucfirst(join(', ', $append)), ENT_COMPAT, 'utf-8') . '.';
+            }
         }
 
         return preg_replace('~^<div class="csl\-bib\-body"><div style="text\-indent: \-25px; padding\-left: 25px;"><div class="csl-entry">(.*?)</div></div></div>$~',
@@ -1187,6 +1260,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
                     $ret[$property] = $this->$property;
                 }
             }
+
             if (!empty($this->doi)) {
                 $ret['sameAs'] = 'http://dx.doi.org/' . $this->doi;
             }
@@ -1195,12 +1269,14 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
         if (in_array($type, [ 'Book' ])) {
             $isbns = $this->getIsbnListNormalized(false);
             $numIsbns = count($isbns);
+
             if (1 == $numIsbns) {
                 $ret['isbn'] = $isbns[0];
             }
             else if ($numIsbns > 1) {
                 $ret['isbn'] = $isbns;
             }
+
             if (!empty($this->numberOfPages) && preg_match('/^\d+$/', $this->numberOfPages)) {
                 $ret['numberOfPages'] = (int)$this->numberOfPages;
             }
@@ -1248,6 +1324,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
                     $ret[$property] = $this->$property;
                 }
             }
+
             if (!empty($this->publisher)) {
                 $publisher = new Organization();
                 $publisher->setName($this->publisher);

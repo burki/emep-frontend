@@ -356,6 +356,9 @@
               <if is-numeric="edition">
                 <number vertical-align="super" variable="edition"/>
               </if>
+              <else>
+                <text vertical-align="super" variable="edition"/>
+              </else>
             </choose>
             <date variable="issued" form="numeric" date-parts="year"/>
           </if>
@@ -497,8 +500,8 @@
         <group delimiter=", ">
           <text variable="source"/>
           <group delimiter=":">
-            <text value="doi"/>
-            <text variable="DOI"/>
+            <!--<text value="doi"/>-->
+            <text variable="DOI" prefix="&amp;lt;doi:" suffix="&amp;gt;"/>
           </group>
         </group>
     </group>
