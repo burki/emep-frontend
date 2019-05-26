@@ -16,7 +16,7 @@
                     { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "asc", "desc" ] },
-                    { "orderSequence": [ "desc", "asc" ] },
+                    {#{ "orderSequence": [ "desc", "asc" ] },#}
                     { "orderSequence": [ "asc", "desc" ] }
                 ]
             });
@@ -32,7 +32,7 @@
                 <th class="all">Title</th>
                 <th class="all">City</th>
                 <th class="min-tablet-p">Venue</th>
-                <th class="min-tablet-p"># of Cat. Entries</th>
+                {#<th class="min-tablet-p"># of Cat. Entries</th>#}
                 <th class="min-tablet-p">Type </th>
             </tr>
             </thead>
@@ -58,7 +58,7 @@
                             {{ exhibition.location.name }}
                         </a>
                     </td>
-                    <td>
+                    {#<td>
                         {% if catalogueEntriesByExhibition[exhibition.id] is defined %}
                             {% set count = catalogueEntriesByExhibition[exhibition.id]|length %}
                             {% if count > 0 %}
@@ -66,7 +66,7 @@
                                 {{ count }}
                             {% endif %}
                         {% endif %}
-                    </td>
+                    </td>#}
                     <td>{{ exhibition.organizerType }}</td>
                 </tr>
             {% endfor %}
