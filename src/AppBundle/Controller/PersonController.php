@@ -440,7 +440,7 @@ extends CrudController
         return $this->render('Person/detail.html.twig', [
             'pageTitle' => $person->getFullname(true), // TODO: lifespan in brackets
             'person' => $person,
-            'showWorks' => !empty($_SESSION['user']),
+            'showWorks' => false, // !empty($_SESSION['user']),
             'catalogueEntries' => $catEntries,
             'catalogueEntriesByExhibition' => $this->findCatalogueEntries($person, true),
             'similar' => $this->findSimilar($person),
