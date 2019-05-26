@@ -400,6 +400,45 @@ extends CrudController
         return new CsvResponse($csvResult, 200, explode( ', ', 'Name, Birth Date, Death Date'));
     }
 
+    protected function lookupExhibitionGroup($em, $exhibition)
+    {
+        $conn = $em->getConnection();
+
+        $queryBuilder = $conn->createQueryBuilder();
+
+        $queryBuilder
+            ->select('id_exhibition')
+            ->from('ExhibitionGroup', 'EG')
+            ->where('id_exhibition=:id_exhibition OR id_exhibition2=:id_exhibition')
+            ->setParameter('id_exhibition', $exhibition->getId())
+            ->orderBy('id_exhibition', 'asc');
+
+        $ids = $queryBuilder->execute()->fetchAll(\PDO::FETCH_COLUMN);
+
+        if (empty($ids)) {
+            return [];
+        }
+
+        $queryBuilder
+            ->select('id_exhibition2')
+            ->from('ExhibitionGroup', 'EG')
+            ->where('id_exhibition=:id_exhibition')
+            ->setParameter('id_exhibition', $ids[0])
+            ;
+
+        $ids = array_merge($ids, $queryBuilder->execute()->fetchAll(\PDO::FETCH_COLUMN));
+
+        // remove oneself
+        $ids = array_diff($ids, [ $exhibition->getId() ]);
+
+        if (empty($ids)) {
+            return [];
+        }
+
+        return $this->hydrateExhibitions($ids, false, true);
+    }
+
+
     /**
      * @Route("/exhibition/{id}", requirements={"id" = "\d+"}, name="exhibition")
      */
@@ -482,6 +521,11 @@ extends CrudController
             }
         }
 
+        // for traveling, find related
+        $relatedExhibitions = $exhibition->isTraveling()
+            ? $this->lookupExhibitionGroup($em, $exhibition)
+            : [];
+
         return $this->render('Exhibition/detail.html.twig', [
             'artists' => $artists,
             'pageTitle' => $exhibition->title, // TODO: dates in brackets
@@ -490,7 +534,8 @@ extends CrudController
             'citeProc' => $citeProc,
             'catalogueEntries' => $catalogueEntries,
             'catalogueEntriesByPersonCount' => $catalogueEntriesByPersonCount,
-            'showWorks' => !empty($_SESSION['user']),
+            'showWorks' => false, // !empty($_SESSION['user']),
+            'related' => $relatedExhibitions,
             'similar' => $this->findSimilar($exhibition),
             'currentPageId' => $id,
             'catalogueStatus' => $catalogueStatus,

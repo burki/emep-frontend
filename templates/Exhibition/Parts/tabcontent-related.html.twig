@@ -23,7 +23,7 @@
         })
     </script>
 
-    <div role="tabpanel" class="tab-pane active" id="home">
+    <div role="tabpanel" class="tab-pane" id="relatedexhibitions">
 
         <table id="exhibitions" class="table table-striped table-bordered dataTable listviewcontainer">
             <thead>
@@ -38,7 +38,7 @@
             </thead>
 
             <tbody>
-            {% for exhibition in person.getExhibitions(-1) %}
+            {% for exhibition in related %}
                 {% set exhPlace = exhibition.location.place %}
 
                 <tr class="listviewrow">

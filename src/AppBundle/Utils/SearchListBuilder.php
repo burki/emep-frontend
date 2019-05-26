@@ -282,6 +282,7 @@ extends ListBuilder
                 foreach ($condition['parameters'] as $name => $value) {
                     $queryBuilder->setParameter($name, $value);
                 }
+
                 foreach ($condition['andWhere'] as $andWhere) {
                     $queryBuilder->andWhere($andWhere);
                 }

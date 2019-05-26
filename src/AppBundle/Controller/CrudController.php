@@ -570,19 +570,24 @@ extends Controller
         }
     }
 
-    protected function hydrateExhibitions($ids, $preserveOrder = false)
+    protected function hydrateExhibitions($ids, $preserveOrder = false, $filterVisible = false)
     {
         // hydrate with doctrine entity
         $qb = $this->getDoctrine()
             ->getManager()
             ->createQueryBuilder();
-        $hydrationQuery = $qb->select([ 'E', 'field(E.id, :ids) as HIDDEN field', 'E.startdate HIDDEN dateSort' ])
+
+        $qb->select([ 'E', 'field(E.id, :ids) as HIDDEN field', 'E.startdate HIDDEN dateSort' ])
             ->from('AppBundle:Exhibition', 'E')
             ->where('E.id IN (:ids)')
             ->orderBy($preserveOrder ? 'field' : 'dateSort')
-            ->getQuery();
             ;
 
+        if ($filterVisible) {
+            $qb->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'));
+        }
+
+        $hydrationQuery = $qb->getQuery();
         $hydrationQuery->setParameter('ids', $ids);
 
         return $hydrationQuery->getResult();
