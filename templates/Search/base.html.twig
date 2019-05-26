@@ -254,7 +254,7 @@
                 {% if 'search-index' != app.request.get('_route') %}
                     <div class="advanced-search-settings"><a href="{{ path('search-index', app.request.query.all) }}"><span class="checkbox-filter-button">Show List</a></span></a></div>
                 {% endif %}
-                {% if 'search-map' != app.request.get('_route') and ('Exhibition' == listBuilder.entity or 'Venue' == listBuilder.entity or 'Person' == listBuilder.entity)  %}
+                {% if 'search-map' != app.request.get('_route') and ('Exhibition' == listBuilder.entity or 'Venue' == listBuilder.entity or 'Organizer' == listBuilder.entity or 'Person' == listBuilder.entity)  %}
                     <div class="advanced-search-settings"><a href="{{ path('search-map', app.request.query.all) }}"><span class="checkbox-filter-button">Show Map</span></a></div>
                 {% endif %}
                 {% if 'search-stats' != app.request.get('_route') %}

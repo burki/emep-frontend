@@ -120,7 +120,7 @@ trait MapBuilderTrait
             // Exhibition / Venue / Place
             $values = [];
             $values_country = [];
-            $subTitle = 'Exhibition' == $entity ? 'Exhibitions' : 'Venues';
+            $subTitle = ''; // 'Exhibition' == $entity ? 'Exhibitions' : 'Venues';
 
             while ($row = $stmt->fetch()) {
                 if (empty($row['location_geo']) && $row['longitude'] == 0 && $row['latitude'] == 0) {
