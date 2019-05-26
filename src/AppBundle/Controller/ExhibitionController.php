@@ -477,7 +477,9 @@ extends CrudController
         $catalogues = $exhibition->findBibitem($em = $this->getDoctrine()->getManager(), 1);
         // expand the notes
         foreach ($catalogues as $catalogue) {
-            $catalogue->buildInfoFull($em, $citeProc);
+            if ($catalogue->hasInfo()) {
+                $catalogue->buildInfoFull($em, $citeProc);
+            }
         }
 
         return $this->render('Exhibition/detail.html.twig', [
