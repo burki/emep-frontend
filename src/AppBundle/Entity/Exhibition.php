@@ -16,6 +16,7 @@ class Exhibition
     use InfoTrait;
 
     const FLAGS_CATIDBYARTIST = 0x20;
+    const FLAGS_TRAVELING = 0x40;
 
     /**
      * @var integer
@@ -437,6 +438,11 @@ class Exhibition
     public function isSortedByPerson()
     {
         return 0 <> ($this->flags & self::FLAGS_CATIDBYARTIST);
+    }
+
+    public function isTraveling()
+    {
+        return 0 <> ($this->flags & self::FLAGS_TRAVELING);
     }
 
     public function checkStatus($ignore)
