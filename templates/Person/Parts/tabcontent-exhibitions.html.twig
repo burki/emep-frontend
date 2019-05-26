@@ -41,13 +41,15 @@
             </thead>
             <tbody>
             {% for exhibition in person.getExhibitions(-1) %}
-
                 {% set exhPlace = exhibition.location.place %}
 
                 <tr class="listviewrow">
                     <td class="date" data-order="{{ exhibition.startdate }}"><b>{{ helper.exhibition_period(exhibition) }}</b></td>
-                    <td class="title"><a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
-                            <b>{{ exhibition.title }}</b> {{ exhibition.titleAppend }}</a></td>
+                    <td class="title">
+                        <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
+                            <b>{{ exhibition.title }}</b> {{ exhibition.titleAppend }}
+                        </a>
+                    </td>
                     <td class="normal">
                         <a href="{% if exhPlace.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : exhPlace.tgn }) }}{% else %}{{ path('place', { 'id' : exhPlace.id }) }}{% endif %}">
                             {{ exhibition.location.placeLabel }}
@@ -58,14 +60,13 @@
                             {{ exhibition.location.name }}
                         </a>
                     </td>
-                    <td>{% if catalogueEntriesByExhibition[exhibition.id] is defined %}
+                    <td>
+                        {% if catalogueEntriesByExhibition[exhibition.id] is defined %}
                             {% set count = catalogueEntriesByExhibition[exhibition.id]|length %}
                             {% if count > 0 %}
                                 {% set divId = 'entries' ~ exhibition.id %}
                                 {{ count }}
                             {% endif %}
-                        {% else %}
-                            {% set count = 0 %}
                         {% endif %}
                     </td>
                     <td>{{ exhibition.organizerType }}</td>
