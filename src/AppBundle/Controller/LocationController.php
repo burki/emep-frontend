@@ -279,7 +279,7 @@ extends CrudController
     /**
      * @Route("/location/{id}/exhibitions/csv", requirements={"id" = "\d+"}, name="location-exhibitions-csv")
      */
-    public function detailActionExhibitions(Request $request, $id = null, $ulan = null, $gnd = null)
+    public function detailActionExhibitions(Request $request, $id = null)
     {
         $routeName = $request->get('_route'); $routeParams = [];
 
@@ -294,6 +294,9 @@ extends CrudController
         if (!isset($location) || $location->getStatus() == -1) {
             return $this->redirectToRoute('venue-index');
         }
+
+        $exhibitionIds = $this->getExhibitionIds($location);
+        $exhibitionStats = $this->getExhibitionStatsByIds($exhibitionIds);
 
         $csvResult = [];
 
