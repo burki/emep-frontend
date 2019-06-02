@@ -1,0 +1,16 @@
+{% extends 'Base/base.html.twig' %}
+
+{% import 'Shared/helper.html.twig' as helper %}
+
+{% block body %}
+    <div class="w-container">
+        <h2 class="heading small">
+            {{ page['title']['rendered']|raw }}
+        </h2>
+    </div>
+    <div class="contentcontainer container-5 w-container">
+        <div class="entry-content">
+            {{ page['content']['rendered']|raw }}
+        </div>
+    </div>
+{% endblock %}

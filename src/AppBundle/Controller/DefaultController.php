@@ -102,28 +102,4 @@ extends Controller
             'posts' => $posts
         ]);
     }
-
-    /**
-     * @Route("/project", name="project")
-     */
-    public function infoAction()
-    {
-        return $this->render('Default/project.html.twig');
-    }
-
-    /**
-     * @Route("/using", name="using")
-     */
-    public function usingAction()
-    {
-        return $this->render('Default/using.html.twig');
-    }
-
-    /**
-     * @Route("/cooperating-institutions", name="cooperating")
-     */
-    public function cooperatingAction()
-    {
-        return $this->render('Default/cooperating_institutions.html.twig');
-    }
 }

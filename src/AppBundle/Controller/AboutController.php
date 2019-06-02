@@ -5,12 +5,11 @@ namespace AppBundle\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-
 /**
  *
  */
-class AboutController extends Controller
+class AboutController
+extends DefaultController
 {
     protected function sendMessage($data)
     {
@@ -30,7 +29,8 @@ class AboutController extends Controller
         if (!empty($htmlBody)) {
             $message->setBody($htmlBody, 'text/html')
                 ->addPart($textBody, 'text/plain');
-        } else {
+        }
+        else {
             $message->setBody($textBody);
         }
 
@@ -40,6 +40,58 @@ class AboutController extends Controller
         catch (\Exception $e) {
             return false;
         }
+    }
+
+    /**
+     * @Route("/project", name="project")
+     */
+    public function infoAction()
+    {
+        return $this->render('Default/project.html.twig');
+    }
+
+    /**
+     * @Route("/using", name="using")
+     */
+    public function usingAction()
+    {
+        return $this->render('Default/using.html.twig');
+    }
+
+    /**
+     * @Route("/cooperating-institutions", name="cooperating")
+     */
+    public function cooperatingAction()
+    {
+        $slug = 'about-partners';
+
+        $client = $this->instantiateWpApiClient();
+
+        $page = null;
+
+        if (false !== $client) {
+            try {
+                $pages = $client->pages()->get(null, [
+                    'slug' => $slug,
+                ]);
+            }
+            catch (\Exception $e) {
+                // var_dump($e);
+                ; // ignore
+            }
+
+            if (!empty($pages)) {
+                $page = $pages[0];
+            }
+        }
+
+        if (!empty($page)) {
+            return $this->render('About/detail.html.twig', [
+                'page' => $page,
+            ]);
+        }
+
+        return $this->render('Default/cooperating_institutions.html.twig');
     }
 
     /**
