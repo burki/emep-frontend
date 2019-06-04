@@ -383,21 +383,15 @@ extends CrudController
 
         $catalogueEntries = $this->findCatalogueEntries($exhibition, $request->get('sort'));
 
-        $artists = [];
+        list($artists, $catalogueEntriesByPersonCount) = $this->buildArtistsCount($catalogueEntries, true);
 
-        foreach ($catalogueEntries as $entry) {
-            $currPerson = $entry->person;
-            if (!in_array($currPerson, $artists)) {
-                array_push($artists, $currPerson);
-            }
-        }
+        $csvResult = array_map(function ($person) use ($catalogueEntriesByPersonCount) {
+                $count = array_key_exists($person->getId(), $catalogueEntriesByPersonCount)
+                    ? $catalogueEntriesByPersonCount[$person->getId()] : 0;
+                return [ $person->getFullname(true), $person->getNationality(), $person->getBirthDate(), $person->getDeathDate(), $count ];
+            }, $artists);
 
-        $csvResult = [];
-        foreach ($artists as $person) {
-            array_push($csvResult, [ $person->getFullname(true), $person->getBirthDate(), $person->getDeathDate() ]);
-        }
-
-        return new CsvResponse($csvResult, 200, explode( ', ', 'Name, Birth Date, Death Date'));
+        return new CsvResponse($csvResult, 200, explode(', ', 'Name, Nationality, Birth Date, Death Date, # of Cat. Entries'));
     }
 
     protected function lookupExhibitionGroup($em, $exhibition)
@@ -438,6 +432,28 @@ extends CrudController
         return $this->hydrateExhibitions($ids, false, true);
     }
 
+    private function buildArtistsCount($catalogueEntries, $sortByName = false)
+    {
+        $artists = []; $catalogueEntriesByPersonCount = [];
+        foreach ($catalogueEntries as $entry) {
+            $person = $entry->getPerson();
+            if (!is_null($person)) {
+                $personId = $person->getId();
+                if (!array_key_exists($personId, $catalogueEntriesByPersonCount)) {
+                    $catalogueEntriesByPersonCount[$personId] = 0;
+                    $artists[] = $person;
+                }
+                ++$catalogueEntriesByPersonCount[$personId];
+            }
+        }
+
+        if ($sortByName) {
+            usort($artists, function ($personA, $personB) { return strcmp($personA->getFullname(), $personB->getFullname()); });
+        }
+
+        return [ $artists, $catalogueEntriesByPersonCount];
+    }
+
 
     /**
      * @Route("/exhibition/{id}", requirements={"id" = "\d+"}, name="exhibition")
@@ -470,28 +486,12 @@ extends CrudController
         }
 
         $catalogueEntries = $this->findCatalogueEntries($exhibition, $request->get('sort'));
-        $artists = []; $catalogueEntriesByPersonCount = [];
-        foreach ($catalogueEntries as $entry) {
-            $person = $entry->person;
-            if (!is_null($person)) {
-                $personId = $person->getId();
-                if (!array_key_exists($personId, $catalogueEntriesByPersonCount)) {
-                    $catalogueEntriesByPersonCount[$personId] = 0;
-                    array_push($artists, $person);
-                }
-                ++$catalogueEntriesByPersonCount[$personId];
-            }
-        }
 
-        $artists = array_unique($artists, SORT_REGULAR); // remove multiple artists
+        list($artists, $catalogueEntriesByPersonCount) = $this->buildArtistsCount($catalogueEntries);
 
         $artistsCountries = [];
         $genderSplit = ['M' => 0, 'F' => 0]; // first male, second female
         foreach ($artists as $artist) {
-            if (is_null($artist)) {
-                continue;
-            }
-
             $currNationality = $artist->getNationality();
             if ($artist->getGender() === 'M') {
                 $genderSplit['M'] = $genderSplit['M'] + 1;
