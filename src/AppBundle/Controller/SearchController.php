@@ -294,7 +294,7 @@ extends CrudController
         $data = [];
 
         if (isset($search) && mb_strlen($search, 'UTF-8') >= 2) {
-            $connection = $this->getDoctrine()->getEntityManager()->getConnection();
+            $connection = $this->getDoctrine()->getManager()->getConnection();
 
             switch ($request->get('_route')) {
                 case 'search-select-person':
@@ -453,7 +453,7 @@ extends CrudController
         }
 
         $filters = $this->form->getData();
-        $connection = $this->getDoctrine()->getEntityManager()->getConnection();
+        $connection = $this->getDoctrine()->getManager()->getConnection();
 
         switch ($entity) {
             case 'Venue':

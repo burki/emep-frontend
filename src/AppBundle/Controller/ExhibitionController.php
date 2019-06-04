@@ -570,7 +570,7 @@ extends CrudController
         $chart = $request->get('chart');
         switch ($chart) {
             case 'container-age':
-                $personIds = StatisticsController::exhibitionAgePersonIds($em = $this->getDoctrine()->getEntityManager(), $request->get('point'), $id);
+                $personIds = StatisticsController::exhibitionAgePersonIds($em = $this->getDoctrine()->getManager(), $request->get('point'), $id);
                 foreach ($personIds as $type => $ids) {
                     $personIds[$type] = $this->hydratePersons($ids);
                 }
@@ -583,7 +583,7 @@ extends CrudController
 
             /*
             case 'container-countries':
-                $personIds = StatisticsController::exhibitionNationalityPersonIds($em = $this->getDoctrine()->getEntityManager(), $request->get('point'), $id);
+                $personIds = StatisticsController::exhibitionNationalityPersonIds($em = $this->getDoctrine()->getManager(), $request->get('point'), $id);
 
                 foreach ($personIds as $type => $ids) {
                     $personIds[$type] = $this->hydratePersons($ids);
@@ -634,7 +634,7 @@ extends CrudController
         ]);
 
         // display the artists by birth-year
-        $stats = StatisticsController::exhibitionAgeDistribution($em = $this->getDoctrine()->getEntityManager(), $exhibition->getId());
+        $stats = StatisticsController::exhibitionAgeDistribution($em = $this->getDoctrine()->getManager(), $exhibition->getId());
         $ageCount = & $stats['age_count'];
 
         $categories = $total = [];
@@ -747,7 +747,7 @@ extends CrudController
         }
 
         // display the artists by birth-year
-        $stats = StatisticsController::exhibitionAgeDistribution($em = $this->getDoctrine()->getEntityManager(), $exhibition->getId());
+        $stats = StatisticsController::exhibitionAgeDistribution($em = $this->getDoctrine()->getManager(), $exhibition->getId());
         $ageCount = & $stats['age_count'];
 
         $categories = $total = [];

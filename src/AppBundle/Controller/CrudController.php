@@ -155,7 +155,7 @@ extends Controller
      */
     protected function buildOrganizerGeonames(Request $request, UrlGeneratorInterface $urlGenerator)
     {
-        $organizerListBuilder = new \AppBundle\Utils\OrganizerListBuilder($conn = $this->getDoctrine()->getEntityManager()->getConnection(), $request, $urlGenerator);
+        $organizerListBuilder = new \AppBundle\Utils\OrganizerListBuilder($conn = $this->getDoctrine()->getManager()->getConnection(), $request, $urlGenerator);
         $alias = $organizerListBuilder->getAlias();
 
         $queryBuilder = $conn->createQueryBuilder();
@@ -380,7 +380,7 @@ extends Controller
      */
     protected function buildItemExhibitionTypes()
     {
-        $conn = $this->getDoctrine()->getEntityManager()->getConnection();
+        $conn = $this->getDoctrine()->getManager()->getConnection();
 
         $queryBuilder = $conn->createQueryBuilder();
         $queryBuilder->select('DISTINCT IE.type')
@@ -526,7 +526,7 @@ extends Controller
                                               $mode = false,
                                               $entity = null)
     {
-        $connection = $this->getDoctrine()->getEntityManager()->getConnection();
+        $connection = $this->getDoctrine()->getManager()->getConnection();
 
         $parameters = $request->query->all();
         $parameters = self::array_filter_recursive($parameters, null, true); // remove empty values

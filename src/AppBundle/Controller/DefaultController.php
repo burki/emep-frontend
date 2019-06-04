@@ -40,7 +40,7 @@ extends Controller
      */
     public function indexAction(Request $request, UrlGeneratorInterface $urlGenerator)
     {
-        $connection = $this->getDoctrine()->getEntityManager()->getConnection();
+        $connection = $this->getDoctrine()->getManager()->getConnection();
 
         $counts = [];
         foreach ([ 'ItemExhibition' , 'Exhibition', 'Venue', 'Organizer', 'Person', 'Place' ] as $entity) {

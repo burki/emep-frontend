@@ -20,7 +20,7 @@ extends Controller
 
     protected function exhibitionGenderDistribution($ids = null)
     {
-        $stats = StatisticsController::itemexhibitionGenderDistribution($this->getDoctrine()->getEntityManager(), $ids);
+        $stats = StatisticsController::itemexhibitionGenderDistribution($this->getDoctrine()->getManager(), $ids);
 
         $data = [];
 
@@ -260,7 +260,7 @@ EOT;
      */
     public function d3jsPlaceAction(Request $request)
     {
-        $em = $this->getDoctrine()->getEntityManager();
+        $em = $this->getDoctrine()->getManager();
 
         $dbconn = $em->getConnection();
 
@@ -375,7 +375,7 @@ EOT;
         }
 
         // display the number of works / exhibited works by artist
-        $em = $this->getDoctrine()->getEntityManager();
+        $em = $this->getDoctrine()->getManager();
 
         $dbconn = $em->getConnection();
 
