@@ -2,6 +2,30 @@
 
 {% import 'Shared/helper.html.twig' as helper %}
 
+{% block head %}
+    <style>
+    h3 {
+        clear: left;
+    }
+
+    p {
+        clear: both;
+    }
+
+    p img.alignleft {
+        height: auto;
+        max-width: 100%;
+        padding-bottom: 20px;
+    }
+
+    img.alignleft {
+        clear: left;
+        display: inline;
+        float: left;
+        margin-right: 3.5em;
+    }
+    </style>
+{% endblock %}
 {% block body %}
     <div class="w-container">
         <h2 class="heading small">

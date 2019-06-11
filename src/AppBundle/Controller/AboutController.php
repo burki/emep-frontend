@@ -42,29 +42,8 @@ extends DefaultController
         }
     }
 
-    /**
-     * @Route("/project", name="project")
-     */
-    public function infoAction()
+    protected function renderWordpress($slug, $fallbackTemplate)
     {
-        return $this->render('Default/project.html.twig');
-    }
-
-    /**
-     * @Route("/using", name="using")
-     */
-    public function usingAction()
-    {
-        return $this->render('Default/using.html.twig');
-    }
-
-    /**
-     * @Route("/cooperating-institutions", name="cooperating")
-     */
-    public function cooperatingAction()
-    {
-        $slug = 'about-partners';
-
         $client = $this->instantiateWpApiClient();
 
         $page = null;
@@ -91,7 +70,40 @@ extends DefaultController
             ]);
         }
 
-        return $this->render('Default/cooperating_institutions.html.twig');
+        return $this->render($fallbackTemplate);
+    }
+
+    /**
+     * @Route("/info")
+     * @Route("/info/project", name="project")
+     */
+    public function infoAction()
+    {
+        return $this->renderWordpress('about-project', 'Default/project.html.twig');
+    }
+
+    /**
+     * @Route("/info/team", name="team")
+     */
+    public function teamAction()
+    {
+        return $this->renderWordpress('team', 'Default/project.html.twig');
+    }
+
+    /**
+     * @Route("/info/using", name="using")
+     */
+    public function usingAction()
+    {
+        return $this->renderWordpress('using-the-database', 'Default/using.html.twig');
+    }
+
+    /**
+     * @Route("/cooperating-institutions", name="cooperating")
+     */
+    public function cooperatingAction()
+    {
+        return $this->renderWordpress('about-partners', 'Default/cooperating_institutions.html.twig');
     }
 
     /**

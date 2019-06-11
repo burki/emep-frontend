@@ -112,6 +112,10 @@ class Builder
             'route' => 'project',
         ]);
 
+        $menu['Info']->addChild('Team', [
+            'route' => 'team',
+        ]);
+
         $menu['Info']->addChild('Using the Database', [
             'route' => 'using',
         ]);
