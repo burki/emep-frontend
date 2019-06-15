@@ -269,6 +269,11 @@ footer {
     }
 }
 
+/* route-specific styles */
+body.route-blog .entry-content {
+    max-width: 45em;
+}
+
 @media print {
     /* http://drupal.stackexchange.com/a/59908*/
     a[href]:after {
