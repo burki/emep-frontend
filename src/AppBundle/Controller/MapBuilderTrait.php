@@ -200,10 +200,10 @@ trait MapBuilderTrait
                     if (in_array($entity, [ 'Venue' ])) {
                         $values[$key]['url_more'] = $place_url . '#venues';
                     }
-                    /* TODO: Org. Body Tab on Place */
                     else if (in_array($entity, [ 'Exhibition' ])) {
                         $values[$key]['url_more'] = $place_url . '#exhibitions';
                     }
+                    /* TODO: Org. Body Tab on Place */
                 }
 
                 if (in_array($entity, [ 'Venue', 'Organizer' ])) {

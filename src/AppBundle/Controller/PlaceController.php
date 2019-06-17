@@ -182,54 +182,35 @@ extends CrudController
             $exhibitionStats[$row['id']] = $row;
         }
 
-        $numberOfExhibitions = $this->getNumberOfExhibitions($id, $tgn, $place->getId());
-        $numberOfVenues = $this->getNumberOfVenues($tgn);
-        $numberofArtists = $this->getNumberOfArtists($tgn);
-
-        $numberOfArtistsBorn = $this->getNumberArtistsBorn($tgn);
-        $numberOfArtistsDied = $this->getNumberArtistsDied($tgn);
-        $numberOfArtistsActive = $this->getNumberArtistsActive($tgn);
-
-        $allArtists = $this->getAllArtists($tgn);
-
-        $numberOfArtistsExhibitioned = $this->getNumberArtistsExhibitioned($tgn);
-
-        $nationalitiesStats = $this->getNumberOfNationalities($tgn);
-
-        $genderStats = $this->getGenderSplit($tgn);
+        $venuesList = $this->getVenuesList($tgn);
 
         $exhibitionTypeStats = $this->getStatsExhibitionTypes($tgn);
-
-        $exhibitionTypeStatisticsFormat = $this->assoc2NameYArray($exhibitionTypeStats);
-
-        $genderStatsStatisticsFormat = $this->assoc2NameYArray($genderStats);
-
-        $exhibitions = $this->getExhibitionsByTgn($tgn);
-
-        $exhibitionsGroupedByYearStats = $this->getExhibitionsGroupedYearByTgn($tgn);
-
-        $venuesList = $this->getVenuesList($tgn);
+        $genderStats = $this->getGenderSplit($tgn);
 
         return $this->render('Place/detail.html.twig', [
             'pageTitle' => $place->getNameLocalized($locale),
             'place' => $place,
-            'persons' => $allArtists,
-            'numberBorn' => $numberOfArtistsBorn,
-            'numberDied' => $numberOfArtistsDied,
-            'numberActive' => $numberOfArtistsActive,
-            'numberVenues' => $numberOfVenues,
-            'numberExhibitions' => $numberOfExhibitions,
+            'persons' => $this->getAllArtists($tgn),
+            'numberBorn' => $this->getNumberArtistsBorn($tgn),
+            'numberDied' => $this->getNumberArtistsDied($tgn),
+            'numberActive' => $this->getNumberArtistsActive($tgn),
+            'numberExhibited' => $this->getNumberArtistsExhibited($tgn),
+            'numberVenues' => count($venuesList),
+            'numberExhibitions' => $this->getNumberOfExhibitions($id, $tgn, $place->getId()),
             'exhibitionTypeStats' => $exhibitionTypeStats,
-            'nationalitiesStats' => $nationalitiesStats,
             'genderStats' => $genderStats,
-            'genderStatsStatisticsFormat' => $genderStatsStatisticsFormat,
-            'exhibitionTypeStatisticsFormat' => $exhibitionTypeStatisticsFormat,
-            'numberOfArtistsExhibitioned' => $numberOfArtistsExhibitioned,
-            'exhibitions' => $exhibitions,
-            'exhibitionsGroupedByYearStats' => $exhibitionsGroupedByYearStats,
+            'exhibitions' => $this->getExhibitionsByTgn($tgn),
             'venuesList' => $venuesList,
             'exhibitionStats' => $exhibitionStats,
             'em' => $this->getDoctrine()->getManager(),
+
+            // tabcontent-statistics.html.twig
+            'nationalitiesStats' => $this->getNumberOfNationalities($tgn),
+            'exhibitionsGroupedByYearStats' => $this->getExhibitionsGroupedYearByTgn($tgn),
+            'exhibitionTypeStatisticsFormat' => $this->assoc2NameYArray($exhibitionTypeStats),
+            'genderStatsStatisticsFormat' => $this->assoc2NameYArray($genderStats),
+
+            // meta
             'pageMeta' => [
                 'jsonLd' => $place->jsonLdSerialize($locale),
             ],
@@ -623,8 +604,9 @@ extends CrudController
                 'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
             ->leftJoin('AppBundle:Person', 'P',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
-                'P.id = IE.person AND P.id IS NOT NULL')
-            ->where('L.place = :tgn AND P.id IS NOT NULL' )
+                'P.id = IE.person AND P.status <> -1')
+            ->where(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
+            ->andWhere('L.place = :tgn AND P.id IS NOT NULL' )
             ->groupBy('P.id')
             ->setParameter('tgn', $tgn)
             ;
@@ -640,18 +622,17 @@ extends CrudController
                 'P.gender as gender'
             ])
             ->from('AppBundle:Person', 'P')
-            ->where('P.birthPlace = :tgn or P.deathPlace = :tgn AND P.id IS NOT NULL')
+            ->where('P.birthPlace = :tgn or P.deathPlace = :tgn AND P.status <> -1')
             ->setParameter('tgn', $tgn)
             ;
 
         $artistsLiving = $qb2->getQuery()->getResult();
 
         $allArtists = array_merge($artists, $artistsLiving);
-        $allArtists = array_unique ( $allArtists, SORT_REGULAR );
+        $allArtists = array_unique($allArtists, SORT_REGULAR );
         $gendersOnly = array_column($allArtists, 'gender');
-        $gendersOnly = array_replace($gendersOnly,array_fill_keys(array_keys($gendersOnly, null),'')); // remove null values if existing
+        $gendersOnly = array_replace($gendersOnly, array_fill_keys(array_keys($gendersOnly, null),'')); // remove null values if existing
         $genderStats = array_count_values($gendersOnly);
-
 
         // creating better named keys
         foreach ([ 'M' => 'male', 'F' => 'female', '' => '[unknown]' ] as $src => $target) {
@@ -664,14 +645,14 @@ extends CrudController
         return $genderStats;
     }
 
-    public function getNumberArtistsExhibitioned($tgn)
+    public function getNumberArtistsExhibited($tgn)
     {
         $qb = $this->getDoctrine()
             ->getManager()
             ->createQueryBuilder();
 
         $qb->select([
-                'COUNT(DISTINCT P.id) AS numArtistsExhibited',
+                'COUNT(DISTINCT P.id) AS total',
             ])
             ->from('AppBundle:Exhibition', 'E')
             ->leftJoin('E.location', 'L')
@@ -679,13 +660,15 @@ extends CrudController
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
             ->leftJoin('IE.person', 'P')
-            ->where('L.place = :tgn')
+            ->where(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
+            ->andWhere('L.place = :tgn AND L.status <> -1')
+            ->andWhere('P.status <> -1')
             ->setParameter('tgn', $tgn)
             ;
 
-        $artists = $qb->getQuery()->getResult();
+        $result = $qb->getQuery()->getResult();
 
-        return $artists;
+        return $result[0]['total'];
     }
 
     public function getNumberArtistsBorn($tgn)
@@ -694,18 +677,15 @@ extends CrudController
             ->getManager()
             ->createQueryBuilder();
 
-
-        $qb->select([
-                'COUNT(DISTINCT P.id) AS numArtistsBorn',
-            ])
+        $qb->select('COUNT(DISTINCT P.id) AS total')
             ->from('AppBundle:Person', 'P')
-            ->where('P.birthPlace = :tgn')
+            ->where('P.birthPlace = :tgn AND P.status <> -1')
             ->setParameter('tgn', $tgn)
             ;
 
-        $artists = $qb->getQuery()->getResult();
+        $result = $qb->getQuery()->getResult();
 
-        return $artists[0]['numArtistsBorn'];
+        return $result[0]['total'];
     }
 
     public function getNumberArtistsDied($tgn)
@@ -715,16 +695,16 @@ extends CrudController
             ->createQueryBuilder();
 
         $qb->select([
-                'COUNT(DISTINCT P.id) AS numArtistsDied',
+                'COUNT(DISTINCT P.id) AS total',
             ])
             ->from('AppBundle:Person', 'P')
-            ->where('P.deathPlace = :tgn')
+            ->where('P.deathPlace = :tgn AND P.status <> -1')
             ->setParameter('tgn', $tgn)
             ;
 
-        $artists = $qb->getQuery()->getResult();
+        $result = $qb->getQuery()->getResult();
 
-        return $artists[0]['numArtistsDied'];
+        return $result[0]['total'];
     }
 
     public function getNumberArtistsActive($tgn)
@@ -734,46 +714,16 @@ extends CrudController
             ->createQueryBuilder();
 
         $qb->select([
-                'COUNT(DISTINCT P.id) AS numArtistsActive',
+                'COUNT(DISTINCT P.id) AS total',
             ])
             ->from('AppBundle:Person', 'P')
-            ->where('JSON_CONTAINS(P.addresses, :placeTgn) = 1')
+            ->where('P.status <> -1 AND JSON_CONTAINS(P.addresses, :placeTgn) = 1')
             ->setParameter('placeTgn', sprintf('{"place_tgn": "%s"}', $tgn))
             ;
 
-        $artists = $qb->getQuery()->getResult();
+        $result = $qb->getQuery()->getResult();
 
-        return $artists[0]['numArtistsActive'];
-    }
-
-    public function getNumberOfVenues($tgn)
-    {
-        $qb = $this->getDoctrine()
-            ->getManager()
-            ->createQueryBuilder();
-
-        $qb->select([
-                'COUNT(DISTINCT L.id) AS numVenues',
-            ])
-            ->from('AppBundle:Exhibition', 'E')
-            ->leftJoin('E.location', 'L')
-            ->leftJoin('AppBundle:ItemExhibition', 'IE',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
-            ->leftJoin('IE.person', 'P')
-            ->where('L.place = :tgn')
-            ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
-            ->setParameter('tgn', $tgn)
-            ->groupBy('E.id')
-            ->groupBy('L.id')
-            ;
-
-        $venues = $qb->getQuery()->getResult();
-
-
-        // there is still a discrepency between this result and when iteration through all exhibitions --> checked with SQL -- same result
-
-        return count( $venues );
+        return $result[0]['total'];
     }
 
     public function getNumberOfArtists($tgn)
