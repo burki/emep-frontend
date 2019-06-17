@@ -34,20 +34,19 @@
 
     <div class="contentcontainer w-container">
         <div class="listviewrow">
-
             {# tabs headers #}
             {% embed "Place/Parts/tabs-header.html.twig" %}
             {% endembed %}
 
             <div class="tab-content">
-                {% set artistsArray = persons %}
-                {% embed "Place/Parts/tabcontent-artists.html.twig" %}
-                {% endembed %}
-
                 {% embed "Place/Parts/tabcontent-venues.html.twig" %}
                 {% endembed %}
 
                 {% embed "Place/Parts/tabcontent-exhibitions.html.twig" %}
+                {% endembed %}
+
+                {% set artistsArray = persons %}
+                {% embed "Place/Parts/tabcontent-artists.html.twig" %}
                 {% endembed %}
 
                 {% embed "Place/Parts/tabcontent-statistics.html.twig" %}

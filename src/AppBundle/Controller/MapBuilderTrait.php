@@ -2,7 +2,7 @@
 
 /**
  *
- * Shared methods to build up statistics
+ * Shared methods to build up map
  *
  */
 

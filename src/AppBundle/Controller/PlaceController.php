@@ -257,7 +257,7 @@ extends CrudController
                 'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
             ->leftJoin('IE.person', 'P')
             ->where('L.place = :tgn')
-            ->andWhere('L.status <> -1')
+            ->andWhere('L.status <> -1 AND 0 = BIT_AND(L.flags, 256)')
             ->setParameter('tgn', $tgn)
             ->groupBy('E.id')
             ->groupBy('L.id')
@@ -292,7 +292,6 @@ extends CrudController
      * @return int
      *
      */
-
     public function getTotalNumberOfWorksByVenueId($id)
     {
         $qb = $this->getDoctrine()

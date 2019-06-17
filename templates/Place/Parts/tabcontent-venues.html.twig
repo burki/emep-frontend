@@ -15,8 +15,10 @@
                     null,
                     { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "desc", "asc" ] },
+                    {#
                     { "orderSequence": [ "desc", "asc" ] },
                     { "orderSequence": [ "desc", "asc" ] },
+                    #}
                     { "orderSequence": [ "desc", "asc" ] },
                     { "orderSequence": [ "desc", "asc" ] },
                     { "orderSequence": [ "desc", "asc" ] },
@@ -30,16 +32,18 @@
     <div role="tabpanel" class="tab-pane{% if venuesList|length > 0 %} active{% endif %}" id="venues">
         <table id="venues-table" class="table table-striped table-bordered dataTable">
             <thead>
-            <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th># of Exhibitions</th>
-                <th># of Solo Exhibitions</th>
-                <th># of Group Exhibitions</th>
-                <th># of Artists</th>
-                <th># of Nationalities</th>
-                <th># of Cat. Entries</th>
-            </tr>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th># of Exhibitions</th>
+                    {#
+                    <th># of Solo Exhibitions</th>
+                    <th># of Group Exhibitions</th>
+                    #}
+                    <th># of Artists</th>
+                    <th># of Nationalities</th>
+                    <th># of Cat. Entries</th>
+                </tr>
             </thead>
             <tbody>
             {% for venueInfo in venuesList %}
@@ -50,8 +54,10 @@
                     </td>
                     <td>{{ venueInfo.type }}</td>
                     <td>{{ max( 0, venueInfo['numExhibitions'] ) }}</td>
+                    {#
                     <td>{{ max( 0, venueInfo['exhibition_types']['solo'] ) }}</td>
                     <td>{{ max( 0, venueInfo['exhibition_types']['group'] ) }}</td>
+                    #}
                     <td>{{ max( 0, venueInfo['numArtists'] ) }}</td>
                     <td>{{ max( 0, venueInfo['numNationalities'] ) }}</td>
                     <td>{{ max( 0, venueInfo['numItems'] ) }}</td>

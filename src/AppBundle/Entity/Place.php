@@ -310,12 +310,14 @@ implements \JsonSerializable, JsonLdSerializable
     {
         $hasPlaceParent = false;
         $ancestorOrSelf = $this;
+
         while (!is_null($ancestorOrSelf)) {
             if ($ancestorOrSelf->type == 'inhabited places') {
                 return true;
             }
             $ancestorOrSelf = $ancestorOrSelf->getParent($em);
         }
+
         return false;
     }
 
@@ -324,6 +326,7 @@ implements \JsonSerializable, JsonLdSerializable
         if (array_key_exists($this->type, self::$zoomLevelByType)) {
             return self::$zoomLevelByType[$this->type];
         }
+
         return 8;
     }
 
@@ -350,7 +353,6 @@ implements \JsonSerializable, JsonLdSerializable
     {
         return $this->countryCode;
     }
-
 
     /**
      * Sets name.
@@ -508,7 +510,9 @@ implements \JsonSerializable, JsonLdSerializable
         if (is_null($children)) {
             return null;
         }
+
         $ret = [];
+
         foreach ($children as $child) {
             $type = $child->getType();
             if (!array_key_exists($type, $ret)) {
@@ -516,6 +520,7 @@ implements \JsonSerializable, JsonLdSerializable
             }
             $ret[$type][] = $child;
         }
+
         $typeWeights = [
             'continents' => -10,
             'nations' => 0,
@@ -528,6 +533,7 @@ implements \JsonSerializable, JsonLdSerializable
             'inhabited places' => 15,
             'archipelagos' => 20,
         ];
+
         uksort($ret, function($typeA, $typeB) use ($typeWeights) {
             if ($typeA == $typeB) {
                 return 0;
@@ -536,6 +542,7 @@ implements \JsonSerializable, JsonLdSerializable
             $typeOrderB = array_key_exists($typeB, $typeWeights) ? $typeWeights[$typeB] : 99;
             return ($typeOrderA < $typeOrderB) ? -1 : 1;
         });
+
         return $ret;
     }
 
