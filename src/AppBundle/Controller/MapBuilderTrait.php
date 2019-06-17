@@ -119,14 +119,14 @@ trait MapBuilderTrait
                     return $ret . ('' !== $append ? ' ' . $append : '');
                 };
 
-                $count_entries = count($value['persons']);
+                $countEntries = count($value['persons']);
 
-                if ($count_entries <= $maxDisplay) {
+                if ($countEntries <= $maxDisplay) {
                     $entry_list = implode('<br />', array_map($buildRow, $value['persons']));
                 }
                 else {
                     $entry_list = implode('<br />', array_map($buildRow, array_slice($value['persons'], 0, $maxDisplay - 1)))
-                                . sprintf('<br />... (%d more)', $count_entries - $maxDisplay);
+                                . sprintf('<br />... (%d more)', $countEntries - ($maxDisplay - 1));
                 }
 
                 $values_final[] = [
@@ -236,14 +236,14 @@ trait MapBuilderTrait
 
             $values_final = [];
             foreach ($values as $key => $value) {
-                $count_entries = array_key_exists('count_exhibition', $value)
+                $countEntries = array_key_exists('count_exhibition', $value)
                     ? (int)$value['count_exhibition'] : count($value['entries']);
 
                 if (count($value['entries']) <= $maxDisplay) {
                     $entry_list = implode('<br />', $value['entries']);
                 }
                 else {
-                    $more = sprintf('%d more', $count_entries - $maxDisplay);
+                    $more = sprintf('%d more', $countEntries - ($maxDisplay - 1));
 
                     if (!empty($value['url_more'])) {
                         $more = sprintf('<a href="%s">%s</a>',
@@ -258,7 +258,7 @@ trait MapBuilderTrait
                     $value['latitude'], $value['longitude'],
                     $value['place'],
                     $entry_list,
-                    $count_entries,
+                    $countEntries,
                 ];
             }
         }
