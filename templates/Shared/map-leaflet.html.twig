@@ -55,10 +55,19 @@
     function showMap() {
         map = L.map('map', { zoomControl: false });
         L.control.zoom({
-             position:'topright'
+            position: 'topright'
         }).addTo(map);
 
-        map.fitBounds({{ bounds|json_encode|raw }});
+        {% if bounds is empty %}
+        map.setView([20, 0], 2);
+        {% elseif bounds[0] is iterable %}
+        map.fitBounds([
+            [ {{ bounds[0]|join(', ') }} ],
+            [ {{ bounds[1]|join(', ') }} ]
+        ], { padding: [3, 3] });
+        {% else %}
+        map.setView([ {{ bounds|join(', ') }}], 8);
+        {% endif %}
 
         {{ map.addTileLayer() }}
     }

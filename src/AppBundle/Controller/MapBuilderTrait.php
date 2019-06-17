@@ -20,8 +20,14 @@ trait MapBuilderTrait
         return \AppBundle\Utils\Formatter::daterangeIncomplete($row['startdate'], $row['enddate']);
     }
 
-    function processMapEntries($stmt, $entity)
+    function processMapEntries($stmt, $entity, $defaultBounds = [
+            [ -15, 120 ],
+            [ 60, -120 ],
+        ])
     {
+        $latMin = $latMax = null;
+        $longMin = $longMax = null;
+
         $maxDisplay = 'Person' == $entity ? 15 : 10;
 
         if ('Person' == $entity) {
@@ -37,6 +43,26 @@ trait MapBuilderTrait
                         || ($latitude == 0 && $longitude == 0))
                     {
                         continue;
+                    }
+
+                    if (is_null($latMin)) {
+                        $latMin = $latMax = $latitude;
+                        $longMin = $longMax = $longitude;
+                    }
+                    else {
+                        if ($latitude < $latMin) {
+                            $latMin = $latitude;
+                        }
+                        else if ($latitude > $latMax) {
+                            $latMax = $latitude;
+                        }
+
+                        if ($longitude < $longMin) {
+                            $longMin = $longitude;
+                        }
+                        else if ($longitude > $longMax) {
+                            $longMax = $longitude;
+                        }
                     }
 
                     $key = $latitude . ':' . $longitude;
@@ -138,6 +164,26 @@ trait MapBuilderTrait
                     $longitude = $row['longitude'];
                 }
 
+                if (is_null($latMin)) {
+                    $latMin = $latMax = $latitude;
+                    $longMin = $longMax = $longitude;
+                }
+                else {
+                    if ($latitude < $latMin) {
+                        $latMin = $latitude;
+                    }
+                    else if ($latitude > $latMax) {
+                        $latMax = $latitude;
+                    }
+
+                    if ($longitude < $longMin) {
+                        $longMin = $longitude;
+                    }
+                    else if ($longitude > $longMax) {
+                        $longMax = $longitude;
+                    }
+                }
+
                 if (!array_key_exists($key, $values)) {
                     $values[$key]  = [
                         'latitude' => (double)$latitude,
@@ -217,10 +263,28 @@ trait MapBuilderTrait
             }
         }
 
+        // set bounds or center
+        if (is_null($latMin) || is_null($latMax) || is_null($longMin) || is_null($longMax)) {
+            $bounds = $defaultBounds;
+        }
+        else {
+            if ($latMin != $latMax || $longMin != $longMax) {
+                $bounds = [
+                    [ $latMin, $longMin  ],
+                    [ $latMax, $longMax,  ],
+                ];
+            }
+            else {
+                // center
+                $bounds = [ $latMin, $longMin  ];
+            }
+        }
+
         return [
             'subTitle' => $subTitle,
             'data' => json_encode($values_final),
             'maxCount' => isset($max_count) ? $max_count : null,
+            'bounds' => $bounds,
         ];
     }
 }

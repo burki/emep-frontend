@@ -267,11 +267,6 @@ extends CrudController
             'disableClusteringAtZoom' => 'Person' == $entity ? 7 : 5,
             'showHeatMap' => 'Person' == $entity,
             'markerStyle' => 'Person' == $entity ? 'pie' : 'circle',
-            'bounds' => [
-                [ 60, -120 ],
-                [ -15, 120 ],
-            ],
-
             'listBuilder' => $listBuilder,
             'form' => $this->form->createView(),
             'searches' => $this->lookupSearches($user, $settings['base']),
