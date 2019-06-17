@@ -366,4 +366,10 @@ class ItemExhibition
             return $owner;
         }
     }
+
+    public function isRegularEntry()
+    {
+        // corresponds to IE.title IS NOT NULL OR IE.item IS NULL
+        return !empty($this->title) || is_null($this->item);
+    }
 }

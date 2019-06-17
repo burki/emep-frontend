@@ -269,7 +269,7 @@ class Exhibition
     protected $items;
 
     /**
-     * @var ArrayCollection<ItemExhibition> The catalogue entri(s) of this exhibition.
+     * @var ArrayCollection<ItemExhibition> The catalogue entries of this exhibition.
      *
      * @ORM\OneToMany(targetEntity="ItemExhibition", mappedBy="exhibition")
      */
@@ -489,6 +489,19 @@ class Exhibition
         }
 
         return $this->status <> $ignore;
+    }
+
+    public function getCatalogueEntries()
+    {
+        if (is_null($this->catalogueEntries)) {
+            return [];
+        }
+
+        return $this->catalogueEntries->filter(
+            function ($entity) {
+               return $entity->isRegularEntry(); // corresponds to IE.title IS NOT NULL OR IE.item IS NULL
+            }
+        );
     }
 
     /* make private properties public through a generic __get / __set */

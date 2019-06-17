@@ -377,12 +377,12 @@ extends CrudController
         $types = [];
 
         foreach ($exhibitions as $exhibition) {
-            $entries = $exhibition->catalogueEntries;
+            $entries = $exhibition->getCatalogueEntries();
 
             foreach ($entries as $entry) {
                 if ($entry->type) {
                     $currType = $entry->type->getName();
-                    array_push($types, (string)$currType == '0_unknown' ? 'unknown' : $currType );
+                    array_push($types, (string)$currType == '0_unknown' ? 'unknown' : $currType);
                 }
             };
         }
