@@ -19,6 +19,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
     use AddressesTrait;
 
     static $entityfactsLocales = [ 'en' ]; // enabled locales in preferred order
+    static $genderMap = [ 'F' => 'female', 'M' => 'male' ]; /* for og:serialize */
 
     /* add -00-00 or -00 to dates without month / day */
     static function formatDateIncomplete($dateStr)
@@ -510,6 +511,17 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
     public function getGender()
     {
         return $this->gender;
+    }
+
+    public function getGenderLabel()
+    {
+        $ret = $this->gender;
+
+        if (!is_null($ret) && array_key_exists($ret, self::$genderMap)) {
+            $ret = self::$genderMap[$ret];
+        }
+
+        return $ret;
     }
 
     /**
@@ -1172,8 +1184,6 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
      */
     public function ogSerialize($locale, $baseUrl)
     {
-        static $genderMap = [ 'F' => 'female', 'M' => 'male' ];
-
         $ret = [
             'og:type' => 'profile',
             'og:title' => $this->getFullname(true),
@@ -1211,8 +1221,8 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
             $ret['profile:last_name'] = $this->familyName;
         }
 
-        if (!is_null($this->gender) && array_key_exists($this->gender, $genderMap)) {
-            $ret['profile:gender'] = $genderMap[$this->gender];
+        if (!is_null($this->gender) && array_key_exists($this->gender, self::$genderMap)) {
+            $ret['profile:gender'] = self::$genderMap[$this->gender];
         }
 
         return $ret;

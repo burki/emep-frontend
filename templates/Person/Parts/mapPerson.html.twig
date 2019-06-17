@@ -27,13 +27,13 @@
                 {% if birthPlace.geo is not empty %}
                     L.marker([ {{ birthPlace.geo }} ], { icon: violetIcon })
                         .bindTooltip({{ birthPlace['name']|json_encode|raw }}, { className: 'my-tooltip' })
-                        .bindPopup('<strong>Birth Place:</strong> {% if birthPlace['tgn'] is not empty %}<a href="{{ path('place-by-tgn', { 'tgn': birthPlace['tgn']}) }}">{% endif %}{{ birthPlace['name'] }}{% if deathPlace['tgn'] is not empty %}</a>{% endif %}', { className: 'my-tooltip'}),
+                        .bindPopup('<strong>Place of Birth:</strong> {% if birthPlace['tgn'] is not empty %}<a href="{{ path('place-by-tgn', { 'tgn': birthPlace['tgn']}) }}">{% endif %}{{ birthPlace['name'] }}{% if deathPlace['tgn'] is not empty %}</a>{% endif %}', { className: 'my-tooltip'}),
                 {% endif %}
 
                 {% if deathPlace.geo is not empty %}
                 L.marker([ {{ deathPlace.geo }} ], { icon: blackIcon })
                     .bindTooltip({{ deathPlace['name']|json_encode|raw }}, { className: 'my-tooltip' })
-                    .bindPopup('<strong>Death Place:</strong> {% if deathPlace['tgn'] is not empty %}<a href="{{ path('place-by-tgn', { 'tgn': deathPlace['tgn']}) }}">{% endif %}{{ deathPlace['name'] }}{% if deathPlace['tgn'] is not empty %}</a>{% endif %}', { className: 'my-tooltip'})
+                    .bindPopup('<strong>Place of Death:</strong> {% if deathPlace['tgn'] is not empty %}<a href="{{ path('place-by-tgn', { 'tgn': deathPlace['tgn']}) }}">{% endif %}{{ deathPlace['name'] }}{% if deathPlace['tgn'] is not empty %}</a>{% endif %}', { className: 'my-tooltip'})
                 {% endif %}
             ]);
 
@@ -94,7 +94,7 @@
             };
 
             var birthAndDeathOverlay = {
-                "Birth and Death places": birthAndDeath
+                "Places of Birth and Death": birthAndDeath
             };
 
             L.control.layers(birthAndDeathOverlay, overlayExhibitionsOverlay).addTo(map);

@@ -185,12 +185,13 @@ extends CrudController
         $venuesList = $this->getVenuesList($tgn);
 
         $exhibitionTypeStats = $this->getStatsExhibitionTypes($tgn);
-        $genderStats = $this->getGenderSplit($tgn);
+        $allArtists = $this->getAllArtists($tgn);
+        $genderCounts = $this->buildGenderCounts($allArtists);
 
         return $this->render('Place/detail.html.twig', [
             'pageTitle' => $place->getNameLocalized($locale),
             'place' => $place,
-            'persons' => $this->getAllArtists($tgn),
+            'persons' => $allArtists,
             'numberBorn' => $this->getNumberArtistsBorn($tgn),
             'numberDied' => $this->getNumberArtistsDied($tgn),
             'numberActive' => $this->getNumberArtistsActive($tgn),
@@ -198,17 +199,17 @@ extends CrudController
             'numberVenues' => count($venuesList),
             'numberExhibitions' => $this->getNumberOfExhibitions($id, $tgn, $place->getId()),
             'exhibitionTypeStats' => $exhibitionTypeStats,
-            'genderStats' => $genderStats,
+            'genderStats' => $genderCounts,
             'exhibitions' => $this->getExhibitionsByTgn($tgn),
             'venuesList' => $venuesList,
             'exhibitionStats' => $exhibitionStats,
             'em' => $this->getDoctrine()->getManager(),
 
             // tabcontent-statistics.html.twig
-            'nationalitiesStats' => $this->getNumberOfNationalities($tgn),
+            'nationalitiesStats' => $this->assoc2NameYArray($this->buildNationalityCounts($allArtists)),
             'exhibitionsGroupedByYearStats' => $this->getExhibitionsGroupedByYearByTgn($tgn),
             'exhibitionTypeStatisticsFormat' => $this->assoc2NameYArray($exhibitionTypeStats),
-            'genderStatsStatisticsFormat' => $this->assoc2NameYArray($genderStats),
+            'genderStatsStatisticsFormat' => $this->assoc2NameYArray($genderCounts),
 
             // meta
             'pageMeta' => [
@@ -518,117 +519,55 @@ extends CrudController
         return $allArtists;
     }
 
-    public function getNumberOfNationalities($tgn)
+    public function buildNationalityCounts($allArtists)
     {
+        $stats = [];
 
-        $qb = $this->getDoctrine()
-            ->getManager()
-            ->createQueryBuilder();
+        foreach ($allArtists as $info) {
+            $person = $info[0];
 
-        $qb->select([
-                'P.id AS id',
-                'P.nationality as nationality'
-            ])
-            ->from('AppBundle:Exhibition', 'E')
-            ->leftJoin('E.location', 'L')
-            ->leftJoin('AppBundle:ItemExhibition', 'IE',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
-            ->innerJoin('AppBundle:Person', 'P',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'P.id = IE.person AND P.status <> -1')
-            // ->leftJoin('IE.person', 'P')
-            ->where('L.place = :tgn' )
-            ->groupBy('P.id')
-            ->setParameter('tgn', $tgn)
-            ;
-
-        $artists = $qb->getQuery()->getResult();
-
-        $qb2 = $this->getDoctrine()
-            ->getManager()
-            ->createQueryBuilder();
-
-        $qb2->select([
-                'P.id AS id',
-                'P.nationality as nationality'
-            ])
-            ->from('AppBundle:Person', 'P')
-            ->where('P.birthPlace = :tgn or P.deathPlace = :tgn')
-            ->setParameter('tgn', $tgn)
-            ;
-
-        $artistsLiving = $qb2->getQuery()->getResult();
-
-        $allArtists = array_merge($artists, $artistsLiving);
-
-        $allArtists = array_unique($allArtists, SORT_REGULAR);
-
-        $countriesOnly = array_column($allArtists, 'nationality');
-
-        $countriesOnly = array_replace($countriesOnly, array_fill_keys(array_keys($countriesOnly, null), '[unknown]')); // remove null values if existing
-
-        $countriesStats = array_count_values($countriesOnly);
-
-        return $this->assoc2NameYArray($countriesStats);
-    }
-
-    public function getGenderSplit($tgn)
-    {
-        $qb = $this->getDoctrine()
-            ->getManager()
-            ->createQueryBuilder();
-
-        $qb->select([
-                'P.id AS id',
-                'P.gender as gender'
-            ])
-            ->from('AppBundle:Exhibition', 'E')
-            ->innerJoin('E.location', 'L')
-            ->innerJoin('AppBundle:ItemExhibition', 'IE',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
-            ->innerJoin('AppBundle:Person', 'P',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'P.id = IE.person AND P.status <> -1')
-            ->where(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
-            ->andWhere('L.place = :tgn AND P.id IS NOT NULL' )
-            ->groupBy('P.id')
-            ->setParameter('tgn', $tgn)
-            ;
-
-        $artists = $qb->getQuery()->getResult();
-
-        $qb2 = $this->getDoctrine()
-            ->getManager()
-            ->createQueryBuilder();
-
-        $qb2->select([
-                'P.id AS id',
-                'P.gender as gender'
-            ])
-            ->from('AppBundle:Person', 'P')
-            ->where('P.birthPlace = :tgn or P.deathPlace = :tgn AND P.status <> -1')
-            ->setParameter('tgn', $tgn)
-            ;
-
-        $artistsLiving = $qb2->getQuery()->getResult();
-
-        $allArtists = array_merge($artists, $artistsLiving);
-        $allArtists = array_unique($allArtists, SORT_REGULAR );
-        $gendersOnly = array_column($allArtists, 'gender');
-        $gendersOnly = array_replace($gendersOnly, array_fill_keys(array_keys($gendersOnly, null),'')); // remove null values if existing
-        $genderStats = array_count_values($gendersOnly);
-
-        // creating better named keys
-        foreach ([ 'M' => 'male', 'F' => 'female', '' => '[unknown]' ] as $src => $target) {
-            if (array_key_exists($src, $genderStats)) {
-                $genderStats[$target] = $genderStats[$src];
-                unset($genderStats[$src]);
+            $key = $person->getNationality();
+            if (is_null($key)) {
+                $key = '[unknown]';
             }
+
+            if (!array_key_exists($key, $stats)) {
+                $stats[$key] = 0;
+            }
+
+            ++$stats[$key];
         }
 
-        return $genderStats;
+        arsort($stats);
+
+        return $stats;
+    }
+
+    public function buildGenderCounts($allArtists)
+    {
+        $stats = [];
+
+        foreach ($allArtists as $info) {
+            $person = $info[0];
+
+            $gender = $person->getGender();
+            if (is_null($gender)) {
+                $key = '[unknown]';
+            }
+            else {
+                $key = $person->getGenderLabel();
+            }
+
+            if (!array_key_exists($key, $stats)) {
+                $stats[$key] = 0;
+            }
+
+            ++$stats[$key];
+        }
+
+        arsort($stats);
+
+        return $stats;
     }
 
     public function getNumberArtistsExhibited($tgn)
@@ -745,7 +684,6 @@ extends CrudController
         $qb = $this->getDoctrine()
             ->getManager()
             ->createQueryBuilder();
-
 
         $qb->select([
                 'COUNT(DISTINCT E.id) AS numExhibitions',

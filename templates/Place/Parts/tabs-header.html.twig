@@ -8,24 +8,25 @@
         </div>
 
         <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 1em">
-            {% set venues = place.venues %}
-            {% if venues|length > 0 %}
-                <li role="presentation" class="active"><a href="#venues" aria-controls="venues" role="tab" data-toggle="tab">{{ 'Venues'|trans }}</a></li>
+            {% set active = true %}
+            {% if exhibitions|length > 0 %}
+            <li role="presentation" class="exhibitions-tab{% if active %} active{% set active = false %}{% endif %}"><a href="#exhibitions" aria-controls="exhibitions" role="tab" data-toggle="tab">{{ 'Exhibitions'|trans }}</a></li>
             {% endif %}
 
-            {% if exhibitions|length > 0 %}
-            <li role="presentation"><a href="#exhibitions" aria-controls="exhibitions" role="tab" data-toggle="tab">{{ 'Exhibitions'|trans }}</a></li>
+            {% if persons|length > 0 %}
+            <li role="presentation" class="artists-tab{% if active %} active{% set active = false %}{% endif %}"><a href="#artists" aria-controls="artists" role="tab" data-toggle="tab">{{ 'Artists'|trans }}</a></li>
+            {% endif %}
+
+            {% set venues = place.venues %}
+            {% if venues|length > 0 %}
+            <li role="presentation" class="venues-tab{% if active %} active{% set active = false %}{% endif %}"><a href="#venues" aria-controls="venues" role="tab" data-toggle="tab">{{ 'Venues'|trans }}</a></li>
             {% endif %}
 
             {#% if organizers|length > 0%}
-            <li role="presentation"><a href="#organizers" aria-controls="organizers" role="tab" data-toggle="tab">{{ 'Organizing Bodies'|trans }}</a></li>
+            <li role="presentation" class="organizer-tab{% if active %} active{% set active = false %}{% endif %}"><a href="#organizers" aria-controls="organizers" role="tab" data-toggle="tab">{{ 'Organizing Bodies'|trans }}</a></li>
             {% endif %#}
 
-            {% if persons|length > 0 %}
-            <li role="presentation"{% if venuesList|length == 0 %} class="active"{% endif %}><a href="#artists" aria-controls="artists" role="tab" data-toggle="tab">{{ 'Artists'|trans }}</a></li>
-            {% endif %}
-
-            <li role="presentation"><a href="#statistics" aria-controls="statistics" role="tab" data-toggle="tab">{{ 'Statistics'|trans }}</a></li>
+            <li role="presentation" class="stats-tab{% if active %} active{% set active = false %}{% endif %}"><a href="#statistics" aria-controls="statistics" role="tab" data-toggle="tab">{{ 'Statistics'|trans }}</a></li>
         </ul>
     </div>
 {% endblock %}

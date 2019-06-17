@@ -39,15 +39,26 @@
             {% endembed %}
 
             <div class="tab-content">
-                {% embed "Place/Parts/tabcontent-venues.html.twig" %}
-                {% endembed %}
-
+            {% set active = true %}
+            {% if exhibitions|length > 0 %}
                 {% embed "Place/Parts/tabcontent-exhibitions.html.twig" %}
                 {% endembed %}
+                {% set active = false %}
+            {% endif %}
 
+            {% if persons|length > 0 %}
                 {% set artistsArray = persons %}
                 {% embed "Place/Parts/tabcontent-artists.html.twig" %}
                 {% endembed %}
+                {% set active = false %}
+            {% endif %}
+
+            {% if  place.venues|length > 0 %}
+                {% embed "Place/Parts/tabcontent-venues.html.twig" %}
+                {% endembed %}
+                {% set active = false %}
+            {% endif %}
+
 
                 {% embed "Place/Parts/tabcontent-statistics.html.twig" %}
                 {% endembed %}

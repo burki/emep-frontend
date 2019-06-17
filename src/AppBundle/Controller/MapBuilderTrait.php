@@ -31,7 +31,7 @@ trait MapBuilderTrait
         $maxDisplay = 'Person' == $entity ? 15 : 10;
 
         if ('Person' == $entity) {
-            $subTitle = 'Birth and Death Places';
+            $subTitle = 'Places of Birth and Death';
 
             $values = [];
             while ($row = $stmt->fetch()) {
