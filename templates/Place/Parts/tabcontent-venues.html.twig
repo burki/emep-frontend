@@ -40,9 +40,9 @@
                     <th># of Solo Exhibitions</th>
                     <th># of Group Exhibitions</th>
                     #}
+                    <th># of Cat. Entries</th>
                     <th># of Artists</th>
                     <th># of Nationalities</th>
-                    <th># of Cat. Entries</th>
                 </tr>
             </thead>
             <tbody>
@@ -54,13 +54,13 @@
                     </td>
                     <td>{{ venueInfo.type }}</td>
                     <td>{{ max( 0, venueInfo['numExhibitions'] ) }}</td>
+                    <td>{{ max( 0, venueInfo['numItems'] ) }}</td>
                     {#
                     <td>{{ max( 0, venueInfo['exhibition_types']['solo'] ) }}</td>
                     <td>{{ max( 0, venueInfo['exhibition_types']['group'] ) }}</td>
                     #}
                     <td>{{ max( 0, venueInfo['numArtists'] ) }}</td>
                     <td>{{ max( 0, venueInfo['numNationalities'] ) }}</td>
-                    <td>{{ max( 0, venueInfo['numItems'] ) }}</td>
                 </tr>
             {% endfor %}
             </tbody>
