@@ -18,7 +18,7 @@ extends AbstractType
             'choices' => $options['data']['choices']['organizer_geoname'],
             'multiple' => true,
             'required' => false,
-            'label' => 'Country / City',
+            'label' => "Organizer's Country / City",
             'attr' => [
                 'data-placeholder' => '- all - ',
                 'class' => 'select2',

@@ -17,8 +17,12 @@
             <li role="presentation"><a href="#exhibitions" aria-controls="exhibitions" role="tab" data-toggle="tab">{{ 'Exhibitions'|trans }}</a></li>
             {% endif %}
 
+            {#% if organizers|length > 0%}
+            <li role="presentation"><a href="#organizers" aria-controls="organizers" role="tab" data-toggle="tab">{{ 'Organizing Bodies'|trans }}</a></li>
+            {% endif %#}
+
             {% if persons|length > 0 %}
-            <li role="presentation"{% if venuesList|length == 0 %} class="active"{% endif %}><a href="#artists" aria-controls="similar" role="tab" data-toggle="tab">{{ 'Artists'|trans }}</a></li>
+            <li role="presentation"{% if venuesList|length == 0 %} class="active"{% endif %}><a href="#artists" aria-controls="artists" role="tab" data-toggle="tab">{{ 'Artists'|trans }}</a></li>
             {% endif %}
 
             <li role="presentation"><a href="#statistics" aria-controls="statistics" role="tab" data-toggle="tab">{{ 'Statistics'|trans }}</a></li>

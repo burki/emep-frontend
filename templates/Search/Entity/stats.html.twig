@@ -1,7 +1,5 @@
 {% extends 'Search/Entity/index.html.twig' %}
 
-{% import 'Shared/helper.html.twig' as helper %}
-
 {% block head %}
     {{ parent() }}
 
@@ -15,5 +13,6 @@
     {{ charts|raw }}
     <script src="{{ app.request.basepath }}/js/collapseChart.js"></script>
 
+    {% import 'Shared/helper.html.twig' as helper %}
     {{ helper.show_detailmodal() }}
 {% endblock %}
