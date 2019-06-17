@@ -34,7 +34,6 @@
         <h1 class="heading-2">Latest Blog Posts</h1>
         <div class="blog-posts-container">
             {% for post in posts %}
-                {#{ dump(post) }#}
                 <a href="{{ path('blog', { 'slug': post['slug'] }) }}" class="blog-post-single-container">
                     <div class="blog-image" style="background-image: url('{{ post['media_url']['source_url'] }}')"></div>
                     <div class="blog-text-container">
@@ -45,6 +44,9 @@
                 </a>
             {% endfor %}
         </div>
+        {% if hasMore %}
+            <div><a href="{{ path('blog-index') }}#{{ hasMore }}">More...</a></div>
+        {% endif %}
         {% endif %}
     </div>
 {% endblock %}

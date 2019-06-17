@@ -47,7 +47,8 @@ extends CrudController
 
     protected function buildSaveSearchParams(Request $request, UrlGeneratorInterface $urlGenerator)
     {
-        $route = str_replace('-save', '-index', $request->get('_route'));
+        $settings = $this->lookupSettingsFromRequest($request);
+        $route = $settings['base'];
 
         $this->form = $this->createSearchForm($request, $urlGenerator);
 
@@ -388,7 +389,7 @@ extends CrudController
         $csvResult = array_map(function ($person) use ($catalogueEntriesByPersonCount) {
                 $count = array_key_exists($person->getId(), $catalogueEntriesByPersonCount)
                     ? $catalogueEntriesByPersonCount[$person->getId()] : 0;
-                return [ $person->getFullname(true), $person->getNationality(), $person->getBirthDate(), $person->getDeathDate(), $count ];
+                return [ $person->getFullname(false), $person->getNationality(), $person->getBirthDate(), $person->getDeathDate(), $count ];
             }, $artists);
 
         return new CsvResponse($csvResult, 200, explode(', ', 'Name, Nationality, Birth Date, Death Date, # of Cat. Entries'));

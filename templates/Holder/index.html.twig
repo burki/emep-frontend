@@ -17,9 +17,6 @@
             {{ helper.indexform_actions('holder-save') }}
         });
     </script>
-
-    {#% import 'Shared/datatables.html.twig' as datatables %}
-    {{ datatables.head() }#}
 {% endblock %}
 
 {% block body %}
@@ -40,11 +37,18 @@
                 {{ form_rest(form) }}
             </div>
         </div>
+
+        {% block filters %}
+            {% import 'Shared/helper.html.twig' as helper %}
+
+            <div class="filter-combination-container">
+                {% form_theme form 'Search/bootstrap_3_adjusted.html.twig' %}
+                <div style="display:none">{{ form_row(form.holder.holder) }}{# for checkbox filter #}</div>
+
+                {{ helper.render_active_filters(listBuilder, form, entityLabels) }}
+            </div><!-- .filter-combination-container -->
+        {% endblock %}
     </form>
-
-
-    <script>
-    </script>
 
     <div class="contentcontainer w-container">
         <div class="listviewrow">

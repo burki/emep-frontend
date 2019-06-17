@@ -13,13 +13,12 @@
     <div class="contentcontainer nopadding w-container">
         <div class="lefthalf">
             <div class="subheader">holding institution</div>
-            <h1 class="heading">{{ holder.name }}</h1>
+            <h1 class="heading">{{ holder.nameAppend ? holder.nameAppend : holder.name }}</h1>
             {% if holder.nameAppend is not empty %}
-                <h2 style="margin-top: -0.8rem"><span class="small">{{ holder.nameAppend }}</span></h2>
+                <h2 class="heading-append"><span class="small">{{ holder.name }}</span></h2>
             {% endif %}
 
             <div class="artist_information">
-                {# load helper part#}
                 {% embed "Holder/Parts/holder-base-information.html.twig" %}
                 {% endembed %}
             </div>

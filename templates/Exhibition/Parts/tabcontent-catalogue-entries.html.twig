@@ -1,4 +1,6 @@
 {% block entries %}
+    {% import 'Shared/helper.html.twig' as helper %}
+
     {% import 'Shared/datatables.html.twig' as datatables %}
     {{ datatables.head() }}
 
@@ -13,6 +15,7 @@
             $('#entrytable-list-view').DataTable({
                 'dom': 'ilrtp',
                 paging: true,
+                pageLength: 25,
                 info: true,
                 'columns': [
                     { "orderSequence": [ "asc", "desc" ] },

@@ -101,12 +101,11 @@
             <div class="subheader">exhibition</div>
             <h1 class="heading">{{ exhibition.titleAppend ? exhibition.titleAppend : exhibition.title }}</h1>
             {% if exhibition.titleAppend is not empty %}
-                <h2 style="margin-top: -0.8rem"><span class="small">{{ exhibition.title }}</span></h2>
+                <h2 class="heading-append"><span class="small">{{ exhibition.title }}</span></h2>
             {% endif %}
 
             <div class="artist-information-text" style="width: 100%; margin-bottom: 2rem;">{{ exhibition.subtitle }} <br /><strong>Status: {{ catalogueStatus[exhibition.status] }}</strong></div>
             <div class="artist_information">
-                {# load helper part#}
                 {% embed "Exhibition/Parts/location-base-information.html.twig" %}
                 {% endembed %}
             </div>
@@ -120,7 +119,6 @@
 
     <div class="contentcontainer w-container">
         <div class="listviewrow">
-            {# tabs headers #}
             {% embed "Exhibition/Parts/tabs-header.html.twig" %}
             {% endembed %}
 

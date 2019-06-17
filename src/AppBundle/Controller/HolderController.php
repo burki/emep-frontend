@@ -85,13 +85,14 @@ extends CrudController
 
             'listBuilder' => $listBuilder,
             'form' => $this->form->createView(),
-            'searches' => $this->lookupSearches($user, $request->get('_route')),
+            'searches' => $this->lookupSearches($user, $settings['base']),
         ]);
     }
 
     protected function buildSaveSearchParams(Request $request, UrlGeneratorInterface $urlGenerator)
     {
-        $route = str_replace('-save', '-index', $request->get('_route'));
+        $settings = $this->lookupSettingsFromRequest($request);
+        $route = $settings['base'];
 
         $this->buildFilterForm();
 
@@ -142,35 +143,37 @@ extends CrudController
             return new JsonLdResponse($holder->jsonLdSerialize($locale));
         }
 
-        $citeProc = $this->instantiateCiteProc($request->getLocale());
+        $placeLabel = $holder->getPlaceLabel();
+        $place = null;
+        if (!empty($placeLabel)) {
+            // currently no relation, so try to look-up
+            $qb = $this->getDoctrine()
+                ->getManager()
+                ->createQueryBuilder();
 
-        $qb = $this->getDoctrine()
-            ->getManager()
-            ->createQueryBuilder();
+            $qb->select([
+                    'H',
+                    'H.placeLabel',
+                    'P.latitude',
+                    'P.longitude'
+                ])
+                ->from('AppBundle:Holder', 'H')
+                ->leftJoin('AppBundle:Place', 'P',
+                           \Doctrine\ORM\Query\Expr\Join::WITH,
+                           "P.type='inhabited places' AND (P.name = H.placeLabel OR P.alternateName = H.placeLabel)")
+                ->where('H.id = ' . $id)
+                ;
 
-        $qb->select([
-                'H',
-                'H.placeLabel',
-                'P.latitude',
-                'P.longitude'
-            ])
-            ->from('AppBundle:Holder', 'H')
-            ->leftJoin('AppBundle:Place', 'P',
-                       \Doctrine\ORM\Query\Expr\Join::WITH,
-                       'P.name = H.placeLabel')
-            ->where('H.id = ' . $id)
-            ;
-
-        $bibitems = $holder->findBibitems($this->getDoctrine()->getManager(), true);
-
-        $holderPlace = $qb->getQuery()->execute();
+            $holderPlace = $qb->getQuery()->execute();
+            $place = $holderPlace[0];
+        }
 
         return $this->render('Holder/detail.html.twig', [
-            'place' => $holderPlace[0],
+            'place' => $place,
             'pageTitle' => $holder->getName(),
             'holder' => $holder,
-            'bibitems' => $bibitems,
-            'citeProc' => $citeProc,
+            'bibitems' => $holder->findBibitems($this->getDoctrine()->getManager(), true),
+            'citeProc' => $this->instantiateCiteProc($request->getLocale()),
             'pageMeta' => [
                 /*
                 'jsonLd' => $holder->jsonLdSerialize($locale),
@@ -200,14 +203,10 @@ extends CrudController
             return $this->redirectToRoute('holder-index');
         }
 
-        $result = $holder->findBibitems($this->getDoctrine()->getManager(), true);
-
         $csvResult = [];
 
-        foreach ($result as $key => $value) {
-            $bibitem = $value[0];
-
-            $innerArray = [];
+        foreach ($holder->findBibitems($this->getDoctrine()->getManager(), true) as $row) {
+            $bibitem = $row[0];
 
             $year = '';
             $datePublished = $bibitem->getDatePublished();
@@ -220,17 +219,41 @@ extends CrudController
                 $publisher = $publisher->getName();
             }
 
-            array_push($innerArray,
-                       $bibitem->getTitle(),
-                       $bibitem->getPublicationLocation(),
-                       $publisher,
-                       $year);
+            $startDate = $endDate = $displayDate = $venue = '';
+            foreach ($bibitem->exhibitionRefs as $exhibitionRef) {
+                if ($exhibitionRef->getRole() == 1) {
+                    $exhibition = $exhibitionRef->getExhibition();
+                    $startDate = $exhibition->getStartdate();
+                    $endDate = $exhibition->getEnddate();
+                    $displayDate = $exhibition->getDisplaydate();
+                    $location = $exhibition->getLocation();
+                    if (!is_null($location)) {
+                        $venue = $location->getName();
+                    }
+                    break;
+                }
+            }
 
-            array_push($csvResult, $innerArray);
+
+            $csvResult[] = [
+                $bibitem->getTitle(),
+                $bibitem->getPublicationLocation(),
+                $publisher,
+                $year,
+                $row['signature'],
+                $row['url'],
+                $startDate,
+                $endDate,
+                $displayDate,
+                $venue,
+            ];
         }
 
         return new CsvResponse($csvResult, 200, [
                 'Title', 'Place of Publication', 'Publisher', 'Year of Publication',
+                'Signature', 'URL',
+                'Start Date', 'End Date', 'Display Date',
+                'Venue',
             ], 'catalogues.xlsx');
     }
 }

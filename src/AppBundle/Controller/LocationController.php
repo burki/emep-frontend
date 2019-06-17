@@ -72,8 +72,9 @@ extends CrudController
 
     protected function buildSaveSearchParams(Request $request, UrlGeneratorInterface $urlGenerator)
     {
-        $route = str_replace('-save', '-index', $request->get('_route'));
-        $entity = 'organizer-index' == $route ? 'Organizer' : 'Venue';
+        $settings = $this->lookupSettingsFromRequest($request);
+        $route = $settings['base'];
+        $entity = 'organizer' == $route ? 'Organizer' : 'Venue';
 
         $this->form = $this->createSearchForm($request, $urlGenerator);
 
@@ -259,21 +260,17 @@ extends CrudController
 
         $artists = $this->getArtistsByExhibitionIds($exhibitionIds);
 
-        $csvResult = [];
+        $csvResult = array_map(function ($values) {
+                $person = $values[0];
+                return [
+                    $person->getFullname(false),
+                    $person->getNationality(),
+                    $person->getBirthDate(), $person->getDeathDate(),
+                    $values['numExhibitionSort'], $values['numCatEntrySort'],
+                ];
+            }, $artists);
 
-        foreach ($artists as $key => $value) {
-            $artist = $value[0];
-
-            $innerArray = [];
-            array_push($innerArray,
-                       $artist->getFullName(true),
-                       $value['numExhibitionSort'],
-                       $value['numCatEntrySort'] );
-
-            array_push($csvResult, $innerArray);
-        }
-
-        return new CsvResponse($csvResult, 200, explode( ', ', 'Person, # of Exhibitions, # of Cat. Entries'));
+        return new CsvResponse($csvResult, 200, explode( ', ', 'Name, Nationality, Birth Date, Death Date, # of Exhibitions, # of Cat. Entries'));
     }
 
     /**

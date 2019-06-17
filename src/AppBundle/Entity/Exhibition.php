@@ -181,6 +181,13 @@ class Exhibition
     /**
      * @var string
      *
+     * @ORM\Column(name="currency", type="string", length=255, nullable=true)
+     */
+    private $currency;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="price", type="string", length=255, nullable=true)
      */
     private $price;
@@ -363,6 +370,35 @@ class Exhibition
     public function getOrganizingCommittee()
     {
         return $this->organizingCommittee;
+    }
+
+    /**
+     * Sets url.
+     *
+     * @param string $url
+     *
+     * @return $this
+     */
+    public function setUrl($url)
+    {
+        $this->url = $url;
+
+        return $this;
+    }
+
+    /**
+     * Gets url.
+     *
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this->url;
+    }
+
+    public function getCurrency()
+    {
+        return $this->currency;
     }
 
     public function getHours()

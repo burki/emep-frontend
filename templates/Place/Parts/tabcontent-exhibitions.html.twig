@@ -1,19 +1,20 @@
 {% block exhibitions %}
+    {% import 'Shared/helper.html.twig' as helper %}
     {% import 'Shared/datatables.html.twig' as datatables %}
     {{ datatables.head() }}
 
     <script>
         $( document ).ready(function() {
             $('#exhibitions-table').DataTable({
+                dom: 'ilrtp',
                 paging: true,
+                pageLength: 25,
                 searching: false,
                 info: true,
-                order: [[ 0, "asc" ]],
-                "dom": 'ilrtp',
-                "columns": [
+                order: [[ 0, 'asc' ]],
+                columns: [
                     { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "asc", "desc" ] },
-                    // { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "desc", "asc" ] }
@@ -29,9 +30,6 @@
             <tr class="listviewheading">
                 <th>Date</th>
                 <th>Title</th>
-                <!--
-                <th>City</th>
-                -->
                 <th>Venue</th>
                 <th>Type of Org. Body</th>
                 <th># of Cat. Entries</th>
@@ -40,23 +38,13 @@
 
             <tbody>
             {% for exhibition in exhibitions %}
-                {% set exhPlace = exhibition.location.place %}
-
                 <tr class="listviewrow">
                     <td class="date" data-order="{{ exhibition.startdate }}"><b>{{ helper.exhibition_period(exhibition) }}</b></td>
-                    <td class="title"><a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
-                            <b>{{ exhibition.title }}</b> {{ exhibition.titleAppend }}</a></td>
-                    <!--
-                    <td class="normal">
-                        <a href="{% if exhPlace.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : exhPlace.tgn }) }}{% else %}{{ path('place', { 'id' : exhPlace.id }) }}{% endif %}">
-                            {{ exhibition.location.placeLabel }}
-                        </a>
+                    <td class="title">
+                        <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}"><b>{{ exhibition.title }}</b> {{ exhibition.titleAppend }}</a>
                     </td>
-                    -->
                     <td class="normal">
-                        <a href="{{ path('location', { 'id' : exhibition.location.id }) }}">
-                            {{ exhibition.location.name }}
-                        </a>
+                        {{ helper.location_linked(exhibition.location) }}
                     </td>
                     <td>{{ exhibition.organizerType }}</td>
                     <td>

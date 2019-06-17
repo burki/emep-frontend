@@ -1,17 +1,19 @@
 {% block exhibitions %}
+    {% import 'Shared/helper.html.twig' as helper %}
     {% import 'Shared/datatables.html.twig' as datatables %}
     {{ datatables.head() }}
 
     <script>
         $( document ).ready(function() {
             $('#exhibitions').DataTable({
-                "dom": 'ilrtp',
+                dom: 'ilrtp',
                 responsive: true,
                 paging: true,
+                pageLength: 25,
                 searching: false,
                 info: true,
                 order: [[ 0, "asc" ]],
-                "columns": [
+                columns: [
                     { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "asc", "desc" ] },
@@ -39,8 +41,6 @@
 
             <tbody>
             {% for exhibition in person.getExhibitions(-1) %}
-                {% set exhPlace = exhibition.location.place %}
-
                 <tr class="listviewrow">
                     <td class="date" data-order="{{ exhibition.startdate }}"><b>{{ helper.exhibition_period(exhibition) }}</b></td>
                     <td class="title">
@@ -49,14 +49,17 @@
                         </a>
                     </td>
                     <td class="normal">
-                        <a href="{% if exhPlace.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : exhPlace.tgn }) }}{% else %}{{ path('place', { 'id' : exhPlace.id }) }}{% endif %}">
+                        {% set place = exhibition.location.place %}
+                        {% if place is not null %}
+                        <a href="{% if place.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : place.tgn }) }}{% else %}{{ path('place', { 'id' : place.id }) }}{% endif %}">
                             {{ exhibition.location.placeLabel }}
                         </a>
+                        {% else %}
+                            {{ exhibition.location.placeLabel }}
+                        {% endif %}
                     </td>
-                    <td class="normal">
-                        <a href="{{ path('location', { 'id' : exhibition.location.id }) }}">
-                            {{ exhibition.location.name }}
-                        </a>
+                    <td class="normal" data-order="{{ exhibition.location.name }}">
+                        {{ helper.location_linked(exhibition.location) }}
                     </td>
                     <td>
                         {% if catalogueEntriesByExhibition[exhibition.id] is defined %}

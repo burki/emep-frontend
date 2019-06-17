@@ -15,13 +15,14 @@
     </div>
 
     {% block filters %}
+        {% import 'Shared/helper.html.twig' as helper %}
         <div class="filters-heading" style="margin-top: 25px;">
             <span style="margin-right: 20px; margin-top: 7px">Additional Filters:</span>
 
             {% set entityLabels = {
                 'exhibition-type': 'Org. Body of Exhibition',
-                'person-birth': 'Birth Year of Artists',
-                'person-death': 'Death Year of Artists',
+                'person-birth': 'Year of Birth',
+                'person-death': 'Year of Death',
             } %}
 
             {% for entity,label in entityLabels %}
@@ -46,7 +47,7 @@
 
             <div id="filter-panel-person-birth" class="collapse filter-panel">
                 <div class="panel panel-default">
-                    <div class="panel-heading">Birth Year of Artists</div>
+                    <div class="panel-heading">Artists' Year of Birth</div>
                     <div class="panel-body">
                         {{ form_row(form.person.birthdate) }}
                     </div>
@@ -55,7 +56,7 @@
 
             <div id="filter-panel-person-death" class="collapse filter-panel">
                 <div class="panel panel-default">
-                    <div class="panel-heading">Death Year of Artists</div>
+                    <div class="panel-heading">Artists' Year of Death</div>
                     <div class="panel-body">
                         {{ form_row(form.person.deathdate) }}
                     </div>
@@ -64,6 +65,5 @@
 
             {{ helper.render_active_filters(listBuilder, form, entityLabels) }}
         </div><!-- .filter-combination-container -->
-
     {% endblock %}
 </form>

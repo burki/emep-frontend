@@ -11,7 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use AppBundle\Utils\SearchListPagination;
 
 /**
- *
+ * Base Controller for home-page and other blog- and info-pages
  */
 class DefaultController
 extends Controller
@@ -38,7 +38,7 @@ extends Controller
     /**
      * @Route("/", name="home")
      */
-    public function indexAction(Request $request, UrlGeneratorInterface $urlGenerator)
+    public function homeAction(Request $request, UrlGeneratorInterface $urlGenerator)
     {
         $connection = $this->getDoctrine()->getManager()->getConnection();
 
@@ -75,14 +75,23 @@ extends Controller
             $counts[$entity] = $listPagination->getTotal();
         }
 
+        // latest blog posts
         $client = $this->instantiateWpApiClient();
 
         $posts = [];
+        $numPosts = 3;
+        $hasMore = false;
         if (false !== $client) {
             try {
                 $posts = $client->posts()->get(null, [
-                    'per_page' => 3,
+                    'per_page' => $numPosts + 1,
                 ]);
+
+                if (count($posts) > $numPosts) {
+                    $post = $posts[$numPosts];
+                    $hasMore = !empty($post['slug']) ? $post['slug'] : true;
+                    unset($posts[$numPosts]);
+                }
 
                 foreach ($posts as $key => $post) {
                     $mediaId = $post['featured_media'];
@@ -99,7 +108,8 @@ extends Controller
 
         return $this->render('Default/index.html.twig', [
             'counts' => $counts,
-            'posts' => $posts
+            'posts' => $posts,
+            'hasMore' => $hasMore,
         ]);
     }
 }

@@ -21,36 +21,36 @@
     ],
 
     "require": {
-        "symfony/yaml": "^4.2",
-        "symfony/console": "^4.2",
-        "symfony/framework-bundle": "^4.2",
+        "symfony/yaml": "^4.3",
+        "symfony/console": "^4.3",
+        "symfony/framework-bundle": "^4.3",
 
-        "symfony/templating": "^4.2",
-        "symfony/translation": "^4.2",
-        "symfony/twig-bundle": "^4.2",
+        "symfony/templating": "^4.3",
+        "symfony/translation": "^4.3",
+        "symfony/twig-bundle": "^4.3",
 
-        "symfony/security-bundle": "^4.2",
+        "symfony/security-bundle": "^4.3",
 
-        "symfony/web-profiler-bundle": "^4.2",
-        "symfony/debug-bundle": "^4.2",
+        "symfony/web-profiler-bundle": "^4.3",
+        "symfony/debug-bundle": "^4.3",
 
-        "symfony/validator": "^4.2",
-        "symfony/form": "^4.2",
+        "symfony/validator": "^4.3",
+        "symfony/form": "^4.3",
         "shapecode/hidden-entity-type-bundle": "^3.0",
 
         "symfony/monolog-bundle": "^3.3",
         "symfony/swiftmailer-bundle": "^3.2",
         "knplabs/knp-menu-bundle": "^2.2",
 
-        "symfony/asset": "^4.2",
+        "symfony/asset": "^4.3",
         "symfony/assetic-bundle": "dev-master as 2.8.3",
-        "leafo/scssphp": "^0.7",
+        "leafo/scssphp": "^0.8",
 
         "lexik/form-filter-bundle": "^5.0",
         "knplabs/knp-paginator-bundle": "^3.0",
 
         "cocur/slugify": "^3.2",
-        "twig/twig": "1.*",
+        "twig/twig": "^2.11",
         "twig/extensions": "^1.5",
         "liip/url-auto-converter-bundle": "dev-master",
 
@@ -64,7 +64,7 @@
         "wikimedia/utfnormal": "^2.0",
 
         "semsol/arc2": "^2.4",
-        "easyrdf/easyrdf": "@stable",
+        "easyrdf/easyrdf": "^0.9",
         "seboettg/citeproc-php": "dev-name-as-sort-order-fix#bf446dc",
         "fale/isbn": "3.*",
 

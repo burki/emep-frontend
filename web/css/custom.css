@@ -1,5 +1,4 @@
 /* custom form styles */
-
 .checkmark:after {
     content: "";
     position: relative;
@@ -93,8 +92,6 @@
     margin-right: 15px;
     margin-left: -15px;
 }
-
-
 
 .advanced-filters-startDateRangeExhibition-startdate-year, .advanced-filters-startDateRangeExhibition-enddate-year,
 .advanced-filters-birthDateRangeArtist-start-year, .advanced-filters-birthDateRangeArtist-end-year,
@@ -417,27 +414,24 @@ div#footer-fwf {
 }
 
 
-
 .places-filter div:nth-child(0) {
-    width: 100%!important;
+    width: 100% !important;
 }
 
 .places-filter .searchbarinputcontainer div:nth-child(1) {
-    width: 100%!important;
+    width: 100% !important;
 }
 
 .places-filter .searchbarinputcontainer div:nth-child(2) {
-    width: 35%!important;
+    width: 35% !important;
 }
 
-
-
 .places-filter {
-    width: 100%!important;
+    width: 100% !important;
 }
 
 .select2 {
-    width: 100%!important;
+    width: 100% !important;
 }
 
 .searchbarinputcontainer .select2-selection {
@@ -447,7 +441,7 @@ div#footer-fwf {
 
 .information-tab {
     margin-top: 2rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     width: 100%;
 }
 
@@ -758,19 +752,21 @@ td.normal a, .listviewrow, .artist-text {
     z-index: 99;
 }
 
-
-
 .coming-soon {
-    color: rgba(91, 105, 116, .8)!important;
+    color: rgba(91, 105, 116, .8) !important;
 }
 
-
-.heading-subtitle-menu{
+.heading-subtitle-menu {
     font-size: 12px;
 }
 
-.heading-title-menu{
+.heading-title-menu {
     text-align: right;
+}
+
+h2.heading-append {
+    margin-top: -0.4rem;
+    line-height: 65%;
 }
 
 .button:hover {

@@ -9,9 +9,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
-
 /**
- *
+ * Shared settings and methods for the various Controllers
  */
 abstract class CrudController
 extends Controller
@@ -182,11 +181,7 @@ extends Controller
             ->orderBy('country, place')
             ;
 
-        // die($queryBuilder->getSql());
-
-
         $geonames = [];
-
 
         $lastCountryCode = '';
 
@@ -292,7 +287,6 @@ extends Controller
         return $ret;
     }
 
-
     /**
      * Checks if a saved search is requested and if so, looks it up and redirects
      */
@@ -331,7 +325,7 @@ extends Controller
         return $route;
     }
 
-    /*
+    /**
      * Saves a search
      */
     protected function handleSaveSearchAction(Request $request,
@@ -373,6 +367,36 @@ extends Controller
             'pageTitle' => $this->get('translator')->trans('Save your query'),
             'form' => $form->createView(),
         ]);
+    }
+
+    /**
+     * Looks up saved searches of a $user for a specific route
+     */
+    protected function lookupSearches($user, $routeName)
+    {
+        if (is_null($user)) {
+            return [];
+        }
+
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+        $qb->select('UA')
+            ->from('AppBundle:UserAction', 'UA')
+            ->where("UA.route = :route")
+            ->andWhere("UA.user = :user")
+            ->orderBy("UA.createdAt", "DESC")
+            ->setParameter('route', $routeName)
+            ->setParameter('user', $user)
+            ;
+
+        $searches = [];
+
+        foreach ($qb->getQuery()->getResult() as $userAction) {
+            $searches[$userAction->getId()] = $userAction->getName();
+        }
+
+        return $searches;
     }
 
     /**
@@ -418,36 +442,6 @@ extends Controller
         return $types;
     }
 
-    /*
-     * Looks up saved searches of a $user for a specific route
-     */
-    protected function lookupSearches($user, $routeName)
-    {
-        if (is_null($user)) {
-            return [];
-        }
-
-        $qb = $this->getDoctrine()
-            ->getManager()
-            ->createQueryBuilder();
-        $qb->select('UA')
-            ->from('AppBundle:UserAction', 'UA')
-            ->where("UA.route = :route")
-            ->andWhere("UA.user = :user")
-            ->orderBy("UA.createdAt", "DESC")
-            ->setParameter('route', $routeName)
-            ->setParameter('user', $user)
-            ;
-
-        $searches = [];
-
-        foreach ($qb->getQuery()->getResult() as $userAction) {
-            $searches[$userAction->getId()] = $userAction->getName();
-        }
-
-        return $searches;
-    }
-
     protected function buildPagination(Request $request, $query, $options = [])
     {
         $paginator = $this->get('knp_paginator');
@@ -468,17 +462,27 @@ extends Controller
     protected function createSearchForm(Request $request, $urlGenerator)
     {
         $venueTypes = $this->buildVenueTypes();
+        $venueGeonames = $this->buildVenueGeonames();
+        // carry the countries over
+        $placeGeonames = [];
+        foreach ($venueGeonames as $key => $label) {
+            if (preg_match('/^cc\:/', $key)) {
+                $placeGeonames[$key] = $label;
+            }
+        }
+
         $exhibitionTypes = [ 'group', 'solo', 'auction' ];
         $exhibitionOrganizerTypes = $this->buildOrganizerTypes();
 
         return $this->createForm(\AppBundle\Form\Type\SearchFilterType::class, [
             'choices' => [
                 'nationality' => array_flip($this->buildPersonNationalities()),
-                'location_geoname' => array_flip($this->buildVenueGeonames()),
+                'location_geoname' => array_flip($venueGeonames),
                 'location_type' => array_combine($venueTypes, $venueTypes),
                 'organizer_geoname' => array_flip($this->buildOrganizerGeonames($request, $urlGenerator)),
                 'organizer_type' => array_combine($venueTypes, $venueTypes),
                 'holder_geoname' => array_flip($this->buildHolderGeonames()),
+                'place_geoname' => array_flip($placeGeonames),
                 'exhibition_type' => array_combine($exhibitionTypes, $exhibitionTypes),
                 'exhibition_organizer_type' => array_combine($exhibitionOrganizerTypes, $exhibitionOrganizerTypes),
                 'itemexhibition_type' => array_flip($this->buildItemExhibitionTypes()),
@@ -520,7 +524,6 @@ extends Controller
         return $filters;
     }
 
-
     protected function instantiateListBuilder(Request $request,
                                               UrlGeneratorInterface $urlGenerator,
                                               $mode = false,
@@ -535,7 +538,6 @@ extends Controller
             static $submitCalled = false; // buildExhibitionCharts calls instantiateListBuilder multiple times
 
             if (!$submitCalled) {
-                // var_dump($parameters['filter']);
                 $this->form->submit($parameters['filter']);
                 $submitCalled = true;
             }
@@ -611,7 +613,7 @@ extends Controller
         return $hydrationQuery->getResult();
     }
 
-    protected  function hydrateWorks($ids, $preserveOrder = false)
+    protected function hydrateWorks($ids, $preserveOrder = false)
     {
         // hydrate with doctrine entity
         $qb = $this->getDoctrine()
@@ -625,9 +627,7 @@ extends Controller
             ->getQuery();
         ;
 
-
         $hydrationQuery->setParameter('ids', $ids);
-
 
         return $hydrationQuery->getResult();
     }

@@ -103,11 +103,10 @@
     <body role="document" class="body route-{{ app.request.get('_route') | replace({'_' : '-'}) }}">
         <a href="#" id="scroll" style="display: none;"><span></span></a>
 
-        {# new header #}
         <div data-collapse="medium" data-animation="default" data-duration="400" class="navbar w-nav">
             <div class="w-container navigation-container">
                 <nav role="navigation" class="nav-menu w-nav-menu">
-                    {{ knp_menu_render('main', { 'currentClass': 'active', 'template': 'Base/knp_menu_new_design.html.twig' }) }}
+                    {{ knp_menu_render('main', { 'currentClass': 'active', 'template': 'Base/knp_menu_customized.html.twig' }) }}
                 </nav>
                 <div class="branding">
                     <a href="{{ path('home') }}" class="brand w-nav-brand">
@@ -120,10 +119,7 @@
             </div>
         </div>
 
-
-
         {% block contenttop %}
-        {#% embed 'Base/contenttop_skeleton.html.twig' %}{% endembed %#}
         {% endblock %}
 
         <div class="w-container wrapper">

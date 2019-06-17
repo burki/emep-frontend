@@ -1,4 +1,5 @@
 {% block information %}
+    {% import 'Shared/helper.html.twig' as helper %}
         <div role="tabpanel" class="tab-pane{% if 'itemexhibition' != app.request.get('_route') %} active{% endif %}" id="information">
             {% set infoShown = false %}
 
@@ -24,7 +25,7 @@
                             <br />Holding Institution{% if bibitem.holderRefs|length > 1 %}s{% endif %}:
                             {% for holderRef in bibitem.holderRefs %}
                                 {% set holder = holderRef.holder %}
-                                <a href="{{ path('holder', { 'id': holder.id }) }}">{{ holder.name }}</a>{% if not loop.last %}, {% endif %}
+                                <a href="{{ path('holder', { 'id': holder.id }) }}#publication-{{ bibitem.id }}">{{ holder.nameAppend ? holder.nameAppend : holder.name }}</a>{% if not loop.last %}, {% endif %}
                             {% endfor %}
                         {% endif %}
                         {% if bibitem.hasInfo %}

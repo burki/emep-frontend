@@ -2,12 +2,16 @@
     <script>
         $( document ).ready(function() {
             $('#artists-table').DataTable({
-                "dom": 'ilrtp',
+                dom: 'ilrtp',
                 paging: true,
+                pageLength: 25,
                 searching: false,
                 info: true,
-                "columns": [
+                columns: [
                     { "orderSequence": [ "asc", "desc" ] },
+                    { "orderSequence": [ "asc", "desc" ] },
+                    { "orderSequence": [ "desc", "asc" ] },
+                    { "orderSequence": [ "desc", "asc" ] },
                     { "orderSequence": [ "desc", "asc" ] },
                     { "orderSequence": [ "desc", "asc" ] }
                 ]
@@ -20,6 +24,9 @@
             <thead>
             <tr>
                 <th>Name</th>
+                <th>Nationality</th>
+                <th>Birth Date</th>
+                <th>Death Date</th>
                 <th># of Exhibitions</th>
                 <th># of Cat. Entries</th>
             </tr>
@@ -31,6 +38,15 @@
                 <tr>
                     <td class="title" data-order="{{ person.fullname(false) }}">
                         <a href="{{ path('person', { 'id' : person.id }) }}">{{ person.fullname(true) }}</a>
+                    </td>
+                    <td>
+                        {{ person.nationality }}
+                    </td>
+                    <td data-order="{{ person.birthDate }}">
+                        {{ person.birthDate|dateincomplete -}}
+                    </td>
+                    <td data-order="{{ person.deathDate }}">
+                        {{ person.deathDate|dateincomplete -}}
                     </td>
                     <td>{{ row['numExhibitionSort'] }}</td>
                     <td>{{ row['numCatEntrySort'] }}</td>

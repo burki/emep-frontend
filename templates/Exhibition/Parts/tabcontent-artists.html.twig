@@ -7,6 +7,7 @@
             $('#artisttable').DataTable({
                 'dom': 'ilrtp',
                 paging: true,
+                pageLength: 25,
                 searching: false,
                 info: true,
                 columns: [
@@ -38,19 +39,15 @@
                     <td class="title" data-order="{{ person.fullname(false) }}">
                         <a href="{{ path('person', { 'id' : person.id }) }}">{{ person.fullname(true) }}</a>
                     </td>
-
                     <td>
                         {{ person.nationality }}
                     </td>
-
                     <td data-order="{{ person.birthDate }}">
                         {{ person.birthDate|dateincomplete -}}
                     </td>
-
                     <td data-order="{{ person.deathDate }}">
                         {{ person.deathDate|dateincomplete -}}
                     </td>
-
                     <td>
                         {{ catalogueEntriesByPersonCount[person.id] }}
                     </td>

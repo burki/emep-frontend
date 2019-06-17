@@ -10,7 +10,7 @@
         <div class="entry-content">
 
     {% for post in posts %}
-        <h3 style="font-size: 14px; clear: left">{{ date(post['date'])|date('d.m.Y')}}
+        <h3 id="{{ post['slug'] }}" style="font-size: 14px; clear: left">{{ date(post['date'])|date('d.m.Y')}}
             <a href="{{ path('blog', { 'slug': post['slug'] }) }}">{{ post['title']['rendered']|raw }}</a>
         </h3>
         <div>

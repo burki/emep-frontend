@@ -55,7 +55,8 @@ extends CrudController
 
     protected function buildSaveSearchParams(Request $request, UrlGeneratorInterface $urlGenerator)
     {
-        $route = str_replace('-save', '-index', $request->get('_route'));
+        $settings = $this->lookupSettingsFromRequest($request);
+        $route = $settings['base'];
 
         $this->form = $this->createSearchForm($request, $urlGenerator);
 

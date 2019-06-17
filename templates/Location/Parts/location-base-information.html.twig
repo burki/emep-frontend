@@ -1,3 +1,5 @@
+{% import 'Shared/helper.html.twig' as helper %}
+
 {# place #}
 {% if location.place is not null %}
     <div class="artist-information-container">
@@ -24,7 +26,7 @@
 {% if location.url is not null %}
     <div class="artist-information-container">
         <div class="artist-information-label">{{ 'URL'|trans }}:</div>
-        <div class="artist-information-text"><a href="{{ location.url }}">{{ location.url }} website</a>
+        <div class="artist-information-text"><a href="{{ location.url }}" target="_blank">{{ location.url|prettifyurl }}</a>
         </div>
     </div>
 {% endif %}

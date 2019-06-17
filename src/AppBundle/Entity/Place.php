@@ -132,7 +132,7 @@ implements \JsonSerializable, JsonLdSerializable
     protected $name;
 
     /**
-     * @var array An alias for the item.
+     * @var string An alias for the item.
      *
      * @ORM\Column(name="name_alternate", type="string", nullable=true)
      */

@@ -23,8 +23,9 @@ extends AbstractType
         $builder->add('location', LocationFilterType::class, $options);
         $builder->add('organizer', OrganizerFilterType::class, $options);
         $builder->add('person', PersonFilterType::class, $options);
+        $builder->add('place', PlaceFilterType::class, $options);
 
-        // currently only for expoer
+        // currently only for export
         $builder->add('holder', HolderFilterType::class, $options);
 
         // submit

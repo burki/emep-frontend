@@ -1,15 +1,17 @@
 {% block exhibitions %}
+    {% import 'Shared/helper.html.twig' as helper %}
     {% import 'Shared/datatables.html.twig' as datatables %}
     {{ datatables.head() }}
 
     <script>
         $( document ).ready(function() {
             $('#exhibitions').DataTable({
+                dom: 'ilrtp',
                 paging: true,
+                pageLength: 25,
                 searching: false,
                 info: true,
                 order: [[ 0, "asc" ]],
-                "dom": 'ilrtp',
                 "columns": [
                     { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "asc", "desc" ] },

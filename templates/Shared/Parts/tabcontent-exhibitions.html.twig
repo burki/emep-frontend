@@ -1,4 +1,5 @@
 {% block exhibitions %}
+    {% import 'Shared/helper.html.twig' as helper %}
     {% import 'Shared/datatables.html.twig' as datatables %}
     {{ datatables.head() }}
 
@@ -7,8 +8,9 @@
     <script>
         $( document ).ready(function() {
             $('#exhibitions').DataTable({
-                "dom": 'ilrtp',
+                dom: 'ilrtp',
                 paging: true,
+                pageLength: 25,
                 searching: false,
                 info: true,
                 responsive: true,
@@ -35,12 +37,11 @@
                 <th>Venue</th>
                 <th># of Cat. Entries</th>
                 <th>Type</th>
-
             </tr>
             </thead>
+
             <tbody>
             {% for exhibition in exhibitionArray %}
-
                 {% set exhPlace = exhibition.location.place %}
 
                 <tr class="listviewrow">
@@ -72,7 +73,5 @@
             {% endfor %}
             </tbody>
         </table>
-
-
     </div><!-- .tab-pane -->
 {% endblock %}

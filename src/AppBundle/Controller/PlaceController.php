@@ -101,7 +101,8 @@ extends CrudController
 
     protected function buildSaveSearchParams(Request $request, UrlGeneratorInterface $urlGenerator)
     {
-        $route = str_replace('-save', '-index', $request->get('_route'));
+        $settings = $this->lookupSettingsFromRequest($request);
+        $route = $settings['base'];
 
         $this->form = $this->createSearchForm($request, $urlGenerator);
 
@@ -127,7 +128,6 @@ extends CrudController
     {
         return $this->handleSaveSearchAction($request, $urlGenerator, $user);
     }
-
 
     /**
      * @Route("/place/{id}", requirements={"id" = "\d+"}, name="place")
@@ -243,46 +243,42 @@ extends CrudController
             ->createQueryBuilder();
 
         $qb->select([
-                'L.id as id',
-                'L.name as name',
-                'L.type as type'
+                'L AS location',
+                'L.id AS id',
+                'L.name AS name',
+                'L.type AS type',
             ])
-            ->from('AppBundle:Exhibition', 'E')
-            ->leftJoin('E.location', 'L')
+            ->from('AppBundle:Location', 'L')
+            ->leftJoin('AppBundle:Exhibition', 'E',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'E.location = L AND ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->leftJoin('AppBundle:ItemExhibition', 'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
             ->leftJoin('IE.person', 'P')
             ->where('L.place = :tgn')
-            ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
+            ->andWhere('L.status <> -1')
             ->setParameter('tgn', $tgn)
             ->groupBy('E.id')
             ->groupBy('L.id')
             ;
 
-        $venues = $qb->getQuery()->getResult();
+        $venues = [];
+        foreach ($qb->getQuery()->getResult() as $venue) {
+            $venueInfo = $venue + [
+                'numArtists' => $this->getNumberOfArtistsByVenueId($venue['id']),
+                'numNationalities' => $this->getNumberOfNationalitiesByVenueId($venue['id']),
+                'numItems' => $this->getTotalNumberOfWorksByVenueId($venue['id']),
+                'numExhibitions' => $this->getNumberOfExhibitionsByVenueId($venue['id']),
+                'exhibition_types' => [],
+            ];
 
-        foreach ($venues as $key => $venue) {
-            $numberOfArtists = $this->getNumberOfArtistsByVenueId($venue['id']);
-            $totalNumberOfNationalities = $this->getNumberOfNationalitiesByVenueId($venue['id']);
-            $exhibitionsByType = $this->getTypesAndNumberOfExhibitionsByVenueId($venue['id']);
-            $totalNumberOfWorks = $this->getTotalNumberOfWorksByVenueId($venue['id']);
-            $numberOfExhibitions = $this->getNumberOfExhibitionsByVenueId($venue['id']);
-
-            $venues[$key]['exhibition_types'] = [];
-
-            foreach ($exhibitionsByType as $type => $num) {
-                $venues[$key]['exhibition_types'][$type] = $num;
+            foreach ($this->getTypesAndNumberOfExhibitionsByVenueId($venue['id']) as $type => $num) {
+                $venueInfo['exhibition_types'][$type] = $num;
             }
 
-            $venues[$key]['numArtists'] = $numberOfArtists;
-            $venues[$key]['numNationalities'] = $totalNumberOfNationalities;
-            $venues[$key]['numItems'] = $totalNumberOfWorks;
-            $venues[$key]['numExhibitions'] = $numberOfExhibitions;
+            $venues[] = $venueInfo;
         }
-
-
-        // there is still a discrepency between this result and when iteration through all exhibitions --> checked with SQL -- same result
 
         return $venues;
     }

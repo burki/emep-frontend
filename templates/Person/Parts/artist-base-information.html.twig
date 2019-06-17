@@ -16,7 +16,6 @@
     </div>
 {% endif %}
 
-
 {# gender #}
     <div class="artist-information-container">
         <div class="artist-information-label">{{ 'Gender'|trans }}:</div>
@@ -72,7 +71,7 @@
 <div class="artist-information-container">
     <div class="artist-information-label">{{ 'Nationality'|trans }}:</div>
     <div class="artist-information-text">
-        {% if person.nationality is sameas(false) or person.nationality == null %}
+        {% if person.nationality is same as(false) or person.nationality == null %}
             [unknown]
         {% else %}
             {{ countryArray[person.nationality] -}}

@@ -1,4 +1,6 @@
 {% block entries %}
+    {% import 'Shared/helper.html.twig' as helper %}
+
     {% import 'Shared/datatables.html.twig' as datatables %}
     {{ datatables.head() }}
 
@@ -12,19 +14,19 @@
         $(document).ready(function() {
             var groupColumn = 1;
             var table = $('#entrytable').DataTable({
-                "dom": 'ilrtp',
+                dom: 'ilrtp',
                 paging: true,
+                pageLength: 25,
                 searching: false,
                 info: true,
-                "columns": [
+                columns: [
                     { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "desc", "asc" ] },
                     { "orderable": false}
                 ]
-            } );
+            });
         } );
     </script>
-
 
     <div role="tabpanel" class="tab-pane active" id="entries">
 
@@ -33,7 +35,8 @@
             <tr class="listviewheading">
                 <th>Catalogue</th>
                 <th>Signature / URL</th>
-                <th>Exhibition</th>
+                <th>Exhibition Date</th>
+                <th>Venue</th>
             </tr>
             </thead>
 
@@ -41,7 +44,7 @@
             {% for row in bibitems %}
                 {% set bibitem = row[0] %}
                 <tr class="listviewrow">
-                    <td class="title" data-sort="{{ bibitem.datePublished|date('Y') }}-{{ bibitem.title }}">{{ bibitem.renderCitationAsHtml(citeProc, false)|raw }}</td>
+                    <td id="publication-{{ bibitem.id }}" class="title" data-sort="{{ bibitem.datePublished|date('Y') }}-{{ bibitem.title }}">{{ bibitem.renderCitationAsHtml(citeProc, false)|raw }}</td>
                     <td class="normal">{% if row.signature is not empty %}
                         {{ row.signature}}
                         {% endif %}
@@ -49,13 +52,16 @@
                             {{ row.url|converturls }}
                         {% endif %}
                     </td>
-                    <td>
+                    <td class="normal">
                     {% for exhibitionRef in bibitem.exhibitionRefs if exhibitionRef.role == 1 %}
                         {% set exhibition = exhibitionRef.exhibition %}
-                        <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">{{ helper.exhibition_period(exhibition) }}</a> at
-                        <a href="{{ path('location', { 'id' : exhibition.location.id }) }}">
-                            {{ exhibition.location.name }}
-                        </a>
+                        <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">{{ helper.exhibition_period(exhibition) }}</a>
+                    {% endfor %}
+                    </td>
+                    <td class="normal">
+                    {% for exhibitionRef in bibitem.exhibitionRefs if exhibitionRef.role == 1 %}
+                        {% set exhibition = exhibitionRef.exhibition %}
+                        {{ helper.location_linked(exhibition.location) }}
                     {% endfor %}
                     </td>
                 </tr>

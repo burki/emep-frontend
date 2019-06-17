@@ -4,8 +4,9 @@
         <script>
             $( document ).ready(function() {
                 $('#similars').DataTable({
-                    "dom": 'ilrtp',
+                    dom: 'ilrtp',
                     paging: true,
+                    pageLength: 25,
                     searching: false,
                     info: true,
                     order: [[ 1, "desc" ]],
@@ -37,7 +38,7 @@
                     {% endif %}
 
                     <tr class="listviewrow">
-                        <td class="normal">
+                        <td class="title">
                             <a href="{{ path('person', { 'id': person_id }) }}">{{ similar[person_id]['name'] }}</a>
                         </td>
                         <td class="normal" data-order="{{ similar[person_id]['count'] }}">

@@ -13,7 +13,7 @@ trait InfoTrait
      * Expanded $info
      */
     protected $infoExpanded = [];
-    
+
     public function hasInfo()
     {
         return !empty($this->info);
@@ -23,9 +23,15 @@ trait InfoTrait
     {
         // lookup publications
         $publicationsById = [];
+        $journalsById = [];
         foreach ($this->info as $entry) {
             if (!empty($entry['id_publication'])) {
-                $publicationsById[$entry['id_publication']] = null;
+                if (preg_match('/^journal:(\d+)$/', $entry['id_publication'], $matches)) {
+                    $journalsById[$matches[1]] = null;;
+                }
+                else {
+                    $publicationsById[$entry['id_publication']] = null;
+                }
             }
         }
 
@@ -45,17 +51,43 @@ trait InfoTrait
             }
         }
 
+        if (!empty($journalsById)) {
+            $qb = $em->createQueryBuilder();
+
+            $qb->select([ 'B' ])
+                ->from('AppBundle:Journal', 'B')
+                ->andWhere('B.id IN (:ids) AND B.status <> -1')
+                ->setParameter('ids', array_keys($journalsById))
+                ;
+
+            $results = $qb->getQuery()
+                ->getResult();
+            foreach ($results as $journal) {
+                $publicationsById['journal:' . $journal->getId()] = $journal;
+            }
+        }
+
         $this->infoExpanded = [];
         foreach ($this->info as $entry) {
             if (!empty($entry['id_publication'])
                 && !is_null($publicationsById[$entry['id_publication']]))
             {
                 $bibitem = $publicationsById[$entry['id_publication']];
-                if (!empty($entry['pages'])) {
-                    $bibitem->setPagination($entry['pages']);
+                if ($bibitem instanceof Journal) {
+                    $citation = $bibitem->getName();
+                    if (!empty($entry['pages'])) {
+                        $citation .= ', ' . $entry['pages'];
+                    }
+                    $entry['citation'] = htmlspecialchars($citation . '.', ENT_COMPAT, 'utf-8');
                 }
-                $entry['citation'] = $bibitem->renderCitationAsHtml($citeProc, false);
+                else {
+                    if (!empty($entry['pages'])) {
+                        $bibitem->setPagination($entry['pages']);
+                    }
+                    $entry['citation'] = $bibitem->renderCitationAsHtml($citeProc, false);
+                }
             }
+
             $this->infoExpanded[] = $entry;
         }
     }

@@ -1,3 +1,5 @@
+{% import 'Shared/helper.html.twig' as helper %}
+
 <div class="artist-information-container">
     <div class="artist-information-label">{{ 'Exhibition period'|trans }}:</div>
     <div class="artist-information-text">{{ helper.exhibition_period(exhibition) }}</div>
@@ -14,14 +16,7 @@
     {% set location = exhibition.location %}
     <div class="artist-information-container">
         <div class="artist-information-label">Venue:</div>
-        <div class="artist-information-text"><a href="{{ path('location', { 'id' : location.id }) }}">{{ location.name }}</a>, {{ helper.place_linked(location.place) }}</div>
-    </div>
-{% endif %}
-
-{% if location.url is not null %}
-    <div class="artist-information-container">
-        <div class="artist-information-label">{{ 'URL'|trans }}:</div>
-        <div class="artist-information-text"><a href="{{ location.url }}">{{ location.url }} website</a></div>
+        <div class="artist-information-text">{{ helper.location_linked(location) }}, {{ helper.place_linked(location.place) }}</div>
     </div>
 {% endif %}
 
@@ -36,21 +31,28 @@
     </div>
 {% endif %}
 
+{% if exhibition.currency is not empty %}
+    <div class="artist-information-container">
+        <div class="artist-information-label">Currency:</div>
+        <div class="artist-information-text">
+            {{ exhibition.currency|currencySymbol }}
+        </div>
+    </div>
+{% endif %}
+
 {% if exhibition.price is not empty %}
     <div class="artist-information-container">
-        <div class="artist-information-label">Price:</div>
+        <div class="artist-information-label">Ticket Price:</div>
         <div class="artist-information-text">
             {{ exhibition.price }}
         </div>
     </div>
 {% endif %}
 
-{% if exhibition.currency is not empty %}
+{% if exhibition.url is not null %}
     <div class="artist-information-container">
-        <div class="artist-information-label">Currency:</div>
-        <div class="artist-information-text">
-            {{ exhibition.currency }}
-        </div>
+        <div class="artist-information-label">{{ 'URL'|trans }}:</div>
+        <div class="artist-information-text"><a href="{{ exhibition.url }}" target="blank">{{ exhibition.url|prettifyurl }}</a></div>
     </div>
 {% endif %}
 

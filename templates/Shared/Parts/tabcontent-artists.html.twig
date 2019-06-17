@@ -1,12 +1,14 @@
+{% import 'Shared/helper.html.twig' as helper %}
 {% if artists|length > 0 %}
     <script>
         $( document ).ready(function() {
             $('#artists-table').DataTable({
-                "dom": 'ilrtp',
+                dom: 'ilrtp',
                 paging: true,
+                pageLength: 25,
                 searching: false,
                 info: true,
-                "columns": [
+                columns: [
                     null,
                     { "orderSequence": [ "desc", "asc" ] },
                     { "orderSequence": [ "desc", "asc" ] }

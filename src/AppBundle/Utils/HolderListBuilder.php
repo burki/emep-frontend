@@ -15,14 +15,6 @@ extends SearchListBuilder
         'holder' => [
             'label' => 'Name',
         ],
-        /*
-        'place' => [
-            'label' => 'City',
-        ],
-        'type' => [
-            'label' => 'Type',
-        ],
-        */
         'count_bibitem' => [
             'label' => '# of Catalogues',
         ],
@@ -31,46 +23,16 @@ extends SearchListBuilder
     var $orders = [
         'holder' => [
             'asc' => [
-                'H.name',
+                'holder',
                 'H.place',
                 'H.id',
             ],
             'desc' => [
-                'H.name DESC',
+                'holder DESC',
                 'H.place DESC',
                 'H.id DESC',
             ],
         ],
-        /*
-        'place' => [
-            'asc' => [
-                'H.place',
-                'H.name',
-                'H.id',
-            ],
-            'desc' => [
-                'H.place DESC',
-                'H.name DESC',
-                'H.id DESC',
-            ],
-        ],
-        'type' => [
-            'asc' => [
-                'H.type IS NOT NULL DESC',
-                'H.type',
-                'H.place',
-                'H.name',
-                'H.id',
-            ],
-            'desc' => [
-                'H.type IS NOT NULL',
-                'H.type DESC',
-                'H.place DESC',
-                'H.name DESC',
-                'H.id DESC',
-            ],
-        ],
-        */
         'count_bibitem' => [
             'desc' => [
                 'count_bibitem DESC',
@@ -97,18 +59,12 @@ extends SearchListBuilder
 
         parent::__construct($connection, $request, $urlGenerator, $queryFilters);
 
-        /* if ('stats-type' == $this->mode) {
-            $this->orders = [ 'default' => [ 'asc' => [ 'type' ] ] ];
-        }
-        else if ('stats-country' == $this->mode) {
-            $this->orders = [ 'default' => [ 'asc' => [ 'country_code' ] ] ];
-        }
-        else */ if ('extended' == $this->mode) {
+        if ('extended' == $this->mode) {
             $this->rowDescr = [
                 'holder_id' => [
                     'label' => 'ID',
                 ],
-                'holder' => [
+                'name' => [
                     'label' => 'Name',
                 ],
                 'place' => [
@@ -117,17 +73,6 @@ extends SearchListBuilder
                 'country_code' => [
                     'label' => 'Country Code',
                 ],
-                /*
-                'type' => [
-                    'label' => 'Type',
-                ],
-                'foundingdate' => [
-                    'label' => 'Founding Date',
-                ],
-                'dissolutiondate' => [
-                    'label' => 'Dissolution Date',
-                ],
-                */
                 'ulan' => [
                     'label' => 'ULAN',
                 ],
@@ -146,10 +91,11 @@ extends SearchListBuilder
             ];
         }
 
-        $entity = $this->entity;
-        $this->rowDescr['holder']['buildValue'] = function (&$row, $val, $listBuilder, $key, $format) use ($entity) {
-            return $listBuilder->buildLinkedValue($val, 'holder', [ 'id' => $row['id'] ], $format);
-        };
+        if (array_key_exists('holder', $this->rowDescr)) {
+            $this->rowDescr['holder']['buildValue'] = function (&$row, $val, $listBuilder, $key, $format) {
+                return $listBuilder->buildLinkedValue($val, 'holder', [ 'id' => $row['id'] ], $format);
+            };
+        }
 
         if (array_key_exists('place', $this->rowDescr)) {
             $this->rowDescr['place']['buildValue'] = function (&$row, $val, $listBuilder, $key, $format) {
@@ -185,7 +131,8 @@ extends SearchListBuilder
         $queryBuilder->select([
             'SQL_CALC_FOUND_ROWS ' . $this->alias . '.id',
             $this->alias . '.id AS holder_id',
-            $this->alias . '.name AS holder',
+            "CONCAT(CASE WHEN " . $this->alias . ".name LIKE 'online:%' THEN '' ELSE CONCAT(" . $this->alias . ".town, ', ') END, " . $this->alias . ".name) AS holder",
+            $this->alias . '.name AS name',
             $this->alias . '.town AS place',
             'NULL AS place_tgn', // $this->alias . '.place_tgn AS place_tgn',
             $this->alias . '.country AS country_code', // 'P' . $this->alias . '.country_code AS country_code',
@@ -254,6 +201,7 @@ extends SearchListBuilder
             $this->alias . '.name',
             $this->alias . '.name_translit',
             // $this->alias . '.name_alternate',
+            $this->alias . '.town',
             $this->alias . '.gnd',
             $this->alias . '.ulan',
             $this->alias . '.place',

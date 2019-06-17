@@ -38,9 +38,9 @@ extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('countryName', [ $this, 'getCountryName' ]),
-            new \Twig_SimpleFunction('file_exists', 'file_exists'),
-            new \Twig_SimpleFunction('daterangeincomplete', [ $this, 'daterangeincompleteFunction' ]),
+            new \Twig\TwigFunction('countryName', [ $this, 'getCountryName' ]),
+            new \Twig\TwigFunction('file_exists', 'file_exists'),
+            new \Twig\TwigFunction('daterangeincomplete', [ $this, 'daterangeincompleteFunction' ]),
         ];
     }
 
@@ -48,19 +48,20 @@ extends \Twig_Extension
     {
         return [
             // general
-            new \Twig_SimpleFilter('without', [ $this, 'withoutFilter' ]),
+            new \Twig\TwigFilter('without', [ $this, 'withoutFilter' ]),
 
-            new \Twig_SimpleFilter('dateincomplete', [ $this, 'dateincompleteFilter' ]),
-            new \Twig_SimpleFilter('datedecade', [ $this, 'datedecadeFilter' ]),
-            new \Twig_SimpleFilter('epoch', [ $this, 'epochFilter' ]),
-            new \Twig_SimpleFilter('prettifyurl', [ $this, 'prettifyurlFilter' ]),
+            new \Twig\TwigFilter('dateincomplete', [ $this, 'dateincompleteFilter' ]),
+            new \Twig\TwigFilter('datedecade', [ $this, 'datedecadeFilter' ]),
+            new \Twig\TwigFilter('epoch', [ $this, 'epochFilter' ]),
+            new \Twig\TwigFilter('prettifyurl', [ $this, 'prettifyurlFilter' ]),
 
             // appbundle-specific
-            new \Twig_SimpleFilter('placeTypeLabel', [ $this, 'placeTypeLabelFilter' ]),
-            new \Twig_SimpleFilter('lookupLocalizedTopic', [ $this, 'lookupLocalizedTopicFilter' ]),
-            new \Twig_SimpleFilter('glossaryAddRefLink', [ $this, 'glossaryAddRefLinkFilter' ],
+            new \Twig\TwigFilter('placeTypeLabel', [ $this, 'placeTypeLabelFilter' ]),
+            new \Twig\TwigFilter('currencySymbol', [ $this, 'buildCurrencySymbol' ]),
+            new \Twig\TwigFilter('lookupLocalizedTopic', [ $this, 'lookupLocalizedTopicFilter' ]),
+            new \Twig\TwigFilter('glossaryAddRefLink', [ $this, 'glossaryAddRefLinkFilter' ],
                                    [ 'is_safe' => [ 'html' ] ]),
-            new \Twig_SimpleFilter('renderCitation', [ $this, 'renderCitation' ],
+            new \Twig\TwigFilter('renderCitation', [ $this, 'renderCitation' ],
                                    [ 'is_safe' => [ 'html' ] ]),
         ];
     }
@@ -179,21 +180,33 @@ extends \Twig_Extension
         return \AppBundle\Controller\TopicController::lookupLocalizedTopic($topic, $this->translator, $locale);
     }
 
-    public function glossaryAddRefLinkFilter($description)
+    /* verbatim copy from SearchListBuilder - TODO: share */
+    public function buildCurrencySymbol($currency)
     {
-        $slugifyer = $this->slugifyer;
+        static $currencies = null;
 
-        return preg_replace_callback('/\[\[(.*?)\]\]/',
-                    function ($matches) use ($slugifyer) {
-                       $slug = $label = $matches[1];
-                       if (!is_null($slugifyer)) {
-                           $slug = $slugifyer->slugify($slug);
-                       }
-                       return '→ <a href="#' . rawurlencode($slug) . '">'
-                         . $label
-                         . '</a>';
-                    },
-                    $description);
+        if (is_null($currencies)) {
+            $currencies = [];
+
+            $fpath = realpath(__DIR__ . '/../Resources/currencies.txt');
+            if (false !== $fpath) {
+                $lines = file($fpath);
+                $col_name = 2;
+
+                foreach ($lines as $line) {
+                    $line = chop($line);
+                    $parts = preg_split('/\t/', $line);
+                    if (!empty($parts[0])) {
+                        $currencies[$parts[0]] = $parts[1];
+                    }
+                }
+            }
+        }
+
+        $symbol = array_key_exists($currency, $currencies)
+            ? $currencies[$currency] : $currency;
+
+        return $symbol;
     }
 
     public function renderCitation($encoded)

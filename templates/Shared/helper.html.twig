@@ -123,6 +123,11 @@
     <a href="#person-{{ person.id }}">{{ person.fullname }}</a>
 {%- endmacro %}
 
+{% macro location_linked(location) -%}
+    <a href="{{ path('location', { 'id' : location.id }) }}">{{ location.nameAppend ? location.nameAppend : location.name }}</a>
+{%- endmacro %}
+
+
 {% macro render_info(entries) -%}
     {% for entry in entries %}
         {{ entry.note }}

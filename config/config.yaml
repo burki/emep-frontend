@@ -14,15 +14,18 @@ framework:
     # validation: ~
     templating:
         engines: ['twig']
-        hinclude_default_template: hinclude.html.twig
+        hinclude_default_template: hinclude.html.twig # TODO: move to fragments
     # knp_paginator needs translate bundle
-    translator: { fallbacks: ['%locale%'], logging: false }
-    # needs form bundle
-    # form: ~
+    translator:
+        fallbacks: ['%locale%']
+        logging: false
     session:
         storage_id: session.storage.php_bridge
         handler_id: ~
-    fragments: { path: /_fragment }
+    fragments:
+        path: /_fragment
+        #hinclude_default_template: hinclude.html.twig # see https://symfony.com/blog/new-in-symfony-4-3-deprecated-the-templating-component-integration 
+        
     # Symfony 4.3 adds automatic search-enging protection in dev-mode
     # You can override, see https://symfony.com/blog/new-in-symfony-4-3-automatic-search-engine-protection
     # disallow_search_engine_index: false
@@ -37,8 +40,7 @@ twig:
         '%kernel.project_dir%/templates': __main__
     form_themes:
         - LexikFormFilterBundle:Form:form_div_layout.html.twig
-        - TetranzSelect2EntityBundle:Form:fields.html.twig
-        
+        - TetranzSelect2EntityBundle:Form:fields.html.twig        
     #form:
     #    resources: ['bootstrap_3_horizontal_layout.html.twig']
         
@@ -164,7 +166,6 @@ knp_menu:
     # use "twig: false" to disable the Twig extension and the TwigRenderer
     twig:
         template: KnpMenuBundle::menu.html.twig
-    #  if true, enables the helper for PHP templates
     templating: false
     # the renderer to use, list is also available by default
     default_renderer: twig

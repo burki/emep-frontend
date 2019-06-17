@@ -32,7 +32,7 @@
         });
     </script>
 
-    <!-- most come after generic $('.select2').select2(); call above -->
+    <!-- must come after generic $('.select2').select2(); call above -->
     <script src="{{ asset('js/select2entity.js') }}"></script>
 {% endblock %}
 
@@ -68,7 +68,6 @@
 
     <div class="contentcontainer w-container">
         <div class="listviewrow">
-
             {% set entities =
                 {
                     'Exhibition' : 'Exhibitions',
@@ -80,9 +79,9 @@
             %}
             <div>
                 <div class="tabsymbols">
-
                     {% if 'ItemExhibition' != listBuilder.entity and 'Place' != listBuilder.entity and type=='index' %}
-                    <div class="advanced-search-settings"><span class="checkbox-filter-button">apply checkbox filter</span></div>{% endif %}
+                    <div class="advanced-search-settings"><span class="checkbox-filter-button">apply checkbox filter</span></div>
+                    {% endif %}
                     <div class="icontab download-csv"><a title="Download as Excel-File" href="{{ path('search-export', { 'entity' : listBuilder.entity }|merge(app.request.query.all)) }}"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage"></a></div>
 
                     {% if app.user  %}

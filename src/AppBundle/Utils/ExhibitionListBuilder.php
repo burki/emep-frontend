@@ -239,7 +239,6 @@ extends SearchListBuilder
             return $listBuilder->buildLinkedLocation($row, $val, $format);
         };
 
-
         if (empty($mode)) {
             $routeParams = [
                 'entity' => 'ItemExhibition',
@@ -285,7 +284,6 @@ extends SearchListBuilder
 
     protected function setSelect($queryBuilder)
     {
-
         if ('stats-gender' == $this->mode) {
             $queryBuilder->select([
                 'P.sex as person_gender',

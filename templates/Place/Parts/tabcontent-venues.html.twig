@@ -1,13 +1,14 @@
 {% if venuesList is not empty %}
-
+    {% import 'Shared/helper.html.twig' as helper %}
     {% import 'Shared/datatables.html.twig' as datatables %}
     {{ datatables.head() }}
 
     <script>
         $( document ).ready(function() {
             $('#venues-table').DataTable({
-                'dom': 'ilrtp',
+                dom: 'ilrtp',
                 paging: true,
+                pageLength: 25,
                 searching: false,
                 info: true,
                 'columns': [
@@ -23,7 +24,6 @@
             });
         })
     </script>
-
 
     {% set childrenByType = place.getChildrenByType(em) %}
 
@@ -42,16 +42,19 @@
             </tr>
             </thead>
             <tbody>
-            {% for venue in venuesList %}
+            {% for venueInfo in venuesList %}
+                {% set location = venueInfo.location %}
                 <tr>
-                    <td><a href="{{ path('location', { 'id' : venue['id'] }) }}"><b>{{ venue['name'] }}</b></a></td>
-                    <td>{{ venue.type }}</td>
-                    <td>{{ max( 0, venue['numExhibitions'] ) }}</td>
-                    <td>{{ max( 0, venue['exhibition_types']['solo'] ) }}</td>
-                    <td>{{ max( 0, venue['exhibition_types']['group'] ) }}</td>
-                    <td>{{ max( 0, venue['numArtists'] ) }}</td>
-                    <td>{{ max( 0, venue['numNationalities'] ) }}</td>
-                    <td>{{ max( 0, venue['numItems'] ) }}</td>
+                    <td class="title" data-sort="{{ location.name }}">
+                        <b>{{ helper.location_linked(location) }}</b>
+                    </td>
+                    <td>{{ venueInfo.type }}</td>
+                    <td>{{ max( 0, venueInfo['numExhibitions'] ) }}</td>
+                    <td>{{ max( 0, venueInfo['exhibition_types']['solo'] ) }}</td>
+                    <td>{{ max( 0, venueInfo['exhibition_types']['group'] ) }}</td>
+                    <td>{{ max( 0, venueInfo['numArtists'] ) }}</td>
+                    <td>{{ max( 0, venueInfo['numNationalities'] ) }}</td>
+                    <td>{{ max( 0, venueInfo['numItems'] ) }}</td>
                 </tr>
             {% endfor %}
             </tbody>

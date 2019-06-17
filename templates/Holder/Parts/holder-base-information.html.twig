@@ -1,4 +1,3 @@
-
 {% if holder.placeLabel is not null %}
     <div class="artist-information-container">
         <div class="artist-information-label">{{ 'City'|trans }}:</div>
@@ -12,7 +11,6 @@
         <div class="artist-information-text">{{ holder.placeAddress }}</div>
     </div>
 {% endif %}
-
 
 {% if holder.url is not empty %}
     <div class="artist-information-container">
@@ -39,6 +37,5 @@
     <div class="artist-information-label">Quickstats</div>
     <div class="statcontainer">
         <div class="artist-information-text-stats">Catalogues: {{ bibitems|length }}</div>
-
     </div>
 </div>

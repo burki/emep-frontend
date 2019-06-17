@@ -471,6 +471,17 @@ extends ListBuilder
             }
         }
 
+        if (array_key_exists('place', $this->queryFilters)) {
+            $placeFilters = & $this->queryFilters['place'];
+
+            if (!empty($placeFilters[$key = 'geoname'])) {
+                $this->addGeonameFilter($queryBuilder, [
+                                            'cc' => 'PL.country_code',
+                                            'tgn' => 'PL.tgn',
+                                        ], $key, $placeFilters[$key]);
+            }
+        }
+
         if (array_key_exists('exhibition', $this->queryFilters)) {
             $exhibitionFilters = & $this->queryFilters['exhibition'];
             foreach ([
@@ -650,7 +661,6 @@ extends ListBuilder
 
     protected function formatPrice($val, $currency)
     {
-
         if (empty($val) || empty($currency)) {
             return $val;
         }
@@ -661,6 +671,7 @@ extends ListBuilder
     public function buildRow($row, $format = 'plain')
     {
         $ret = [];
+
         foreach ($this->rowDescr as $key => $descr) {
             $val = null;
 

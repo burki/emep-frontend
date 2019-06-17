@@ -4,12 +4,13 @@
         <script>
             $( document ).ready(function() {
                 $('#similartable').DataTable({
-                    "dom": 'ilrtp',
+                    dom: 'ilrtp',
                     paging: true,
+                    pageLength: 25,
                     searching: false,
                     info: true,
-                    order: [[ 1, "desc" ]],
-                    "columns": [
+                    order: [[ 1, 'desc' ]],
+                    columns: [
                         { "orderSequence": [ "asc", "desc" ] },
                         { "orderSequence": [ "desc", "asc" ] }
                     ]
@@ -50,7 +51,7 @@
                     {% endif %}
 
                     <tr class="listviewrow">
-                        <td class="normal">
+                        <td class="title">
                             <a href="{{ path('exhibition', { 'id': exhibition_id }) }}">{{  similar[exhibition_id]['title'] }}</a>
                         </td>
                         <td class="normal" data-order="{{ similar[exhibition_id]['count'] }}">

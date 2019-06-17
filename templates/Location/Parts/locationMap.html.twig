@@ -1,4 +1,6 @@
 {% block map %}
+    {% import 'Shared/map-leaflet.html.twig' as map %}
+    
     {% if location.geo is not empty %}
         {% set geo = location.geo %}
     {% elseif location.place.geo is not empty %}
