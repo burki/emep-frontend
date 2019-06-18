@@ -33,8 +33,7 @@ extends CrudController
         $countriesActive = [];
 
         foreach ($qb->getQuery()->getResult() as $result) {
-            $countryCode = $result['countryCode'];
-            $countriesActive[$countryCode] = Intl::getRegionBundle()->getCountryName($countryCode);
+            $countriesActive[$countryCode] = $this->expandCountryCode($result['countryCode']);
         }
 
         asort($countriesActive);

@@ -7,15 +7,12 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Pagerfanta\Pagerfanta;
 
 use AppBundle\Utils\CsvResponse;
-use AppBundle\Utils\SearchListBuilder;
 use AppBundle\Utils\SearchListPagination;
 use AppBundle\Utils\SearchListAdapter;
-
 
 /**
  *

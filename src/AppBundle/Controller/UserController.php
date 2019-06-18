@@ -2,9 +2,6 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Form\Type\UserType;
-use AppBundle\Entity\User;
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -12,9 +9,10 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
-
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Security\Core\User\UserInterface;
+
+use AppBundle\Form\Type\UserType;
+use AppBundle\Entity\User;
 
 /**
  *
@@ -75,7 +73,6 @@ extends CrudController
 
         return $searches;
     }
-
 
     /**
      * @Route("/login", name="login")

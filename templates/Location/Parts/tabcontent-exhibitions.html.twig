@@ -16,6 +16,7 @@
                     { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "asc", "desc" ] },
+                    { "orderSequence": [ "desc", "asc" ] },
                     { "orderSequence": [ "desc", "asc" ] }
                 ]
             });
@@ -23,15 +24,15 @@
     </script>
 
     <div role="tabpanel" class="tab-pane active" id="home">
-
         <table id="exhibitions" class="table table-striped table-bordered dataTable listviewcontainer">
             <thead>
-            <tr class="listviewheading">
-                <th>Date</th>
-                <th>Title</th>
-                <th>Type of Org. Body</th>
-                <th># of Cat. Entries</th>
-            </tr>
+                <tr class="listviewheading">
+                    <th>Date</th>
+                    <th>Title</th>
+                    <th>Type of Org. Body</th>
+                    <th># of Cat. Entries</th>
+                    <th># of Artists</th>
+                </tr>
             </thead>
 
             <tbody>
@@ -44,9 +45,8 @@
                         <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}"><b>{{ exhibition.title }}</b> {{ exhibition.titleAppend }}</a>
                     </td>
                     <td>{{ exhibition.organizerType }}</td>
-                    <td>
-                        {{ exhibitionStats[exhibition.id].numCatEntrySort }}
-                    </td>
+                    <td>{{ exhibitionStats[exhibition.id].numCatEntrySort }}</td>
+                    <td>{{ exhibitionStats[exhibition.id].numPersonSort }}</td>
                 </tr>
             {% endfor %}
             </tbody>

@@ -8,14 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-
-use Pagerfanta\Pagerfanta;
-
 use AppBundle\Utils\CsvResponse;
-use AppBundle\Utils\SearchListBuilder;
-use AppBundle\Utils\SearchListPagination;
-use AppBundle\Utils\SearchListAdapter;
 
 /**
  *
@@ -44,8 +37,7 @@ extends CrudController
         $countriesActive = [];
 
         foreach ($qb->getQuery()->getResult() as $result) {
-            $countryCode = $result['nationality'];
-            $countriesActive[$countryCode] = Intl::getRegionBundle()->getCountryName($countryCode);
+            $countriesActive[$result['nationality']] = $this->expandCountryCode($result['nationality']);
         }
 
         asort($countriesActive);
@@ -577,7 +569,7 @@ extends CrudController
         arsort($exhibitionPlacesByCountryTotal);
 
         $finalData = array_map(function ($key) use ($exhibitionPlacesByCountryTotal) {
-                $name = '' === $key ? 'unknown' : Intl::getRegionBundle()->getCountryName($key);
+                $name = $this->expandCountryCode($key);
                 return [ 'name' => $name, 'y' => (int)$exhibitionPlacesByCountryTotal[$key]];
             },
             array_keys($exhibitionPlacesByCountryTotal));
@@ -702,5 +694,90 @@ extends CrudController
 
         return new \Symfony\Component\HttpFoundation\Response($ret, \Symfony\Component\HttpFoundation\Response::HTTP_OK,
                                                               [ 'Content-Type' => 'text/plain; charset=UTF-8' ]);
+    }
+
+
+    /**
+     * Experimental, would need to be cut down to a limited number of places
+     * 
+     * @Route("/person/birth-death", name="person-birth-death")
+     *
+     */
+    public function d3jsPlaceAction(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $dbconn = $em->getConnection();
+
+        $querystr = "SELECT Geoname.tgn AS tgn, COALESCE(Geoname.name_alternate, Geoname.name) AS name, country_code"
+                  . ' FROM Person INNER JOIN Geoname ON Person.deathplace_tgn=Geoname.tgn'
+                  . ' WHERE Person.status <> -1'
+                  . ' GROUP BY country_code, name'
+                  . ' ORDER BY country_code, name'
+                  ;
+
+        $stmt = $dbconn->query($querystr);
+        $deathplaces_by_country = [];
+        while ($row = $stmt->fetch()) {
+            $deathplaces_by_country[$row['country_code']][$row['tgn']] = $row['name'];
+        }
+
+        $missingplaces_by_country = [];
+
+        $dependencies = [];
+        foreach ($deathplaces_by_country as $country_code => $places) {
+            foreach ($places as $tgn => $place) {
+                // find all birth-places as dependencies
+                $querystr = "SELECT pb.tgn AS tgn, COALESCE(pb.name_alternate, pb.name) AS name, country_code, COUNT(*) AS how_many"
+                          . ' FROM Person'
+                          . ' INNER JOIN Geoname pb ON Person.birthplace_tgn=pb.tgn'
+                          . " WHERE Person.deathplace_tgn='" . $tgn. "' AND Person.status <> -1"
+                          . ' GROUP BY country_code, name';
+                $stmt = $dbconn->query($querystr);
+                $dependencies_by_place = [];
+                while ($row = $stmt->fetch()) {
+                    // add to $missingplaces_by_country if not already in $death_by_country
+                    if (!isset($deathplaces_by_country[$row['country_code']])
+                        || !isset($deathplaces_by_country[$row['country_code']][$row['tgn']]))
+                    {
+                        $missingplaces_by_country[$row['country_code']][$row['tgn']] = $row['name'];
+                    }
+                    $place_key = 'place.' . $row['country_code'] . '.' . $row['tgn'];
+                    $dependencies_by_place[] = $place_key;
+                }
+
+                $place_key = 'place.' . $country_code . '.' . $tgn;
+                $entry = [
+                    'name' => $place_key,
+                    'label' => $place,
+                    'size' => 1,
+                    'imports' => [],
+                ];
+                if (!empty($dependencies_by_place)) {
+                    $entry['imports'] = $dependencies_by_place;
+                }
+
+                $dependencies[] = $entry;
+            }
+        }
+
+        foreach ($missingplaces_by_country as $country_code => $places) {
+            arsort($places);
+            foreach ($places as $tgn => $place) {
+                $place_key = $country_code . '.' . $tgn;
+                $entry = [
+                    'name' => 'place.' . $place_key,
+                    'label' => $place,
+                    'size' => 1,
+                    'imports' => [],
+                ];
+                $dependencies[] = $entry;
+            }
+        }
+
+        // display the static content
+        return $this->render('Statistics/birth-death.html.twig', [
+            'dependencies' => $dependencies,
+        ]);
     }
 }

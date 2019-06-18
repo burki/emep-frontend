@@ -30,7 +30,7 @@
 
             {% if catalogueEntries is not empty %}
             {# statistics #}
-            <li role="presentation"><a href="#stats" data-url="{{ path('exhibition-stats-partial', { id: exhibition.id }) }}" aria-controls="chronology" role="tab" data-toggle="tab">{{ 'Statistics'|trans }}</a></li>
+            <li role="presentation"><a href="#statistics" aria-controls="statistics" role="tab" data-toggle="tab">{{ 'Statistics'|trans }}</a></li>
             {% endif %}
         </ul>
     </div>

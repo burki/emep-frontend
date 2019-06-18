@@ -10,10 +10,10 @@ namespace AppBundle\Controller;
 
 trait StatisticsBuilderTrait
 {
+    static $countryMap = [ 'UA' => 'RU' ];
+
     function processExhibitionNationality($stmt)
     {
-        $countryMap = [ 'UA' => 'RU' ];
-
         $statsByCountry = [];
         $statsByNationality = [];
         while ($row = $stmt->fetch()) {
@@ -22,8 +22,8 @@ trait StatisticsBuilderTrait
                 continue;
             }
 
-            if (array_key_exists($cc, $countryMap)) {
-                $cc = $countryMap[$cc];
+            if (array_key_exists($cc, self::$countryMap)) {
+                $cc = self::$countryMap[$cc];
             }
 
             if (!array_key_exists($cc, $statsByCountry)) {
@@ -36,8 +36,8 @@ trait StatisticsBuilderTrait
 
             $nationality = empty($row['nationality'])
                 ? 'XX' : $row['nationality'];
-            if (array_key_exists($nationality, $countryMap)) {
-                $nationality = $countryMap[$nationality];
+            if (array_key_exists($nationality, self::$countryMap)) {
+                $nationality = self::$countryMap[$nationality];
             }
 
             if (!array_key_exists($nationality, $statsByNationality)) {

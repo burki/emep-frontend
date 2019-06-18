@@ -8,16 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-
-
-use Pagerfanta\Pagerfanta;
-
 use AppBundle\Utils\CsvResponse;
-use AppBundle\Utils\SearchListBuilder;
-use AppBundle\Utils\SearchListPagination;
-use AppBundle\Utils\SearchListAdapter;
-
 
 /**
  *
@@ -154,7 +145,7 @@ extends CrudController
         return $qb->getQuery()->getResult();
     }
 
-    protected function getGenderSplitByExhId($exhibitionIds)
+    protected function getGenderCountsByExhibitionId($exhibitionIds)
     {
         if (empty($exhibitionIds)) {
             return [];
@@ -174,7 +165,7 @@ extends CrudController
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'IE.person = P AND (IE.title IS NOT NULL OR IE.item IS NULL)')
             ->innerJoin('IE.exhibition', 'E')
-            ->where('E.id IN(:ids)')
+            ->where('E.id IN(:ids) AND P.status <> -1')
             ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('ids', $exhibitionIds)
             ->groupBy('gender')
@@ -185,8 +176,7 @@ extends CrudController
         $data = [];
 
         foreach ($results as $result) {
-            $key = 'unknown';
-
+            $key = '[unknown]';
 
             if ($result['gender'] == 'M') {
                 $key = 'male';
@@ -270,7 +260,7 @@ extends CrudController
                 ];
             }, $artists);
 
-        return new CsvResponse($csvResult, 200, explode( ', ', 'Name, Nationality, Birth Date, Death Date, # of Exhibitions, # of Cat. Entries'));
+        return new CsvResponse($csvResult, 200, explode( ', ', 'Name, Nationality, Date of Birth, Date of Death, # of Exhibitions, # of Cat. Entries'));
     }
 
     /**
@@ -341,25 +331,20 @@ extends CrudController
         $exhibitionIds = $this->getExhibitionIds($location);
 
         $artists = $this->getArtistsByExhibitionIds($exhibitionIds);
-        $exhibitionStats = $this->getExhibitionStatsByIds($exhibitionIds);
 
         $dataNumberOfArtistsPerCountry = $this->detailDataNumberOfArtistsPerCountry($artists);
 
-        $detailDataNumberItemTypes = $this->detailDataNumberItemTypes($location);
-
-        $genderStats = $this->getGenderSplitByExhId($exhibitionIds);
-
-        $genderStatsStatisticsFormat = PlaceController::assoc2NameYArray($genderStats);
+        $genderCounts = $this->getGenderCountsByExhibitionId($exhibitionIds);
 
         return $this->render('Location/detail.html.twig', [
             'pageTitle' => $location->getName(),
             'location' => $location,
-            'exhibitionStats' => $exhibitionStats,
+            'exhibitionStats' => $this->getExhibitionStatsByIds($exhibitionIds),
             'artists' => $artists,
             'dataNumberOfArtistsPerCountry' => $dataNumberOfArtistsPerCountry,
-            'detailDataNumberItemTypes' => $detailDataNumberItemTypes,
-            'genderStats' => $genderStats,
-            'genderStatsStatisticsFormat' => $genderStatsStatisticsFormat,
+            'detailDataNumberItemTypes' => $this->detailDataNumberItemTypes($location),
+            'genderStats' => $genderCounts,
+            'genderStatsStatisticsFormat' => $this->assoc2NameYArray($genderCounts),
             'pageMeta' => [
                 /*
                 'jsonLd' => $location->jsonLdSerialize($locale),
@@ -410,7 +395,7 @@ extends CrudController
         arsort($artistNationalitiesTotal);
 
         $finalData = array_map(function ($key) use ($artistNationalitiesTotal) {
-                $name = '' === $key ? 'unknown' : Intl::getRegionBundle()->getCountryName($key);
+                $name = $this->expandCountryCode($key);
                 return [ 'name' => $name, 'y' => (int)$artistNationalitiesTotal[$key]];
             },
             array_keys($artistNationalitiesTotal));

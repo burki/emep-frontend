@@ -41,13 +41,21 @@ extends Controller
         return $array;
     }
 
+    protected function expandCountryCode($countryCode, $labelUnknown = '[unknown]')
+    {
+        if (empty($countryCode)) {
+            return $labelUnknown;
+        }
+
+        return Intl::getRegionBundle()->getCountryName($countryCode);
+    }
+
     protected function buildActiveCountries($qb)
     {
         $countriesActive = [];
 
         foreach ($qb->getQuery()->getResult() as $result) {
-            $countryCode = $result['countryCode'];
-            $countriesActive[$countryCode] = Intl::getRegionBundle()->getCountryName($countryCode);
+            $countriesActive[$result['countryCode']] = $this->expandCountryCode($result['countryCode']);
         }
 
         asort($countriesActive);
@@ -74,8 +82,7 @@ extends Controller
         $countriesActive = [];
 
         foreach ($qb->getQuery()->getResult() as $result) {
-            $countryCode = $result['nationality'];
-            $countriesActive[$countryCode] = Intl::getRegionBundle()->getCountryName($countryCode);
+            $countriesActive[$result['nationality']] = $this->expandCountryCode($result['nationality']);
         }
 
         asort($countriesActive);
