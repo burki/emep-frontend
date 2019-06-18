@@ -290,6 +290,17 @@ class Exhibition
         return preg_replace('/\s+00:00:00$/', '', $datetime);
     }
 
+    public static function extractYear($datetime)
+    {
+        if (is_null($datetime)) {
+            return $datetime;
+        }
+
+        if (preg_match('/^([\d]+)\-/', $datetime, $matches)) {
+            return (int)($matches[1]);
+        }
+    }
+
     public function getId()
     {
         return $this->id;
@@ -335,6 +346,11 @@ class Exhibition
     public function getEnddate()
     {
         return self::stripTime($this->enddate);
+    }
+
+    public function getStartyear()
+    {
+        return self::extractYear($this->startdate);
     }
 
     public function getDisplaydate()

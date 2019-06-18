@@ -489,10 +489,12 @@ extends CrudController
         foreach ($catalogueEntriesByExhibition as $catalogueEntries) {
             $currExhibition = $catalogueEntries[0]->exhibition;
 
-            $currExhibitionYear = date('Y', strtotime($currExhibition->getStartDate())) ;
-
-            foreach ($catalogueEntries as $entry) {
-                array_push($works, $currExhibitionYear );
+            $currExhibitionYear = $currExhibition->getStartYear();
+            if (!is_null($currExhibitionYear)) {
+                // very inefficient
+                foreach ($catalogueEntries as $entry) {
+                    array_push($works, $currExhibitionYear );
+                }
             }
         }
 
@@ -519,9 +521,9 @@ extends CrudController
         $yearsOnly = json_encode(array_keys($arrayWithoutGaps));
         $valuesOnly = json_encode(array_values($arrayWithoutGaps));
         $sumOfAllExhibitions = array_sum(array_values($worksTotalPerYear));
-        $yearActive = $max - $min > 0 ? $max - $min : 1;
+        $yearActive = $max - $min + 1;
 
-        $averagePerYear = round( $sumOfAllExhibitions / $yearActive, 1 );
+        $averagePerYear = round($sumOfAllExhibitions / $yearActive, 1);
 
         return [ $yearsOnly, $valuesOnly, $sumOfAllExhibitions, $yearActive, $averagePerYear];
     }
@@ -606,51 +608,44 @@ extends CrudController
         return [ json_encode($finalData), $sumOfAllExhibitions, count(array_keys($exhibitionPlacesTotal)) ];
     }
 
-
     public function detailDataNumberOfExhibitionsPerYear($person)
     {
         $exhibitionYear = [];
 
-
-        $exhibitions = $person->getExhibitions(-1);
-
-        foreach ($exhibitions as $exhibition) {
-            array_push($exhibitionYear, (int) date('Y', strtotime($exhibition->getStartDate())) );
+        foreach ($person->getExhibitions(-1) as $exhibition) {
+            $startYear = $exhibition->getStartYear();
+            if (!is_null($startYear)) {
+                $exhibitionYear[] = $startYear;
+            }
         }
 
-        $exhibitionYear = array_count_values ( $exhibitionYear );
-
+        $exhibitionYear = array_count_values($exhibitionYear);
 
         $yearsArray = array_keys($exhibitionYear);
 
         if (!empty($yearsArray)) {
             $min = $yearsArray[0];
-            $max = $yearsArray[ (count($exhibitionYear) -1 ) ];
+            $max = $yearsArray[count($exhibitionYear) - 1];
         }
         else {
             $min = 0;
             $max = 0;
         }
 
-        $arrayWithoutGaps = [];
-
         // create an array without any year gaps inbetween
+        $arrayWithoutGaps = [];
         for ($i = $min; $i <= $max; $i++) {
             $arrayWithoutGaps[(string)$i] = array_key_exists($i, $exhibitionYear) ? $exhibitionYear[$i] : 0;
         }
 
-        $yearsOnly = json_encode( array_keys($arrayWithoutGaps) );
-        $valuesOnly = json_encode ( array_values($arrayWithoutGaps) );
+        $yearsOnly = json_encode(array_keys($arrayWithoutGaps));
+        $valuesOnly = json_encode (array_values($arrayWithoutGaps));
         $sumOfAllExhibitions = array_sum(array_values($arrayWithoutGaps));
-        $yearActive = $max - $min > 0 ? $max - $min : 1;
-        $averagePerYear = round( $sumOfAllExhibitions / $yearActive, 1 );
+        $yearActive = $max - $min + 1;
+        $averagePerYear = round($sumOfAllExhibitions / $yearActive, 1);
 
-
-        $returnArray = [$yearsOnly, $valuesOnly, $sumOfAllExhibitions, $yearActive, $averagePerYear];
-
-        return $returnArray;
+        return [ $yearsOnly, $valuesOnly, $sumOfAllExhibitions, $yearActive, $averagePerYear ];
     }
-
 
     /**
      * @Route("/person/gnd/beacon", name="person-gnd-beacon")
@@ -696,10 +691,9 @@ extends CrudController
                                                               [ 'Content-Type' => 'text/plain; charset=UTF-8' ]);
     }
 
-
     /**
      * Experimental, would need to be cut down to a limited number of places
-     * 
+     *
      * @Route("/person/birth-death", name="person-birth-death")
      *
      */
