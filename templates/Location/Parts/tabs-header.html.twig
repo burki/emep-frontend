@@ -14,24 +14,20 @@
             {% if location.getOrganizerOf(true)|length > 0 %}
                 <li role="presentation" class="organizer-tab{% if active %} active{% set active = false %}{% endif %}"><a href="#organizer-tab" aria-controls="home" role="tab" data-toggle="tab">{{ 'Organizer'|trans }}</a></li>
             {% endif %}
-            {# co-appearances #}
             {% if artists|length > 0 %}
                 <li role="presentation" class="artists-tab{% if active %} active{% set active = false %}{% endif %}"><a href="#artists" aria-controls="similar" role="tab" data-toggle="tab">{{ 'Artists'|trans }}</a></li>
             {% endif %}
+            {% if artists|length > 0 %}
+            <li role="presentation" class="statistics-tab{% if active %} active{% set active = false %}{% endif %}"><a href="#statistics" aria-controls="statistics" role="tab" data-toggle="tab">{{ 'Statistics'|trans }}</a></li>
+            {% endif %}
             {# authority files #}
             {% if location.gnd is not empty or location.ulan is not empty %}
-                <li role="presentation"><a href="#authority" aria-controls="authority" role="tab" data-toggle="tab">{{ 'Integrated Authority File'|trans }}</a></li>
-            {% endif %}
-
-            {% if artists|length > 0 %}
-            <li role="presentation"><a href="#statistics" aria-controls="authority" role="tab" data-toggle="tab">{{ 'Statistics'|trans }}</a></li>
+                <li role="presentation" class="authority-tab{% if active %} active{% set active = false %}{% endif %}"><a href="#authority" aria-controls="authority" role="tab" data-toggle="tab">{{ 'Integrated Authority File'|trans }}</a></li>
             {% endif %}
         </ul>
-
     </div>
 
     <script>
-
         $('.download-csv-exhibitions').on('click', function() {
             window.location.href =  "{{ path('location-exhibitions-csv', { id: location.getId() }) }}";
         });
@@ -46,8 +42,12 @@
             hideAll();
 
             setInterval(function() {
-                if( $('.exhibitions-tab').hasClass('active') ){ hideAll(); $('.download-csv-exhibitions').show(); }
-                else if( $('.artists-tab').hasClass('active') ){ hideAll(); $('.download-csv-artists').show(); }
+                if ($('.exhibitions-tab').hasClass('active')) {
+                    hideAll(); $('.download-csv-exhibitions').show();
+                }
+                else if ($('.artists-tab').hasClass('active')) {
+                    hideAll(); $('.download-csv-artists').show();
+                }
                 else {
                     hideAll();
                 }
@@ -58,8 +58,5 @@
             $('.download-csv-exhibitions').hide();
             $('.download-csv-artists').hide();
         }
-
-
     </script>
-
 {% endblock %}

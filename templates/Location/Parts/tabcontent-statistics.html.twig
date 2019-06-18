@@ -1,4 +1,4 @@
-<div role="tabpanel" class="tab-pane" id="statistics">
+<div role="tabpanel" class="tab-pane{% if active %} active{% endif %}" id="statistics">
     {% import 'Shared/highcharts.html.twig' as highcharts %}
     {{ highcharts.head() }}
 

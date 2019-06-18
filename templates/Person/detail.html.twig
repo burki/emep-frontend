@@ -48,7 +48,6 @@
 {% endblock %}
 
 {% block body %}
-
     <div class="contentcontainer nopadding w-container">
         <div class="lefthalf">
             <div class="subheader">artist</div>
@@ -68,9 +67,6 @@
             {% endembed %}
         </div>
     </div>
-
-
-
 
     <div class="contentcontainer w-container">
          <div class="listviewrow">
@@ -104,10 +100,8 @@
             </div>
     </div>
 
-
     <div class="row">
         <div class="col-sm-8 person-description">
-
             {% if showWorks and person.items is not empty %}
             <h3>Works</h3>
             <div class="gallery">
@@ -133,9 +127,6 @@
                 {% endfor %}
             </div>
         {% endif %}
-
-
-
 
         {# find a artist with all informations set correctly #}
         <div class="col-sm-4 sidebar">

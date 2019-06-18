@@ -2,7 +2,7 @@
 
 {% block authority %}
     {% if location.gnd is not empty or location.ulan is not empty %}
-        <div role="tabpanel" class="tab-pane" id="authority">
+        <div role="tabpanel" class="tab-pane{% if active %} active{% endif %}" id="authority">
             <div class="container-fluid box">
                 <div class="row box-color-title">
                     <div class="col-sm-12">

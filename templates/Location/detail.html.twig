@@ -42,30 +42,36 @@
             {% endembed %}
 
             <div class="tab-content">
-                {% set exhibitionArray = location.exhibitions %}
+            {% set active = true %}
+            {% set exhibitionArray = location.exhibitions %}
 
-                {% if location.exhibitions|length > 0 %}
-                    {% embed "Location/Parts/tabcontent-exhibitions.html.twig" %}
-                    {% endembed %}
-                {% endif %}
+            {% if location.exhibitions|length > 0 %}
+                {% embed "Location/Parts/tabcontent-exhibitions.html.twig" %}
+                {% endembed %}
+                {% set active = false %}
+            {% endif %}
 
-                {% if location.organizerOf|length > 0 %}
-                    {% embed "Location/Parts/tabcontent-organizer.html.twig" %}
-                    {% endembed %}
-                {% endif %}
+            {% if location.organizerOf|length > 0 %}
+                {% embed "Location/Parts/tabcontent-organizer.html.twig" %}
+                {% endembed %}
+                {% set active = false %}
+            {% endif %}
 
-                {% set artistsArray = artists %}
-
+            {% set artistsArray = artists %}
+            {% if artists|length > 0 %}
                 {% embed "Location/Parts/tabcontent-artists.html.twig" %}
                 {% endembed %}
+                {% set active = false %}
 
+                {% embed "Location/Parts/tabcontent-statistics.html.twig" %}
+                {% endembed %}
+                {% set active = false %}
+            {% endif %}
+
+            {% if location.gnd is not empty or location.ulan is not empty %}
                 {% embed "Location/Parts/tabcontent-authority.html.twig" %}
                 {% endembed %}
-
-                {% if artists|length > 0 %}
-                    {% embed "Location/Parts/tabcontent-statistics.html.twig" %}
-                    {% endembed %}
-                {% endif %}
+            {% endif %}
             </div><!-- .tab-content -->
         </div><!-- .listviewrow -->
     </div><!-- .contentcontainer -->
