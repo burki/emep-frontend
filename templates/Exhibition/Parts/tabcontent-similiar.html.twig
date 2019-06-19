@@ -1,6 +1,6 @@
 {% block similars %}
+    {% import 'Shared/helper.html.twig' as helper %}
     {% if similar|length > 0 %}
-
         <script>
             $( document ).ready(function() {
                 $('#similartable').DataTable({
@@ -9,8 +9,11 @@
                     pageLength: 25,
                     searching: false,
                     info: true,
-                    order: [[ 1, 'desc' ]],
+                    order: [[ 4, 'desc' ]],
                     columns: [
+                        { "orderSequence": [ "asc", "desc" ] },
+                        { "orderSequence": [ "asc", "desc" ] },
+                        { "orderSequence": [ "asc", "desc" ] },
                         { "orderSequence": [ "asc", "desc" ] },
                         { "orderSequence": [ "desc", "asc" ] }
                     ]
@@ -22,48 +25,56 @@
             <table id="similartable" class="table table-striped table-bordered dataTable listviewcontainer">
                 <thead>
                 <tr class="listviewheading">
-                    <th><span>Exhibitions</span></th>
-                    <th><span># Artists</span></th>
+                    <th class="all">Date</th>
+                    <th class="all">Title</th>
+                    <th class="all">City</th>
+                    <th class="min-tablet-p">Venue</th>
+                    <th class="all"># of common Artists</th>
                 </tr>
                 </thead>
 
-
-                {% set similar_keys = similar|keys %}
-                {% set found = false %}
-                {% set numArtists = exhibition.artists|length %}
-
             {% set similar_keys = similar|keys %}
             {% set similar_found = false %}
-
-
-                {% set similar_keys = similar|keys %}
-                {% set found = false %}
-                {% set numArtists = exhibition.artists|length %}
-
+            {% set numArtists = exhibition.artists|length %}
 
             {% for exhibition_id in similar_keys %}
-
                {% if similar[exhibition_id]['count'] > 1 or numArtists == 1 %}
                     {% if not similar_found %}
                         {% set similar_found = true %}
-
-                        <tbody>
+                <tbody>
                     {% endif %}
 
-                    <tr class="listviewrow">
-                        <td class="title">
-                            <a href="{{ path('exhibition', { 'id': exhibition_id }) }}">{{  similar[exhibition_id]['title'] }}</a>
-                        </td>
-                        <td class="normal" data-order="{{ similar[exhibition_id]['count'] }}">
-                            <a href="{{ path('person-shared-partial', { 'exhibitions': [ exhibition.id, exhibition_id ]|join(',') }) }}" data-remote="false" data-toggle="modal" data-target="#detailModal">{{ similar[exhibition_id]['count'] }} artists</a>
-                        </td>
-                    </tr>
+                    {% set aExhibition = similarHydrated[exhibition_id] %}
+                <tr class="listviewrow">
+                    <td class="date" data-order="{{ aExhibition.startdate }}"><b>{{ helper.exhibition_period(aExhibition) }}</b></td>
+                    <td class="title" data-order="{{ aExhibition.title }}">
+                        <a href="{{ path('exhibition', { 'id' : aExhibition.id }) }}">
+                            <b>{{ aExhibition.title }}</b> {{ aExhibition.titleAppend }}
+                        </a>
+                    </td>
+                    <td class="normal" data-order="{{ aExhibition.location.placeLabel }}">
+                        {% set place = aExhibition.location.place %}
+                        {% if place is not null %}
+                        <a href="{% if place.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : place.tgn }) }}{% else %}{{ path('place', { 'id' : place.id }) }}{% endif %}">
+                            {{ aExhibition.location.placeLabel }}
+                        </a>
+                        {% else %}
+                            {{ aExhibition.location.placeLabel }}
+                        {% endif %}
+                    </td>
+                    <td class="normal" data-order="{{ aExhibition.location.name }}">
+                        {{ helper.location_linked(aExhibition.location) }}
+                    </td>
+                    <td class="normal" data-order="{{ similar[exhibition_id]['count'] }}">
+                        <a href="{{ path('person-shared-partial', { 'exhibitions': [ aExhibition.id, exhibition_id ]|join(',') }) }}" data-remote="false" data-toggle="modal" data-target="#detailModal">{{ similar[exhibition_id]['count'] }} artists</a>
+                    </td>
+                </tr>
                 {% endif %}
-
             {% endfor %}
+
             {% if similar_found %}
                 </tbody>
-                {% endif %}
+            {% endif %}
             </table>
         </div><!-- .tab-pane -->
     {% endif %}

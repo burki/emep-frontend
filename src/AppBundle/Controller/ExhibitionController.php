@@ -216,6 +216,22 @@ extends CrudController
         return $jaccardIndex;
     }
 
+    protected function hydrateSimilar($result)
+    {
+        $exhibitionsByIds = [];
+
+        $exhibitionIds = array_keys($result);
+        if (!empty($exhibitionIds)) {
+            $exhibitions = $this->hydrateExhibitions($exhibitionIds);
+            $exhibitionsByIds = array_combine(
+                array_map(function ($exhibition) { return $exhibition->getId(); }, $exhibitions),
+                $exhibitions
+            );
+        }
+
+        return $exhibitionsByIds;
+    }
+
     protected function findCatalogueEntries($exhibition, $sort = '')
     {
         // get the catalogue entries by exhibition
@@ -319,40 +335,21 @@ extends CrudController
             return $this->redirectToRoute('exhibition-index');
         }
 
-        $citeProc = $this->instantiateCiteProc($request->getLocale());
-        if ($exhibition->hasInfo()) {
-            // expand the publications
-            $exhibition->buildInfoFull($this->getDoctrine()->getManager(), $citeProc);
-        }
-
         $result = $this->findSimilar($exhibition);
-
-        $exhibitionIds = array_keys($result);
-        $exhibitionsByIds = [];
-        if (!empty($exhibitionIds)) {
-            $exhibitions = $this->hydrateExhibitions($exhibitionIds);
-            $exhibitionsByIds = array_combine(
-                array_map(function ($exhibition) { return $exhibition->getId(); }, $exhibitions),
-                $exhibitions
-            );
-        }
+        $exhibitionsByIds = $this->hydrateSimilar($result);
 
         $csvResult = [];
         foreach ($result as $id => $value) {
             if ($value['count'] > 0) {
-                $innerArray = [];
-
                 $exhibition = $exhibitionsByIds[$id];
 
-                array_push($innerArray,
+                $csvResult[] = [
                     $exhibition->getStartdate(), $exhibition->getEnddate(), $exhibition->getDisplaydate(),
                     $exhibition->getTitle(),
                     $exhibition->getLocation()->getPlaceLabel(),
                     $exhibition->getLocation()->getName(),
                     $value['count']
-                );
-
-                array_push($csvResult, $innerArray);
+                ];
             }
         }
 
@@ -510,6 +507,7 @@ extends CrudController
             ? $this->lookupExhibitionGroup($em, $exhibition)
             : [];
 
+        $similar = $this->findSimilar($exhibition);
         return $this->render('Exhibition/detail.html.twig', [
             'pageTitle' => $exhibition->title, // TODO: dates in brackets
             'exhibition' => $exhibition,
@@ -520,7 +518,8 @@ extends CrudController
             'catalogueEntriesByPersonCount' => $catalogueEntriesByPersonCount,
             'showWorks' => false, // !empty($_SESSION['user']),
             'related' => $relatedExhibitions,
-            'similar' => $this->findSimilar($exhibition),
+            'similar' => $similar,
+            'similarHydrated' => $this->hydrateSimilar($similar),
             'currentPageId' => $id,
             'catalogueStatus' => \AppBundle\Utils\SearchListBuilder::$STATUS_LABELS,
             'genderSplit' => $genderSplit,
