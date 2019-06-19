@@ -42,7 +42,7 @@ extends DefaultController
         }
     }
 
-    protected function renderWordpress($slug, $fallbackTemplate)
+    protected function fetchWordpressPage($slug)
     {
         $client = $this->instantiateWpApiClient();
 
@@ -64,10 +64,21 @@ extends DefaultController
             }
         }
 
+        return $page;
+    }
+
+    protected function renderWordpress($slug, $fallbackTemplate = null)
+    {
+        $page = $this->fetchWordpressPage($slug);
+
         if (!empty($page)) {
             return $this->render('About/detail.html.twig', [
                 'page' => $page,
             ]);
+        }
+
+        if (is_null($fallbackTemplate)) {
+            return $this->redirectToRoute('project');
         }
 
         return $this->render($fallbackTemplate);
@@ -96,6 +107,14 @@ extends DefaultController
     public function usingAction()
     {
         return $this->renderWordpress('using-the-database', 'Default/using.html.twig');
+    }
+
+    /**
+     * @Route("/info/publications", name="publications")
+     */
+    public function publicationsAction()
+    {
+        return $this->renderWordpress('publications');
     }
 
     /**

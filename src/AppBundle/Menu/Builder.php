@@ -128,6 +128,10 @@ class Builder
             'route' => 'holder',
         ]);
 
+        $menu['Info']->addChild('Publications', [
+            'route' => 'publications',
+        ]);
+
         $menu->addChild('My Data', [ 'route' => 'my-data' ]);
 
         return $menu;

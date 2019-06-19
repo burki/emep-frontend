@@ -138,11 +138,6 @@
             {% endif %#}
             <div id="footer-navigation" class="container">
                 <div class="row">
-                    {#
-                    <div class="col-xs-12 col-sm-8" style="z-index: 1">
-                        {{ knp_menu_render('footer-main', { 'currentClass': 'active', 'template': 'Base/knp_menu.html.twig' }) }}-->
-                    </div>
-                     #}
                     <div id="footer-univie" class="col-sm-4">
                         <a href="https://kunstgeschichte.univie.ac.at/ueber-uns/mitarbeiterinnen/professoreninnen/rosenberg-raphael/" target="_blank">
                             <img src="{{ app.request.basepath }}/img/Uni_Logo_2016.png" style="width: 185px; height: auto" alt="Universität Wien" />
@@ -152,6 +147,10 @@
                         <a href="http://pf.fwf.ac.at/de/wissenschaft-konkret/project-finder/40238" target="_blank">
                             <img src="{{ app.request.basepath }}/img/fwf-logo-color-transparent.gif" style="width: 165px; height: auto; margin-top: 7px" alt="FWF - Der Wissenschaftsfond." />
                         </a>
+                    </div>
+                    <div class="col-sm-4" style="text-align: right">
+                        <a href="{{ path('contact') }}">Contact us</a><br />
+                        <a href="https://dsba.univie.ac.at/fileadmin/user_upload/p_dsba/datenschutzerklaerung_websites_2018-05-23.pdf" target="_blank">Privacy Policy</a>
                     </div>
                 </div>
             </div>

@@ -226,7 +226,7 @@ footer {
     font-size: 1.2rem;
     background-color: $color-gray-dark;
     a, a:visited {
-        color: white;
+        color: $color-color-dark;
         &:hover {
             color: $color-color-dark;
         }
