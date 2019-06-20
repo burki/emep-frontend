@@ -453,6 +453,22 @@ implements \JsonSerializable, JsonLdSerializable
         }
     }
 
+    public function getNameListing()
+    {
+        if (!empty($this->nameTransliterated)) {
+            // show translit / translation in brackets instead of original
+            $parts = [ $this->nameTransliterated ];
+
+            if (!empty($this->nameAlternate)) {
+                $parts[] = $this->nameAlternate;
+            }
+
+            return sprintf('[%s]', join(' : ', $parts));
+        }
+
+        return $this->getName();
+    }
+
     /**
      * Sets url.
      *
@@ -502,9 +518,15 @@ implements \JsonSerializable, JsonLdSerializable
      *
      * @return string
      */
-    public function getGeo()
+    public function getGeo($getFromPlaceIfEmpty = false)
     {
-        return $this->geo;
+        if (!empty($this->geo) || !$getFromPlaceIfEmpty) {
+            return $this->geo;
+        }
+
+        if (!is_null($this->place)) {
+            return $this->place->getGeo();
+        }
     }
 
     /**

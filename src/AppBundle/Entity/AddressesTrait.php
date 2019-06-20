@@ -41,11 +41,15 @@ trait AddressesTrait
      *
      *
      */
-    function buildAddresses($entries, $showCountry = false, $filterExhibition = null, $linkPlace = false)
+    function buildAddresses($entries, $showCountry = false, $filterExhibition = null, $linkPlace = false, $returnStructure = false)
     {
         $addresses = self::splitAddresses($entries);
         if (empty($addresses)) {
             return [];
+        }
+
+        if ($returnStructure) {
+            $keys = array_keys($addresses);
         }
 
         $numAddresses = empty($addresses) ? 0 : count($addresses['place']);
@@ -60,6 +64,18 @@ trait AddressesTrait
                     continue;
                 }
             }
+
+            if ($returnStructure) {
+                $entry = [];
+
+                foreach ($keys as $key) {
+                    $entry[$key] = $addresses[$key][$i];
+                }
+
+                $fields[] = $entry;
+                continue;
+            }
+
 
             $lines = [];
 

@@ -349,14 +349,11 @@ extends CrudController
 
         $person = $persons[0];
 
-        $csvResult = [];
-
         $catalogueEntries = $this->findCatalogueEntries($person, true);
 
-        $result = $person->getExhibitions(-1);
-
-        foreach ($result as $exhibition) {
-            $innerArray = [
+        $csvResult = [];
+        foreach ($person->getExhibitions(-1) as $exhibition) {
+            $csvResult[] = [
                 $exhibition->getStartdate(), $exhibition->getEnddate(), $exhibition->getDisplaydate(),
                 $exhibition->getTitle(),
                 $exhibition->getLocation()->getPlaceLabel(),
@@ -365,8 +362,6 @@ extends CrudController
                 array_key_exists($exhibition->getId(), $catalogueEntries)
                  ? count($catalogueEntries[$exhibition->getId()]) : 0
             ];
-
-            array_push($csvResult, $innerArray);
         }
 
         return new CsvResponse($csvResult, 200, explode(', ', 'Start Date, End Date, Display Date, Title, City, Venue, Type of Org. Body, # of Cat. Entries'));
@@ -416,35 +411,24 @@ extends CrudController
             return new JsonLdResponse($person->jsonLdSerialize($locale));
         }
 
-        $dataNumberOfExhibitionsPerYear = $this->detailDataNumberOfExhibitionsPerYear($person);
-
-        $dataNumberOfExhibitionsPerCity = $this->detailDataNumberOfExhibitionsPerCity($person);
-
-        $dataNumberOfExhibitionsPerCountry = $this->detailDataNumberOfExhibitionsPerCountry($person);
-
         $catEntries = $this->findCatalogueEntries($person);
-
-        $dataNumberOfWorksPerYear = $this->detailDataNumberOfWorksPerYear($catEntries);
-
-        $dataNumberOfWorksPerType = $this->detailDataNumberOfWorksPerType($catEntries);
-
-        $dataNumberOfExhibitionsPerOrgBody = $this->detailDataNumberOfExhibitionsPerOrgBody($person);
 
         return $this->render('Person/detail.html.twig', [
             'pageTitle' => $person->getFullname(true), // TODO: lifespan in brackets
             'person' => $person,
+            'mapMarkers' => $this->buildMapMarkers($person),
             'showWorks' => false, // !empty($_SESSION['user']),
             'catalogueEntries' => $catEntries,
             'catalogueEntriesByExhibition' => $this->findCatalogueEntries($person, true),
             'similar' => $this->findSimilar($person),
             'currentPageId' => $id,
             'countryArray' => $this->buildCountries(),
-            'dataNumberOfExhibitionsPerYear' => $dataNumberOfExhibitionsPerYear,
-            'dataNumberOfExhibitionsPerCity' => $dataNumberOfExhibitionsPerCity,
-            'dataNumberOfExhibitionsPerCountry' => $dataNumberOfExhibitionsPerCountry,
-            'dataNumberOfWorksPerYear' => $dataNumberOfWorksPerYear,
-            'dataNumberOfWorksPerType' => $dataNumberOfWorksPerType,
-            'dataNumberOfExhibitionsPerOrgBody' => $dataNumberOfExhibitionsPerOrgBody,
+            'dataNumberOfExhibitionsPerYear' => $this->detailDataNumberOfExhibitionsPerYear($person),
+            'dataNumberOfExhibitionsPerCity' => $this->detailDataNumberOfExhibitionsPerCity($person),
+            'dataNumberOfExhibitionsPerCountry' => $this->detailDataNumberOfExhibitionsPerCountry($person),
+            'dataNumberOfWorksPerYear' => $this->detailDataNumberOfWorksPerYear($catEntries),
+            'dataNumberOfWorksPerType' => $this->detailDataNumberOfWorksPerType($catEntries),
+            'dataNumberOfExhibitionsPerOrgBody' => $this->detailDataNumberOfExhibitionsPerOrgBody($person),
             'pageMeta' => [
                 'jsonLd' => $person->jsonLdSerialize($locale),
                 'og' => $this->buildOg($person, $routeName, $routeParams),
@@ -453,6 +437,162 @@ extends CrudController
         ]);
     }
 
+    protected function buildMapMarkers($person)
+    {
+        $markers = [];
+
+        $places = [];
+
+        $birthPlace = $person->getBirthPlaceInfo();
+        if (!empty($birthPlace) && !empty($birthPlace['geo'])) {
+            $places[] = [
+                'info' => $birthPlace,
+                'label' => 'Place of Birth',
+            ];
+        }
+
+        $deathPlace = $person->getDeathPlaceInfo();
+        if (!empty($deathPlace) && !empty($deathPlace['geo'])) {
+            $places[] = [
+                'info' => $deathPlace,
+                'label' => 'Place of Death',
+            ];
+        }
+
+        // places of activity
+        $addresses = $person->getAddressesSeparated(null, false, true);
+        // we currently have geo, so get all tgn
+        $tgns = array_filter(array_unique(array_column($addresses, 'place_tgn')));
+        $placesByTgn = [];
+        if (!empty($tgns)) {
+            foreach ($this->hydratePlaces($tgns, true) as $place) {
+                if (!empty($place->getGeo())) {
+                    $placesByTgn[$place->getTgn()] = $place;
+                }
+            }
+        }
+        foreach ($addresses as $address) {
+            $tgn = $address['place_tgn'];
+            if (!empty($tgn) && array_key_exists($tgn, $placesByTgn)) {
+                $place = $placesByTgn[$tgn];
+                $places[] = [
+                    'info' => [
+                        'geo' => $place->getGeo(),
+                        'name' => $place->getNameLocalized(),
+                        'tgn' => $place->getTgn(),
+                        'address' => $address,
+                    ],
+                    'label' => 'Place of Activity',
+                ];
+            }
+        }
+
+
+        // Exhibitions
+        foreach ($person->getExhibitions(-1) as $exhibition) {
+            $location = $exhibition->getLocation();
+            if (is_null($location)) {
+                continue;
+            }
+
+            $geo = $location->getGeo(true);
+            if (is_null($geo)) {
+                continue;
+            }
+
+            $info = [
+                'geo' => $geo,
+                'exhibition' => $exhibition,
+            ];
+
+            $place = $location->getPlace();
+            if (is_null($place)) {
+                $info += [ 'name' => $location->getPlaceLabel() ];
+            }
+            else {
+                $info += [ 'name' => $place->getNameLocalized(), 'tgn' => $place->getTgn() ];
+            }
+
+            $places[] = [
+                'info' => $info,
+                'label' => 'Exhibition',
+            ];
+        }
+
+
+        foreach ($places as $place) {
+            $value = $group = null;
+            switch ($place['label']) {
+                case 'Place of Birth':
+                case 'Place of Death':
+                    $group = 'birthDeath';
+                    $value = [
+                        'icon' => 'Place of Death' == $place['label'] ? 'blackIcon' : 'violetIcon',
+                        'html' => sprintf('<b>%s</b>: <a href="%s">%s</a>',
+                                          $place['label'],
+                                          htmlspecialchars($this->generateUrl('place-by-tgn', [
+                                               'tgn' => $place['info']['tgn'],
+                                          ])),
+                                          htmlspecialchars($place['info']['name'], ENT_QUOTES))
+                    ];
+                    break;
+
+                case 'Place of Activity':
+                    $group = 'birthDeath';
+                    $value = [
+                        'icon' => 'greenIcon',
+                        'html' => sprintf('%s: %s<a href="%s">%s</a>',
+                                          $place['label'],
+                                          !empty($place['info']['address']['address'])
+                                            ? htmlspecialchars($place['info']['address']['address'], ENT_QUOTES) . ', '
+                                            : '',
+                                          htmlspecialchars($this->generateUrl('place-by-tgn', [
+                                               'tgn' => $place['info']['tgn'],
+                                          ])),
+                                          htmlspecialchars($place['info']['name'], ENT_QUOTES))
+                    ];
+                    break;
+
+                case 'Exhibition':
+                    $group = 'exhibition';
+                    $exhibition = $place['info']['exhibition'];
+                    $value = [
+                        'icon' => 'orangeIcon',
+                        'html' =>  sprintf('<a href="%s">%s</a> at <a href="%s">%s</a> (%s)',
+                                htmlspecialchars($this->generateUrl('exhibition', [
+                                    'id' => $exhibition->getId(),
+                                ])),
+                                htmlspecialchars($exhibition->getTitleListing(), ENT_QUOTES),
+                                htmlspecialchars($this->generateUrl('location', [
+                                    'id' => $exhibition->getLocation()->getId(),
+                                ])),
+                                htmlspecialchars($exhibition->getLocation()->getNameListing(), ENT_QUOTES),
+                                $this->buildDisplayDate($exhibition)
+                        ),
+                    ];
+                    break;
+            }
+
+            if (is_null($value)) {
+                continue;
+            }
+
+            if (!array_key_exists($geo = $place['info']['geo'], $markers)) {
+                $markers[$geo] = [
+                    'place' => $place['info'],
+                    'groupedEntries' => [],
+                ];
+            }
+
+            if (!array_key_exists($group, $markers[$geo]['groupedEntries'])) {
+                $markers[$geo]['groupedEntries'][$group] = [];
+            }
+
+            $markers[$geo]['groupedEntries'][$group][] = $value;
+        }
+
+        return $markers;
+    }
 
     public function detailDataNumberOfWorksPerType($catalogueEntries)
     {
@@ -464,7 +604,7 @@ extends CrudController
             foreach ($catalogueEntry as $entry) {
                 if ($entry->type) {
                     $currType = $entry->type->getName();
-                    array_push($works, (string)$currType == '0_unknown' ? 'unknown' : $currType);
+                    $works[] = $currType == '0_unknown' ? 'unknown' : $currType;
                 }
             }
         }
@@ -493,7 +633,7 @@ extends CrudController
             if (!is_null($currExhibitionYear)) {
                 // very inefficient
                 foreach ($catalogueEntries as $entry) {
-                    array_push($works, $currExhibitionYear );
+                    $works[] = $currExhibitionYear;
                 }
             }
         }
@@ -525,9 +665,8 @@ extends CrudController
 
         $averagePerYear = round($sumOfAllExhibitions / $yearActive, 1);
 
-        return [ $yearsOnly, $valuesOnly, $sumOfAllExhibitions, $yearActive, $averagePerYear];
+        return [ $yearsOnly, $valuesOnly, $sumOfAllExhibitions, $yearActive, $averagePerYear ];
     }
-
 
     public function detailDataNumberOfExhibitionsPerOrgBody($person)
     {
@@ -538,7 +677,7 @@ extends CrudController
             if ('' == $type) {
                 $type = 'unknown';
             }
-            array_push($exhibitionOrganizerTypes, $type );
+            $exhibitionOrganizerTypes[] = $type;
         }
 
         $exhibitionOrganizerTypesTotal = array_count_values($exhibitionOrganizerTypes);
@@ -581,7 +720,6 @@ extends CrudController
         return [ json_encode($finalData), $sumOfAllExhibitions, count(array_keys($exhibitionPlacesByCountryTotal)) ];
     }
 
-
     public function detailDataNumberOfExhibitionsPerCity($person)
     {
         $exhibitionPlaces = [];
@@ -592,7 +730,7 @@ extends CrudController
                 continue;
             }
 
-            array_push($exhibitionPlaces, $location->getPlaceLabel());
+            $exhibitionPlaces[] = $location->getPlaceLabel();
         }
 
         $exhibitionPlacesTotal = array_count_values($exhibitionPlaces);
@@ -747,6 +885,7 @@ extends CrudController
                     'size' => 1,
                     'imports' => [],
                 ];
+
                 if (!empty($dependencies_by_place)) {
                     $entry['imports'] = $dependencies_by_place;
                 }

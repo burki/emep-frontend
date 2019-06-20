@@ -49,6 +49,7 @@ extends \Twig_Extension
         return [
             // general
             new \Twig\TwigFilter('without', [ $this, 'withoutFilter' ]),
+            new \Twig\TwigFilter('unique', 'array_unique'),
 
             new \Twig\TwigFilter('dateincomplete', [ $this, 'dateincompleteFilter' ]),
             new \Twig\TwigFilter('datedecade', [ $this, 'datedecadeFilter' ]),
@@ -67,7 +68,8 @@ extends \Twig_Extension
     }
 
     // see https://api.drupal.org/api/drupal/core%21themes%21engines%21twig%21twig.engine/function/twig_without/8.2.x
-    public function withoutFilter($element) {
+    public function withoutFilter($element)
+    {
         if ($element instanceof \ArrayAccess) {
             $filtered_element = clone $element;
         }

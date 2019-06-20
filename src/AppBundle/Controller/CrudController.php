@@ -620,6 +620,24 @@ extends Controller
         return $hydrationQuery->getResult();
     }
 
+    protected function hydratePlaces($tgns, $preserveOrder = false)
+    {
+        // hydrate with doctrine entity
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+        $hydrationQuery = $qb->select([ 'PL', 'field(PL.tgn, :tgns) as HIDDEN field', 'COALESCE(PL.alternateName, PL.name) HIDDEN nameSort' ])
+            ->from('AppBundle:Place', 'PL')
+            ->where('PL.tgn IN (:tgns)')
+            ->orderBy($preserveOrder ? 'field' : 'nameSort')
+            ->getQuery();
+            ;
+
+        $hydrationQuery->setParameter('tgns', $tgns);
+
+        return $hydrationQuery->getResult();
+    }
+
     protected function hydrateWorks($ids, $preserveOrder = false)
     {
         // hydrate with doctrine entity

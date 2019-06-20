@@ -328,6 +328,22 @@ class Exhibition
         }
     }
 
+    public function getTitleListing()
+    {
+        if (!empty($this->titleTransliterated)) {
+            // show translit / translation in brackets instead of original
+            $parts = [ $this->titleTransliterated ];
+
+            if (!empty($this->titleAlternate)) {
+                $parts[] = $this->titleAlternate;
+            }
+
+            return sprintf('[%s]', join(' : ', $parts));
+        }
+
+        return $this->getTitle();
+    }
+
     public function getSubtitle()
     {
         return $this->subtitle;

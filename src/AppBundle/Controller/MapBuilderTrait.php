@@ -13,6 +13,14 @@ trait MapBuilderTrait
     /* TODO: move to shared helper */
     private function buildDisplayDate($row)
     {
+        if (is_object($row)) {
+            $row = [
+                'displaydate' => $row->getDisplayDate(),
+                'startdate' => $row->getStartDate(),
+                'enddate' => $row->getEndDate(),
+            ];
+        }
+
         if (!empty($row['displaydate'])) {
             return $row['displaydate'];
         }
@@ -153,38 +161,36 @@ trait MapBuilderTrait
                     continue;
                 }
 
-                $key = $row['latitude'] . ':' . $row['longitude'];
-
                 if (!empty($row['location_geo'])) {
                     list($latitude, $longitude) = preg_split('/\s*,\s*/', $row['location_geo'], 2);
-                    $key = $latitude . ':' . $longitude;
                 }
                 else {
                     $latitude = $row['latitude'];
                     $longitude = $row['longitude'];
                 }
 
-                if (is_null($latMin)) {
-                    $latMin = $latMax = $latitude;
-                    $longMin = $longMax = $longitude;
-                }
-                else {
-                    if ($latitude < $latMin) {
-                        $latMin = $latitude;
-                    }
-                    else if ($latitude > $latMax) {
-                        $latMax = $latitude;
-                    }
-
-                    if ($longitude < $longMin) {
-                        $longMin = $longitude;
-                    }
-                    else if ($longitude > $longMax) {
-                        $longMax = $longitude;
-                    }
-                }
-
+                $key = $latitude . ':' . $longitude;
                 if (!array_key_exists($key, $values)) {
+                    if (is_null($latMin)) {
+                        $latMin = $latMax = $latitude;
+                        $longMin = $longMax = $longitude;
+                    }
+                    else {
+                        if ($latitude < $latMin) {
+                            $latMin = $latitude;
+                        }
+                        else if ($latitude > $latMax) {
+                            $latMax = $latitude;
+                        }
+
+                        if ($longitude < $longMin) {
+                            $longMin = $longitude;
+                        }
+                        else if ($longitude > $longMax) {
+                            $longMax = $longitude;
+                        }
+                    }
+
                     $values[$key]  = [
                         'latitude' => (double)$latitude,
                         'longitude' => (double)$longitude,

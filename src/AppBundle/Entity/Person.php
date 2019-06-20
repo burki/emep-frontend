@@ -679,9 +679,9 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
      *
      * @return array
      */
-    public function getAddressesSeparated($filterExhibition = null, $linkPlace = false)
+    public function getAddressesSeparated($filterExhibition = null, $linkPlace = false, $returnStructure = false)
     {
-        return $this->buildAddresses($this->addresses, false, $filterExhibition, $linkPlace);
+        return $this->buildAddresses($this->addresses, false, $filterExhibition, $linkPlace, $returnStructure);
     }
 
     private static function buildPlaceInfo($place, $locale)
@@ -801,13 +801,6 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
         if (!empty($placeInfo)) {
             return $placeInfo;
         }
-
-        /*
-        if (!is_null($this->additional) && array_key_exists('wikidata', $this->additional)) {
-            return self::buildPlaceInfoFromWikidata($this->additional['wikidata']['de'],
-                                                    'placeOfDeath');
-        }
-        */
 
         if (!empty($this->deathPlaceLabel)) {
             return [
