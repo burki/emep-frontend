@@ -356,7 +356,7 @@ extends SearchListBuilder
             'L.place AS place',
             'L.place_tgn AS place_tgn',
             'L.name AS location',
-            'L.name_alternate AS location_alternte',
+            'L.name_alternate AS location_alternate',
             'L.name_translit AS location_translit',
             'L.id AS location_id',
             'L.place_geo',

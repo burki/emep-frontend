@@ -227,11 +227,11 @@ trait MapBuilderTrait
                                 htmlspecialchars($this->generateUrl('exhibition', [
                                     'id' => $row['exhibition_id'],
                                 ])),
-                                htmlspecialchars($row['exhibition']),
+                                htmlspecialchars(\AppBundle\Utils\SearchListBuilder::buildExhibitionTitleListing($row)),
                                 htmlspecialchars($this->generateUrl('location', [
                                     'id' => $row['location_id'],
                                 ])),
-                                htmlspecialchars($row['location']),
+                                htmlspecialchars(\AppBundle\Utils\SearchListBuilder::buildLocationNameListing($row)),
                                 $this->buildDisplayDate($row)
                         );
                 }

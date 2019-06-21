@@ -61,6 +61,40 @@ extends ListBuilder
                        max(self::STATUS_INTERNALONLY, self::STATUS_DELETED));
     }
 
+    static function buildExhibitionTitleListing(&$row)
+    {
+        if (!empty($row['exhibition_translit'])) {
+            // show translit / translation in brackets instead of original
+            $parts = [ $row['exhibition_translit'] ];
+
+            if (!empty($row['exhibition_alternate'])) {
+                $parts[] = $row['exhibition_alternate'];
+            }
+
+            return sprintf('[%s]',
+                           join(' : ', $parts));
+        }
+
+        return $row['exhibition'];
+    }
+
+    static function buildLocationNameListing(&$row)
+    {
+        if (!empty($row['location_translit'])) {
+            // show translit / translation in brackets instead of original
+            $parts = [ $row['location_translit'] ];
+
+            if (!empty($row['location_alternate'])) {
+                $parts[] = $row['location_alternate'];
+            }
+
+            return sprintf('[%s]',
+                           join(' : ', $parts));
+        }
+
+        return $row['location'];
+    }
+
     var $request = null;
     var $urlGenerator = null;
     var $orders = [];
@@ -548,16 +582,7 @@ extends ListBuilder
             return false;
         }
 
-        if (!empty($row['exhibition_translit'])) {
-            // show translit / translation in brackets instead of original
-            $parts = [ $row['exhibition_translit'] ];
-
-            if (!empty($row['exhibition_alternate'])) {
-                $parts[] = $row['exhibition_alternate'];
-            }
-
-            $val = sprintf('[%s]', join(' : ', $parts));
-        }
+        $val = self::buildExhibitionTitleListing($row);
 
         return sprintf('<a href="%s">%s</a>',
                        $this->urlGenerator->generate('exhibition', [ 'id' => $row['exhibition_id'] ]),
@@ -585,16 +610,7 @@ extends ListBuilder
             return false;
         }
 
-        if (!empty($row['location_translit'])) {
-            // show translit / translation in brackets instead of original
-            $parts = [ $row['location_translit'] ];
-
-            if (!empty($row['location_alternate'])) {
-                $parts[] = $row['location_alternate'];
-            }
-
-            $val = sprintf('[%s]', join(' : ', $parts));
-        }
+        $val = self::buildLocationNameListing($row);
 
         return sprintf('<a href="%s">%s</a>',
                        $this->urlGenerator->generate($route_name, [ 'id' => $row['location_id'] ]),
