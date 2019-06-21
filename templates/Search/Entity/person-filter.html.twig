@@ -19,7 +19,6 @@
             <span style="margin-right: 20px; margin-top: 7px">Additional Filters:</span>
 
             {% set entityLabels = {
-                'exhibition-type': 'Org. Body of Exhibition',
                 'person-birth': 'Year of Birth',
                 'person-death': 'Year of Death',
             } %}
@@ -35,6 +34,7 @@
             {% form_theme form 'Search/bootstrap_3_adjusted.html.twig' %}
             <div style="display:none">{{ form_row(form.person.person) }}{# for checkbox filter #}</div>
 
+            {#
             <div id="filter-panel-exhibition-type" class="collapse filter-panel">
                 <div class="panel panel-default">
                     <div class="panel-heading">Org. Body of Exhibition</div>
@@ -43,6 +43,7 @@
                     </div>
                 </div>
             </div>
+            #}
 
             <div id="filter-panel-person-birth" class="collapse filter-panel">
                 <div class="panel panel-default">

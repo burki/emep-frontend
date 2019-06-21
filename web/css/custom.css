@@ -358,6 +358,10 @@ div#footer-fwf {
     float: right;
 }
 
+.w-input.select-queries {
+    font-size: 12px;
+}
+
 .nav-tabs {
     border-bottom: 1px solid #a4b1ba;
 }
