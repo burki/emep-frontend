@@ -218,7 +218,7 @@ trait MapBuilderTrait
                                 htmlspecialchars($this->generateUrl('location', [
                                     'id' => $row['location_id'],
                                 ])),
-                                htmlspecialchars($row['location'])
+                                htmlspecialchars(\AppBundle\Utils\SearchListBuilder::buildLocationNameListing($row))
                         );
                 }
                 else if ('Exhibition' == $entity) {

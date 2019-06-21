@@ -40,18 +40,18 @@
                 ],
                 'order': [[ groupColumn, 'asc' ]],
                 'displayLength': 25,
-                'drawCallback': function ( settings ) {
+                'drawCallback': function (settings) {
                     var api = this.api();
-                    var rows = api.rows( {page:'current'} ).nodes();
-                    var last= null;
+                    var rows = api.rows({ page: 'current' }).nodes();
+                    var last = null;
 
-                    api.column(groupColumn, { page:'current' }).data().each( function ( group, i ) {
-                        if ( last !== group ) {
-                            var splitData =  $.parseHTML( group );
+                    api.column(groupColumn, { page: 'current' }).data().each(function (group, i) {
+                        if (last !== group) {
+                            var splitData =  $.parseHTML(group);
                             var url = $(splitData).data('url');
                             var splitGroup = $(splitData).text();
 
-                            $(rows).eq( i ).before(
+                            $(rows).eq(i).before(
                                 '<tr class="group groupHeader" data-artist="' + splitGroup + '">'
                                 + '<td colspan="5"><h3 class="artist-header"><span class="artistsymbol vorzeichen plussign">+</span><span class="artistsymbol vorzeichen collapsed minussign">-</span>'
                                 + group
@@ -190,6 +190,5 @@
             {% endfor %}
             </tbody>
         </table>
-
     </div><!-- .tab-pane -->
 {% endblock %}

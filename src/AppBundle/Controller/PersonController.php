@@ -259,6 +259,22 @@ extends CrudController
         return $entries;
     }
 
+    protected function hydrateSimilar($result)
+    {
+        $personsByIds = [];
+
+        $personIds = array_keys($result);
+        if (!empty($personIds)) {
+            $persons = $this->hydratePersons($personIds);
+            $personsByIds = array_combine(
+                array_map(function ($person) { return $person->getId(); }, $persons),
+                $persons
+            );
+        }
+
+        return $personsByIds;
+    }
+
     /**
      * @Route("/person/{id}/coappearances/csv", requirements={"id" = "\d+"}, name="person-coappearances-csv")
      */
@@ -297,19 +313,20 @@ extends CrudController
         $person = $persons[0];
 
         $result = $this->findSimilar($person);
+        $personsByIds = $this->hydrateSimilar($result);
+
         $csvResult = [];
-
-        foreach ($result as $key => $value) {
-            $person = $value;
-
-            $innerArray = [];
-
-            array_push($innerArray, $person['name'], $person['count'] );
-
-            array_push($csvResult, $innerArray);
+        foreach ($result as $id => $value) {
+            $person = $personsByIds[$id];
+            $csvResult[] = [
+                $person->getFullname(),
+                $person->getNationality(),
+                $person->getBirthDate(), $person->getDeathDate(),
+                $value['count'],
+            ];
         }
 
-        return new CsvResponse($csvResult, 200, explode(', ', 'Artist, # of Co-Appearances'));
+        return new CsvResponse($csvResult, 200, explode(', ', 'Name, Nationality, Date of Birth, Date of Death, # of Co-Appearances'));
     }
 
     /**
@@ -412,6 +429,7 @@ extends CrudController
         }
 
         $catEntries = $this->findCatalogueEntries($person);
+        $similar = $this->findSimilar($person);
 
         return $this->render('Person/detail.html.twig', [
             'pageTitle' => $person->getFullname(true), // TODO: lifespan in brackets
@@ -420,7 +438,8 @@ extends CrudController
             'showWorks' => false, // !empty($_SESSION['user']),
             'catalogueEntries' => $catEntries,
             'catalogueEntriesByExhibition' => $this->findCatalogueEntries($person, true),
-            'similar' => $this->findSimilar($person),
+            'similar' => $similar,
+            'similarHydrated' => $this->hydrateSimilar($similar),
             'currentPageId' => $id,
             'countryArray' => $this->buildCountries(),
             'dataNumberOfExhibitionsPerYear' => $this->detailDataNumberOfExhibitionsPerYear($person),

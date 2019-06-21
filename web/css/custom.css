@@ -773,7 +773,7 @@ h2.heading-append {
     color: rgba(255,255,255, 0.75)
 }
 
-.searchbarcontainer{
+.searchbarcontainer {
     width: 100%;
 }
 
@@ -786,20 +786,21 @@ h2.heading-append {
     cursor: pointer;
 }
 
-.subfilter-remove:hover{
+.subfilter-remove:hover {
     background-color: #c71f59;
     color: white;
 }
 
-#entrytable-list-view_info{
+#entrytable-list-view_info {
     margin-right: 20px;
 }
 
 .highcharts-data-table th {
     height: 25px;
+    padding-right: 20px;
 }
 
 .highcharts-data-table td, .highcharts-data-table tr  {
-    height: 20px!important;
+    height: 20px !important;
     padding-right: 20px;
 }

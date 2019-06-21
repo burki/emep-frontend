@@ -1,6 +1,5 @@
 {% block similars %}
     {% if similar|length > 0 %}
-
         <script>
             $( document ).ready(function() {
                 $('#similars').DataTable({
@@ -9,9 +8,12 @@
                     pageLength: 25,
                     searching: false,
                     info: true,
-                    order: [[ 1, "desc" ]],
-                    "columns": [
+                    order: [[ 4, 'desc' ]],
+                    columns: [
                         { "orderSequence": [ "asc", "desc" ] },
+                        { "orderSequence": [ "asc", "desc" ] },
+                        { "orderSequence": [ "desc", "asc" ] },
+                        { "orderSequence": [ "desc", "asc" ] },
                         { "orderSequence": [ "desc", "asc" ] }
                     ]
                 });
@@ -22,7 +24,10 @@
             <table id="similars" class="table table-striped table-bordered dataTable listviewcontainer">
                 <thead>
                 <tr class="listviewheading">
-                    <th class="all">Artists</th>
+                    <th class="all">Name</th>
+                    <th>Nationality</th>
+                    <th>Date of Birth</th>
+                    <th>Date of Death</th>
                     <th class="all"># of Co-Appearances</th>
                 </tr>
                 </thead>
@@ -37,14 +42,24 @@
                         <tbody>
                     {% endif %}
 
-                    <tr class="listviewrow">
-                        <td class="title">
-                            <a href="{{ path('person', { 'id': person_id }) }}">{{ similar[person_id]['name'] }}</a>
-                        </td>
-                        <td class="normal" data-order="{{ similar[person_id]['count'] }}">
-                            <a href="{{ path('exhibition-shared-partial', { 'persons': [ person.id, person_id ]|join(',') }) }}" data-remote="false" data-toggle="modal" data-target="#detailModal">{{ similar[person_id]['count'] }} exhibitions</a>
-                        </td>
-                    </tr>
+                    {% set aPerson = similarHydrated[person_id] %}
+                <tr class="listviewrow">
+                    <td class="title" data-order="{{ aPerson.fullname(false) }}">
+                        <a href="{{ path('person', { 'id' : aPerson.id }) }}">{{ aPerson.fullname(true) }}</a>
+                    </td>
+                    <td>
+                        {{ aPerson.nationality }}
+                    </td>
+                    <td data-order="{{ aPerson.birthDate }}">
+                        {{ aPerson.birthDate|dateincomplete -}}
+                    </td>
+                    <td data-order="{{ aPerson.deathDate }}">
+                        {{ aPerson.deathDate|dateincomplete -}}
+                    </td>
+                    <td class="normal" data-order="{{ similar[person_id]['count'] }}">
+                        <a href="{{ path('exhibition-shared-partial', { 'persons': [ person.id, person_id ]|join(',') }) }}" data-remote="false" data-toggle="modal" data-target="#detailModal">{{ similar[person_id]['count'] }} exhibitions</a>
+                    </td>
+                </tr>
                 {% endif %}
             {% endfor %}
             {% if similar_found %}
