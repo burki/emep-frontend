@@ -17,12 +17,15 @@ extends SearchListBuilder
         ],
         'exhibition' => [
             'label' => 'Title',
+            'class' => 'title',
         ],
         'place' => [
             'label' => 'City',
+            'class' => 'normal',
         ],
         'location' => [
             'label' => 'Venue',
+            'class' => 'normal',
         ],
         'type' => [
             'label' => 'Type',
@@ -32,9 +35,11 @@ extends SearchListBuilder
         ],
         'count_itemexhibition' => [
             'label' => '# of Cat. Entries',
+            'class' => 'normal',
         ],
         'count_person' => [
             'label' => '# of Artists',
+            'class' => 'normal',
         ],
     ];
 

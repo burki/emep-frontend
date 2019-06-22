@@ -14,21 +14,26 @@ extends SearchListBuilder
     var $rowDescr = [
         'location' => [
             'label' => 'Name',
+            'class' => 'title',
         ],
         'place' => [
             'label' => 'City',
+            'class' => 'normal',
         ],
         'type' => [
             'label' => 'Type',
         ],
         'count_exhibition' => [
             'label' => '# of Exhibitions',
+            'class' => 'normal',
         ],
         'count_itemexhibition' => [
             'label' => '# of Cat. Entries',
+            'class' => 'normal',
         ],
         'count_person' => [
             'label' => '# of Artists',
+            'class' => 'normal',
         ],
     ];
 

@@ -15,18 +15,21 @@ extends SearchListBuilder
     var $rowDescr = [
         'person' => [
             'label' => 'Name',
+            'class' => 'title',
         ],
         'birthdate' => [
             'label' => 'Year of Birth',
         ],
         'birthplace' => [
             'label' => 'Place of Birth',
+            'class' => 'normal',
         ],
         'deathdate' => [
             'label' => 'Year of Death',
         ],
         'deathplace' => [
             'label' => 'Place of Death',
+            'class' => 'normal',
         ],
         'gender' => [
             'label' => 'Gender',
@@ -36,9 +39,11 @@ extends SearchListBuilder
         ],
         'count_exhibition' => [
             'label' => '# of Exhibitions',
+            'class' => 'normal',
         ],
         'count_itemexhibition' => [
             'label' => '# of Cat. Entries',
+            'class' => 'normal',
         ],
     ];
 

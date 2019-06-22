@@ -634,6 +634,13 @@ extends ListBuilder
         return $ret;
     }
 
+    public function getColumnInfo($key)
+    {
+        if (array_key_exists($key, $this->rowDescr)) {
+            return $this->rowDescr[$key];
+        }
+    }
+
     protected function formatRowValue($val, $descr, $format)
     {
         if (is_null($val)) {

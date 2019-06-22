@@ -7,30 +7,32 @@
                 </div>
             </div>
             <table class="table table-striped">
-                <thead>
+            <thead>
                 <tr>
+                    {% set colInfo = [] %}
                     {% for key,label in listBuilder.buildHeaderRow() %}
-                        <th>
-                            {% set sortInfo = listBuilder.sortInfo(key) %}
-                            {% if sortInfo is not empty %}
-                                <a href="{{ sortInfo.action }}"{% if sortInfo.active is not empty %} class="{{ sortInfo.active }}"{% endif %}>{{ label }}</a>
-                            {% else %}
-                                {{ label }}
-                            {% endif %}
-                        </th>
+                    <th>
+                        {% set colInfo = colInfo|merge([ listBuilder.getColumnInfo(key) ]) %}
+                        {% set sortInfo = listBuilder.sortInfo(key) %}
+                        {% if sortInfo is not empty %}
+                            <a href="{{ sortInfo.action }}"{% if sortInfo.active is not empty %} class="{{ sortInfo.active }}"{% endif %}>{{ label }}</a>
+                        {% else %}
+                            {{ label }}
+                        {% endif %}
+                    </th>
                     {% endfor %}
                 </tr>
-                </thead>
-                <tbody>
+            </thead>
+            <tbody>
                 {% for row in pager.currentPageResults %}
                     <tr>
                         {% set rowValues = listBuilder.buildRow(row, 'html') %}
                         {% for val in rowValues %}
-                            <td>{% if loop.first %}{% if 'ItemExhibition' != listBuilder.entity and 'Place' != listBuilder.entity %}<span class="checkmark" data-id="{{ row.id }}"></span>{% endif %}{% endif %}{{ val|raw }}</td>
+                        <td{% if colInfo[loop.index0].class is not empty %} class="{{ colInfo[loop.index0].class }}"{% endif %}>{% if loop.first %}{% if 'ItemExhibition' != listBuilder.entity and 'Place' != listBuilder.entity %}<span class="checkmark" data-id="{{ row.id }}"></span>{% endif %}{% endif %}{{ val|raw }}</td>
                         {% endfor %}
                     </tr>
                 {% endfor %}
-                </tbody>
+            </tbody>
             </table>
 
             <div class="pagerfanta">{{ pagerfanta(pager, 'twitter_bootstrap3', { 'omitFirstPage': true }) }}</div>

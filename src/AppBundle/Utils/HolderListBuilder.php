@@ -14,6 +14,7 @@ extends SearchListBuilder
     var $rowDescr = [
         'holder' => [
             'label' => 'Name',
+            'class' => 'title',
         ],
         'count_bibitem' => [
             'label' => '# of Catalogues',

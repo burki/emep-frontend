@@ -14,18 +14,22 @@ extends SearchListBuilder
     var $rowDescr = [
         'place' => [
             'label' => 'City',
+            'class' => 'title',
         ],
         'country' => [
             'label' => 'Country',
         ],
         'count_location' => [
             'label' => '# of Venues',
+            'class' => 'normal',
         ],
         'count_exhibition' => [
             'label' => '# of Exhibitions',
+            'class' => 'normal',
         ],
         'count_itemexhibition' => [
             'label' => '# of Cat. Entries',
+            'class' => 'normal',
         ],
     ];
 
@@ -147,6 +151,59 @@ extends SearchListBuilder
 
             return $listBuilder->buildLinkedValue($val, 'place-by-tgn', [ 'tgn' => $row['place_tgn'] ], $format);
         };
+
+        if (empty($mode)) {
+
+            if (empty($routeParams['filter']['search'])) {
+                $routeParams = [
+                    'filter' => $this->getQueryFilters(true),
+                ];
+                unset($routeParams['filter']['place']); // we don't need country filter when we set to place
+
+                $routeParams['entity'] = 'Venue';
+                $this->rowDescr['count_location']['buildValue']
+                    = function (&$row, $val, $listBuilder, $key, $format) use ($routeParams) {
+                        if ('html' != $format) {
+                            return false;
+                        }
+
+                        $routeParams['filter']['location']['geoname'] = [ 'tgn:' . $row['place_tgn'] ];
+
+                        return sprintf('<a href="%s">%s</a>',
+                                       $this->urlGenerator->generate('search-index', $routeParams),
+                                       $this->formatRowValue($val, [], $format));
+                    };
+
+
+                $routeParams['entity'] = 'Exhibition';
+                $this->rowDescr['count_exhibition']['buildValue']
+                    = function (&$row, $val, $listBuilder, $key, $format) use ($routeParams) {
+                        if ('html' != $format) {
+                            return false;
+                        }
+
+                        $routeParams['filter']['location']['geoname'] = [ 'tgn:' . $row['place_tgn'] ];
+
+                        return sprintf('<a href="%s">%s</a>',
+                                       $this->urlGenerator->generate('search-index', $routeParams),
+                                       $this->formatRowValue($val, [], $format));
+                    };
+
+                $routeParams['entity'] = 'ItemExhibition';
+                $this->rowDescr['count_itemexhibition']['buildValue']
+                    = function (&$row, $val, $listBuilder, $key, $format) use ($routeParams) {
+                        if ('html' != $format) {
+                            return false;
+                        }
+
+                        $routeParams['filter']['location']['geoname'] = [ 'tgn:' . $row['place_tgn'] ];
+
+                        return sprintf('<a href="%s">%s</a>',
+                                       $this->urlGenerator->generate('search-index', $routeParams),
+                                       $this->formatRowValue($val, [], $format));
+                    };
+            }
+        }
     }
 
     protected function setSelect($queryBuilder)
