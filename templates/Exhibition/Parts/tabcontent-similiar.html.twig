@@ -66,7 +66,7 @@
                         {{ helper.location_linked(aExhibition.location) }}
                     </td>
                     <td class="normal" data-order="{{ similar[exhibition_id]['count'] }}">
-                        <a href="{{ path('person-shared-partial', { 'exhibitions': [ aExhibition.id, exhibition_id ]|join(',') }) }}" data-remote="false" data-toggle="modal" data-target="#detailModal">{{ similar[exhibition_id]['count'] }} artists</a>
+                        <a href="{{ path('person-shared-partial', { 'exhibitions': [ exhibition.id, exhibition_id ]|join(',') }) }}" data-remote="false" data-toggle="modal" data-target="#detailModal">{{ similar[exhibition_id]['count'] }} artists</a>
                     </td>
                 </tr>
                 {% endif %}

@@ -13,10 +13,10 @@
                 info: true,
                 columns: [
                     { "orderSequence": [ "asc", "desc" ] },
-                    { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "desc", "asc" ] },
                     { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "desc", "asc" ] },
+                    { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "asc", "desc" ] }
                 ]
@@ -30,16 +30,16 @@
             <thead>
             <tr>
                 <th>Name</th>
-                <th>Nationality</th>
                 <th>Date of Birth </th>
                 <th>Place of Birth</th>
                 <th>Date of Death</th>
                 <th>Place of Death</th>
+                <th>Nationality</th>
                 <th>Exhibited in City</th>
             </tr>
             </thead>
-            <tbody>
 
+            <tbody>
             {% for person in artistsArray %}
                 {% set exhibited = person['exhibited'] %}
 
@@ -53,7 +53,6 @@
 
                 <tr>
                     <td class="title" data-order="{{ person.fullname(false) }}"><b>{{ helper.person_linked(person, true) }}</b></td>
-                    <td>{{ person.nationality }}</td>
                     <td data-order="{{ person.birthDate }}">{{ person.birthDate|dateincomplete -}} </td>
                     <td class="normal">
                         {% set birthPlace = person.birthPlace %}
@@ -68,6 +67,7 @@
                             {{ helper.place_linked(deathPlace) }}
                         {% endif %}
                     </td>
+                    <td>{{ person.nationality }}</td>
                     <td data-order="{{ hasExibitedText }}">{{ hasExibitedText }}</td>
                 </tr>
             {% endfor %}
