@@ -525,10 +525,7 @@ extends CrudController
         foreach ($allArtists as $info) {
             $person = $info[0];
 
-            $key = $person->getNationality();
-            if (is_null($key)) {
-                $key = '[unknown]';
-            }
+            $key = $this->expandCountryCode($person->getNationality());
 
             if (!array_key_exists($key, $stats)) {
                 $stats[$key] = 0;

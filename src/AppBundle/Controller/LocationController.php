@@ -226,7 +226,6 @@ extends CrudController
         return $exhibitionStats;
     }
 
-
     /**
      * @Route("/location/{id}/artists/csv", requirements={"id" = "\d+"}, name="location-artists-csv")
      */
@@ -254,13 +253,13 @@ extends CrudController
                 $person = $values[0];
                 return [
                     $person->getFullname(false),
-                    $person->getNationality(),
                     $person->getBirthDate(), $person->getDeathDate(),
+                    $person->getNationality(),
                     $values['numExhibitionSort'], $values['numCatEntrySort'],
                 ];
             }, $artists);
 
-        return new CsvResponse($csvResult, 200, explode( ', ', 'Name, Nationality, Date of Birth, Date of Death, # of Exhibitions, # of Cat. Entries'));
+        return new CsvResponse($csvResult, 200, explode( ', ', 'Name, Date of Birth, Date of Death, Nationality, # of Exhibitions, # of Cat. Entries'));
     }
 
     /**
@@ -332,8 +331,6 @@ extends CrudController
 
         $artists = $this->getArtistsByExhibitionIds($exhibitionIds);
 
-        $dataNumberOfArtistsPerCountry = $this->detailDataNumberOfArtistsPerCountry($artists);
-
         $genderCounts = $this->getGenderCountsByExhibitionId($exhibitionIds);
 
         return $this->render('Location/detail.html.twig', [
@@ -341,7 +338,7 @@ extends CrudController
             'location' => $location,
             'exhibitionStats' => $this->getExhibitionStatsByIds($exhibitionIds),
             'artists' => $artists,
-            'dataNumberOfArtistsPerCountry' => $dataNumberOfArtistsPerCountry,
+            'dataNumberOfArtistsPerCountry' => $this->detailDataNumberOfArtistsPerCountry($artists),
             'detailDataNumberItemTypes' => $this->detailDataNumberItemTypes($location),
             'genderStats' => $genderCounts,
             'genderStatsStatisticsFormat' => $this->assoc2NameYArray($genderCounts),
