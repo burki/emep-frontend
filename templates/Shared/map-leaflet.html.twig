@@ -1,6 +1,6 @@
 {% macro head() %}
-    <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/leaflet-1.0.3/leaflet.css" />
-    <script src="{{ app.request.basepath }}/vendor/leaflet-1.0.3/leaflet.js"></script>
+    <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/leaflet-1.5.1/leaflet.css" />
+    <script src="{{ app.request.basepath }}/vendor/leaflet-1.5.1/leaflet.js"></script>
 {% endmacro %}
 
 {% macro head_markercluster() %}
@@ -77,8 +77,17 @@
 {% macro defineColorIcons() %}
     var baseUrlMarkerImg = '{{ app.request.basepath }}/vendor/leaflet-color-markers/img/';
 
-    var violetIcon = new L.Icon({
+    var blueIcon = new L.Icon({
         iconUrl: baseUrlMarkerImg + 'marker-icon-2x-blue.png',
+        shadowUrl: baseUrlMarkerImg + 'marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    });
+
+    var violetIcon = new L.Icon({
+        iconUrl: baseUrlMarkerImg + 'marker-icon-2x-violet.png',
         shadowUrl: baseUrlMarkerImg + 'marker-shadow.png',
         iconSize: [25, 41],
         iconAnchor: [12, 41],
