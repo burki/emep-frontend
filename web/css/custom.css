@@ -366,30 +366,40 @@ div#footer-fwf {
     border-bottom: 1px solid #a4b1ba;
 }
 
-.nav-tabs>li {
+.nav-tabs > li {
 }
 
-.nav-tabs>li>a {
+.nav-tabs > li > a {
     line-height: 3;
     color: #5b6974;
 
 }
 
-.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover, .nav-tabs>li.active>a:hover {
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:focus,
+.nav-tabs > li.active > a:hover
+{
     background-color: transparent;
     border: none;
 }
 
-.nav-tabs>li.active>a, .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover, .nav-tabs>li.active>a:hover{
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:focus,
+.nav-tabs > li.active > a:hover
+{
     color: #1869a3;
     border-bottom: solid 1px #1869a3;
 }
 
-
-.nav-tabs>li>a:hover, .nav-tabs>li>a:hover {
+.nav-tabs > li > a:hover
+{
     background-color: transparent;
     border: 1px solid transparent;
-    color: #1869a3!important;
+    color: #1869a3 !important;
+}
+
+a.heading-beta, a.heading-beta:visited {
+    color: #ff0000 !important;
 }
 
 .groupHeader a, .groupHeader {

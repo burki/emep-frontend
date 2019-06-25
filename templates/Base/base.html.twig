@@ -46,10 +46,10 @@
         <meta property="og:title" content="{{ pageTitle }}">
         {% endif %}
 
-        <script src="{{ app.request.basepath }}/js/jquery-2.2.3.min.js"></script>
+        <script src="{{ app.request.basepath }}/js/jquery-3.3.1.min.js"></script>
 
         <!-- Latest compiled and minified CSS -->
-        <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="{{ app.request.basepath }}/vendor/bootstrap-3.4.0-dist/css/bootstrap.min.css">
 
         <!-- webflow css -->
         <link rel="stylesheet" href="{{ app.request.basepath }}/css/normalize.css">
@@ -61,7 +61,7 @@
         <link rel="stylesheet" href="{{ app.request.basepath }}/css/datatables-responsive.min.css">
 
         <!-- Latest compiled and minified JavaScript -->
-        <script src="{{ app.request.basepath }}/vendor/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+        <script src="{{ app.request.basepath }}/vendor/bootstrap-3.4.0-dist/js/bootstrap.min.js"></script>
 
         <!-- important for async loading of elements -->
         <script src="{{ app.request.basepath }}/js/hinclude.js"></script>
@@ -69,7 +69,6 @@
         <script src="{{ app.request.basepath }}/js/wNumb.js"></script>
         <script src="{{ app.request.basepath }}/js/nouislider.js"></script>
         <script src="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.js"></script>
-
 
         {% include 'AppBundle:Shared:stylesheets.html.twig' %}
 
@@ -109,9 +108,13 @@
                     {{ knp_menu_render('main', { 'currentClass': 'active', 'template': 'Base/knp_menu_customized.html.twig' }) }}
                 </nav>
                 <div class="branding">
-                    <a href="{{ path('home') }}" class="brand w-nav-brand">
-                        <div class="text-block heading-title-menu">Database of Modern Exhibitions (DoME)<br /><span class="heading-subtitle-menu">European Paintings and Drawings 1905-1915</span></div>
-                    </a>
+                    <div class="text-block heading-title-menu brand">
+                        <a href="{{ path('home') }}" class="w-nav-brand">
+                            Database of Modern Exhibitions (DoME)<br />
+                            <span class="heading-subtitle-menu">European Paintings and Drawings 1905-1915</span>
+                        </a><br />
+                        <a href="{{ path('using') }}" class="heading-beta">BETA-Version</a>
+                    </div>
                     <div class="w-nav-button">
                         <div class="w-icon-nav-menu"></div>
                     </div>
