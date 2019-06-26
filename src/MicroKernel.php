@@ -30,9 +30,11 @@ extends Kernel
             $debug = filter_var(getenv('APP_DEBUG'), FILTER_VALIDATE_BOOLEAN);
         }
 
+        /*
         // hack to access backend session
         session_name('sid-emep');
         session_start();
+        */
 
         return new self($env, $debug);
     }

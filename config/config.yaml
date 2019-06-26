@@ -20,8 +20,9 @@ framework:
         fallbacks: ['%locale%']
         logging: false
     session:
-        storage_id: session.storage.php_bridge
+        # storage_id: session.storage.php_bridge
         handler_id: ~
+        name: dome
     fragments:
         path: /_fragment
         #hinclude_default_template: hinclude.html.twig # see https://symfony.com/blog/new-in-symfony-4-3-deprecated-the-templating-component-integration 
