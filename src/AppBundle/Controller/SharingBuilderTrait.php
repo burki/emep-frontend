@@ -51,7 +51,8 @@ trait SharingBuilderTrait
         $og = [
             'og:site_name' => $translator->trans($globals['siteName']),
             'og:locale' => $this->buildOgLocale(),
-            'og:url' => $this->generateUrl($routeName, $routeParams, true),
+            'og:url' => $this->generateUrl($routeName, $routeParams,
+                                           \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL),
         ];
 
         /*
