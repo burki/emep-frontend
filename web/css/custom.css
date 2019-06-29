@@ -366,13 +366,9 @@ div#footer-fwf {
     border-bottom: 1px solid #a4b1ba;
 }
 
-.nav-tabs > li {
-}
-
 .nav-tabs > li > a {
     line-height: 3;
     color: #5b6974;
-
 }
 
 .nav-tabs > li.active > a,
@@ -419,14 +415,12 @@ a.heading-beta, a.heading-beta:visited {
     border: none;
 }
 
-
 .artist-first-letter {
     color: #5B6974;
     font-size: 21px;
     line-height: 12px;
     margin-top: 10px;
 }
-
 
 .places-filter div:nth-child(0) {
     width: 100% !important;
@@ -501,6 +495,7 @@ path.highcharts-tick {
 .number-right {
     text-align: right;
 }
+
 .number-center {
     text-align: center;
 }
@@ -513,7 +508,6 @@ footer {
 .select2-container {
     margin-left: 5px;
 }
-
 
 
 .holder div:nth-child(1) {
@@ -558,7 +552,6 @@ footer {
 }
 
 .middle-selector {
-
 }
 
 .end-selector {
@@ -569,11 +562,9 @@ footer {
     display: none;
 }
 
-
 table a {
     text-decoration: underline!important;
 }
-
 
 @media (max-width: 767px) {
     input[type=text], #exhibition_filter_country, #holder_filter_search, #holder_filter_country, #place_filter_search, #place_filter_country, #exhibition_filter_search, #location_filter_search, #location_filter_country, #person_filter_search, #person_filter_gender, #person_filter_nationality {
@@ -612,7 +603,6 @@ table a {
 
 
     /* MENU MOBILE STYLE */
-
     .menu_level_1 {
         display: block;
         position: relative;
@@ -717,7 +707,13 @@ table a {
 }
 
 
-.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+.table > tbody > tr > td,
+.table > tbody > tr > th,
+.table > tfoot > tr > td,
+.table > tfoot > tr > th,
+.table > thead > tr > td,
+.table > thead > tr > th
+{
     line-height: 1.2;
 }
 
