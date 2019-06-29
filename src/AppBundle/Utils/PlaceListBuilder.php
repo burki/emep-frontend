@@ -95,7 +95,7 @@ extends SearchListBuilder
     ];
 
     public function __construct(\Doctrine\DBAL\Connection $connection,
-                                Request $request,
+                                Request $request = null,
                                 UrlGeneratorInterface $urlGenerator,
                                 $queryFilters = null,
                                 $mode = '')
@@ -109,6 +109,9 @@ extends SearchListBuilder
         }
         else if ('stats-country' == $this->mode) {
             $this->orders = [ 'default' => [ 'asc' => [ 'country_code' ] ] ];
+        }
+        else if ('sitemap' == $this->mode) {
+            $this->orders = [ 'default' => [ 'asc' => [ 'id' ] ] ];
         }
         else if ('extended' == $this->mode) {
             $this->rowDescr = [
@@ -212,6 +215,16 @@ extends SearchListBuilder
             $queryBuilder->select([
                 $this->alias . '.country_code AS country_code',
                 'COUNT(DISTINCT ' . $this->alias . '.tgn) AS how_many',
+            ]);
+
+            return $this;
+        }
+
+        if ('sitemap' == $this->mode) {
+            $queryBuilder->select([
+                $this->alias . '.id AS id',
+                $this->alias . '.tgn AS tgn',
+                $this->alias . '.changed AS changedAt',
             ]);
 
             return $this;

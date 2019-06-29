@@ -149,7 +149,7 @@ extends SearchListBuilder
     ];
 
     public function __construct(\Doctrine\DBAL\Connection $connection,
-                                Request $request,
+                                Request $request = null,
                                 UrlGeneratorInterface $urlGenerator,
                                 $queryFilters = null,
                                 $mode = '')
@@ -172,6 +172,9 @@ extends SearchListBuilder
         }
         else if ('stats-organizer-type' == $this->mode) {
             $this->orders = [ 'default' => [ 'asc' => [ 'how_many DESC' ] ] ];
+        }
+        else if ('sitemap' == $this->mode) {
+            $this->orders = [ 'default' => [ 'asc' => [ 'id' ] ] ];
         }
         else if ('extended' == $this->mode) {
             $this->rowDescr = [
@@ -343,6 +346,15 @@ extends SearchListBuilder
             $queryBuilder->select([
                 'E.organizer_type AS organizer_type',
                 'COUNT(DISTINCT E.id) AS how_many',
+            ]);
+
+            return $this;
+        }
+
+        if ('sitemap' == $this->mode) {
+            $queryBuilder->select([
+                'E.id AS id',
+                'E.changed AS changedAt',
             ]);
 
             return $this;

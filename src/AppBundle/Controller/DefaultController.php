@@ -36,7 +36,7 @@ extends Controller
     }
 
     /**
-     * @Route("/", name="home")
+     * @Route("/", name="home", options={"sitemap" = true})
      */
     public function homeAction(Request $request, UrlGeneratorInterface $urlGenerator)
     {

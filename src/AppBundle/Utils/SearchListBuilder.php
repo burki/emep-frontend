@@ -101,7 +101,7 @@ extends ListBuilder
     var $queryFilters = [];
 
     public function __construct(\Doctrine\DBAL\Connection $connection,
-                                Request $request,
+                                Request $request = null,
                                 UrlGeneratorInterface $urlGenerator,
                                 $queryFilters = null)
     {
@@ -111,7 +111,7 @@ extends ListBuilder
         $this->urlGenerator = $urlGenerator;
 
         if (is_null($queryFilters)) {
-            $queryFilters = $this->request->get('filter');
+            $queryFilters = !is_null($this->request) ? $this->request->get('filter') : [];
         }
 
         $this->setQueryFilters($queryFilters);
@@ -138,16 +138,22 @@ extends ListBuilder
 
     protected function determineSortOrder()
     {
+        $sort = null;
+        if (!is_null($this->request)) {
+            $sort = $this->request->get('sort');
+        }
+
         $sortKeys = array_keys($this->orders);
-
-        $sort = $this->request->get('sort');
-
         if (!in_array($sort, $sortKeys)) {
             $sort = $sortKeys[0];
         }
 
+        $order = null;
+        if (!is_null($this->request)) {
+            $order = $this->request->get('order');
+        }
+
         $sortOrders = array_keys($this->orders[$sort]);
-        $order = $this->request->get('order');
         if (!in_array($order, $sortOrders)) {
             $order = $sortOrders[0];
         }

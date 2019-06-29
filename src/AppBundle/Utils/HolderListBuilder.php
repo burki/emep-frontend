@@ -51,7 +51,7 @@ extends SearchListBuilder
     ];
 
     public function __construct(\Doctrine\DBAL\Connection $connection,
-                                Request $request,
+                                Request $request = null,
                                 UrlGeneratorInterface $urlGenerator,
                                 $queryFilters = null,
                                 $mode = '')
@@ -60,7 +60,10 @@ extends SearchListBuilder
 
         parent::__construct($connection, $request, $urlGenerator, $queryFilters);
 
-        if ('extended' == $this->mode) {
+        if ('sitemap' == $this->mode) {
+            $this->orders = [ 'default' => [ 'asc' => [ 'id' ] ] ];
+        }
+        else if ('extended' == $this->mode) {
             $this->rowDescr = [
                 'holder_id' => [
                     'label' => 'ID',
@@ -124,6 +127,15 @@ extends SearchListBuilder
             $queryBuilder->select([
                 'P' . $this->alias . '.country_code AS country_code',
                 'COUNT(DISTINCT ' . $this->alias . '.id) AS how_many',
+            ]);
+
+            return $this;
+        }
+
+        if ('sitemap' == $this->mode) {
+            $queryBuilder->select([
+                $this->alias . '.id AS id',
+                $this->alias . '.changed AS changedAt',
             ]);
 
             return $this;

@@ -78,7 +78,9 @@
         "white-october/pagerfanta-bundle": "^1.2",
 
         "vnn/wordpress-rest-api-client": "^1.2",
-        "guzzlehttp/guzzle": "^6.3"
+        "guzzlehttp/guzzle": "^6.3",
+
+        "presta/sitemap-bundle": "^1.7"
     },
 
     "autoload": {

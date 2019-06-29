@@ -34,12 +34,12 @@ extends CrudController
     ];
 
     /**
-     * @Route("/search", name="search-index")
-     * @Route("/exhibition", name="exhibition-index")
-     * @Route("/person", name="person-index")
-     * @Route("/location", name="venue-index")
-     * @Route("/organizer", name="organizer-index")
-     * @Route("/place/exhibiting", name="place-index")
+     * @Route("/search", name="search-index", options={"sitemap" = true})
+     * @Route("/exhibition", name="exhibition-index", options={"sitemap" = true})
+     * @Route("/person", name="person-index", options={"sitemap" = true})
+     * @Route("/location", name="venue-index", options={"sitemap" = true})
+     * @Route("/organizer", name="organizer-index", options={"sitemap" = true})
+     * @Route("/place/exhibiting", name="place-index", options={"sitemap" = true})
      */
     public function searchAction(Request $request,
                                  UrlGeneratorInterface $urlGenerator,

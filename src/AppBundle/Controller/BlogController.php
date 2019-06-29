@@ -12,7 +12,7 @@ class BlogController
 extends DefaultController
 {
     /**
-     * @Route("/blog", name="blog-index")
+     * @Route("/blog", name="blog-index", options={"sitemap" = { "section" = "default" }})
      */
     public function blogIndexAction(Request $request)
     {

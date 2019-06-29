@@ -91,6 +91,9 @@ extends Kernel
             // pagination
             new WhiteOctober\PagerfantaBundle\WhiteOctoberPagerfantaBundle(),
 
+            // sitemap
+            new Presta\SitemapBundle\PrestaSitemapBundle(),
+
             // own code
             new AppBundle\AppBundle(),
         ];
@@ -146,6 +149,9 @@ extends Kernel
                 $routes->import('@TwigBundle/Resources/config/routing/errors.xml')
             );
         }
+
+        // for /sitemap.xml
+        $routes->mount('/', $routes->import('@PrestaSitemapBundle/Resources/config/routing.yml'));
 
         // our controllers
         $confDir = $this->getProjectDir().'/config';

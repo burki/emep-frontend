@@ -86,7 +86,7 @@ extends DefaultController
 
     /**
      * @Route("/info")
-     * @Route("/info/project", name="project")
+     * @Route("/info/project", name="project", options={"sitemap" = true})
      */
     public function infoAction()
     {
@@ -94,7 +94,7 @@ extends DefaultController
     }
 
     /**
-     * @Route("/info/team", name="team")
+     * @Route("/info/team", name="team", options={"sitemap" = true})
      */
     public function teamAction()
     {
@@ -102,7 +102,7 @@ extends DefaultController
     }
 
     /**
-     * @Route("/info/using", name="using")
+     * @Route("/info/using", name="using", options={"sitemap" = true})
      */
     public function usingAction()
     {
@@ -110,7 +110,7 @@ extends DefaultController
     }
 
     /**
-     * @Route("/info/publications", name="publications")
+     * @Route("/info/publications", name="publications", options={"sitemap" = true})
      */
     public function publicationsAction()
     {
@@ -118,7 +118,7 @@ extends DefaultController
     }
 
     /**
-     * @Route("/cooperating-institutions", name="cooperating")
+     * @Route("/cooperating-institutions", name="cooperating", options={"sitemap" = true})
      */
     public function cooperatingAction()
     {
@@ -126,7 +126,7 @@ extends DefaultController
     }
 
     /**
-     * @Route("/contact", name="contact")
+     * @Route("/contact", name="contact", options={"sitemap" = true})
      */
     public function contactAction(Request $request)
     {
