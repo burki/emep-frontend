@@ -391,25 +391,17 @@ extends CrudController
      */
     public function detailAction(Request $request, $id = null, $ulan = null, $gnd = null)
     {
-        $routeName = 'person';
-        $routeParams = [];
-
         $criteria = new \Doctrine\Common\Collections\Criteria();
         $personRepo = $this->getDoctrine()
                 ->getRepository('AppBundle:Person');
 
         if (!empty($id)) {
-            $routeParams = [ 'id' => $id ];
             $criteria->where($criteria->expr()->eq('id', $id));
         }
         else if (!empty($ulan)) {
-            $routeName = 'person-by-ulan';
-            $routeParams = [ 'ulan' => $ulan ];
             $criteria->where($criteria->expr()->eq('ulan', $ulan));
         }
         else if (!empty($gnd)) {
-            $routeName = 'person-by-gnd';
-            $routeParams = [ 'gnd' => $gnd ];
             $criteria->where($criteria->expr()->eq('gnd', $gnd));
         }
 
@@ -426,6 +418,17 @@ extends CrudController
         $locale = $request->getLocale();
         if (in_array($request->get('_route'), [ 'person-jsonld', 'person-by-ulan-json', 'person-by-gnd-jsonld' ])) {
             return new JsonLdResponse($person->jsonLdSerialize($locale));
+        }
+
+        $routeName = 'person';
+        $routeParams = [ 'id' => $person->getId() ];
+        if (!empty($person->getUlan())) {
+            $routeName = 'person-by-ulan';
+            $routeParams = [ 'ulan' => $person->getUlan() ];
+        }
+        else if (!empty($person->getGnd())) {
+            $routeName = 'person-by-gnd';
+            $routeParams = [ 'gnd' => $person->getGnd() ];
         }
 
         $catEntries = $this->findCatalogueEntries($person);
