@@ -181,7 +181,7 @@ extends CrudController
             $exhibitionStats[$row['id']] = $row;
         }
 
-        $venuesList = $this->getVenuesList($tgn);
+        $venuesList = $this->getVenuesList($tgn = $place->getTgn());
 
         $exhibitionTypeStats = $this->getStatsExhibitionTypes($tgn);
         $allArtists = $this->getAllArtists($tgn);
