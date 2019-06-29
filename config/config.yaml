@@ -27,9 +27,9 @@ framework:
         path: /_fragment
         #hinclude_default_template: hinclude.html.twig # see https://symfony.com/blog/new-in-symfony-4-3-deprecated-the-templating-component-integration 
         
-    # Symfony 4.3 adds automatic search-enging protection in dev-mode
+    # Symfony 4.3 adds automatic search-enging protection in debug-mode
     # You can override, see https://symfony.com/blog/new-in-symfony-4-3-automatic-search-engine-protection
-    # disallow_search_engine_index: false
+    disallow_search_engine_index: false
 
 twig:
     globals:
