@@ -14,7 +14,7 @@ framework:
     # validation: ~
     templating:
         engines: ['twig']
-        hinclude_default_template: hinclude.html.twig # TODO: move to fragments
+        hinclude_default_template: hinclude.html.twig # TODO: move to fragments, but it seems as assetic needs to be replaced before
     # knp_paginator needs translate bundle
     translator:
         fallbacks: ['%locale%']

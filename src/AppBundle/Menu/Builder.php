@@ -116,8 +116,8 @@ class Builder
             'route' => 'team',
         ]);
 
-        $menu['Info']->addChild('Using the Database', [
-            'route' => 'using',
+        $menu['Info']->addChild('Content of the Database', [
+            'route' => 'database',
         ]);
 
         $menu['Info']->addChild('Cooperating Institutions', [

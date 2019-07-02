@@ -102,9 +102,9 @@ extends DefaultController
     }
 
     /**
-     * @Route("/info/using", name="using", options={"sitemap" = true})
+     * @Route("/info/database", name="database", options={"sitemap" = true})
      */
-    public function usingAction()
+    public function databaseAction()
     {
         return $this->renderWordpress('using-the-database', 'Default/using.html.twig');
     }
