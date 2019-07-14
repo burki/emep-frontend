@@ -725,7 +725,12 @@ extends CrudController
                 continue;
             }
 
-            array_push($exhibitionPlacesByCountry, $location->getPlace()->getCountryCode());
+            $place = $location->getPlace();
+            if (is_null($place)) {
+                continue;
+            }
+
+            $exhibitionPlacesByCountry[] = $location->getPlace()->getCountryCode();
         }
 
         $exhibitionPlacesByCountryTotal = array_count_values($exhibitionPlacesByCountry);
