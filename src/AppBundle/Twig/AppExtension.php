@@ -19,7 +19,7 @@
 namespace AppBundle\Twig;
 
 class AppExtension
-extends \Twig_Extension
+extends \Twig\Extension\AbstractExtension
 {
     private $translator;
     private $slugifyer;
@@ -59,11 +59,8 @@ extends \Twig_Extension
             // appbundle-specific
             new \Twig\TwigFilter('placeTypeLabel', [ $this, 'placeTypeLabelFilter' ]),
             new \Twig\TwigFilter('currencySymbol', [ $this, 'buildCurrencySymbol' ]),
-            new \Twig\TwigFilter('lookupLocalizedTopic', [ $this, 'lookupLocalizedTopicFilter' ]),
-            new \Twig\TwigFilter('glossaryAddRefLink', [ $this, 'glossaryAddRefLinkFilter' ],
-                                   [ 'is_safe' => [ 'html' ] ]),
             new \Twig\TwigFilter('renderCitation', [ $this, 'renderCitation' ],
-                                   [ 'is_safe' => [ 'html' ] ]),
+                                 [ 'is_safe' => [ 'html' ] ]),
         ];
     }
 
@@ -174,16 +171,7 @@ extends \Twig_Extension
             ;
     }
 
-    public function lookupLocalizedTopicFilter($topic, $locale = null)
-    {
-        if (is_null($locale)) {
-            $locale = $this->getLocale();
-        }
-        return \AppBundle\Controller\TopicController::lookupLocalizedTopic($topic, $this->translator, $locale);
-    }
-
-    /* verbatim copy from SearchListBuilder - TODO: share */
-    public function buildCurrencySymbol($currency)
+    public function buildCurrencySymbol($currency, $extended = false)
     {
         static $currencies = null;
 
@@ -199,14 +187,17 @@ extends \Twig_Extension
                     $line = chop($line);
                     $parts = preg_split('/\t/', $line);
                     if (!empty($parts[0])) {
-                        $currencies[$parts[0]] = $parts[1];
+                        $currencies[$parts[0]] = [
+                            'short' => $parts[1],
+                            'extended' => $parts[1] . (!empty($parts[$col_name]) ? ' (' . $parts[$col_name] . ')' : ''),
+                        ];
                     }
                 }
             }
         }
 
         $symbol = array_key_exists($currency, $currencies)
-            ? $currencies[$currency] : $currency;
+            ? $currencies[$currency][$extended ? 'extended' : 'short'] : $currency;
 
         return $symbol;
     }

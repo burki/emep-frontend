@@ -15,14 +15,14 @@
 {% if exhibition.location is not null %}
     {% set location = exhibition.location %}
     <div class="artist-information-container">
-        <div class="artist-information-label">Venue:</div>
+        <div class="artist-information-label">{{ 'Venue'|trans }}:</div>
         <div class="artist-information-text">{{ helper.location_linked(location) }}, {{ helper.place_linked(location.place) }}</div>
     </div>
 {% endif %}
 
 {% if exhibition.organizers is not empty %}
     <div class="artist-information-container">
-        <div class="artist-information-label">Organizing Bodies:</div>
+        <div class="artist-information-label">{{ 'Organizing Bodies'|trans }}:</div>
         <div class="artist-information-text">
             {% for organizer in exhibition.organizers %}
                 <a href="{{ path('organizer', { 'id' : organizer.id }) }}">{{ organizer.name }}</a>{% if not loop.last %} / {% endif %}
@@ -33,16 +33,16 @@
 
 {% if exhibition.currency is not empty %}
     <div class="artist-information-container">
-        <div class="artist-information-label">Currency:</div>
+        <div class="artist-information-label">{{ 'Currency'|trans }}:</div>
         <div class="artist-information-text">
-            {{ exhibition.currency|currencySymbol }}
+            {{ exhibition.currency|currencySymbol(true) }}
         </div>
     </div>
 {% endif %}
 
 {% if exhibition.price is not empty %}
     <div class="artist-information-container">
-        <div class="artist-information-label">Ticket Price:</div>
+        <div class="artist-information-label">{{ 'Ticket Price'|trans }}:</div>
         <div class="artist-information-text">
             {{ exhibition.price }}
         </div>

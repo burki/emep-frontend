@@ -1,7 +1,7 @@
 K	K	Austro-Hungarian Krone
 BEC	fr	Belgian Franc
 FRF	F	French Franc
-Mk	M	German Goldmark
+Mk	M	German Mark
 GBP	s	Great Britain Pound (in Shilling)
 ITL	L	Italian Lira
 NLG	fl	Netherlands Guilder
