@@ -353,6 +353,8 @@ extends SearchListBuilder
             'P.country AS nationality',
             'IE.catalogueId AS catalogueId',
             'IE.title AS title',
+            'IE.title_alternate AS title_alternate',
+            'IE.title_translit AS title_translit',
             'TypeTerm.name AS type',
             'IE.displaydate AS displaydate',
             'IE.owner AS owner',

@@ -95,6 +95,23 @@ extends ListBuilder
         return $row['location'];
     }
 
+    static function buildItemExhibitionTitleListing(&$row)
+    {
+        if (!empty($row['title_translit'])) {
+            // show translit / translation in brackets instead of original
+            $parts = [ $row['title_translit'] ];
+
+            if (!empty($row['title_alternate'])) {
+                $parts[] = $row['title_alternate'];
+            }
+
+            return sprintf('[%s]',
+                           join(' : ', $parts));
+        }
+
+        return $row['title'];
+    }
+
     var $request = null;
     var $urlGenerator = null;
     var $orders = [];
@@ -600,6 +617,8 @@ extends ListBuilder
         if ('html' != $format || empty($val)) {
             return false;
         }
+
+        $val = self::buildItemExhibitionTitleListing($row);
 
         return sprintf('<a href="%s#%s">%s</a>',
                        $this->urlGenerator->generate('itemexhibition', [
