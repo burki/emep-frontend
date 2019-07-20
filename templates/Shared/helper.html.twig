@@ -226,9 +226,21 @@
     $('.checkmark').on('click', function() {
         var currId = $(this).data('id');
         if (-1 == currId) {
-            $('.checkmark.checked').removeClass('checked');
-            // deselect all
-            active = [];
+            if (active.length > 0) {
+                // deselect all
+                $('.checkmark.checked').removeClass('checked');
+                active = [];
+            }
+            else {
+                // select all
+                $('.checkmark').each(function (idx) {
+                    var dataId = $(this).data('id');
+                    if (-1 != dataId) {
+                        $(this).addClass('checked');
+                        active.push(dataId);
+                    }
+                });
+            }
         }
         else {
             var index = active.indexOf(currId);
