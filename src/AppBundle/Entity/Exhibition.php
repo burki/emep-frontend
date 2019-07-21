@@ -17,6 +17,11 @@ class Exhibition
 
     const FLAGS_CATIDBYARTIST = 0x20;
     const FLAGS_TRAVELING = 0x40;
+    const FLAGS_PARTICIPANTADDRESSESLISTED = 0x80;
+    const FLAGS_MEMBERSLISTED = 0x200;
+    const FLAGS_MEMBERADDRESSESLISTED = 0x400;
+    const FLAGS_OTHERMEDIUMSLISTED = 0x800;
+    const FLAGS_ALTEREDSTRUCTURE = 0x2000;
 
     /**
      * @var integer
@@ -374,6 +379,16 @@ class Exhibition
         return $this->displaydate;
     }
 
+    /**
+     * Gets type.
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
     public function getLocation()
     {
         return $this->location;
@@ -511,6 +526,37 @@ class Exhibition
     public function isTraveling()
     {
         return 0 <> ($this->flags & self::FLAGS_TRAVELING);
+    }
+
+    public function getInfoFromFlags()
+    {
+        $lines = [];
+
+        if ($this->isTraveling()) {
+            $lines[] = 'Traveling Exhibition';
+        }
+
+        if (0 <> ($this->flags & self::FLAGS_ALTEREDSTRUCTURE)) {
+            $lines[] = 'Catalogue structure altered';
+        }
+
+        if (0 <> ($this->flags & self::FLAGS_OTHERMEDIUMSLISTED)) {
+            $lines[] = 'Other Mediums Listed';
+        }
+
+        if (0 <> ($this->flags & self::FLAGS_PARTICIPANTADDRESSESLISTED)) {
+            $lines[] = 'Participant Addresses listed';
+        }
+
+        if (0 <> ($this->flags & self::FLAGS_MEMBERSLISTED)) {
+            $lines[] = 'Members listed in Catalogue';
+        }
+
+        if (0 <> ($this->flags & self::FLAGS_MEMBERADDRESSESLISTED)) {
+            $lines[] = 'Member Addresses listed';
+        }
+
+        return implode("\n", $lines);
     }
 
     public function checkStatus($ignore)

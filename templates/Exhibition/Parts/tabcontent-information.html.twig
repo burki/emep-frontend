@@ -53,6 +53,13 @@
                 <div class="artist-information-text">{{ exhibition.catalogueStructure|nl2br }}</div>
             {% endif %}
 
+            {% set infoFromFlags = exhibition.infoFromFlags %}
+            {% if infoFromFlags is not empty %}
+                {% set infoShown = true %}
+                <div class="artist-information-label information-tab">Additional Information</div>
+                <div class="artist-information-text">{{ infoFromFlags|nl2br }}</div>
+            {% endif %}
+
             {% if exhibition.note is not empty %}
                 {% set infoShown = true %}
                 <div class="artist-information-label information-tab">Note</div>

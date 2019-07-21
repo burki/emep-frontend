@@ -5,18 +5,18 @@
     <div class="artist-information-text">{{ helper.exhibition_period(exhibition) }}</div>
 </div>
 
-{% if location.type is not null %}
-    <div class="artist-information-container">
-        <div class="artist-information-label">{{ 'Type'|trans }}:</div>
-        <div class="artist-information-text">{{ location.type }}</div>
-    </div>
-{% endif %}
-
 {% if exhibition.location is not null %}
     {% set location = exhibition.location %}
     <div class="artist-information-container">
         <div class="artist-information-label">{{ 'Venue'|trans }}:</div>
         <div class="artist-information-text">{{ helper.location_linked(location) }}, {{ helper.place_linked(location.place) }}</div>
+    </div>
+{% endif %}
+
+{% if exhibition.type is not null %}
+    <div class="artist-information-container">
+        <div class="artist-information-label">{{ 'Type'|trans }}:</div>
+        <div class="artist-information-text">{{ exhibition.type }}</div>
     </div>
 {% endif %}
 

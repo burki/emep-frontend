@@ -288,6 +288,16 @@ implements \JsonSerializable, JsonLdSerializable
     }
 
     /**
+     * Gets type.
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
      * Sets description.
      *
      * @param string $description
@@ -299,19 +309,6 @@ implements \JsonSerializable, JsonLdSerializable
         $this->description = $description;
 
         return $this;
-    }
-
-    /**
-     * Sets description.
-     *
-     * @param string $description
-     *
-     * @return $this
-     */
-    public function getType()
-    {
-        return $this->type;
-
     }
 
     /**
