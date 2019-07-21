@@ -25,6 +25,8 @@
                 {% if pageMeta.og['og:url'] is defined %}
         <link rel="canonical" href="{{ pageMeta.og['og:url'] }}">
                 {% endif %}
+            {% elseif pageMeta.canonical is not empty %}
+        <link rel="canonical" href="{{ pageMeta.canonical }}">
             {% endif %}
             {% if pageMeta.twitter is defined %}
                 {% for prop, val in pageMeta.twitter %}
@@ -39,7 +41,7 @@
             {% endif %}
             {% if pageMeta.jsonLd is defined %}
         <script type="application/ld+json">
-            {{ pageMeta.jsonLd|json_encode|raw }}
+            {{ pageMeta.jsonLd|json_encode(constant('JSON_UNESCAPED_UNICODE'))|raw }}
         </script>
             {% endif %}
         {% elseif pageTitle is defined %}

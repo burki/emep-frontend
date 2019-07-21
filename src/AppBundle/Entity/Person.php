@@ -1171,7 +1171,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
         return $ret;
     }
 
-    /*
+    /**
      * See https://developers.facebook.com/docs/reference/opengraph/object-type/profile/
      *
      */
@@ -1219,21 +1219,5 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
         }
 
         return $ret;
-    }
-
-    // solr-stuff
-    public function indexHandler()
-    {
-        return '*';
-    }
-
-    /**
-     * TODO: move to a trait
-     *
-     * @return boolean
-    */
-    public function shouldBeIndexed()
-    {
-        return $this->status >= 0;
     }
 }

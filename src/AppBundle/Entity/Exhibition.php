@@ -12,6 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity
  */
 class Exhibition
+implements JsonLdSerializable
 {
     use InfoTrait;
 
@@ -580,6 +581,58 @@ class Exhibition
                return $entity->isRegularEntry(); // corresponds to IE.title IS NOT NULL OR IE.item IS NULL
             }
         );
+    }
+
+    public function jsonLdSerialize($locale, $omitContext = false)
+    {
+        $ret = [
+            '@context' => 'http://schema.org',
+            '@type' => 'ExhibitionEvent',
+            'name' => $this->getTitle() . $this->getTitleAppend(),
+        ];
+
+        if ($omitContext) {
+            unset($ret['@context']);
+        }
+
+        foreach ([ 'start', 'end'] as $key) {
+            $property = $key . 'date';
+            if (!empty($this->$property)) {
+                $ret[$property] = \AppBundle\Utils\JsonLd::formatDate8601($this->$property);
+            }
+        }
+
+        if (!empty($this->location)) {
+            $ret['location'] = [
+                '@type' => 'Place',
+                'name' => $this->location->getName(),
+            ];
+
+            $addresses = array_map(function ($address) { return $address['info']; }, $this->location->getAddressesSeparated());
+            if (!empty($addresses)) {
+                $ret['location']['address'] = join(', ', $addresses);
+            }
+
+            $place = $this->location->getPlace();
+            if (!empty($place)) {
+                $ret['location']['containedInPlace'] = $place->jsonLdSerialize($locale, true);
+            }
+        }
+
+        /*
+        $description = $this->getDescriptionLocalized($locale);
+        if (!empty($description)) {
+            $ret['description'] = $description;
+        }
+        */
+
+        foreach ([ 'url' ] as $property) {
+            if (!empty($this->$property)) {
+                $ret[$property] = $this->$property;
+            }
+        }
+
+        return $ret;
     }
 
     /* make private properties public through a generic __get / __set */

@@ -450,7 +450,7 @@ extends CrudController
     /**
      * @Route("/exhibition/{id}", requirements={"id" = "\d+"}, name="exhibition")
      */
-    public function detailAction(Request $request, $id, $itemexhibitionId = null)
+    public function detailAction(Request $request, UrlGeneratorInterface $urlGenerator, $id, $itemexhibitionId = null)
     {
         $routeName = $request->get('_route'); $routeParams = [];
 
@@ -526,8 +526,13 @@ extends CrudController
             'charts' => $this->buildDetailCharts($exhibition),
             'numNationalities' => count($artistsCountries),
             'pageMeta' => [
-                /*
+                'canonical' => $urlGenerator->generate(
+                    'exhibition',
+                    [ 'id' => $exhibition->id ],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                ),
                 'jsonLd' => $exhibition->jsonLdSerialize($locale),
+                /*
                 'og' => $this->buildOg($exhibition, $routeName, $routeParams),
                 'twitter' => $this->buildTwitter($exhibition, $routeName, $routeParams),
                 */
@@ -538,9 +543,9 @@ extends CrudController
     /**
      * @Route("/exhibition/{id}/{itemexhibitionId}", requirements={"id" = "\d+", "itemexhibitionId" = "\d+"}, name="itemexhibition")
      */
-    public function detailItemExhibitionAction(Request $request, $id, $itemexhibitionId)
+    public function detailItemExhibitionAction(Request $request, UrlGeneratorInterface $urlGenerator, $id, $itemexhibitionId)
     {
-        return $this->detailAction($request, $id, $itemexhibitionId);
+        return $this->detailAction($request, $urlGenerator, $id, $itemexhibitionId);
     }
 
     private function buildDetailCharts($exhibition)

@@ -699,7 +699,6 @@ implements \JsonSerializable, JsonLdSerializable
             'url' => $this->url,
             'foundingDate' => $this->foundingDate,
             'dissolutionDate' => $this->dissolutionDate,
-
         ];
     }
 
@@ -710,6 +709,7 @@ implements \JsonSerializable, JsonLdSerializable
             '@type' => 'Organization',
             'name' => $this->getName(),
         ];
+
         if ($omitContext) {
             unset($ret['@context']);
         }
