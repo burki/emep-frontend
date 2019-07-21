@@ -81,17 +81,40 @@
 
 {# addresses #}
 
-
 {% set addresses = person.addressesSeparated(null, true) %}
 {% if addresses is not empty %}
+    {% import 'Shared/helper.html.twig' as helper %}
     <div class="artist-information-container">
         <div class="artist-information-label">{{ 'Places of Activity'|trans }}:</div>
         <div class="artist-information-text">
             {% for address in addresses %}
-                {{ address['info']|replace({ "%basepath%" : app.request.basepath })|replace({ "\n" : ", " })|raw }}<br />
+                {{ address['info']|replace({ "%basepath%" : app.request.basepath })|replace({ "\n" : ", " })|raw }}
+                {% if address['exhibitions'] is not empty %}
+                    {% set reference = '' %}
+                    {% for exhibition in address['exhibitions'] %}
+                        {% if loop.index0 > 0 %}
+                            {% if loop.last %}{% set reference = reference ~ ' and ' %}
+                            {% else %}{% set reference = reference ~ ', ' %}
+                            {% endif %}
+                        {% endif %}
+                        {% set reference = reference ~ exhibition.title ~ ' (' ~ helper.exhibition_period(exhibition)|trim ~ ')' %}
+                    {% endfor %}
+                <a data-toggle="tooltip" class="tooltipLink" data-original-title="According to {{ reference|escape('html_attr') }}">
+                    <i style="color: #ccc" class="glyphicon glyphicon-info-sign"></i>
+                </a>
+                {% endif %}
+                <br />
             {% endfor %}
         </div>
     </div>
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip({
+                html: true,
+                placement: 'auto left'
+            });
+        });
+    </script>
 {% endif %}
 
 {# url #}

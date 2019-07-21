@@ -39,7 +39,6 @@ trait AddressesTrait
 
     /*
      *
-     *
      */
     function buildAddresses($entries, $showCountry = false, $filterExhibition = null, $linkPlace = false, $returnStructure = false)
     {
@@ -55,11 +54,13 @@ trait AddressesTrait
         $numAddresses = empty($addresses) ? 0 : count($addresses['place']);
         $fields = [];
         for ($i = 0; $i < $numAddresses; $i++) {
+            $id_exhibitions = array_key_exists('id_exhibition', $addresses)
+                    && array_key_exists($i, $addresses['id_exhibition'])
+                    && is_array($addresses['id_exhibition'][$i])
+                ? $addresses['id_exhibition'][$i] : [];
+
             if (!is_null($filterExhibition)) {
-                if (!array_key_exists('id_exhibition', $addresses)
-                    || !array_key_exists($i, $addresses['id_exhibition'])
-                    || !is_array($addresses['id_exhibition'][$i])
-                    || !in_array($filterExhibition, $addresses['id_exhibition'][$i]))
+                if (!in_array($filterExhibition, $id_exhibitions))
                 {
                     continue;
                 }
@@ -118,7 +119,10 @@ trait AddressesTrait
             }
 
             if (!empty($lines)) {
-                $fields[] = [ 'info' => join("\n", $lines) ];
+                $fields[] = [
+                    'info' => join("\n", $lines),
+                    'id_exhibitions' => $id_exhibitions,
+                ];
             }
         }
 

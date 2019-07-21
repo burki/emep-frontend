@@ -681,7 +681,18 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
      */
     public function getAddressesSeparated($filterExhibition = null, $linkPlace = false, $returnStructure = false)
     {
-        return $this->buildAddresses($this->addresses, false, $filterExhibition, $linkPlace, $returnStructure);
+        $addresses = $this->buildAddresses($this->addresses, false, $filterExhibition, $linkPlace, $returnStructure);
+
+        if (!$returnStructure) {
+            // lookup exhibitions
+            for ($i = 0; $i < count($addresses); $i++) {
+                $addresses[$i]['exhibitions'] = !empty($addresses[$i]['id_exhibitions'])
+                    ? $this->getExhibitions(-1, $addresses[$i]['id_exhibitions'])
+                    : [];
+            }
+        }
+
+        return $addresses;
     }
 
     private static function buildPlaceInfo($place, $locale)
@@ -1090,16 +1101,22 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
     }
 
     /* filter removed exhibitions */
-    public function getExhibitions($ignoreStatus = 0)
+    public function getExhibitions($ignoreStatus = 0, $idsToFilter = [])
     {
         if (is_null($this->exhibitions)) {
             return $this->exhibitions;
         }
 
         return $this->exhibitions->filter(
-            function ($entity) use ($ignoreStatus) {
-               return is_null($ignoreStatus)
+            function ($entity) use ($ignoreStatus, $idsToFilter) {
+                $collect = is_null($ignoreStatus)
                     || $entity->checkStatus($ignoreStatus);
+
+                if ($collect && !empty($idsToFilter)) {
+                    $collect = in_array($entity->getId(), $idsToFilter);
+                }
+
+                return $collect;
             }
         );
     }
