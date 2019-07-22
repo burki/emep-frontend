@@ -838,16 +838,25 @@ EOT;
         foreach ($result as $row) {
             $nationality = empty($row['nationality'])
                 ? 'XX' : $row['nationality'];
+
             if (array_key_exists($nationality, self::$countryMap)) {
                 $nationality = self::$countryMap[$nationality];
             }
 
-            $statsByNationality[$nationality] = [
-                'label' => 'XX' == $nationality
-                    ? '[unknown]' : $this->expandCountryCode($nationality),
-                'countArtists' => $row['numArtists'],
-                'countItemExhibition' => $row['numEntries'],
-            ];
+            if (array_key_exists($nationality, $statsByNationality)) {
+                // we merge different countries together
+                $statsByNationality[$nationality]['countArtists'] += $row['numArtists'];
+                $statsByNationality[$nationality]['countItemExhibition'] += $row['numEntries'];
+            }
+            else {
+                $statsByNationality[$nationality] = [
+                    'label' => 'XX' == $nationality
+                        ? '[unknown]' : $this->expandCountryCode($nationality),
+                    'countArtists' => $row['numArtists'],
+                    'countItemExhibition' => $row['numEntries'],
+                ];
+            }
+
 
             $totalArtists += $row['numArtists'];
             $totalItemExhibition += $row['numEntries'];
