@@ -95,6 +95,28 @@ extends ListBuilder
         return $row['location'];
     }
 
+    static function buildHolderNameListing(&$row)
+    {
+        if (!empty($row['holder_translit'])) {
+            // show translit / translation in brackets instead of original
+            $parts = [ $row['holder_translit'] ];
+
+            if (!empty($row['holder_alternate'])) {
+                $parts[] = $row['holder_alternate'];
+            }
+
+            $prefix = preg_match('/^online\:/', $row['place'])
+                ? ''
+                : $row['place'] . ', ';
+
+            return $prefix
+                . sprintf('[%s]',
+                          join(' : ', $parts));
+        }
+
+        return $row['holder'];
+    }
+
     static function buildItemExhibitionTitleListing(&$row)
     {
         if (!empty($row['title_translit'])) {
@@ -645,6 +667,21 @@ extends ListBuilder
     protected function buildLinkedOrganizer(&$row, $val, $format)
     {
         return $this->buildLinkedLocation($row, $val, $format /*, 'organizer' */); // currently use same route
+    }
+
+    protected function buildLinkedHolder(&$row, $val, $format)
+    {
+        if ('html' != $format || empty($val)) {
+            return false;
+        }
+
+        $val = self::buildHolderNameListing($row);
+
+        return sprintf('<a href="%s">%s</a>',
+                       $this->urlGenerator->generate('holder', [
+                            'id' => $row['holder_id'],
+                       ]),
+                       $this->formatRowValue($val, [], $format));
     }
 
     public function buildHeaderRow()

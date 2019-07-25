@@ -97,7 +97,7 @@ extends SearchListBuilder
 
         if (array_key_exists('holder', $this->rowDescr)) {
             $this->rowDescr['holder']['buildValue'] = function (&$row, $val, $listBuilder, $key, $format) {
-                return $listBuilder->buildLinkedValue($val, 'holder', [ 'id' => $row['id'] ], $format);
+                return $listBuilder->buildLinkedHolder($row, $val, $format);
             };
         }
 
@@ -145,7 +145,8 @@ extends SearchListBuilder
             'SQL_CALC_FOUND_ROWS ' . $this->alias . '.id',
             $this->alias . '.id AS holder_id',
             "CONCAT(CASE WHEN " . $this->alias . ".name LIKE 'online:%' THEN '' ELSE CONCAT(" . $this->alias . ".town, ', ') END, " . $this->alias . ".name) AS holder",
-            $this->alias . '.name AS name',
+            $this->alias . '.name AS holder_name',
+            $this->alias . '.name_translit AS holder_translit',
             $this->alias . '.town AS place',
             'NULL AS place_tgn', // $this->alias . '.place_tgn AS place_tgn',
             $this->alias . '.country AS country_code', // 'P' . $this->alias . '.country_code AS country_code',

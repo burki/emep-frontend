@@ -7,7 +7,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-
 use Pagerfanta\Pagerfanta;
 
 use AppBundle\Utils\CsvResponse;
