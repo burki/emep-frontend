@@ -33,7 +33,7 @@ extends CrudController
         $countriesActive = [];
 
         foreach ($qb->getQuery()->getResult() as $result) {
-            $countriesActive[$countryCode] = $this->expandCountryCode($result['countryCode']);
+            $countriesActive[$result['countryCode']] = $this->expandCountryCode($result['countryCode']);
         }
 
         asort($countriesActive);
