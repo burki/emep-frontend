@@ -194,6 +194,11 @@ extends CrudController
                 $charts = $this->buildLocationCharts($request, $urlGenerator, $listBuilder);
 
                 break;
+
+            case 'Place':
+                $charts = $this->buildPlaceCharts($request, $urlGenerator, $listBuilder);
+
+                break;
         }
 
         if (empty($charts)) {

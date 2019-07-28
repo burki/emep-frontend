@@ -754,6 +754,9 @@ EOT;
         return $charts;
     }
 
+    /**
+     * Stats for venue and organizer listings
+     */
     function buildLocationCharts($request, $urlGenerator, $listBuilder)
     {
         $prefix = 'Organizer' ==  $listBuilder->getEntity() ? 'organizer' : 'location';
@@ -782,6 +785,29 @@ EOT;
         $renderParams = $this->processLocationCountry($stmt);
         if (!empty($renderParams)) {
             $template = $this->get('twig')->loadTemplate('Statistics/' . $prefix . '-country-index.html.twig');
+
+            $charts[] = $template->render($renderParams);
+        }
+
+        return $charts;
+    }
+
+    /**
+     * Stats for exhibiting cities
+     */
+    function buildPlaceCharts($request, $urlGenerator, $listBuilder)
+    {
+        $charts = [];
+
+        // country
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-country', $listBuilder->getEntity());
+        $query = $listBuilder->query();
+        // echo $query->getSQL();
+
+        $stmt = $query->execute();
+        $renderParams = $this->processLocationCountry($stmt);
+        if (!empty($renderParams)) {
+            $template = $this->get('twig')->loadTemplate('Statistics/place-country-index.html.twig');
 
             $charts[] = $template->render($renderParams);
         }

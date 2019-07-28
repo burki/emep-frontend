@@ -1,0 +1,37 @@
+{% import 'Shared/highcharts.html.twig' as highcharts %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#container-places-countries').highcharts({
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie'
+                },
+                title: {
+                    text: ' '
+                },
+                tooltip: {
+                    pointFormat: '{point.y} Exhibiting Cities (<b>{point.percentage:.1f}%</b>)'
+                },
+                plotOptions: {
+                    pie: {
+                    }
+                },
+                series: [{
+                    name: 'Number of Venues',
+                    type: 'pie',
+                    innerSize: '50%',
+                    data: {{ data|raw }}
+                }],
+                exporting: {
+                    csv: {
+                        {{ highcharts.pieChartCategoryHeader('Country') }}
+                    }
+                }
+            });
+        });
+    </script>
+
+    <h3 class="chart-header" data-collapse="container-places-countries"><span class="chartsymbol">+</span>Countries of Exhibiting Cities<span class="charttypeTitle">(Pie Chart)</span></h3>
+    <div class="collapse" id="container-places-countries" style="width: 100%; height: 400px; margin: 0 auto;"></div>

@@ -104,9 +104,7 @@
                         <a href="{{ path(listBuilder.entity|lower ~ '-index', app.request.query.all) }}" aria-controls="entries">{{ pageTitle|trans }}</a>
                     </li>
                     <li role="presentation" class="{% if type == 'map' %}active {% endif %}entries-tab" ><a href="{{ path(listBuilder.entity|lower ~ '-index-map', app.request.query.all) }}" aria-controls="entries">{{ 'Map'|trans }}</a></li>
-                    {% if 'Place' != listBuilder.entity %}
                     <li role="presentation" class="{% if type == 'stats' %}active {% endif %}entries-tab" ><a href="{{ path(listBuilder.entity|lower ~ '-index-stats', app.request.query.all) }}" aria-controls="entries">{{ 'Statistics'|trans }}</a></li>
-                    {% endif %}
                 </ul>
             </div>
 

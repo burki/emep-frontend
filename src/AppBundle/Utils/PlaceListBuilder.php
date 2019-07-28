@@ -108,7 +108,7 @@ extends SearchListBuilder
             $this->orders = [ 'default' => [ 'asc' => [ 'type' ] ] ];
         }
         else if ('stats-country' == $this->mode) {
-            $this->orders = [ 'default' => [ 'asc' => [ 'country_code' ] ] ];
+            $this->orders = [ 'default' => [ 'asc' => [ 'how_many DESC' ] ] ];
         }
         else if ('sitemap' == $this->mode) {
             $this->orders = [ 'default' => [ 'asc' => [ 'id' ] ] ];
