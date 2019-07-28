@@ -232,6 +232,7 @@
                     'ItemExhibition' : 'Catalogue Entries',
                     'Venue' : 'Venues',
                     'Organizer' : 'Organizing Bodies',
+                    'Place' : 'Exhibiting Cities',
                 }
         %}
         <div>
@@ -254,7 +255,7 @@
                 {% if 'search-index' != app.request.get('_route') %}
                     <div class="advanced-search-settings"><a href="{{ path('search-index', app.request.query.all) }}"><span class="checkbox-filter-button">Show List</a></span></a></div>
                 {% endif %}
-                {% if 'search-map' != app.request.get('_route') and ('Exhibition' == listBuilder.entity or 'Venue' == listBuilder.entity or 'Organizer' == listBuilder.entity or 'Person' == listBuilder.entity)  %}
+                {% if 'search-map' != app.request.get('_route') and ('Exhibition' == listBuilder.entity or 'Venue' == listBuilder.entity or 'Organizer' == listBuilder.entity or 'Person' == listBuilder.entity or 'Place' == listBuilder.entity)  %}
                     <div class="advanced-search-settings"><a href="{{ path('search-map', app.request.query.all) }}"><span class="checkbox-filter-button">Show Map</span></a></div>
                 {% endif %}
                 {% if 'search-stats' != app.request.get('_route') %}
@@ -294,7 +295,7 @@
                         {% for key, label in listBuilder.buildHeaderRow() %}
                             {% set sortInfo = listBuilder.sortInfo(key) %}
                         <th{% if sortInfo is not empty %}{% if sortInfo.active is not empty %} class="{{ sortInfo.active }}"{% else %} class="sorting"{% endif %}{% endif %}>
-                            {% if loop.first %}{% if 'ItemExhibition' != listBuilder.entity %}<span class="checkmark" data-id="-1" title="Select/Deselect all"></span>{% endif %}{% endif %}
+                            {% if loop.first %}{% if 'ItemExhibition' != listBuilder.entity and 'Place' != listBuilder.entity %}<span class="checkmark" data-id="-1" title="Select/Deselect all"></span>{% endif %}{% endif %}
                             {% if sortInfo is not empty %}
                                 <a href="{{ sortInfo.action }}"{% if sortInfo.active is not empty %} class="{{ sortInfo.active }}"{% else %} class="sorting"{% endif %}>{{ label }}</a>
                             {% else %}
@@ -309,7 +310,7 @@
                     <tr>
                         {% set rowValues = listBuilder.buildRow(row, 'html') %}
                         {% for val in rowValues %}
-                        <td>{% if loop.first %}{% if 'ItemExhibition' != listBuilder.entity %}<span class="checkmark" data-id="{{ row.id }}"></span>{% endif %}{% endif %}{{ val|raw }}</td>
+                        <td>{% if loop.first %}{% if 'ItemExhibition' != listBuilder.entity and 'Place' != listBuilder.entity %}<span class="checkmark" data-id="{{ row.id }}"></span>{% endif %}{% endif %}{{ val|raw }}</td>
                         {% endfor %}
                     </tr>
                     {% endfor %}
