@@ -11,14 +11,12 @@
                 <tr>
                     {% set colInfo = [] %}
                     {% for key,label in listBuilder.buildHeaderRow() %}
-                    <th>
-                        {% set colInfo = colInfo|merge([ listBuilder.getColumnInfo(key) ]) %}
                         {% set sortInfo = listBuilder.sortInfo(key) %}
-                        {% if sortInfo is not empty %}
-                            <a href="{{ sortInfo.action }}"{% if sortInfo.active is not empty %} class="{{ sortInfo.active }}"{% endif %}>{{ label }}</a>
-                        {% else %}
+                    <th{% if sortInfo is not empty %}{% if sortInfo.active is not empty %} class="{{ sortInfo.active }}"{% else %} class="sorting"{% endif %}{% endif %}>
+                        {% set colInfo = colInfo|merge([ listBuilder.getColumnInfo(key) ]) %}
+                        {%- if sortInfo is not empty %}<a href="{{ sortInfo.action }}"{% if sortInfo.active is not empty %} class="{{ sortInfo.active }}"{% else %} class="sorting"{% endif %}>{{ label }}</a>{% else %}
                             {{ label }}
-                        {% endif %}
+                        {% endif -%}
                     </th>
                     {% endfor %}
                 </tr>

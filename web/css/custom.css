@@ -287,17 +287,46 @@ tr {
     background-color: #F6F7FB;
 }
 
-
+/*
 .desc, .asc {
     background-color: #F6F7FB;
 }
+*/
 
-.desc:after{
-    content: "\00a0 \00a0 \00a0 ↓";
+table th > a {
+    text-decoration: none !important;
 }
 
-.asc:after{
-    content: "\00a0 \00a0 \00a0 ↑";
+/* the following are set in order to act like datatable */
+th.asc, th.desc, th.sorting {
+    position: relative;
+    padding-right: 30px !important;
+}
+
+th.asc:after, th.desc:after, th.sorting:after {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    display: block;
+    font-family: 'Glyphicons Halflings';
+    opacity: 0.5;
+}
+
+th.desc:after {
+    content: "\e156";
+}
+
+th.asc:after {
+    content: "\e155";
+}
+
+th.sorting:after {
+    opacity: 0.2;
+    content: "\e150";
+}
+
+th.asc a, th.desc a, th.sorting a {
+    color: rgb(149, 163, 172);
 }
 
 .cat-entries-button {
@@ -504,7 +533,6 @@ footer {
     background-color: #F6F7FB!important;
 }
 
-
 .select2-container {
     margin-left: 5px;
 }
@@ -563,7 +591,7 @@ footer {
 }
 
 table a {
-    text-decoration: underline!important;
+    text-decoration: underline !important;
 }
 
 @media (max-width: 767px) {
