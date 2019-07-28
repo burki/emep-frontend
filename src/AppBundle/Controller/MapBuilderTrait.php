@@ -121,7 +121,7 @@ trait MapBuilderTrait
                         $append .= '*';
                     }
                     if (in_array($entry['id'], $idsByType['death'])) {
-                        $append .= '+';
+                        $append .= '†';
                     }
 
                     return $ret . ('' !== $append ? ' ' . $append : '');

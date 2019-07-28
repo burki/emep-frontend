@@ -541,7 +541,6 @@ extends CrudController
             ];
         }
 
-
         foreach ($places as $place) {
             $value = $group = null;
             switch ($place['label']) {
@@ -562,8 +561,8 @@ extends CrudController
                 case 'Place of Activity':
                     $group = 'birthDeath';
                     $value = [
-                        'icon' => 'greenIcon',
-                        'html' => sprintf('%s: %s<a href="%s">%s</a>',
+                        'icon' => 'yellowIcon',
+                        'html' => sprintf('<b>%s</b>: %s<a href="%s">%s</a>',
                                           $place['label'],
                                           !empty($place['info']['address']['address'])
                                             ? htmlspecialchars($place['info']['address']['address'], ENT_QUOTES) . ', '
@@ -579,7 +578,7 @@ extends CrudController
                     $group = 'exhibition';
                     $exhibition = $place['info']['exhibition'];
                     $value = [
-                        'icon' => 'orangeIcon',
+                        'icon' => 'blueIcon',
                         'html' =>  sprintf('<a href="%s">%s</a> at <a href="%s">%s</a> (%s)',
                                 htmlspecialchars($this->generateUrl('exhibition', [
                                     'id' => $exhibition->getId(),

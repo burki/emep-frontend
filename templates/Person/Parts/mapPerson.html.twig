@@ -33,7 +33,7 @@
                 {% if 1 == icons|length %}
                     {% set icon = icons[0] %}
                 {% else %}
-                    {% set icon = 'blueIcon' %}
+                    {% set icon = 'orangeIcon' %}
                 {% endif %}
                 {% if 'exhibition' == group %}
                     {% set prepend = '<b>Exhibitions:</b><br />' %}
@@ -44,7 +44,7 @@
                 {% endif %}
                 var marker = L.marker([ {{ geo }} ], { icon: {{ icon }} })
                         .bindTooltip({{ info.place.name|json_encode|raw }}, { className: 'my-tooltip' })
-                        .bindPopup('{{ prepend|raw }}{{ entries|column('html')|join('<br/>')|raw }}{{ append|raw }}', { className: 'my-tooltip'})
+                        .bindPopup('{{ prepend|raw }}{{ entries|column('html')|join('<br/>')|raw }}{{ append|raw }}', { className: 'my-tooltip' })
                         ;
                 {% if 'birthDeath' == group %}birthDeathMarkers.push(marker);{% endif %}
                 {% if 'exhibition' == group %}exhibitionMarkers.push(marker);{% endif %}
@@ -57,13 +57,13 @@
             if (birthDeathMarkers.length > 0) {
                 var birthDeath = L.featureGroup(birthDeathMarkers);
                 layers.push(birthDeath);
-                overlays["Places of Birth and Death"] = birthDeath;
+                overlays['Places of Birth and Death'] = birthDeath;
             }
 
             if (exhibitionMarkers.length > 0) {
                 var exhibitions = L.featureGroup(exhibitionMarkers);
                 layers.push(exhibitions);
-                overlays["Exhibitions"] = exhibitions;
+                overlays['Exhibitions'] = exhibitions;
             }
 
             if (layers.length > 0) {
@@ -105,8 +105,8 @@
                 shadowSize: [41, 41]
             });
 
-            var greenIcon = new L.Icon({
-                iconUrl: baseUrlMarkerImg + 'marker-icon-2x-green.png',
+            var yellowIcon = new L.Icon({
+                iconUrl: baseUrlMarkerImg + 'marker-icon-2x-yellow.png',
                 shadowUrl: baseUrlMarkerImg + 'marker-shadow.png',
                 iconSize: [25, 41],
                 iconAnchor: [12, 41],
