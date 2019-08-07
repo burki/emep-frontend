@@ -41,6 +41,17 @@ extends AbstractType
             ],
         ]);
 
+        $builder->add('flags', ChoiceType::class, [
+            'multiple' => true,
+            'required' => false,
+            'choices' => $options['data']['choices']['exhibition_flags'],
+            'label' => 'Additional Information',
+            'attr' => [
+                'data-placeholder' => '- all -',
+                'class' => 'select2',
+            ],
+        ]);
+
         $builder->add('exhibition', Select2EntityType::class, [
             'multiple' => true,
             'label' => 'Exhibition',

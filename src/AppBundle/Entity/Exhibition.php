@@ -538,11 +538,11 @@ implements JsonLdSerializable
         }
 
         if (0 <> ($this->flags & self::FLAGS_ALTEREDSTRUCTURE)) {
-            $lines[] = 'Catalogue structure altered';
+            $lines[] = 'Catalogue Structure altered';
         }
 
         if (0 <> ($this->flags & self::FLAGS_OTHERMEDIUMSLISTED)) {
-            $lines[] = 'Other Mediums Listed';
+            $lines[] = 'Other Mediums listed';
         }
 
         if (0 <> ($this->flags & self::FLAGS_PARTICIPANTADDRESSESLISTED)) {
@@ -550,7 +550,7 @@ implements JsonLdSerializable
         }
 
         if (0 <> ($this->flags & self::FLAGS_MEMBERSLISTED)) {
-            $lines[] = 'Members listed in Catalogue';
+            $lines[] = 'Members listed';
         }
 
         if (0 <> ($this->flags & self::FLAGS_MEMBERADDRESSESLISTED)) {

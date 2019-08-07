@@ -75,6 +75,7 @@
                                 {{ form_row(form.exhibition.date) }}
                                 {{ form_row(form.exhibition.type) }}
                                 {{ form_row(form.exhibition.organizer_type) }}
+                                {{ form_row(form.exhibition.flags) }}
                                 {{ form_row(form.exhibition.exhibition) }}
                             </div>
                         </div>
@@ -152,7 +153,11 @@
                             {% if label is empty %}{% set label = key|humanize %}{% endif %}
                             {% set relation = 'equal to' %}
                             {% if fieldVal is iterable and fieldVal|length > 1 %}
+                                {% if 'flags' == key %}
+                                {% set relation = 'all of' %}
+                                {% else %}
                                 {% set relation = 'one of' %}
+                                {% endif %}
                             {% endif %}
 
                             {% set displayVal = fieldVal %}

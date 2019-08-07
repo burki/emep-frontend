@@ -589,6 +589,18 @@ extends ListBuilder
                     }
                 }
             }
+
+            if (!empty($exhibitionFilters['flags'])) {
+                // we and on every flag
+                foreach ($exhibitionFilters['flags'] as $i => $flag) {
+                    if (0 <> intval($flag)) {
+                        $paramName = 'exhibition_flags_' . $i;
+                        $queryBuilder->andWhere(sprintf('(E.flags & %s) <> 0',
+                                                        ':' . $paramName))
+                            ->setParameter($paramName, intval($flag));
+                    }
+                }
+            }
         }
 
         if (array_key_exists('catentry', $this->queryFilters)) {

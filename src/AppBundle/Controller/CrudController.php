@@ -492,6 +492,14 @@ extends Controller
                 'place_geoname' => array_flip($placeGeonames),
                 'exhibition_type' => array_combine($exhibitionTypes, $exhibitionTypes),
                 'exhibition_organizer_type' => array_combine($exhibitionOrganizerTypes, $exhibitionOrganizerTypes),
+                'exhibition_flags' => array_flip([
+                    \AppBundle\Entity\Exhibition::FLAGS_TRAVELING => 'Traveling Exhibition',
+                    \AppBundle\Entity\Exhibition::FLAGS_ALTEREDSTRUCTURE => 'Catalogue Structure altered',
+                    \AppBundle\Entity\Exhibition::FLAGS_OTHERMEDIUMSLISTED => 'Other Mediums listed',
+                    \AppBundle\Entity\Exhibition::FLAGS_PARTICIPANTADDRESSESLISTED => 'Participant Addresses listed',
+                    \AppBundle\Entity\Exhibition::FLAGS_MEMBERSLISTED => 'Members listed',
+                    \AppBundle\Entity\Exhibition::FLAGS_MEMBERADDRESSESLISTED => 'Member Addresses listed',
+                ]),
                 'itemexhibition_type' => array_flip($this->buildItemExhibitionTypes()),
             ],
         ]);
