@@ -361,6 +361,19 @@ implements JsonLdSerializable
         return $this->status;
     }
 
+    public function buildStatusLabel()
+    {
+        if (is_null($this->status) || !array_key_exists($this->status, \AppBundle\Utils\SearchListBuilder::$STATUS_LABELS)) {
+            return '';
+        }
+
+        if (0 != ($this->flags & self::FLAGS_NOCATALOGUE)) {
+            return 'No Catalogue available';
+        }
+
+        return \AppBundle\Utils\SearchListBuilder::$STATUS_LABELS[$this->status];
+    }
+
     public function getStartdate()
     {
         return self::stripTime($this->startdate);

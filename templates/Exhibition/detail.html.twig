@@ -106,7 +106,7 @@
 
             <div class="artist-information-text" style="width: 100%; margin-bottom: 2rem;">
                 {{ exhibition.subtitle }}<br />
-                <strong>ID: {{ exhibition.id }}, Status: {{ catalogueStatus[exhibition.status] }}</strong>
+                <strong>ID: {{ exhibition.id }}, Status: {{ exhibition.buildStatusLabel }}</strong>
             </div>
             <div class="artist_information">
                 {% embed "Exhibition/Parts/exhibition-base-information.html.twig" %}
