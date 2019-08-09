@@ -45,6 +45,17 @@ extends AbstractType
             'label' => 'Year of Death',
         ]);
 
+        $builder->add('additional', ChoiceType::class, [
+            'multiple' => true,
+            'required' => false,
+            'choices' => $options['data']['choices']['person_additional'],
+            'label' => 'Additional',
+            'attr' => [
+                'data-placeholder' => '- all -',
+                'class' => 'select2',
+            ],
+        ]);
+
         $builder->add('person', Select2EntityType::class, [
             'multiple' => true,
             'label' => 'Artist',

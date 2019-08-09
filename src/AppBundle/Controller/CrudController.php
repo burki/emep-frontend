@@ -483,24 +483,28 @@ extends Controller
 
         return $this->createForm(\AppBundle\Form\Type\SearchFilterType::class, [
             'choices' => [
-                'nationality' => array_flip($this->buildPersonNationalities()),
-                'location_geoname' => array_flip($venueGeonames),
-                'location_type' => array_combine($venueTypes, $venueTypes),
-                'organizer_geoname' => array_flip($this->buildOrganizerGeonames($request, $urlGenerator)),
-                'organizer_type' => array_combine($venueTypes, $venueTypes),
-                'holder_geoname' => array_flip($this->buildHolderGeonames()),
-                'place_geoname' => array_flip($placeGeonames),
                 'exhibition_type' => array_combine($exhibitionTypes, $exhibitionTypes),
                 'exhibition_organizer_type' => array_combine($exhibitionOrganizerTypes, $exhibitionOrganizerTypes),
                 'exhibition_flags' => array_flip([
                     \AppBundle\Entity\Exhibition::FLAGS_TRAVELING => 'Traveling Exhibition',
                     \AppBundle\Entity\Exhibition::FLAGS_NOCATALOGUE => 'No Catalogue available',
                     \AppBundle\Entity\Exhibition::FLAGS_ALTEREDSTRUCTURE => 'Catalogue Structure altered',
+                    'preface' => 'Catalogue Preface available',
                     \AppBundle\Entity\Exhibition::FLAGS_OTHERMEDIUMSLISTED => 'Other Mediums listed',
                     \AppBundle\Entity\Exhibition::FLAGS_PARTICIPANTADDRESSESLISTED => 'Participant Addresses listed',
                     \AppBundle\Entity\Exhibition::FLAGS_MEMBERSLISTED => 'Members listed',
                     \AppBundle\Entity\Exhibition::FLAGS_MEMBERADDRESSESLISTED => 'Member Addresses listed',
                 ]),
+                'nationality' => array_flip($this->buildPersonNationalities()),
+                'person_additional' => array_flip([
+                    'address_available' => 'Place of Activity available',
+                ]),
+                'location_geoname' => array_flip($venueGeonames),
+                'location_type' => array_combine($venueTypes, $venueTypes),
+                'organizer_geoname' => array_flip($this->buildOrganizerGeonames($request, $urlGenerator)),
+                'organizer_type' => array_combine($venueTypes, $venueTypes),
+                'holder_geoname' => array_flip($this->buildHolderGeonames()),
+                'place_geoname' => array_flip($placeGeonames),
                 'itemexhibition_type' => array_flip($this->buildItemExhibitionTypes()),
             ],
         ]);

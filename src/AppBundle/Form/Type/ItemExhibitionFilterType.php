@@ -54,6 +54,21 @@ extends AbstractType
             */
             'required' => false,
         ]);
+
+        $builder->add('owner_available', ChoiceType::class, [
+            'label' => 'Owner available',
+            // 'multiple' => true,
+            'choices' => [
+                '- all - ' => '',
+                'yes' => 'Y',
+            ],
+            /*
+            'attr' => [
+                'data-placeholder' => '- all - ',
+            ],
+            */
+            'required' => false,
+        ]);
     }
 
     public function getBlockPrefix()

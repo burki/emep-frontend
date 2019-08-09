@@ -474,8 +474,55 @@ extends ListBuilder
 
     protected function addQueryFilters($queryBuilder)
     {
+        if (array_key_exists('exhibition', $this->queryFilters)) {
+            $exhibitionFilters = & $this->queryFilters['exhibition'];
+
+            foreach ([
+                'type' => 'E.type',
+                'organizer_type' => 'E.organizer_type',
+                'exhibition' => 'E.id',
+                ] as $key => $field)
+            {
+                $this->addInFilter($queryBuilder, $field, 'exhibition_' . $key,
+                                   array_key_exists($key,  $exhibitionFilters) ? $exhibitionFilters[$key] : null);
+            }
+
+            foreach ([ 'date' => 'E.startdate' ] as $key => $field) {
+                if (!empty($exhibitionFilters[$key]) && is_array($exhibitionFilters[$key])) {
+                    foreach ([ 'from', 'until' ] as $part) {
+                        if (array_key_exists($part, $exhibitionFilters[$key])) {
+                            $paramName = $key . '_' . $part;
+                            $queryBuilder->andWhere(sprintf('YEAR(%s) %s %s',
+                                                            $field,
+                                                            'from' == $part ? '>=' : '<',
+                                                            ':' . $paramName))
+                                ->setParameter($paramName,
+                                               intval($exhibitionFilters[$key][$part])
+                                               + ('until' == $part ? 1 : 0));
+                        }
+                    }
+                }
+            }
+
+            if (!empty($exhibitionFilters['flags'])) {
+                // we and on every flag
+                foreach ($exhibitionFilters['flags'] as $i => $flag) {
+                    if ('preface' == $flag) {
+                        $queryBuilder->andWhere('E.preface IS NOT NULL');
+                    }
+                    else if (0 <> intval($flag)) {
+                        $paramName = 'exhibition_flags_' . $i;
+                        $queryBuilder->andWhere(sprintf('(E.flags & %s) <> 0',
+                                                        ':' . $paramName))
+                            ->setParameter($paramName, intval($flag));
+                    }
+                }
+            }
+        }
+
         if (array_key_exists('person', $this->queryFilters)) {
             $personFilters = & $this->queryFilters['person'];
+
             foreach ([
                 'gender' => 'P.sex',
                 'nationality' => 'P.country',
@@ -502,10 +549,21 @@ extends ListBuilder
                     }
                 }
             }
+
+            if (!empty($personFilters['additional'])) {
+                foreach ($personFilters['additional'] as $i => $key) {
+                    switch ($key) {
+                        case 'address_available':
+                            $queryBuilder->andWhere('P.actionplace IS NOT NULL');
+                            break;
+                    }
+                }
+            }
         }
 
         if (array_key_exists('location', $this->queryFilters)) {
             $locationFilters = & $this->queryFilters['location'];
+
             foreach ([ 'type' => 'L.type', 'location' => 'L.id' ] as $key => $field) {
                 $this->addInFilter($queryBuilder, $field, 'location_' . $key,
                                    array_key_exists($key,  $locationFilters) ? $locationFilters[$key] : null);
@@ -561,50 +619,9 @@ extends ListBuilder
             }
         }
 
-        if (array_key_exists('exhibition', $this->queryFilters)) {
-            $exhibitionFilters = & $this->queryFilters['exhibition'];
-            foreach ([
-                'type' => 'E.type',
-                'organizer_type' => 'E.organizer_type',
-                'exhibition' => 'E.id',
-                ] as $key => $field)
-            {
-                $this->addInFilter($queryBuilder, $field, 'exhibition_' . $key,
-                                   array_key_exists($key,  $exhibitionFilters) ? $exhibitionFilters[$key] : null);
-            }
-
-            foreach ([ 'date' => 'E.startdate' ] as $key => $field) {
-                if (!empty($exhibitionFilters[$key]) && is_array($exhibitionFilters[$key])) {
-                    foreach ([ 'from', 'until' ] as $part) {
-                        if (array_key_exists($part, $exhibitionFilters[$key])) {
-                            $paramName = $key . '_' . $part;
-                            $queryBuilder->andWhere(sprintf('YEAR(%s) %s %s',
-                                                            $field,
-                                                            'from' == $part ? '>=' : '<',
-                                                            ':' . $paramName))
-                                ->setParameter($paramName,
-                                               intval($exhibitionFilters[$key][$part])
-                                               + ('until' == $part ? 1 : 0));
-                        }
-                    }
-                }
-            }
-
-            if (!empty($exhibitionFilters['flags'])) {
-                // we and on every flag
-                foreach ($exhibitionFilters['flags'] as $i => $flag) {
-                    if (0 <> intval($flag)) {
-                        $paramName = 'exhibition_flags_' . $i;
-                        $queryBuilder->andWhere(sprintf('(E.flags & %s) <> 0',
-                                                        ':' . $paramName))
-                            ->setParameter($paramName, intval($flag));
-                    }
-                }
-            }
-        }
-
         if (array_key_exists('catentry', $this->queryFilters)) {
             $itemExhibitionFilters = & $this->queryFilters['catentry'];
+
             foreach ([ 'type' => 'IE.type', 'forsale' => 'IE.forsale' ] as $key => $field) {
                 $this->addInFilter($queryBuilder, $field, 'itemexhibition_' . $key,
                                    array_key_exists($key,  $itemExhibitionFilters) ? $itemExhibitionFilters[$key] : null);
@@ -612,6 +629,10 @@ extends ListBuilder
 
             if (!empty($itemExhibitionFilters['price_available'])) {
                 $queryBuilder->andWhere('IE.price IS NOT NULL');
+            }
+
+            if (!empty($itemExhibitionFilters['owner_available'])) {
+                $queryBuilder->andWhere('IE.owner IS NOT NULL');
             }
         }
     }
