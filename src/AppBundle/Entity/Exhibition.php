@@ -19,6 +19,7 @@ implements JsonLdSerializable
     const FLAGS_CATIDBYARTIST = 0x20;
     const FLAGS_TRAVELING = 0x40;
     const FLAGS_PARTICIPANTADDRESSESLISTED = 0x80;
+    const FLAGS_NOCATALOGUE = 0x100;
     const FLAGS_MEMBERSLISTED = 0x200;
     const FLAGS_MEMBERADDRESSESLISTED = 0x400;
     const FLAGS_OTHERMEDIUMSLISTED = 0x800;
@@ -535,6 +536,10 @@ implements JsonLdSerializable
 
         if ($this->isTraveling()) {
             $lines[] = 'Traveling Exhibition';
+        }
+
+        if (0 <> ($this->flags & self::FLAGS_NOCATALOGUE)) {
+            $lines[] = 'No Catalogue available';
         }
 
         if (0 <> ($this->flags & self::FLAGS_ALTEREDSTRUCTURE)) {

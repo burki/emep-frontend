@@ -494,6 +494,7 @@ extends Controller
                 'exhibition_organizer_type' => array_combine($exhibitionOrganizerTypes, $exhibitionOrganizerTypes),
                 'exhibition_flags' => array_flip([
                     \AppBundle\Entity\Exhibition::FLAGS_TRAVELING => 'Traveling Exhibition',
+                    \AppBundle\Entity\Exhibition::FLAGS_NOCATALOGUE => 'No Catalogue available',
                     \AppBundle\Entity\Exhibition::FLAGS_ALTEREDSTRUCTURE => 'Catalogue Structure altered',
                     \AppBundle\Entity\Exhibition::FLAGS_OTHERMEDIUMSLISTED => 'Other Mediums listed',
                     \AppBundle\Entity\Exhibition::FLAGS_PARTICIPANTADDRESSESLISTED => 'Participant Addresses listed',
