@@ -446,11 +446,11 @@ extends CrudController
             'currentPageId' => $id,
             'countryArray' => $this->buildCountries(),
             'dataNumberOfExhibitionsPerYear' => $this->detailDataNumberOfExhibitionsPerYear($person),
+            'dataNumberOfExhibitionsPerVenue' => $this->detailDataNumberOfExhibitionsPerVenue($person),
             'dataNumberOfExhibitionsPerCity' => $this->detailDataNumberOfExhibitionsPerCity($person),
             'dataNumberOfExhibitionsPerCountry' => $this->detailDataNumberOfExhibitionsPerCountry($person),
             'dataNumberOfWorksPerYear' => $this->detailDataNumberOfWorksPerYear($catEntries),
             'dataNumberOfWorksPerType' => $this->detailDataNumberOfWorksPerType($catEntries),
-            'dataNumberOfExhibitionsPerOrgBody' => $this->detailDataNumberOfExhibitionsPerOrgBody($person),
             'pageMeta' => [
                 'jsonLd' => $person->jsonLdSerialize($locale),
                 'og' => $this->buildOg($person, $routeName, $routeParams),
@@ -689,27 +689,34 @@ extends CrudController
         return [ $yearsOnly, $valuesOnly, $sumOfAllExhibitions, $yearActive, $averagePerYear ];
     }
 
-    public function detailDataNumberOfExhibitionsPerOrgBody($person)
+    public function detailDataNumberOfExhibitionsPerVenue($person)
     {
-        $exhibitionOrganizerTypes = [];
+        $exhibitionVenues = [];
 
         foreach ($person->getExhibitions(-1) as $exhibition) {
-            $type = (string)$exhibition->getOrganizerType();
-            if ('' == $type) {
-                $type = 'unknown';
+            $venue = $exhibition->getLocation();
+            if (is_null($venue)) {
+                $name = '[unknown]';
             }
-            $exhibitionOrganizerTypes[] = $type;
+            else {
+                $name = $venue->getNameListing();
+                $place = $venue->getPlace();
+                if (!is_null($place)) {
+                    $name .= ', ' . $place->getNameLocalized();
+                }
+            }
+            $exhibitionVenues[] = $name;
         }
 
-        $exhibitionOrganizerTypesTotal = array_count_values($exhibitionOrganizerTypes);
-        arsort($exhibitionOrganizerTypesTotal);
+        $exhibitionVenuesTotal = array_count_values($exhibitionVenues);
+        arsort($exhibitionVenuesTotal);
 
-        $finalData = array_map(function ($key) use ($exhibitionOrganizerTypesTotal) {
-                return [ 'name' => $key, 'y' => (int)$exhibitionOrganizerTypesTotal[$key]];
+        $finalData = array_map(function ($key) use ($exhibitionVenuesTotal) {
+                return [ 'name' => $key, 'y' => (int)$exhibitionVenuesTotal[$key]];
             },
-            array_keys($exhibitionOrganizerTypesTotal));
+            array_keys($exhibitionVenuesTotal));
 
-        $sumOfAllExhibitions = array_sum(array_values($exhibitionOrganizerTypesTotal));
+        $sumOfAllExhibitions = array_sum(array_values($exhibitionVenuesTotal));
 
         return [ json_encode($finalData), $sumOfAllExhibitions ];
     }
