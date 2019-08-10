@@ -1,0 +1,50 @@
+{% extends 'Base/base.html.twig' %}
+
+{% block head %}
+    {% import 'Shared/highcharts.html.twig' as highcharts %}
+    {{ highcharts.head() }}
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            {{ chart|raw }}
+        });
+    </script>
+{% endblock %}
+
+{% block chart %}
+    {% import 'Shared/highcharts.html.twig' as highcharts %}
+
+    $('#{{ container|raw }}').highcharts({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: ' '
+        },
+        tooltip: {
+            pointFormat: '{point.y} artists (<b>{point.percentage:.1f}%</b>)'
+        },
+        plotOptions: {
+            pie: {
+            }
+        },
+        series: [{
+            name: 'Number of Artists',
+            type: 'pie',
+            innerSize: '50%',
+            data: {{ data|json_encode|raw }}
+        }],
+        exporting: {
+            csv: {
+                {{ highcharts.pieChartCategoryHeader('City') }}
+            }
+        }
+    });
+{% endblock %}
+
+{% block body %}
+    <div id="{{ container }}" style="width: 100%; height: 400px; margin: 0 auto"></div>
+{% endblock %}

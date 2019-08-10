@@ -507,6 +507,8 @@ extends CrudController
             ? $this->lookupExhibitionGroup($em, $exhibition)
             : [];
 
+        list($charts, $placesActivityAvailable) = $this->buildDetailCharts($exhibition, $artists);
+
         $similar = $this->findSimilar($exhibition);
         return $this->render('Exhibition/detail.html.twig', [
             'pageTitle' => $exhibition->title, // TODO: dates in brackets
@@ -524,7 +526,8 @@ extends CrudController
             'currentPageId' => $id,
             'catalogueStatus' => \AppBundle\Utils\SearchListBuilder::$STATUS_LABELS,
             'genderSplit' => $genderSplit,
-            'charts' => $this->buildDetailCharts($exhibition),
+            'charts' => $charts,
+            'placesActivityAvailable' => $placesActivityAvailable,
             'numNationalities' => count($artistsCountries),
             'pageMeta' => [
                 'canonical' => $urlGenerator->generate(
@@ -547,7 +550,7 @@ extends CrudController
 
         $places = [];
 
-        // exhibitions
+        // exhibition
         $location = $exhibition->getLocation();
         if (!is_null($location)) {
             $geo = $location->getGeo(true);
@@ -700,7 +703,7 @@ extends CrudController
         return $this->detailAction($request, $urlGenerator, $id, $itemexhibitionId);
     }
 
-    private function buildDetailCharts($exhibition)
+    private function buildDetailCharts($exhibition, &$persons)
     {
         $charts = [];
 
@@ -745,6 +748,53 @@ extends CrudController
             'data' => $this->artistsNationalityByExhibitionStatistics($exhibition->getId()),
             'exhibitionId' => $exhibition->getId(),
         ]);
+
+        // places of activity for this exhibition
+        $countByTgn = [];
+        $countUnknown = 0;
+        $placesOfActivityAvailable = false;
+
+        foreach ($persons as $person) {
+            $found = false;
+
+            $addresses = $person->getAddressesSeparated($exhibition->getId(), false, true);
+            // we currently have geo, so get all tgn
+            $tgns = array_filter(array_unique(array_column($addresses, 'place_tgn')));
+            foreach ($tgns as $tgn) {
+                $found = true;
+                if (!array_key_exists($tgn, $countByTgn)) {
+                    $countByTgn[$tgn] = 0;
+                }
+
+                ++$countByTgn[$tgn];
+            }
+            if (!$found) {
+                ++$countUnknown;
+            }
+        }
+
+        if (!empty($countByTgn)) {
+            $placesOfActivityAvailable = true;
+
+            $placesOfActivity = [];
+
+            if ($countUnknown > 0) {
+                $placesOfActivity['[unknown]'] = $countUnknown;
+            }
+
+            foreach ($this->hydratePlaces(array_keys($countByTgn), true) as $place) {
+                $placesOfActivity[$place->getNameLocalized()] = $countByTgn[$place->getTgn()];
+            }
+
+            arsort($placesOfActivity);
+
+            $template = $this->get('twig')->loadTemplate('Statistics/exhibition-places-activity-stats.html.twig');
+            $charts[] = $chart = $template->renderBlock('chart', [
+                'container' => 'container-places-activity-pie',
+                'data' => $this->assoc2NameYArray($placesOfActivity),
+                'exhibitionId' => $exhibition->getId(),
+            ]);
+        }
 
         // exhibiting cities of artists
         $template = $this->get('twig')->loadTemplate('Statistics/exhibition-city-stats.html.twig');
@@ -804,7 +854,10 @@ extends CrudController
             'data' => json_encode($data),
         ]);
 
-        return join("\n", $charts);
+        return [
+            join("\n", $charts),
+            $placesOfActivityAvailable,
+        ];
     }
 
     private function exhibitionAgePersonIds($em, $age, $exhibitionId = null)
