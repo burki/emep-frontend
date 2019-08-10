@@ -511,6 +511,7 @@ extends CrudController
         return $this->render('Exhibition/detail.html.twig', [
             'pageTitle' => $exhibition->title, // TODO: dates in brackets
             'exhibition' => $exhibition,
+            'mapMarkers' => $this->buildMapMarkers($exhibition, $artists),
             'catalogue' => $catalogues,
             'citeProc' => $citeProc,
             'artists' => $artists,
@@ -538,6 +539,157 @@ extends CrudController
                 */
             ],
         ]);
+    }
+
+    protected function buildMapMarkers($exhibition, $persons)
+    {
+        $markers = [];
+
+        $places = [];
+
+        // exhibitions
+        $location = $exhibition->getLocation();
+        if (!is_null($location)) {
+            $geo = $location->getGeo(true);
+            if (!is_null($geo)) {
+                $info = [
+                    'geo' => $geo,
+                    'exhibition' => $exhibition,
+                ];
+
+                $place = $location->getPlace();
+                if (is_null($place)) {
+                    $info += [ 'name' => $location->getPlaceLabel() ];
+                }
+                else {
+                    $info += [ 'name' => $place->getNameLocalized(), 'tgn' => $place->getTgn() ];
+                }
+
+                $places[] = [
+                    'info' => $info,
+                    'label' => 'Exhibition',
+                ];
+            }
+        }
+
+        // places of activity for this exhibition
+        $placesByTgn = [];
+        foreach ($persons as $person) {
+            $addresses = $person->getAddressesSeparated($exhibition->getId(), false, true);
+            // we currently have geo, so get all tgn
+            $tgns = array_filter(array_unique(array_column($addresses, 'place_tgn')));
+            foreach ($tgns as $tgn) {
+                if (!array_key_exists($tgn, $placesByTgn)) {
+                    $placesByTgn[$tgn] = [ 'persons' => [] ];
+                }
+
+                $placesByTgn[$tgn]['persons'][] = [
+                    'person' => $person,
+                    'addresses' => $addresses,
+                ];
+            }
+        }
+
+        $tgns = array_keys($placesByTgn);
+        if (!empty($tgns)) {
+            $maxDisplay = 15;
+            foreach ($this->hydratePlaces($tgns, true) as $place) {
+                if (!empty($place->getGeo())) {
+                    $placeInfo = [
+                        'label' => 'Place of Activity',
+                        'info' => [
+                            'tgn' => $tgn = $place->getTgn(),
+                            'name' => $place->getNameLocalized(),
+                            'geo' => $place->getGeo(),
+                        ],
+                    ];
+
+                    // add the persons
+                    $entriesByFullname = [];
+
+                    foreach ($placesByTgn[$tgn]['persons'] as $entry) {
+                        $person = & $entry['person'];
+                        list($route, $routeParams) = $person->getRouteInfo();
+                        $entriesByFullname[$person->getFullname()] = sprintf('<a href="%s">%s</a>',
+                                                                             $this->generateUrl($route, $routeParams),
+                                                                             htmlspecialchars($person->getFullname(true), ENT_QUOTES));
+                    }
+
+                    ksort($entriesByFullname);
+
+                    $entries = array_values($entriesByFullname);
+                    $countEntries = count($entries);
+                    if ($countEntries <= $maxDisplay) {
+                        $entry_list = implode('<br />', $entries);
+                    }
+                    else {
+                        $entry_list = implode('<br />', array_slice($entries, 0, $maxDisplay - 1))
+                                    . sprintf('<br />... (%d more)', $countEntries - ($maxDisplay - 1));
+                    }
+
+                    $placeInfo['html'] = $entry_list;
+
+                    $places[] = $placeInfo;
+                }
+            }
+        }
+
+        foreach ($places as $place) {
+            $value = $group = null;
+            switch ($place['label']) {
+                case 'Place of Activity':
+                    $group = 'birthDeath';
+                    $value = [
+                        'icon' => 'yellowIcon',
+                        'html' => sprintf('<b>%s</b>: <a href="%s">%s</a><br />%s',
+                                          $place['label'],
+                                          htmlspecialchars($this->generateUrl('place-by-tgn', [
+                                               'tgn' => $place['info']['tgn'],
+                                          ])),
+                                          htmlspecialchars($place['info']['name'], ENT_QUOTES),
+                                          $place['html'])
+                    ];
+                    break;
+
+                case 'Exhibition':
+                    $group = 'exhibition';
+                    $exhibition = $place['info']['exhibition'];
+                    $value = [
+                        'icon' => 'blueIcon',
+                        'html' =>  sprintf('<a href="%s">%s</a> at <a href="%s">%s</a> (%s)',
+                                htmlspecialchars($this->generateUrl('exhibition', [
+                                    'id' => $exhibition->getId(),
+                                ])),
+                                htmlspecialchars($exhibition->getTitleListing(), ENT_QUOTES),
+                                htmlspecialchars($this->generateUrl('location', [
+                                    'id' => $exhibition->getLocation()->getId(),
+                                ])),
+                                htmlspecialchars($exhibition->getLocation()->getNameListing(), ENT_QUOTES),
+                                $this->buildDisplayDate($exhibition)
+                        ),
+                    ];
+                    break;
+            }
+
+            if (is_null($value)) {
+                continue;
+            }
+
+            if (!array_key_exists($geo = $place['info']['geo'], $markers)) {
+                $markers[$geo] = [
+                    'place' => $place['info'],
+                    'groupedEntries' => [],
+                ];
+            }
+
+            if (!array_key_exists($group, $markers[$geo]['groupedEntries'])) {
+                $markers[$geo]['groupedEntries'][$group] = [];
+            }
+
+            $markers[$geo]['groupedEntries'][$group][] = $value;
+        }
+
+        return $markers;
     }
 
     /**

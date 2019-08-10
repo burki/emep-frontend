@@ -1121,6 +1121,25 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
         );
     }
 
+    /**
+     * We prefer person-by-ulan
+     */
+    public function getRouteInfo()
+    {
+        $route = 'person';
+        $routeParams = [ 'id' => $this->id ];
+
+        foreach ([ 'ulan', 'gnd' ] as $key) {
+            if (!empty($this->$key)) {
+                $route = 'person-by-' . $key;
+                $routeParams = [ $key => $this->$key ];
+                break;
+            }
+        }
+
+        return [ $route, $routeParams ];
+    }
+
     public function jsonSerialize()
     {
         return [
