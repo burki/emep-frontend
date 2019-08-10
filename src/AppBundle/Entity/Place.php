@@ -277,6 +277,10 @@ implements \JsonSerializable, JsonLdSerializable
      */
     public function getGeo()
     {
+        if (is_null($this->latitude) || is_null($this->longitude)) {
+            return null;
+        }
+
         return implode(',', [$this->latitude, $this->longitude]);
     }
 
