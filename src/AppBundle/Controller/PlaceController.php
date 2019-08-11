@@ -234,7 +234,7 @@ extends CrudController
                 'L.type AS type',
             ])
             ->from('AppBundle:Location', 'L')
-            ->leftJoin('AppBundle:Exhibition', 'E',
+            ->innerJoin('AppBundle:Exhibition', 'E',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'E.location = L AND ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->leftJoin('AppBundle:ItemExhibition', 'IE',
