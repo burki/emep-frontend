@@ -181,9 +181,11 @@ extends CrudController
             $exhibitionStats[$row['id']] = $row;
         }
 
-        $venuesList = $this->getVenuesList($tgn = $place->getTgn());
-
         $exhibitionTypeStats = $this->getStatsExhibitionTypes($tgn);
+
+        $exhibitions = $this->getExhibitionsByTgn($tgn);
+        $venues = $this->getVenuesList($tgn = $place->getTgn());
+
         $allArtists = $this->getAllArtists($tgn);
         $genderCounts = $this->buildGenderCounts($allArtists);
 
@@ -191,14 +193,15 @@ extends CrudController
             'pageTitle' => $place->getNameLocalized($locale),
             'place' => $place,
             'persons' => $allArtists,
-            'exhibitions' => $this->getExhibitionsByTgn($tgn),
-            'venues' => $venuesList,
+            'exhibitions' => $exhibitions,
+            'venues' => $venues,
+            'organizers' => $this->getOrganizersByTgn($tgn),
             'numberBorn' => $this->getNumberArtistsBorn($tgn),
             'numberDied' => $this->getNumberArtistsDied($tgn),
             'numberActive' => $this->getNumberArtistsActive($tgn),
             'numberExhibited' => $this->getNumberArtistsExhibited($tgn),
-            'numberVenues' => count($venuesList),
-            'numberExhibitions' => $this->getNumberOfExhibitions($id, $tgn, $place->getId()),
+            'numberExhibitions' => count($exhibitions), // $this->getNumberOfExhibitions($tgn),
+            'numberVenues' => count($venues),
             'exhibitionTypeStats' => $exhibitionTypeStats,
             'genderStats' => $genderCounts,
             'exhibitionStats' => $exhibitionStats,
@@ -220,6 +223,8 @@ extends CrudController
     /**
      * Venues including stats
      * This is currently utterly inefficient (one DB-call for each Catalogue Entry)
+     *
+     * TODO: merge with getOrganizersByTgn
      */
     public function getVenuesList($tgn)
     {
@@ -237,10 +242,6 @@ extends CrudController
             ->innerJoin('AppBundle:Exhibition', 'E',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'E.location = L AND ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
-            ->leftJoin('AppBundle:ItemExhibition', 'IE',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
-            ->leftJoin('IE.person', 'P')
             ->where('L.place = :tgn')
             ->andWhere('L.status <> -1 AND 0 = BIT_AND(L.flags, 256)')
             ->setParameter('tgn', $tgn)
@@ -268,7 +269,6 @@ extends CrudController
         return $venues;
     }
 
-
     /**
      *
      */
@@ -280,7 +280,6 @@ extends CrudController
 
         $qb->select([
                 'COUNT(DISTINCT IE.id) as numItems',
-                // 'COUNT(DISTINCT E.id) AS numExhibitionSort',
             ])
             ->from('AppBundle:Exhibition', 'E')
             ->innerJoin('AppBundle:ItemExhibition', 'IE',
@@ -389,6 +388,75 @@ extends CrudController
         $result = $qb->getQuery()->getResult();
 
         return $result[0]['numExhibitions'] ;
+    }
+
+    /**
+     * Org. Bodies including stats
+     */
+    public function getOrganizersByTgn($tgn)
+    {
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb->select([
+                'L AS location',
+                'L.id AS id',
+                'L.name AS name',
+                'L.type AS type',
+                'COUNT(DISTINCT E.id) as numExhibitions',
+                'COUNT(DISTINCT IE.id) as numItems',
+                'COUNT(DISTINCT P.id) as numArtists',
+            ])
+            ->from('AppBundle:Location', 'L')
+            ->innerJoin('AppBundle:Exhibition', 'E',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'L MEMBER OF E.organizers'
+                . ' AND ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
+            ->leftJoin('AppBundle:ItemExhibition', 'IE',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
+            ->leftJoin('IE.person', 'P')
+            ->where('L.place = :tgn')
+            ->andWhere('L.status <> -1')
+            ->setParameter('tgn', $tgn)
+            ->groupBy('E.id')
+            ->groupBy('L.id')
+            ;
+
+        $organizers = [];
+        foreach ($qb->getQuery()->getResult() as $organizer) {
+            $organizers[] = $organizer + $this->getNumberOfNationalitiesByOrganizer($organizer['location']);
+        }
+
+        return $organizers;
+    }
+
+    public function getNumberOfNationalitiesByOrganizer($organizer)
+    {
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb->select([
+                "COUNT(DISTINCT COALESCE(P.nationality, '_unknown')) AS numNationalities", // we want to count NULL as well
+            ])
+            ->from('AppBundle:Person', 'P')
+            ->innerJoin('AppBundle:ItemExhibition', 'IE',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE.person = P AND (IE.title IS NOT NULL OR IE.item IS NULL)')
+            ->innerJoin('IE.exhibition', 'E')
+            ->innerJoin('AppBundle:Location', 'L',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'L MEMBER OF E.organizers'
+                . ' AND ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
+            ->where('L = :location')
+            ->setParameter('location', $organizer)
+            ;
+
+        $result = $qb->getQuery()->getResult();
+
+        return $result[0];
     }
 
     public function getExhibitionsGroupedByYearByTgn($tgn)
@@ -675,7 +743,7 @@ extends CrudController
         return count($artists);
     }
 
-    public function getNumberOfExhibitions($id, $tgn, $placeId)
+    private function getNumberOfExhibitions($tgn)
     {
         $qb = $this->getDoctrine()
             ->getManager()

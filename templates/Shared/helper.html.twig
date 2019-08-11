@@ -127,6 +127,9 @@
     <a href="{{ path('location', { 'id' : location.id }) }}">{{ location.nameAppend ? location.nameAppend : location.name }}</a>
 {%- endmacro %}
 
+{% macro organizer_linked(location) -%}
+    <a href="{{ path('organizer', { 'id' : location.id }) }}">{{ location.nameAppend ? location.nameAppend : location.name }}</a>
+{%- endmacro %}
 
 {% macro render_info(entries) -%}
     {% for entry in entries %}

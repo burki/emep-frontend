@@ -17,14 +17,13 @@
             <li role="presentation" class="artists-tab{% if active %} active{% set active = false %}{% endif %}"><a href="#artists" aria-controls="artists" role="tab" data-toggle="tab">{{ 'Artists'|trans }}</a></li>
             {% endif %}
 
-            {% set venues = place.venues %}
             {% if venues|length > 0 %}
             <li role="presentation" class="venues-tab{% if active %} active{% set active = false %}{% endif %}"><a href="#venues" aria-controls="venues" role="tab" data-toggle="tab">{{ 'Venues'|trans }}</a></li>
             {% endif %}
 
-            {#% if organizers|length > 0%}
+            {% if organizers|length > 0 %}
             <li role="presentation" class="organizer-tab{% if active %} active{% set active = false %}{% endif %}"><a href="#organizers" aria-controls="organizers" role="tab" data-toggle="tab">{{ 'Organizing Bodies'|trans }}</a></li>
-            {% endif %#}
+            {% endif %}
 
             <li role="presentation" class="stats-tab{% if active %} active{% set active = false %}{% endif %}"><a href="#statistics" aria-controls="statistics" role="tab" data-toggle="tab">{{ 'Statistics'|trans }}</a></li>
         </ul>

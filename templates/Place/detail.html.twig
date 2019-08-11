@@ -53,15 +53,20 @@
                 {% set active = false %}
             {% endif %}
 
-            {% if  place.venues|length > 0 %}
+            {% if  venues|length > 0 %}
                 {% embed "Place/Parts/tabcontent-venues.html.twig" %}
                 {% endembed %}
                 {% set active = false %}
             {% endif %}
 
-
-                {% embed "Place/Parts/tabcontent-statistics.html.twig" %}
+            {% if  organizers|length > 0 %}
+                {% embed "Place/Parts/tabcontent-organizers.html.twig" %}
                 {% endembed %}
+                {% set active = false %}
+            {% endif %}
+
+            {% embed "Place/Parts/tabcontent-statistics.html.twig" %}
+            {% endembed %}
             </div><!-- .tab-content -->
         </div>
     </div>

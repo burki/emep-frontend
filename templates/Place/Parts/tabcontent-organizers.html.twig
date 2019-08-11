@@ -1,0 +1,55 @@
+{% if organizers is not empty %}
+    {% import 'Shared/helper.html.twig' as helper %}
+    {% import 'Shared/datatables.html.twig' as datatables %}
+    {{ datatables.head() }}
+
+    <script>
+        $( document ).ready(function() {
+            $('#organizers-table').DataTable({
+                dom: 'ilrtp',
+                paging: true,
+                pageLength: 25,
+                searching: false,
+                info: true,
+                'columns': [
+                    null,
+                    { "orderSequence": [ "asc", "desc" ] },
+                    { "orderSequence": [ "desc", "asc" ] },
+                    { "orderSequence": [ "desc", "asc" ] },
+                    { "orderSequence": [ "desc", "asc" ] },
+                    { "orderSequence": [ "desc", "asc" ] },
+                ]
+            });
+        })
+    </script>
+
+    <div role="tabpanel" class="tab-pane{% if active %} active{% endif %}" id="organizers">
+        <table id="organizers-table" class="table table-striped table-bordered dataTable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th># of Exhibitions</th>
+                    <th># of Cat. Entries</th>
+                    <th># of Artists</th>
+                    <th># of Nationalities</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for organizerInfo in organizers %}
+                {% set location = organizerInfo.location %}
+                <tr>
+                    <td class="title" data-sort="{{ location.name }}">
+                        <b>{{ helper.organizer_linked(location) }}</b>
+                    </td>
+                    <td>{{ organizerInfo.type }}</td>
+                    <td>{{ max( 0, organizerInfo['numExhibitions'] ) }}</td>
+                    <td>{{ max( 0, organizerInfo['numItems'] ) }}</td>
+                    <td>{{ max( 0, organizerInfo['numArtists'] ) }}</td>
+                    <td>{{ max( 0, organizerInfo['numNationalities'] ) }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div><!-- .tab-pane -->
+{% endif %}
