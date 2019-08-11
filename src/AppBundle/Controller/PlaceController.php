@@ -191,6 +191,8 @@ extends CrudController
             'pageTitle' => $place->getNameLocalized($locale),
             'place' => $place,
             'persons' => $allArtists,
+            'exhibitions' => $this->getExhibitionsByTgn($tgn),
+            'venues' => $venuesList,
             'numberBorn' => $this->getNumberArtistsBorn($tgn),
             'numberDied' => $this->getNumberArtistsDied($tgn),
             'numberActive' => $this->getNumberArtistsActive($tgn),
@@ -199,8 +201,6 @@ extends CrudController
             'numberExhibitions' => $this->getNumberOfExhibitions($id, $tgn, $place->getId()),
             'exhibitionTypeStats' => $exhibitionTypeStats,
             'genderStats' => $genderCounts,
-            'exhibitions' => $this->getExhibitionsByTgn($tgn),
-            'venuesList' => $venuesList,
             'exhibitionStats' => $exhibitionStats,
             'em' => $this->getDoctrine()->getManager(),
 
