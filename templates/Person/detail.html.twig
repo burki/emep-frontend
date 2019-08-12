@@ -116,6 +116,7 @@
             </div>
     </div>
 
+    {#
     <div class="row">
         <div class="col-sm-8 person-description">
             {% if showWorks and person.items is not empty %}
@@ -136,7 +137,7 @@
                 {% if item.displaydate is not empty %}
                     {{ item.displaydate }}
                 {% else %}
-                    ({{ item.earliestdate|dateincomplete }}{# - {{  item.latestdate|dateincomplete  }}#})
+                    ({{ item.earliestdate|dateincomplete }}})
                 {% endif %}
                 </div>
             </a>
@@ -144,7 +145,7 @@
             </div>
         {% endif %}
 
-        {# find a artist with all informations set correctly #}
+
         <div class="col-sm-4 sidebar">
             {% set entityfacts = person.entityfacts %}
             {% if entityfacts is not empty %}
@@ -159,26 +160,23 @@
 
         </div>
     </div><!-- .row -->
+    #}
+
+    {{ helper.render_person_citation(person) }}
 
     <!-- Modal for shared Exhibitions -->
     <div id="detailModal" class="modal fade" role="dialog">
-      <div class="modal-dialog">
-
-        <!-- Modal content-->
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-          </div>
-          <div class="modal-body">
-            <p>Loading....</p>
-          </div>
-          <!--
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
-          -->
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>Loading....</p>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
     <script>

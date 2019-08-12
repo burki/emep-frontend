@@ -372,7 +372,6 @@ implements \JsonSerializable, JsonLdSerializable
         return $this->foundingDate;
     }
 
-
     /**
      * Sets name.
      *
@@ -432,6 +431,22 @@ implements \JsonSerializable, JsonLdSerializable
 
             return sprintf('[%s]', implode(' : ', $append));
         }
+    }
+
+    public function getNameListing()
+    {
+        if (!empty($this->nameTransliterated)) {
+            // show translit / translation in brackets instead of original
+            $parts = [ $this->nameTransliterated ];
+
+            if (!empty($this->nameAlternate)) {
+                $parts[] = $this->nameAlternate;
+            }
+
+            return sprintf('[%s]', join(' : ', $parts));
+        }
+
+        return $this->getName();
     }
 
     /**
@@ -601,6 +616,16 @@ implements \JsonSerializable, JsonLdSerializable
         return $this->foundingLocation;
     }
     */
+
+    /**
+     * Gets dateModified.
+     *
+     * @return \DateTime
+     */
+    public function getDateModified()
+    {
+        return $this->changedAt;
+    }
 
     public function findBibitems($em, $catalogueEntriesOnly = false)
     {

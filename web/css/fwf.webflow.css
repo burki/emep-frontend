@@ -1,5 +1,5 @@
 body {
-  font-family: Lato, sans-serif;
+  font-family: Arimo, Arial, "Arial Unicode MS", sans-serif;
   color: #333;
   font-size: 14px;
   line-height: 20px;
@@ -1342,4 +1342,8 @@ a {
     padding: 16px;
     font-size: 14px;
   }
+}
+
+div.citation {
+  font-size: 12px;
 }

@@ -1060,6 +1060,16 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
         return $this->slug;
     }
 
+    /**
+     * Gets dateModified.
+     *
+     * @return \DateTime
+     */
+    public function getDateModified()
+    {
+        return $this->changedAt;
+    }
+
     /*
      * Returns
      *  familyName, givenName

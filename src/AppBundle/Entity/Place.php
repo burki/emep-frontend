@@ -580,6 +580,16 @@ implements \JsonSerializable, JsonLdSerializable
         return array_reverse($path);
     }
 
+    /**
+     * Gets dateModified.
+     *
+     * @return \DateTime
+     */
+    public function getDateModified()
+    {
+        return $this->changedAt;
+    }
+
     public function jsonSerialize()
     {
         return [

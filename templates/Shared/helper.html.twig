@@ -140,6 +140,37 @@
     {% endfor %}
 {% endmacro %}
 
+{% macro render_citation(name, lastModified, url) -%}
+    <div class="citation">
+        <b>Recommended Citation:</b>
+        "{{ name }}." In <i>{{ siteName|trans|replace({' | ':  '. '}) }}</i>.
+        Last modified {{ lastModified|date('M j, Y') }}. <a href="{{ url }}">{{ url }}</a>
+    </div>
+{% endmacro%}
+
+{% macro render_exhibition_citation(exhibition) -%}
+    {{ _self.render_citation(exhibition.titleListing, exhibition.dateModified, url('exhibition', { 'id' : exhibition.id })) }}
+{% endmacro%}
+
+{% macro render_person_citation(person) -%}
+    {% set routeInfo = person.routeInfo %}
+    {{ _self.render_citation(person.fullName(true), person.dateModified, url(routeInfo[0], routeInfo[1])) }}
+{% endmacro%}
+
+{% macro render_place_citation(place) -%}
+    {{ _self.render_citation(place.nameLocalized, place.dateModified, url('place-by-tgn', { 'tgn' : place.tgn })) }}
+{% endmacro%}
+
+{% macro render_location_citation(location) -%}
+    {% set route = 'location' %}
+    {% if location.exhibitions is empty and location.organizerOf is not empty %}{% set route = 'organizer' %}{% endif %}
+    {{ _self.render_citation(location.nameListing, location.dateModified, url(route, { 'id' : location.id })) }}
+{% endmacro%}
+
+{% macro render_holder_citation(holder) -%}
+    {{ _self.render_citation(holder.nameListing, holder.dateModified, url('holder', { 'id' : holder.id })) }}
+{% endmacro%}
+
 {% macro active_tab_from_hash(entries) %}
     <script>
     // Javascript to enable link to tab with anchor

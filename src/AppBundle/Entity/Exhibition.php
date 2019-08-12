@@ -162,7 +162,7 @@ implements JsonLdSerializable
      *
      * @ORM\Column(name="created", type="datetime", nullable=true)
      */
-    private $created;
+    private $createdAt;
 
     /**
      * @var integer
@@ -176,7 +176,7 @@ implements JsonLdSerializable
      *
      * @ORM\Column(name="changed", type="datetime", nullable=true)
      */
-    private $changed;
+    private $changedAt;
 
     /**
      * @var integer
@@ -486,6 +486,16 @@ implements JsonLdSerializable
     public function getCatalogueStructure()
     {
         return $this->catalogueStructure;
+    }
+
+    /**
+     * Gets dateModified.
+     *
+     * @return \DateTime
+     */
+    public function getDateModified()
+    {
+        return $this->changedAt;
     }
 
     public function getItems($minStatus = 0)
