@@ -14,17 +14,20 @@ extends SearchListBuilder
     /* TODO: share across entities and use logic in setJoin to build the query */
     static function fetchDateModified(\Doctrine\DBAL\Connection $connection, $id)
     {
-        $querystr = "SELECT GREATEST(MAX(P.changed), MAX(E.changed), MAX(IE.changed), MAX(L.changed), MAX(PL.changed), MAX(EO.changed), MAX(IEO.changed), MAX(OP.changed)) AS modified"
+        $querystr = "SELECT GREATEST(MAX(P.changed), MAX(E.changed), MAX(IE.changed), MAX(L.changed), MAX(PL.changed)) AS modified"
             . " FROM Location L"
             . " LEFT OUTER JOIN Exhibition E ON E.id_location=L.id"
             . " LEFT OUTER JOIN Geoname PL ON L.place_tgn=PL.tgn"
-            . " LEFT OUTER JOIN ExhibitionLocation EL ON EL.id_location=L.id"
-            . " LEFT OUTER JOIN Exhibition EO ON EO.id = EL.id_exhibition=EO.id AND EL.role = 0"
             . " LEFT OUTER JOIN ItemExhibition IE ON IE.id_exhibition=E.id"
             . " LEFT OUTER JOIN Person P ON IE.id_person=P.id"
+            /*
+            // TODO: check correctness / performance
+            . " LEFT OUTER JOIN ExhibitionLocation EL ON EL.id_location=L.id AND EL.role = 0"
+            . " LEFT OUTER JOIN Exhibition EO ON EO.id = EL.id_exhibition=EO.id"
             . " LEFT OUTER JOIN ItemExhibition IEO ON IE.id_exhibition=EO.id"
-            . " LEFT OUTER JOIN Person OP ON IEO.id_person=OP.id"
-            . " WHERE E.id=?";
+            . " LEFT OUTER JOIN Person PO ON IEO.id_person=PO.id"
+            */
+            . " WHERE L.id=?";
 
         $stmt = $connection->executeQuery($querystr, [ $id ]);
         if ($row = $stmt->fetch()) {
