@@ -154,6 +154,8 @@ extends CrudController
             return new JsonLdResponse($place->jsonLdSerialize($locale));
         }
 
+        $place->setDateModified(\AppBundle\Utils\PlaceListBuilder::fetchDateModified($this->getDoctrine()->getConnection(), $place->getTgn()));
+
         // stats
         $qb = $this->getDoctrine()
             ->getManager()

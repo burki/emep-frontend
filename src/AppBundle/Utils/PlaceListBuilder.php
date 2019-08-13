@@ -11,6 +11,31 @@ extends SearchListBuilder
     protected $entity = 'Place';
     protected $alias = 'PL';
 
+    /* TODO: share across entities and use logic in setJoin to build the query */
+    static function fetchDateModified(\Doctrine\DBAL\Connection $connection, $tgn)
+    {
+        // TODO: add Person-join through placeOfBirth / placeOfDeath and maybe placeOfActivity
+        $querystr = "SELECT GREATEST(MAX(P.changed), MAX(E.changed), MAX(IE.changed), MAX(L.changed), MAX(PL.changed)) AS modified"
+            . " FROM Geoname PL"
+            . " LEFT OUTER JOIN Location L ON L.place_tgn=PL.tgn"
+            . " LEFT OUTER JOIN Exhibition E ON E.id_location=L.id"
+            . " LEFT OUTER JOIN ItemExhibition IE ON IE.id_exhibition=E.id"
+            . " LEFT OUTER JOIN Person P ON IE.id_person=P.id"
+            /*
+            // TODO: the followin kills performance, investigate
+            . " LEFT OUTER JOIN ExhibitionLocation EL ON EL.id_location=L.id AND EL.role = 0"
+            . " LEFT OUTER JOIN Exhibition EO ON EO.id = EL.id_exhibition=EO.id"
+            . " LEFT OUTER JOIN ItemExhibition IEO ON IEO.id_exhibition=EO.id"
+            . " LEFT OUTER JOIN Person PO ON IEO.id_person=PO.id"
+            */
+            . " WHERE PL.tgn=?";
+
+        $stmt = $connection->executeQuery($querystr, [ $tgn ]);
+        if ($row = $stmt->fetch()) {
+            return new \DateTime($row['modified'] . '+0');
+        }
+    }
+
     var $rowDescr = [
         'place' => [
             'label' => 'City',

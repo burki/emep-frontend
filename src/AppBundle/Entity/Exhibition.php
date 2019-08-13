@@ -179,6 +179,11 @@ implements JsonLdSerializable
     private $changedAt;
 
     /**
+     * @var \DateTime The date on which the Exhibition or one of its related entities were last modified.
+     */
+    private $dateModified;
+
+    /**
      * @var integer
      *
      * @ORM\Column(name="changed_by", type="integer", nullable=true)
@@ -489,12 +494,30 @@ implements JsonLdSerializable
     }
 
     /**
+     * Sets dateModified.
+     *
+     * @param \DateTime $dateModified
+     *
+     * @return $this
+     */
+    public function setDateModified(\DateTime $dateModified = null)
+    {
+        $this->dateModified = $dateModified;
+
+        return $this;
+    }
+
+    /**
      * Gets dateModified.
      *
      * @return \DateTime
      */
     public function getDateModified()
     {
+        if (!is_null($this->dateModified)) {
+            return $this->dateModified;
+        }
+
         return $this->changedAt;
     }
 

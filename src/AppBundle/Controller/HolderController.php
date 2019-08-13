@@ -139,6 +139,8 @@ extends CrudController
             return new JsonLdResponse($holder->jsonLdSerialize($locale));
         }
 
+        $holder->setDateModified(\AppBundle\Utils\HolderListBuilder::fetchDateModified($this->getDoctrine()->getConnection(), $holder->getId()));
+
         $placeLabel = $holder->getPlaceLabel();
         $place = null;
         if (!empty($placeLabel)) {

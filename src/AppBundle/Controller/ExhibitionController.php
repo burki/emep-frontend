@@ -477,6 +477,8 @@ extends CrudController
             $exhibition->buildInfoFull($this->getDoctrine()->getManager(), $citeProc);
         }
 
+        $exhibition->setDateModified(\AppBundle\Utils\ExhibitionListBuilder::fetchDateModified($this->getDoctrine()->getConnection(), $exhibition->getId()));
+
         $catalogueEntries = $this->findCatalogueEntries($exhibition, $request->get('sort'));
 
         list($artists, $catalogueEntriesByPersonCount) = $this->buildArtistsCount($catalogueEntries);

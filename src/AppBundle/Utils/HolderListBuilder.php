@@ -11,6 +11,24 @@ extends SearchListBuilder
     protected $entity = 'Holder';
     protected $alias = 'H';
 
+    /* TODO: share across entities and use logic in setJoin to build the query */
+    static function fetchDateModified(\Doctrine\DBAL\Connection $connection, $id)
+    {
+        $querystr = "SELECT GREATEST(MAX(H.changed), MAX(E.changed), MAX(B.changed)) AS modified"
+            . " FROM Holder H"
+            . " LEFT JOIN HolderPublication BH ON BH.id_holder = H.id"
+            . " LEFT JOIN Publication B ON BH.id_publication = B.id AND B.status <> -1"
+            . " LEFT JOIN ExhibitionPublication BE ON BE.id_publication = B.id AND BE.role = 1"
+            . " LEFT JOIN Exhibition E ON BE.id_exhibition=E.id"
+            . " WHERE H.id=?"
+            ;
+
+        $stmt = $connection->executeQuery($querystr, [ $id ]);
+        if ($row = $stmt->fetch()) {
+            return new \DateTime($row['modified'] . '+0');
+        }
+    }
+
     var $rowDescr = [
         'holder' => [
             'label' => 'Name',
@@ -181,8 +199,8 @@ extends SearchListBuilder
                                 'Publication', 'B',
                                 'BH.id_publication = B.id AND B.status <> -1');
         $queryBuilder->leftJoin('BH',
-                       'ExhibitionPublication', 'BE',
-                       'BE.id_publication = B.id AND BE.role = 1');// catalogues only
+                                'ExhibitionPublication', 'BE',
+                                'BE.id_publication = B.id AND BE.role = 1');// catalogues only
     }
 
     protected function setJoin($queryBuilder)

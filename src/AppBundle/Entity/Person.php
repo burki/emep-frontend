@@ -21,7 +21,9 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
     static $entityfactsLocales = [ 'en' ]; // enabled locales in preferred order
     static $genderMap = [ 'F' => 'female', 'M' => 'male' ]; /* for og:serialize */
 
-    /* add -00-00 or -00 to dates without month / day */
+    /**
+     * appends -00-00 or -00 to dates without month / day
+     */
     static function formatDateIncomplete($dateStr)
     {
         if (preg_match('/^\d{4}$/', $dateStr)) {
@@ -249,6 +251,11 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
      * @ORM\Column(name="changed", type="datetime")
      */
     protected $changedAt;
+
+    /**
+     * @var \DateTime The date on which the Person or one of its related entities were last modified.
+     */
+    protected $dateModified;
 
     /**
      * @var string
@@ -1061,20 +1068,39 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
     }
 
     /**
+     * Sets dateModified.
+     *
+     * @param \DateTime $dateModified
+     *
+     * @return $this
+     */
+    public function setDateModified(\DateTime $dateModified = null)
+    {
+        $this->dateModified = $dateModified;
+
+        return $this;
+    }
+
+    /**
      * Gets dateModified.
      *
      * @return \DateTime
      */
     public function getDateModified()
     {
+        if (!is_null($this->dateModified)) {
+            return $this->dateModified;
+        }
+
         return $this->changedAt;
     }
 
-    /*
+    /**
      * Returns
      *  familyName, givenName
      * or
      *  givenName familyName
+     * depending on $givenNameFirst
      *
      * @return string
      */

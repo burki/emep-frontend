@@ -414,6 +414,7 @@ extends CrudController
         }
 
         $person = $persons[0];
+        $person->setDateModified(\AppBundle\Utils\PersonListBuilder::fetchDateModified($this->getDoctrine()->getConnection(), $person->getId()));
 
         $locale = $request->getLocale();
         if (in_array($request->get('_route'), [ 'person-jsonld', 'person-by-ulan-json', 'person-by-gnd-jsonld' ])) {

@@ -185,6 +185,11 @@ implements \JsonSerializable, JsonLdSerializable
     protected $changedAt;
 
     /**
+     * @var \DateTime The date on which the Location or one of its related entities were last modified.
+     */
+    protected $dateModified;
+
+    /**
      * @var string
      *
      * @Assert\Type(type="string")
@@ -691,12 +696,30 @@ implements \JsonSerializable, JsonLdSerializable
     }
 
     /**
+     * Sets dateModified.
+     *
+     * @param \DateTime $dateModified
+     *
+     * @return $this
+     */
+    public function setDateModified(\DateTime $dateModified = null)
+    {
+        $this->dateModified = $dateModified;
+
+        return $this;
+    }
+
+    /**
      * Gets dateModified.
      *
      * @return \DateTime
      */
     public function getDateModified()
     {
+        if (!is_null($this->dateModified)) {
+            return $this->dateModified;
+        }
+
         return $this->changedAt;
     }
 

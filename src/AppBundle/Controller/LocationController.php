@@ -327,6 +327,8 @@ extends CrudController
             return new JsonLdResponse($location->jsonLdSerialize($locale));
         }
 
+        $location->setDateModified(\AppBundle\Utils\LocationListBuilder::fetchDateModified($this->getDoctrine()->getConnection(), $location->getId()));
+  
         $exhibitionIds = $this->getExhibitionIds($location);
 
         $artists = $this->getArtistsByExhibitionIds($exhibitionIds);
