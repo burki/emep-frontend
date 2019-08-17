@@ -426,7 +426,20 @@ implements JsonLdSerializable
 
     public function getOrganizerType()
     {
-        return $this->organizerType;
+        $types = [];
+        if (!is_null($this->organizers)) {
+            foreach ($this->organizers as $organizer) {
+                $type = $organizer->getType();
+                if (!empty($type)) {
+                    $types[] = $type;
+                }
+            }
+        }
+
+        $types = array_unique($types);
+        asort($types);
+
+        return join(', ', $types);
     }
 
     public function getOrganizers()
