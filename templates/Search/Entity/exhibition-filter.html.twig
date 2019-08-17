@@ -5,14 +5,13 @@
         <div class="searchbarinputcontainer">
             <input class="text-field-class w-input search-input input-text-search" type="text" name="filter[search]" value="{{ filter.search }}" placeholder="search" />
             {{ form_widget(form.location.geoname) }}
-            {{ form_widget(form.exhibition.organizer_type) }}
+            {{ form_widget(form.organizer.type) }}
         </div>
 
         <div class="searchbuttoncontainer">
             <button type="submit" id="filter_submit" name="filter[submit]" class="submit-button w-button submit-filter-visible">Search</button>
         </div>
     </div>
-
 
     {% block filters %}
         {% import 'Shared/helper.html.twig' as helper %}

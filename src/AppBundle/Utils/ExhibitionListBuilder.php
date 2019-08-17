@@ -364,7 +364,7 @@ extends SearchListBuilder
 
         if ('stats-organizer-type' == $this->mode) {
             $queryBuilder->select([
-                'E.organizer_type AS organizer_type',
+                'O.type AS organizer_type',
                 'COUNT(DISTINCT E.id) AS how_many',
             ]);
 
@@ -432,7 +432,7 @@ extends SearchListBuilder
             $queryBuilder->groupBy('L.place');
         }
         else if ('stats-organizer-type' == $this->mode) {
-            $queryBuilder->groupBy('organizer_type');
+            $queryBuilder->groupBy('O.type');
         }
         else {
             $queryBuilder->groupBy('E.id');

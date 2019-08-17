@@ -226,11 +226,12 @@ implements JsonLdSerializable
     private $flags = '0';
 
     /**
+     * Deprecated property
      * @var string
      *
-     * @ORM\Column(name="organizer_type", type="string", length=30, nullable=true)
-     */
+     * xORM\Column(name="organizer_type", type="string", length=30, nullable=true)
     private $organizerType;
+     */
 
     /**
      * @var string

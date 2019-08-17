@@ -375,7 +375,7 @@ extends SearchListBuilder
             'L.type AS location_type',
             'L.place AS place',
             'L.place_tgn AS place_tgn',
-            'E.organizer_type AS organizer_type',
+            // 'E.organizer_type AS organizer_type',
             "GROUP_CONCAT(O.name ORDER BY EL.ord SEPARATOR '; ') AS organizers",
 
             "1 AS status",

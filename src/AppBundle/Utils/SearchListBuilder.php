@@ -479,7 +479,7 @@ extends ListBuilder
 
             foreach ([
                 'type' => 'E.type',
-                'organizer_type' => 'E.organizer_type',
+                // 'organizer_type' => 'E.organizer_type',
                 'exhibition' => 'E.id',
                 ] as $key => $field)
             {

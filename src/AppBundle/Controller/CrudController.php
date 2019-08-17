@@ -107,9 +107,11 @@ extends Controller
     {
         $em = $this->getDoctrine()
             ->getManager();
-        $result = $em->createQuery("SELECT DISTINCT E.organizerType AS type FROM AppBundle:Exhibition E"
-            . " WHERE " . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E')
-            . " AND E.organizerType <> ''"
+        $result = $em->createQuery("SELECT DISTINCT O.type AS type"
+            . " FROM AppBundle:Location O"
+            . " INNER JOIN AppBundle:Exhibition E"
+            . " WITH O MEMBER OF E.organizers"
+            . ' AND ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E')
             . " ORDER BY type")
             ->getScalarResult();
 
