@@ -120,6 +120,10 @@ class Builder
             'route' => 'database',
         ]);
 
+        $menu['Info']->addChild('Using the Database', [
+            'route' => 'using',
+        ]);
+
         $menu['Info']->addChild('Cooperating Institutions', [
             'route' => 'cooperating',
         ]);

@@ -25,7 +25,6 @@ extends DefaultController
             ->setReplyTo($data['email']);
             ;
 
-
         if (!empty($htmlBody)) {
             $message->setBody($htmlBody, 'text/html')
                 ->addPart($textBody, 'text/plain');
@@ -106,7 +105,15 @@ extends DefaultController
      */
     public function databaseAction()
     {
-        return $this->renderWordpress('using-the-database', 'Default/using.html.twig');
+        return $this->renderWordpress('database', 'Default/using.html.twig');
+    }
+
+    /**
+     * @Route("/info/using", name="using", options={"sitemap" = true})
+     */
+    public function usingAction()
+    {
+        return $this->renderWordpress('using-the-database');
     }
 
     /**
