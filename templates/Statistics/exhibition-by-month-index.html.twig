@@ -60,14 +60,14 @@
                 text: ''
             },
             subtitle: {
-                text: 'Average: {{ data_avg }} exhibitions per month'
+                text: 'Average: {{ data_avg_monthly }} exhibitions per month'
             },
             xAxis: {
                 title: {
                     enabled: false, // only for export-data.js
                     text: 'Year-Month'
                 },
-                categories: {{ categories|raw }},
+                categories: {{ categories_monthly|raw }},
                 labels: {
                     rotation: -45,
                     step: 3, // this will show one label for every quarter
@@ -91,7 +91,7 @@
                 {
                     name: 'Number of Exhibitions',
                     type: 'column',
-                    data: {{ data|raw }}
+                    data: {{ data_monthly|raw }}
                 }
             ]
         });

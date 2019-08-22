@@ -169,7 +169,6 @@ trait StatisticsBuilderTrait
             'total' => $total,
             'data' => json_encode($data),
         ];
-
     }
 
     function processExhibitionByMonth($stmt)
@@ -188,7 +187,7 @@ trait StatisticsBuilderTrait
         }
         $max_year = $min_year;
 
-        $data = $data_yearly = $categories = $scatter_data = $scatter_categories = [];
+        $data_monthly = $data_yearly = $categories = $scatter_data = $scatter_categories = [];
 
         $keys = array_keys($frequency_count);
         if (empty($keys)) {
@@ -197,7 +196,7 @@ trait StatisticsBuilderTrait
 
         $i = $min = $keys[0];
         $max = $keys[count($keys) - 1];
-        $sum = 0;
+        $sum_yearly = $sum_monthly = 0;
 
         while ($i <= $max) {
             $key = $i;
@@ -209,39 +208,43 @@ trait StatisticsBuilderTrait
             }
 
             $count = array_key_exists($key, $frequency_count) ? $frequency_count[$key] : 0;
-            $sum += $count;
-            $data[] = $count;
             $data_yearly[$year] += $count;
+            $sum_yearly += $count;
 
-            if ($count > 0) {
-                $max_year = $year;
+            // there are dates where month is not set; we don't consider them for monthly and scatter
+            if (0 != $month) {
+                $sum_monthly += $count;
+                $data_monthly[] = $count;
 
-                $scatter_data[] = [
-                    'y' => $year - $min_year,
-                    'x' => $month - 1,
-                    'count' => $count, 'year' => $year,
-                    'marker' => [ 'radius' => intval(2 * sqrt($count) + 0.5) ]
-                ];
+                if ($count > 0) {
+                    $max_year = $year;
+
+                    $scatter_data[] = [
+                        'y' => $year - $min_year,
+                        'x' => $month - 1,
+                        'count' => $count, 'year' => $year,
+                        'marker' => [ 'radius' => intval(2 * sqrt($count) + 0.5) ]
+                    ];
+                }
             }
 
             if ($i % 100 < 12) {
                 ++$i;
             }
             else {
-                $i = $i + (100 - $i % 100) + 1;
+                $i = $i + (100 - $i % 100);
             }
         }
 
-
         $scatter_categories = range($min_year, $max_year);
 
-        $data_avg = round(1.0 * $sum / count($data), 1);
-        $data_avg_yearly = round(1.0 * $sum / count(array_keys($data_yearly)), 1);
+        $data_avg_monthly = round(1.0 * $sum_monthly / count($data_monthly), 1);
+        $data_avg_yearly = round(1.0 * $sum_yearly / count(array_keys($data_yearly)), 1);
 
         return [
-            'data_avg' => $data_avg,
-            'categories' => json_encode($categories),
-            'data' => json_encode($data),
+            'data_avg_monthly' => $data_avg_monthly,
+            'categories_monthly' => json_encode($categories),
+            'data_monthly' => json_encode($data_monthly),
             'data_avg_yearly' => $data_avg_yearly,
             'categories_yearly' => json_encode(array_keys($data_yearly)),
             'data_yearly' => json_encode(array_values($data_yearly)),

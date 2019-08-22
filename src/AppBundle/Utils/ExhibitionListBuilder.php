@@ -471,10 +471,6 @@ extends SearchListBuilder
     {
         $queryBuilder->andWhere($this->buildExhibitionVisibleCondition('E'));
 
-        if ('stats-by-month' == $this->mode) {
-            $queryBuilder->andWhere('MONTH(E.startdate) <> 0');
-        }
-
         $this->addSearchFilters($queryBuilder, [
             'E.title',
             'E.title_short',
