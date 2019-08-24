@@ -96,7 +96,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
     /**
      * @var string A short description of the item.
      *
-     * @ORM\Column(name="cv", type="string", nullable=true)
+     * @ORM\Column(name="occupation", type="string", nullable=true)
      *
      */
     protected $description;

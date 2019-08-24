@@ -1,3 +1,9 @@
+{%  if person.description is not empty %}
+<p class="artist-information-text">
+    {{ person.description|nl2br  }}
+</p>
+{% endif %}
+
 {# variantName #}
 {% if person.variantName is not empty %}
     <div class="artist-information-container">
@@ -134,3 +140,5 @@
         <div class="artist-information-text-stats">Exhibiting Cities: {{ dataNumberOfExhibitionsPerCity[2] }}</div>
     </div>
 </div>
+
+{# TODO: show Additional Notes / Public Note #}

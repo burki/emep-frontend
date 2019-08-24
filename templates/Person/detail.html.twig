@@ -73,10 +73,6 @@
                 {% embed "Person/Parts/artist-base-information.html.twig" %}
                 {% endembed %}
             </div>
-
-            {%  if person.description is not empty %}
-                <p class="artist-text">{{ person.description|nl2br  }}</p>
-            {% endif %}
         </div>
         <div class="maphalf">
             {% embed "Person/Parts/mapPerson.html.twig" %}
