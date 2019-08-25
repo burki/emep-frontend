@@ -30,7 +30,7 @@
             <thead>
             <tr>
                 <th>Name</th>
-                <th>Date of Birth </th>
+                <th>Date of Birth</th>
                 <th>Place of Birth</th>
                 <th>Date of Death</th>
                 <th>Place of Death</th>
@@ -58,6 +58,8 @@
                         {% set birthPlace = person.birthPlace %}
                         {% if birthPlace is not empty %}
                             {{ helper.place_linked(birthPlace) }}
+                        {% elseif person.birthPlaceLabel is not empty %}
+                            {{ person.birthPlaceLabel }}
                         {% endif %}
                     </td>
                     <td data-order="{{ person.deathDate }}">{{ person.deathDate|dateincomplete -}} </td>
