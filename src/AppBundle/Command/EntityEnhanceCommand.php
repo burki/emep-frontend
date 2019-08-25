@@ -169,7 +169,7 @@ extends ContainerAwareCommand
         return $result;
     }
 
-    /*
+    /**
      * Get additional properties, currently from entityfacts and wikidata
      * TODO: Better wikidata queries in
      * site/tool/missing_personwikidata.php
@@ -350,7 +350,7 @@ extends ContainerAwareCommand
         }
     }
 
-    /*
+    /**
      * Fetch missing entityfact data
      *
      */
@@ -417,145 +417,6 @@ extends ContainerAwareCommand
 
         $this->enhancePersonProperties();
     }
-
-    /*
-    protected function enhancePlace()
-    {
-        // currently only geonames
-        // TODO: maybe get outlines
-        // http://www.geonames.org/servlet/geonames?&srv=780&geonameId=2921044&type=json
-        $em = $this->getContainer()->get('doctrine')->getManager();
-        $placeRepository = $em->getRepository('AppBundle:Place');
-
-        foreach ([ 'nation', 'country',
-                  'state', 'metropolitan area',
-                  'inhabited place', 'neighborhood' ] as $type) {
-            $places = $placeRepository->findBy([ 'type' => $type,
-                                                 'geonames' => null]);
-            foreach ($places as $place) {
-                $geo = $place->getGeo();
-                if (empty($geo) || false === strpos($geo, ':')) {
-                    continue;
-                }
-                $persist = false;
-                list($lat, $long) = explode(':', $geo, 2);
-                $url = sprintf('http://api.geonames.org/extendedFindNearby?lat=%s&lng=%s&username=burckhardtd',
-                               $lat, $long);
-
-                $xml = simplexml_load_file($url);
-                foreach ($xml->geoname as $geoname) {
-                    switch ($type) {
-                        case 'nation':
-                            if ('PCLI' == $geoname->fcode) {
-                                $geonames = (string)($geoname->geonameId);
-                                var_dump($place->getName() . ': '
-                                 . (string)($geoname->name) . ' - ' . $geonames );
-                                $place->setGeonames($geonames);
-                                $persist = true;
-                            }
-                            break;
-
-                        case 'country':
-                            if ('ADM1' == $geoname->fcode) {
-                                $geonames = (string)($geoname->geonameId);
-                                var_dump($place->getName() . ': '
-                                 . (string)($geoname->name) . ' - ' . $geonames );
-                                $place->setGeonames($geonames);
-                                $persist = true;
-                            }
-                            break;
-
-                        case 'state':
-                            if ('ADM1' == $geoname->fcode) {
-                                $geonames = (string)($geoname->geonameId);
-                                var_dump($place->getName() . ': '
-                                 . (string)($geoname->name) . ' - ' . $geonames );
-                                $place->setGeonames($geonames);
-                                $persist = true;
-                            }
-                            break;
-
-                        case 'metropolitan area':
-                            if ('ADM2' == $geoname->fcode) {
-                                $geonames = (string)($geoname->geonameId);
-                                var_dump($place->getName() . ': '
-                                 . (string)($geoname->name) . ' - ' . $geonames );
-                                $place->setGeonames($geonames);
-                                $persist = true;
-                            }
-                            break;
-
-                        case 'inhabited place':
-                            if ('PPLA3' == $geoname->fcode || 'ADM4' == $geoname->fcode) {
-                                $geonames = (string)($geoname->geonameId);
-                                var_dump($place->getName() . ': '
-                                 . (string)($geoname->name) . ' - ' . $geonames );
-                                $place->setGeonames($geonames);
-                                $persist = true;
-                            }
-                            break;
-
-                        case 'neighborhood':
-                            if ('PPLX' == $geoname->fcode) {
-                                $geonames = (string)($geoname->geonameId);
-                                var_dump($place->getName() . ': '
-                                 . (string)($geoname->name) . ' - ' . $geonames );
-                                $place->setGeonames($geonames);
-                                $persist = true;
-                            }
-                            break;
-                    }
-                }
-                if ($persist) {
-                    $em->persist($place);
-                    $em->flush();
-                }
-            }
-
-            $places = $placeRepository->findBy([ 'type' => $type ]);
-            foreach ($places as $place) {
-                $persist = false;
-                $additional = $place->getAdditional();
-                if (!is_null($additional) && array_key_exists('bounds', $additional)) {
-                    continue; // TODO: maybe option to force update
-                }
-                $geonames = $place->getGeonames();
-                if (empty($geonames)) {
-                    continue;
-                }
-                $url = sprintf('http://api.geonames.org/get?geonameId=%s&username=burckhardtd',
-                               $geonames);
-                $xml = simplexml_load_file($url);
-                $json = json_encode($xml);
-                $info_array = json_decode($json, true);
-                if (array_key_exists('bbox', $info_array)) {
-                    if (is_null($additional)) {
-                        $additional = [];
-                    }
-
-                    $info = $info_array['bbox'];
-                    $additional['bounds'] = [
-                        [ $info['south'], $info['west'] ],
-                        [ $info['north'], $info['east'] ],
-                    ];
-
-                    foreach ( [ 'areaInSqKm', 'population' ] as $key) {
-                        if (array_key_exists($key, $info_array)) {
-                            $additional[$key] = $info_array[$key];
-                        }
-                    }
-
-                    $place->setAdditional($additional);
-                    $persist = true;
-                }
-                if ($persist) {
-                    $em->persist($place);
-                    $em->flush();
-                }
-            }
-        }
-    }
-    */
 
     protected function enhanceLocation()
     {
@@ -628,7 +489,7 @@ extends ContainerAwareCommand
         }
     }
 
-    /*
+    /**
      * TODO: add additional fields to Country-table
      */
     protected function enhanceCountry()

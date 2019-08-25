@@ -146,11 +146,11 @@ EOT;
 
         $criteria = new \Doctrine\Common\Collections\Criteria();
         $criteria->where($criteria->expr()->neq(
-            'wikidata', null
-        ))
-        ->andWhere($criteria->expr()->neq('status', -1))
-        // ->andWhere($criteria->expr()->eq('ulan', '500004793'))
-        ;
+                'wikidata', null
+            ))
+            ->andWhere($criteria->expr()->neq('status', -1))
+            // ->andWhere($criteria->expr()->eq('ulan', '500004793'))
+            ;
 
         // $criteria->setMaxResults(5); // testing
 
@@ -159,7 +159,10 @@ EOT;
             $persist = false;
 
             $additional = $person->getAdditional();
-            if (is_null($additional) || !array_key_exists('wikilinks', $additional)) {
+            if (is_null($additional)
+                || !array_key_exists('wikilinks', $additional)
+                || !is_array($additional['wikilinks']))
+            {
                 continue;
             }
 
