@@ -135,14 +135,12 @@
             <tbody>
             {% for catalogueEntry in catalogueEntries %}
                 {% set catalogueEntry  = catalogueEntry[0] %}
-                {% set initial = catalogueEntry.person.fullname %}
-
-                {% set addresses = catalogueEntry.person.addressesSeparated(exhibition.id) %}
 
                 <tr data-rowname="{{ catalogueEntry.exhibition.id }}" data-collapsed="true" class="listviewrow collapsed collapseRow">
 
                     <td>{{ helper.itemexhibition_detail(catalogueEntry) }}</td>
                     <td><span id="person-{{ catalogueEntry.exhibition.id }}" class="artist-name-row" data-url="{{ path('exhibition', { 'id' : catalogueEntry.exhibition.id }) }}" data-exhibition-id="{{ catalogueEntry.exhibition.id }}">{{ catalogueEntry.exhibition.title }}</span>
+                        {% set addresses = catalogueEntry.person.addressesSeparated(catalogueEntry.exhibition.id) %}
                         {% if addresses is not empty %}
                             <span class="small">
                         {% for address in addresses %}
@@ -171,9 +169,6 @@
             <tbody>
             {% for catalogueEntry in catalogueEntries %}
                 {% set catalogueEntry  = catalogueEntry[0] %}
-                {% set initial = catalogueEntry.person.fullname %}
-
-                {% set addresses = catalogueEntry.person.addressesSeparated(exhibition.id) %}
 
                 <tr class="listviewrow">
                     <td data-order="{{ loop.index }}">{{ catalogueEntry.getTitleFull }}</td>
