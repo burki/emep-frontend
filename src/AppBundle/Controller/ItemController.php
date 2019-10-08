@@ -8,6 +8,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
+use PhpOffice\PhpWord\Shared\Converter;
+
 /**
  *
  */
@@ -38,6 +40,7 @@ extends Controller
     /**
      * @Route("/work", name="item-index")
      * @Route("/work/by-exhibition", name="item-by-exhibition")
+     * @Route("/work/by-exhibition/export", name="item-by-exhibition-export")
      * @Route("/work/by-style", name="item-by-style")
      */
     public function indexAction(Request $request)
@@ -61,7 +64,7 @@ extends Controller
             ->orderBy('P.familyName');
 
         $templateAppend = '';
-        if ('item-by-exhibition' == $route) {
+        if ('item-by-exhibition' == $route || 'item-by-exhibition-export' == $route) {
             $templateAppend = '-by-exhibition';
             $qb->select([
                     'E',
@@ -135,6 +138,138 @@ extends Controller
         $results = $qb->getQuery()
             // ->setMaxResults(10) // for testing
             ->getResult();
+
+        if ('item-by-exhibition-export' == $route) {
+            $phpWord = new \PhpOffice\PhpWord\PhpWord();
+            $phpWord->setDefaultParagraphStyle([
+                'lineHeight' => 1.1,
+                // the following is important in order not to get a gap between image and text
+                'spaceAfter' => \PhpOffice\PhpWord\Shared\Converter::pointToTwip(0),
+            ]);
+            $phpWord->addTitleStyle(2, [
+                'size' => 12,
+                'bold' => true,
+                // 'color' => 'e07743',
+            ], [
+                'spaceBefore' => Converter::pointToTwip(10),
+                'spaceAfter' => 0,
+            ]);
+
+            $innerStyle = [
+                'cellMarginRight' => Converter::pointToTwip(10),
+                'cellMarginBottom' => Converter::pointToTwip(10),
+                /*
+                'bgColor' => 'FF0000', 'cellMarginTop' => 120, 'cellMarginBottom' => 120,
+                'cellMarginLeft' => 120, 'cellMarginRight' => 120, 'borderTopSize' => 120,
+                'borderBottomSize' => 120, 'borderLeftSize' => 120, 'borderRightSize' => 120,
+                'borderInsideHSize' => 120, 'borderInsideVSize' => 120,
+                */
+            ];
+
+            $height = 65; // in pt
+
+            // Begin code
+            $section = $phpWord->addSection();
+
+            foreach ($results as $exhibition) {
+                set_time_limit(120);
+
+                $section->addTitle($exhibition->getTitle() .  $exhibition->getTitleAppend(), 2);
+
+                $info = '';
+
+                $displaydate = $exhibition->getDisplaydate();
+                if (empty($displaydate)) {
+                    $displaydate = \AppBundle\Utils\Formatter::daterangeIncomplete($exhibition->getStartdate(), $exhibition->getEnddate(), $request->getLocale());
+                }
+                $info .= $displaydate;
+
+                $location = $exhibition->getLocation();
+                if (!is_null($location)) {
+                    $place = $location->getPlace();
+                    if (!is_null($place)) {
+                        $info .= ' ' . $place->getNameLocalized($request->getLocale()) . ' : ';
+                    }
+                    $info .= ' ' . $location->getName();
+                }
+
+                $section->addText(htmlspecialchars($info, ENT_COMPAT, 'utf-8'), [], [
+                    // 'spaceAfter' => Converter::pointToTwip(10),
+                ]);
+
+                $items = $exhibition->getItems();
+                if (!empty($items)) {
+                    $table = $section->addTable();
+
+                    $count = 0;
+                    foreach ($items as $item) {
+                        if (0 == $count) {
+                            // add new inner row
+                            $fullCell = $table->addRow()->addCell();
+                            $innerRow = $fullCell->addTable($innerStyle)->addRow();
+                        }
+
+                        $cell = $innerRow->addCell();
+
+                        $preview = $item->getPreviewImg();
+
+                        $imgUrl = is_null($preview)
+                            ? '/img/placeholder-image.jpg'
+                            : '/uploads/' .  $preview->getImgUrl('preview');
+
+                        $imgUrl = 'https://exhibitions05-15.kugb.univie.ac.at' . $imgUrl;
+                        $cell->addImage($imgUrl, [ 'height' => $height ]);
+
+                        // build the caption
+                        $parts = [];
+                        $creators = $item->creators;
+                        if (!empty($creators)) {
+                            $parts = array_map(function ($creator) { return $creator->getFamilyName(); },
+                                               $creators->toArray());
+                        }
+
+                        $parts[] = $item->getTitle();
+
+                        $displaydate = $item->getDisplayDate();
+                        if (empty($displaydate)) {
+                            $displaydate = \AppBundle\Utils\Formatter::dateIncomplete($item->getEarliestdate(), $request->getLocale());
+                        }
+                        if (!empty($displaydate)) {
+                            $parts[] = $displaydate;
+                        }
+
+                        $catalogueId = $item->catalogueId;
+                        if (!empty($catalogueId)) {
+                            $parts[] = $catalogueId;
+                        }
+
+                        $style = $item->getStyle();
+                        if (!empty($style)) {
+                            $parts[] = $style;
+                        }
+
+                        $cell->addText(htmlspecialchars(join(', ', $parts), ENT_COMPAT, 'utf-8'));
+
+                        if (++$count > 4) {
+                            $count = 0;
+                        }
+                    }
+                }
+            }
+
+            $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
+
+
+            header("Content-Type: application/vnd.openxmlformats-officedocument.wordprocessing??ml.document");
+            header('Content-Disposition: attachment; filename=works-by-exhibition.docx');
+            $objWriter->save('php://output');// this would output it like echo, but in combination with header: it will be sent
+
+            exit;
+
+            return new \Symfony\Component\HttpFoundation\Response($ret, 200, [
+                'Content-Type' => 'text/plain; charset=utf-8',
+            ]);
+        }
 
         return $this->render('Item/index'
                              . $templateAppend

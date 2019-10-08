@@ -606,6 +606,7 @@ class Item
             if ($img->getStatus() == -1) {
                 continue;
             }
+
             if ('preview00' == $img->getName()) {
                 return $img;
             }
@@ -614,7 +615,8 @@ class Item
         return null;
     }
 
-    public function setPersons($persons, $em) {
+    public function setPersons($persons, $em)
+    {
         $this->personRefs = [];
         $ord = 0;
         foreach ($persons as $person) {
