@@ -78,7 +78,7 @@ extends Controller
                 ->leftJoin('I.media', 'M')
                 ->where('E.status <> -1 AND I.status <> -1')
                 ->orderBy('E.startdate, E.id')
-                // , nameSort, dateSort, catSort')
+                // ->setMaxResults(15) // for testing
                 ;
 
             $qbPerson
@@ -166,7 +166,8 @@ extends Controller
                 */
             ];
 
-            $height = 65; // in pt
+            $height = 85; // in pt, around 3cm
+            $imgPerRow = 3;
 
             // Begin code
             $section = $phpWord->addSection();
@@ -250,7 +251,7 @@ extends Controller
 
                         $cell->addText(htmlspecialchars(join(', ', $parts), ENT_COMPAT, 'utf-8'));
 
-                        if (++$count > 4) {
+                        if (++$count > $imgPerRow - 1) {
                             $count = 0;
                         }
                     }
