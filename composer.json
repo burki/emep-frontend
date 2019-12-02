@@ -28,23 +28,35 @@
         "symfony/templating": "^4.3",
         "symfony/translation": "^4.3",
         "symfony/twig-bundle": "^4.3",
+        "symfony/intl": "^4.3",
 
         "symfony/security-bundle": "^4.3",
+        "symfony/security-core": "^4.3",
+        "symfony/security-csrf": "^4.3",
 
         "symfony/web-profiler-bundle": "^4.3",
         "symfony/debug-bundle": "^4.3",
+        "symfony/var-dumper": "^4.3",
+        "symfony/var-exporter": "^4.3",
+        "symfony/http-foundation": "^4.3",
+        "symfony/mime": "^4.3",
 
         "symfony/validator": "^4.3",
         "symfony/form": "^4.3",
+        "symfony/inflector": "^4.3",
         "shapecode/hidden-entity-type-bundle": "^3.0",
 
         "symfony/monolog-bundle": "^3.3",
+        "symfony/monolog-bridge": "^4.3",
         "symfony/swiftmailer-bundle": "^3.2",
         "knplabs/knp-menu-bundle": "^2.2",
 
         "symfony/asset": "^4.3",
         "symfony/assetic-bundle": "dev-master as 2.8.3",
         "leafo/scssphp": "^0.8",
+
+        "symfony/filesystem": "^4.3",
+        "symfony/finder": "^4.3",
 
         "lexik/form-filter-bundle": "^5.0",
         "knplabs/knp-paginator-bundle": "^3.0",
@@ -82,7 +94,6 @@
 
         "presta/sitemap-bundle": "^1.7"
     },
-
     "autoload": {
         "psr-4": {
             "AppBundle\\": "src/AppBundle/"
