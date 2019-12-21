@@ -99,7 +99,7 @@ trait StatisticsBuilderTrait
             return ($a < $b) ? 1 : -1;
         });
 
-        $maxNationality = max(count($yCategories), 16);
+        $maxNationality = max(count($yCategories) + 1, 16);
         $xCategories = array_keys($nationalities);
         if (count($xCategories) > $maxNationality) {
             $xCategories = array_merge(array_slice($xCategories, 0, $maxNationality - 1),
