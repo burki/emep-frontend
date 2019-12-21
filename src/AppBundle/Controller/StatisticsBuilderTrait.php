@@ -65,13 +65,22 @@ trait StatisticsBuilderTrait
         }
 
         $countries = array_keys($statsByCountry);
+        $yCategories = [];
+        foreach ($statsByCountry as $cc => $stats) {
+            if (0 == $stats['totalItemExhibition']) {
+                continue;
+            }
 
-        uksort($nationalities, function ($idxA, $idxB) use ($countries, $nationalities) {
+            $yCategories[] = $cc;
+        }
+
+        // give preference to $nationalities in $yCategories (Exhibiting Countries)
+        uksort($nationalities, function ($idxA, $idxB) use ($yCategories, $nationalities) {
             if ('XX' == $idxA) {
                 $a = 0;
             }
             else {
-                $countryIdx = array_search($idxA, $countries);
+                $countryIdx = array_search($idxA, $yCategories);
                 $a = false !== $countryIdx ? $countryIdx + 100000 : $nationalities[$idxA];
             }
 
@@ -79,7 +88,7 @@ trait StatisticsBuilderTrait
                 $b = 0;
             }
             else {
-                $countryIdx = array_search($idxB, $countries);
+                $countryIdx = array_search($idxB, $yCategories);
                 $b = false !== $countryIdx ? $countryIdx  + 100000 : $nationalities[$idxB];
             }
 
@@ -90,7 +99,7 @@ trait StatisticsBuilderTrait
             return ($a < $b) ? 1 : -1;
         });
 
-        $maxNationality = 16;
+        $maxNationality = max(count($yCategories), 16);
         $xCategories = array_keys($nationalities);
         if (count($xCategories) > $maxNationality) {
             $xCategories = array_merge(array_slice($xCategories, 0, $maxNationality - 1),
@@ -104,28 +113,37 @@ trait StatisticsBuilderTrait
                 continue;
             }
 
+            // we have to aggregate by $x since the same $x for 'other' can show multiple times
             $values = [];
             foreach ($stats['countByNationality'] as $nationality => $counts) {
                 $x = array_search('XX' === $nationality ? 'unknown' : $nationality, $xCategories);
                 if (false === $x) {
                     $x = array_search('other', $xCategories);
                 }
+
                 if (false !== $x) {
-                    $percentage = 100.0 * $counts[$key] / $stats['totalItemExhibition'];
-                    $valuesFinal[] = [
-                        'x' => $x,
-                        'y' => $y,
-                        'value' => $percentage,
-                        'total' => $counts[$key],
-                    ];
+                    if (!array_key_exists($x, $values)) {
+                        $values[$x] = 0;
+                    }
+                    $values[$x] += $counts[$key];
                 }
+            }
+
+            foreach ($values as $x => $total) {
+                $percentage = 100.0 * $total / $stats['totalItemExhibition'];
+                $valuesFinal[] = [
+                    'x' => $x,
+                    'y' => $y,
+                    'value' => $percentage,
+                    'total' => $total,
+                ];
             }
 
             $y++;
         }
 
         return [
-            'countries' => $countries,
+            'countries' => $yCategories,
             'nationalities' => $xCategories,
             'data' => $valuesFinal,
         ];
