@@ -187,6 +187,9 @@ extends SearchListBuilder
         else if ('stats-by-month' == $this->mode) {
             $this->orders = [ 'default' => [ 'asc' => [ 'start_year', 'start_month' ] ] ];
         }
+        else if ('stats-age' == $this->mode) {
+            $this->orders = []; // query has now order
+        }
         else if ('stats-place' == $this->mode) {
             $this->orders = [ 'default' => [ 'asc' => [ 'how_many DESC' ] ] ];
         }

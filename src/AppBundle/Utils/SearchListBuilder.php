@@ -243,6 +243,11 @@ extends ListBuilder
 
     protected function setOrder($queryBuilder)
     {
+        if (empty($this->orders)) {
+            // certain stat-queries don't have an ORDER BY part
+            return $this;
+        }
+
         list($sort, $order) = $this->determineSortOrder();
 
         foreach ($this->orders[$sort][$order] as $orderBy) {
