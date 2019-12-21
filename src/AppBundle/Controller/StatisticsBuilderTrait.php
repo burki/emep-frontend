@@ -35,7 +35,7 @@ trait StatisticsBuilderTrait
             }
 
             $nationality = empty($row['nationality'])
-                ? 'XX' : $row['nationality'];
+                ? 'unknown' : $row['nationality'];
             if (array_key_exists($nationality, self::$countryMap)) {
                 $nationality = self::$countryMap[$nationality];
             }
@@ -76,7 +76,7 @@ trait StatisticsBuilderTrait
 
         // give preference to $nationalities in $yCategories (Exhibiting Countries)
         uksort($nationalities, function ($idxA, $idxB) use ($yCategories, $nationalities) {
-            if ('XX' == $idxA) {
+            if ('unknown' == $idxA) {
                 $a = 0;
             }
             else {
@@ -84,7 +84,7 @@ trait StatisticsBuilderTrait
                 $a = false !== $countryIdx ? $countryIdx + 100000 : $nationalities[$idxA];
             }
 
-            if ('XX' == $idxB) {
+            if ('unknown' == $idxB) {
                 $b = 0;
             }
             else {
@@ -99,9 +99,10 @@ trait StatisticsBuilderTrait
             return ($a < $b) ? 1 : -1;
         });
 
-        $maxNationality = max(count($yCategories) + 1, 16);
+        $maxNationality = max(count($yCategories) + 1, 13);
         $xCategories = array_keys($nationalities);
         if (count($xCategories) > $maxNationality) {
+            // trim down and add 'other'
             $xCategories = array_merge(array_slice($xCategories, 0, $maxNationality - 1),
                                        [ 'unknown', 'other' ]);
         }
@@ -116,7 +117,7 @@ trait StatisticsBuilderTrait
             // we have to aggregate by $x since the same $x for 'other' can show multiple times
             $values = [];
             foreach ($stats['countByNationality'] as $nationality => $counts) {
-                $x = array_search('XX' === $nationality ? 'unknown' : $nationality, $xCategories);
+                $x = array_search($nationality, $xCategories);
                 if (false === $x) {
                     $x = array_search('other', $xCategories);
                 }
@@ -256,7 +257,7 @@ trait StatisticsBuilderTrait
 
         $scatter_categories = range($min_year, $max_year);
 
-        $data_avg_monthly = round(1.0 * $sum_monthly / count($data_monthly), 1);
+        $data_avg_monthly = empty($data_monthly) ? 0 : round(1.0 * $sum_monthly / count($data_monthly), 1);
         $data_avg_yearly = round(1.0 * $sum_yearly / count(array_keys($data_yearly)), 1);
 
         return [
