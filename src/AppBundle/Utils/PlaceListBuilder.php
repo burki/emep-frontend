@@ -181,7 +181,6 @@ extends SearchListBuilder
         };
 
         if (empty($mode)) {
-
             if (empty($routeParams['filter']['search'])) {
                 $routeParams = [
                     'filter' => $this->getQueryFilters(true),
@@ -316,6 +315,16 @@ extends SearchListBuilder
             $queryBuilder->join('IE',
                                 'Person', 'P',
                                 'P.id=IE.id_person AND P.status <> -1');
+        }
+
+        if (array_key_exists('organizer', $this->queryFilters)) {
+            // so we can filter on O.*
+            $queryBuilder->innerJoin('E',
+                                    'ExhibitionLocation', 'EL',
+                                    'EL.id_exhibition=E.id AND ' . $this->buildExhibitionVisibleCondition('E'));
+            $queryBuilder->innerJoin('EL',
+                                    'Location', 'O',
+                                    'EL.id_location=O.id AND EL.role = 0');
         }
 
         return $this;
