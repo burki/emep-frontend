@@ -423,6 +423,16 @@ trait StatisticsBuilderTrait
             }
         }
 
+        if (0 == $min_year && 0 == $max_year) {
+            // all empty
+            return [
+                'subtitle' => json_encode($subtitle),
+                'categories' => json_encode([]),
+                'person_birth' => json_encode([]),
+                'person_death' => json_encode([]),
+            ];
+        }
+
         if ($min_year < 1820) {
             $min_year = 1820;
         }
