@@ -281,10 +281,12 @@ trait StatisticsBuilderTrait
             if (0 == $min_age) {
                 $min_age = (int)$row['age'];
             }
+
             $max_age = $age = (int)$row['age'];
             if (!array_key_exists($age, $ageCount)) {
                 $ageCount[$age] = [];
             }
+
             $ageCount[$age][$row['state']] = $row['how_many'];
         }
 
@@ -296,7 +298,14 @@ trait StatisticsBuilderTrait
 
         $ageCount = & $stats['age_count'];
 
-        $categories = $total = [];
+        $categories = [];
+
+        // init since the following loop might never be run if $stats['min_age'] > 120
+        $total = [
+            'age_living' => [],
+            'age_deceased' => [],
+        ];
+
         for ($age = $stats['min_age']; $age <= $stats['max_age'] && $age < 120; $age++) {
             $categories[] = $age; // 0 == $age % 5 ? $year : '';
 
