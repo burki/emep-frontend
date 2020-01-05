@@ -488,9 +488,14 @@ trait StatisticsBuilderTrait
                 ++$frequency_count[$how_many];
             }
 
-            ksort($frequency_count);
-            $keys = array_keys($frequency_count);
-            $min = $keys[0]; $max = $keys[count($keys) - 1];
+            if (!empty($frequency_count)) {
+                ksort($frequency_count);
+                $keys = array_keys($frequency_count);
+                $min = $keys[0]; $max = $keys[count($keys) - 1];
+            }
+            else {
+                $min = $max = 1; // 1 and not 0 because of log
+            }
 
             $sum = 0;
             for ($i = $min; $i <= $max; $i++) {
