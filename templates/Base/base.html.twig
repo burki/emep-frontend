@@ -176,7 +176,7 @@
 
         {% if gaTracking is not empty %}
         <!-- Global site tag (gtag.js) - Google Analytics -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-122763666-1"></script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{ gaTracking }}"></script>
         <script>
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
