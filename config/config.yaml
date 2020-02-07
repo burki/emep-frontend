@@ -10,8 +10,8 @@ parameters:
     
 framework:
     secret: '%kernel.secret%'
-    # JMS\TranslationBundle\JMSTranslationBundle needs validation
-    # validation: ~
+    # TODO: remove templating
+    # https://stackoverflow.com/a/58380813
     templating:
         engines: ['twig']
         hinclude_default_template: hinclude.html.twig # TODO: move to fragments, but it seems as assetic needs to be replaced before
