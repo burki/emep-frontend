@@ -6,32 +6,52 @@
                     {{ pager.currentPageOffsetStart }} - {{ pager.currentPageOffsetEnd }} of {{ pager.getNbResults() }}
                 </div>
             </div>
+
             <table class="table table-striped">
-            <thead>
-                <tr>
-                    {% set colInfo = [] %}
-                    {% for key,label in listBuilder.buildHeaderRow() %}
-                        {% set sortInfo = listBuilder.sortInfo(key) %}
-                    <th{% if sortInfo is not empty %}{% if sortInfo.active is not empty %} class="{{ sortInfo.active }}"{% else %} class="sorting"{% endif %}{% endif %}>
-                        {% if loop.first %}{% if 'Place' != listBuilder.entity %}<span class="checkmark" data-id="-1" title="Select/Deselect all"></span>{% endif %}{% endif %}
-                        {% set colInfo = colInfo|merge([ listBuilder.getColumnInfo(key) ]) %}
-                        {%- if sortInfo is not empty %}<a href="{{ sortInfo.action }}"{% if sortInfo.active is not empty %} class="{{ sortInfo.active }}"{% else %} class="sorting"{% endif %}>{{ label }}</a>{% else %}
-                            {{ label }}
-                        {% endif -%}
-                    </th>
-                    {% endfor %}
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in pager.currentPageResults %}
+                <thead>
                     <tr>
-                        {% set rowValues = listBuilder.buildRow(row, 'html') %}
-                        {% for val in rowValues %}
-                        <td{% if colInfo[loop.index0].class is not empty %} class="{{ colInfo[loop.index0].class }}"{% endif %}>{% if loop.first %}{% if 'ItemExhibition' != listBuilder.entity and 'Place' != listBuilder.entity %}<span class="checkmark" data-id="{{ row.id }}"></span>{% endif %}{% endif %}{{ val|raw }}</td>
+                        {% set colInfo = [] %}
+                        {% for key,label in listBuilder.buildHeaderRow() %}
+                            {% set sortInfo = listBuilder.sortInfo(key) %}
+                            {% set colInfo = colInfo|merge([ listBuilder.getColumnInfo(key) ]) %}
+                            {% set classes = [] %}
+                            {% if colInfo[loop.index0].hidden is not empty %}
+                                {% set classes = classes|merge(['hidden-' ~ colInfo[loop.index0].hidden ])%}
+                            {% endif %}
+                            {% if sortInfo is not empty %}
+                                {% if sortInfo.active is not empty %}
+                                    {% set classes = classes|merge([ sortInfo.active ]) %}
+                                {% else %}
+                                    {% set classes = classes|merge([ 'sorting' ]) %}
+                                {% endif %}
+                            {% endif %}
+                        <th{% if classes is not empty %} class="{{ classes|join(' ') }}"{% endif %}>
+                            {% if loop.first %}{% if 'ItemExhibition' != listBuilder.entity and 'Place' != listBuilder.entity %}<span class="checkmark" data-id="-1" title="Select/Deselect all"></span>{% endif %}{% endif %}
+                            {%- if sortInfo is not empty %}<a href="{{ sortInfo.action }}"{% if sortInfo.active is not empty %} class="{{ sortInfo.active }}"{% else %} class="sorting"{% endif %}>{{ label }}</a>{% else %}
+                                {{ label }}
+                            {% endif -%}
+                        </th>
                         {% endfor %}
                     </tr>
-                {% endfor %}
-            </tbody>
+                </thead>
+
+                <tbody>
+                    {% for row in pager.currentPageResults %}
+                        <tr>
+                            {% set rowValues = listBuilder.buildRow(row, 'html') %}
+                            {% for val in rowValues %}
+                                {% set classes = [] %}
+                                {% if colInfo[loop.index0].class is not empty %}
+                                    {% set classes = classes|merge([ colInfo[loop.index0].class ]) %}
+                                {% endif %}
+                                {% if colInfo[loop.index0].hidden is not empty %}
+                                    {% set classes = classes|merge(['hidden-' ~ colInfo[loop.index0].hidden ])%}
+                                {% endif %}
+                            <td{% if classes is not empty %} class="{{ classes|join(' ') }}"{% endif %}>{% if loop.first %}{% if 'ItemExhibition' != listBuilder.entity and 'Place' != listBuilder.entity %}<span class="checkmark" data-id="{{ row.id }}"></span>{% endif %}{% endif %}{{ val|raw }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
             </table>
 
             <div class="pagerfanta">{{ pagerfanta(pager, 'twitter_bootstrap3', { 'omitFirstPage': true }) }}</div>

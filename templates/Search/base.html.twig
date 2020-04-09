@@ -274,46 +274,10 @@
         </div>
 
         <div class="listviewrow">
-        {% block content %}
-            {% if pager.currentPageResults is not empty %}
-            <div style="width: 100%; text-align: right;">
-            <div class="count">
-                {{ pager.currentPageOffsetStart }} - {{ pager.currentPageOffsetEnd }} of {{ pager.getNbResults() }}
-            </div>
-            </div>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        {% for key, label in listBuilder.buildHeaderRow() %}
-                            {% set sortInfo = listBuilder.sortInfo(key) %}
-                        <th{% if sortInfo is not empty %}{% if sortInfo.active is not empty %} class="{{ sortInfo.active }}"{% else %} class="sorting"{% endif %}{% endif %}>
-                            {% if loop.first %}{% if 'ItemExhibition' != listBuilder.entity and 'Place' != listBuilder.entity %}<span class="checkmark" data-id="-1" title="Select/Deselect all"></span>{% endif %}{% endif %}
-                            {% if sortInfo is not empty %}
-                                <a href="{{ sortInfo.action }}"{% if sortInfo.active is not empty %} class="{{ sortInfo.active }}"{% else %} class="sorting"{% endif %}>{{ label }}</a>
-                            {% else %}
-                                {{ label }}
-                            {% endif %}
-                        </th>
-                        {% endfor %}
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for row in pager.currentPageResults %}
-                    <tr>
-                        {% set rowValues = listBuilder.buildRow(row, 'html') %}
-                        {% for val in rowValues %}
-                        <td>{% if loop.first %}{% if 'ItemExhibition' != listBuilder.entity and 'Place' != listBuilder.entity %}<span class="checkmark" data-id="{{ row.id }}"></span>{% endif %}{% endif %}{{ val|raw }}</td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-
-            <div class="pagerfanta">{{ pagerfanta(pager, 'twitter_bootstrap3', { 'omitFirstPage': true }) }}</div>
-            {% else %}
-                No matching entry. Please adjust your search.
-            {% endif %}
-        {% endblock %}
+            {% block content %}
+                {% embed "Search/Entity/list.html.twig" %}
+                {% endembed %}
+            {% endblock %}
         </div>
         </div>
     </div>

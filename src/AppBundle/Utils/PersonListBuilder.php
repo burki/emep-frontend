@@ -43,6 +43,7 @@ extends SearchListBuilder
         'birthplace' => [
             'label' => 'Place of Birth',
             'class' => 'normal',
+            'hidden' => 'sm',
         ],
         'deathdate' => [
             'label' => 'Year of Death',
@@ -50,6 +51,7 @@ extends SearchListBuilder
         'deathplace' => [
             'label' => 'Place of Death',
             'class' => 'normal',
+            'hidden' => 'sm',
         ],
         'gender' => [
             'label' => 'Gender',

@@ -49,9 +49,11 @@ extends SearchListBuilder
         ],
         'type' => [
             'label' => 'Type',
+            'hidden' => 'sm',
         ],
         'organizers' => [
             'label' => 'Org. Body',
+            'hidden' => 'sm',
         ],
         'count_itemexhibition' => [
             'label' => '# of Cat. Entries',
