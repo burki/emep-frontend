@@ -47,21 +47,6 @@
                 {% block filters %}
                 <div class="filters-heading"><!--  style="margin-top: 25px;" -->
                     <span style="margin-right: 20px; margin-top: 7px">Filter by:</span>
-                    {#
-                    {% set entityLabels = {
-                        'exhibition': 'Exhibition',
-                        'person': 'Artist',
-                        'catentry': 'Cat. Entry',
-                        'venue': 'Venue',
-                        'organizer': 'Organizing Body'
-                    } %}
-
-                    {% for entity,label in entityLabels %}
-                    <button type="button" class="btn" data-toggle="collapse" data-target="#filter-panel-{{ entity }}">
-                        <span class="glyphicon glyphicon-cog"></span> {{ label }}
-                    </button>
-                    {% endfor %}
-                    #}
                 </div>
 
                 <div class="filter-combination-container">
@@ -69,7 +54,7 @@
                     <div class="filter-panel">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <a data-toggle="collapse" data-target="#filter-panel-exhibition">Exhibition</a>
+                                <a data-toggle="collapse" data-target="#filter-panel-exhibition" href="#">Exhibition</a>
                             </div>
                             <div id="filter-panel-exhibition" class="panel-body collapse">
                                 {{ form_row(form.exhibition.date) }}
@@ -83,7 +68,7 @@
                     <div class="filter-panel">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <a data-toggle="collapse" data-target="#filter-panel-person">Artist</a>
+                                <a data-toggle="collapse" data-target="#filter-panel-person" href="#">Artist</a>
                             </div>
                             <div id="filter-panel-person" class="panel-body collapse">
                                 {{ form_row(form.person.gender) }}
@@ -98,7 +83,7 @@
                     <div class="filter-panel">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <a data-toggle="collapse" data-target="#filter-panel-catentry">Catalogue Entry</a>
+                                <a data-toggle="collapse" data-target="#filter-panel-catentry" href="#">Catalogue Entry</a>
                             </div>
                             <div id="filter-panel-catentry" class="panel-body collapse ">
                                 {{ form_row(form.catentry.type) }}
@@ -111,7 +96,7 @@
                     <div class=" filter-panel">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <a data-toggle="collapse" data-target="#filter-panel-venue">Venue</a>
+                                <a data-toggle="collapse" data-target="#filter-panel-venue" href="#">Venue</a>
                             </div>
                             <div id="filter-panel-venue" class="panel-body collapse">
                                 {{ form_row(form.location.geoname) }}
@@ -123,7 +108,7 @@
                     <div class="filter-panel">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <a data-toggle="collapse" data-target="#filter-panel-organizer">Organizing Body</a>
+                                <a data-toggle="collapse" data-target="#filter-panel-organizer" href="#">Organizing Body</a>
                             </div>
                             <div id="filter-panel-organizer"  class="panel-body collapse">
                                 {{ form_row(form.organizer.geoname) }}
