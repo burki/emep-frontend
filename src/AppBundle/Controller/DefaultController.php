@@ -110,6 +110,9 @@ extends Controller
             'counts' => $counts,
             'posts' => $posts,
             'hasMore' => $hasMore,
+            'pageMeta' => [
+                'description' => 'This open-access database enables detailed researches into info extracted from exhibition catalogues. It covers as comprehensively as possible the European Continent for the years between 1905 and 1915 – a crucial moment in the history of Avant-gardes.',
+            ],
         ]);
     }
 }

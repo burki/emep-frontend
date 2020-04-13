@@ -3,7 +3,7 @@
 {% block body %}
     <div class="container-6 w-container">
         <div class="main-stats-container">
-            <h1 class="heading-2">Browse</h1>
+            <h2 class="heading-2">Browse</h2>
             <div class="div-block-6">
                 <div class="main-stats-single-container"><a href="{{ path('exhibition-index') }}" class="list-link-menu">Exhibitions</a>
                     <div class="main-stat-number">{{ counts['Exhibition'] }} Exhibitions</div>
@@ -31,7 +31,7 @@
         </div>
 
         {% if posts is not empty %}
-        <h1 class="heading-2">Latest Blog Posts</h1>
+        <h2 class="heading-2">Latest Blog Posts</h2>
         <div class="blog-posts-container">
             {% for post in posts %}
                 <a href="{{ path('blog', { 'slug': post['slug'] }) }}" class="blog-post-single-container">
