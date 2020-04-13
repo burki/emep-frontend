@@ -86,7 +86,7 @@ extends SearchListBuilder
                 'holder_id' => [
                     'label' => 'ID',
                 ],
-                'name' => [
+                'holder_name' => [
                     'label' => 'Name',
                 ],
                 'place' => [
