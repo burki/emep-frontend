@@ -503,6 +503,9 @@ extends CrudController
                 $catalogue->buildInfoFull($em, $citeProc);
             }
         }
+        if (count($catalogues)) {
+            $exhibition->setSubjectOf($catalogues);
+        }
 
         // for traveling, find related
         $relatedExhibitions = $exhibition->isTraveling()

@@ -294,6 +294,12 @@ implements JsonLdSerializable
      */
     protected $artists;
 
+    /**
+     * Used to set catalogues found by $this->findBibitem($em)
+     * before calling $this->jsonLdSerialize()
+     */
+    protected $subjectOf;
+
     public static function stripTime($datetime)
     {
         if (is_null($datetime)) {
@@ -580,6 +586,20 @@ implements JsonLdSerializable
         return $results;
     }
 
+    /**
+     * Sets subjectOf.
+     *
+     * @param ArrayCollection $subjectOf
+     *
+     * @return $this
+     */
+    public function setSubjectOf($subjectOf)
+    {
+        $this->subjectOf = $subjectOf;
+
+        return $this;
+    }
+
     public function isSortedByPerson()
     {
         return 0 <> ($this->flags & self::FLAGS_CATIDBYARTIST);
@@ -695,6 +715,16 @@ implements JsonLdSerializable
             if (!empty($this->$property)) {
                 $ret[$property] = $this->$property;
             }
+        }
+
+        if (!empty($this->subjectOf)) {
+            $subjectOf = [];
+            foreach ($this->subjectOf as $bibitem) {
+                $subjectOf[] = $bibitem->jsonLdSerialize($locale, true);
+            }
+
+            $ret['subjectOf'] = count($subjectOf) > 1
+                ? $subjectOf : $subjectOf[0];
         }
 
         return $ret;

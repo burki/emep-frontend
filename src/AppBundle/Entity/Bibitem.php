@@ -31,7 +31,7 @@ class Bibitem
 implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSerializable */
 {
     use InfoTrait;
-    
+
     /**
      * Build a list of normalized ISBNs of the book.
      *
@@ -242,6 +242,13 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
      * *ORM\Column(type="string", nullable=true)
      */
     protected $issn;
+
+    /**
+     * @var string The oclc id(s) of the book
+     *
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $oclc;
 
     /**
      * @var string The title of the item.
@@ -1140,7 +1147,6 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
                     $data[$key][] = $targetEntry;
                 }
             }
-
         }
         // var_dump($data);
 
@@ -1202,12 +1208,13 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
             if (!empty($this->volume)) {
                 $ret['issueNumber'] = $this->volume;
             }
+
             $parent = clone $this;
             $parent->setItemType('journal');
             $ret['isPartOf'] = $parent->jsonLdSerialize($parent);
         }
         else {
-            $ret['name'] = $this->name;
+            $ret['name'] = $this->getName();
         }
 
         if ($omitContext) {
@@ -1325,10 +1332,8 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
                 }
             }
 
-            if (!empty($this->publisher)) {
-                $publisher = new Organization();
-                $publisher->setName($this->publisher);
-                $ret['publisher'] = $publisher->jsonLdSerialize($locale, true);
+            if (!is_null($this->publisher)) {
+                $ret['publisher'] = $this->publisher->jsonLdSerialize($locale, true);
                 if (!empty($this->publicationLocation)) {
                     $location = new Place();
                     $location->setName($this->publicationLocation);
@@ -1341,6 +1346,17 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
             && !in_array($type, [ 'ScholarlyArticle', 'Chapter', 'Periodical' ]))
         {
             $ret['datePublished'] = \AppBundle\Utils\JsonLd::formatDate8601($this->datePublished);
+        }
+
+        if (!empty($this->oclc)) {
+            $workExamples = [];
+            foreach (preg_split('/\s*,\s*/', $this->oclc) as $id) {
+                $workExamples[] = sprintf('http://www.worldcat.org/oclc/%s', $id);
+            }
+
+            if (!empty($workExamples)) {
+                $ret['workExample'] = $workExamples;
+            }
         }
 
         return $ret;

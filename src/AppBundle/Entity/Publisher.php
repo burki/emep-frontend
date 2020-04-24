@@ -47,12 +47,14 @@ implements \JsonSerializable, JsonLdSerializable
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
+
     /**
      * @var integer
      *
      * @ORM\Column(type="integer", nullable=false)
      */
     protected $status = 0;
+
     /**
      * @var string The name of the item.
      *
@@ -60,6 +62,7 @@ implements \JsonSerializable, JsonLdSerializable
      * @ORM\Column(nullable=true)
      */
     protected $name;
+
     /**
      * @var string URL of the item.
      *
@@ -73,7 +76,6 @@ implements \JsonSerializable, JsonLdSerializable
      * *ORM\Column(type="string", length=32, nullable=true)
      */
     protected $gnd;
-
 
     /**
      * @var \DateTime
@@ -161,6 +163,16 @@ implements \JsonSerializable, JsonLdSerializable
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Gets localized name.
+     *
+     * @return string
+     */
+    public function getNameLocalized($locale)
+    {
+        return $this->getName();
     }
 
     /**
