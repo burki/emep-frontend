@@ -10,6 +10,7 @@ parameters:
     database.cache_driver: ~ # set to apcu, memcached or redis depending on your setup
 
     mailer.transport: 'sendmail'
+    # if you don't have sendmail configured, you can use a smtp-host instead
     # mailer.transport: 'smtp'
     mailer.host: ~
     mailer.port: ~

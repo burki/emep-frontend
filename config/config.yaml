@@ -131,7 +131,7 @@ stof_doctrine_extensions:
     orm:
         default:
             timestampable: true
-   
+
 assetic:
     debug:          '%kernel.debug%'
     use_controller: '%kernel.debug%'
@@ -145,7 +145,7 @@ assetic:
         # see http://symfony.com/doc/current/cookbook/assetic/php.html
         scssphp:
             formatter: 'Leafo\ScssPhp\Formatter\Compressed'
-                        
+
 swiftmailer:
     # disable_delivery:  true
     # delivery_address: daniel.burckhardt@sur-gmbh.ch
