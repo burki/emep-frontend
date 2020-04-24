@@ -116,6 +116,7 @@ extends CrudController
     }
 
     /**
+     * @Route("/holder/{id}.jsonld", requirements={"id" = "\d+"}, name="holder-jsonld")
      * @Route("/holder/{id}", requirements={"id" = "\d+"}, name="holder")
      */
     public function detailAction(Request $request, $id = null, $ulan = null, $gnd = null)

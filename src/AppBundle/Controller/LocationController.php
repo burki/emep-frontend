@@ -303,7 +303,9 @@ extends CrudController
     }
 
     /**
+     * @Route("/location/{id}.jsonld", requirements={"id" = "\d+"}, name="location-jsonld")
      * @Route("/location/{id}", requirements={"id" = "\d+"}, name="location")
+     * @Route("/organizer/{id}.jsonld", requirements={"id" = "\d+"}, name="organizer-lsonld")
      * @Route("/organizer/{id}", requirements={"id" = "\d+"}, name="organizer")
      */
     public function detailAction(Request $request, $id = null, $ulan = null, $gnd = null)
@@ -323,12 +325,12 @@ extends CrudController
         }
 
         $locale = $request->getLocale();
-        if (in_array($request->get('_route'), [ 'location-jsonld' ])) {
+        if (in_array($request->get('_route'), [ 'location-jsonld', 'organizer-jsonld' ])) {
             return new JsonLdResponse($location->jsonLdSerialize($locale));
         }
 
         $location->setDateModified(\AppBundle\Utils\LocationListBuilder::fetchDateModified($this->getDoctrine()->getConnection(), $location->getId()));
-  
+
         $exhibitionIds = $this->getExhibitionIds($location);
 
         $artists = $this->getArtistsByExhibitionIds($exhibitionIds);

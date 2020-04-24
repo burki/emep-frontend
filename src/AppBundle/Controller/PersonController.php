@@ -385,8 +385,11 @@ extends CrudController
     }
 
     /**
+     * @Route("/person/ulan/{ulan}.jsonld", requirements={"ulan"="[0-9]+"}, name="person-by-ulan-jsonld")
      * @Route("/person/ulan/{ulan}", requirements={"ulan"="[0-9]+"}, name="person-by-ulan")
+     * @Route("/person/gnd/{gnd}.jsonld", requirements={"gnd"="[0-9xX]+"}, name="person-by-gnd-jsonld")
      * @Route("/person/gnd/{gnd}", requirements={"gnd"="[0-9xX]+"}, name="person-by-gnd")
+     * @Route("/person/{id}.jsonld", name="person-jsonld", requirements={"id"="\d+"})
      * @Route("/person/{id}", name="person", requirements={"id"="\d+"})
      */
     public function detailAction(Request $request, $id = null, $ulan = null, $gnd = null)

@@ -448,6 +448,7 @@ extends CrudController
 
 
     /**
+     * @Route("/exhibition/{id}.jsonld", name="exhibition-jsonld")
      * @Route("/exhibition/{id}", requirements={"id" = "\d+"}, name="exhibition")
      */
     public function detailAction(Request $request, UrlGeneratorInterface $urlGenerator, $id, $itemexhibitionId = null)
@@ -464,11 +465,6 @@ extends CrudController
 
         if (!isset($exhibition) || !$exhibition->checkStatus(-1)) {
             return $this->redirectToRoute('exhibition-index');
-        }
-
-        $locale = $request->getLocale();
-        if (in_array($request->get('_route'), [ 'exhibition-jsonld' ])) {
-            return new JsonLdResponse($person->jsonLdSerialize($locale));
         }
 
         $citeProc = $this->instantiateCiteProc($request->getLocale());
@@ -507,6 +503,10 @@ extends CrudController
             $exhibition->setSubjectOf($catalogues);
         }
 
+        if (in_array($request->get('_route'), [ 'exhibition-jsonld' ])) {
+            return new JsonLdResponse($exhibition->jsonLdSerialize($request->getLocale()));
+        }
+
         // for traveling, find related
         $relatedExhibitions = $exhibition->isTraveling()
             ? $this->lookupExhibitionGroup($em, $exhibition)
@@ -540,7 +540,7 @@ extends CrudController
                     [ 'id' => $exhibition->id ],
                     UrlGeneratorInterface::ABSOLUTE_URL
                 ),
-                'jsonLd' => $exhibition->jsonLdSerialize($locale),
+                'jsonLd' => $exhibition->jsonLdSerialize($request->getLocale()),
                 /*
                 'og' => $this->buildOg($exhibition, $routeName, $routeParams),
                 'twitter' => $this->buildTwitter($exhibition, $routeName, $routeParams),

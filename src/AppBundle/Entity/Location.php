@@ -755,7 +755,7 @@ implements \JsonSerializable, JsonLdSerializable
 
             if ('founding' == $lifespan) {
                 $property = $lifespan . 'Location';
-                if (!is_null($this->$property)) {
+                if (property_exists($this, $property) && !is_null($this->$property)) {
                     $ret[$property] = $this->$property->jsonLdSerialize($locale, true);
                 }
             }

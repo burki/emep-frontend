@@ -1236,8 +1236,19 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
             $ret['gender'] = $genderMap[$this->gender];
         }
 
+        $sameAs = [];
+        if (!empty($this->ulan)) {
+            $sameAs[] = 'http://vocab.getty.edu/ulan/' . $this->ulan;
+        }
         if (!empty($this->gnd)) {
-            $ret['sameAs'] = 'http://d-nb.info/gnd/' . $this->gnd;
+            $sameAs[] = 'http://d-nb.info/gnd/' . $this->gnd;
+        }
+        if (!empty($this->wikidata)) {
+            $sameAs[] = 'http://www.wikidata.org/entity/' . $this->wikidata;
+        }
+
+        if (count($sameAs) > 0) {
+            $ret['sameAs'] = (1 == count($sameAs)) ? $sameAs[0] : $sameAs;
         }
 
         return $ret;

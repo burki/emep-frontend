@@ -129,7 +129,9 @@ extends CrudController
     }
 
     /**
+     * @Route("/place/{id}.jsonld", name="place-jsonld")
      * @Route("/place/{id}", requirements={"id" = "\d+"}, name="place")
+     * @Route("/place/tgn/{tgn}.jsonld", name="place-by-tgn-jsonld")
      * @Route("/place/tgn/{tgn}", requirements={"tgn" = "\d+"}, name="place-by-tgn")
      */
     public function detailAction(Request $request, $id = null, $tgn = null)
@@ -151,7 +153,7 @@ extends CrudController
         $locale = $request->getLocale();
 
         if (in_array($request->get('_route'), [ 'place-jsonld', 'place-by-tgn-jsonld' ])) {
-            return new JsonLdResponse($place->jsonLdSerialize($locale));
+            return new JsonLdResponse($place->jsonLdSerialize($locale, false, $this->getDoctrine()->getManager()));
         }
 
         $place->setDateModified(\AppBundle\Utils\PlaceListBuilder::fetchDateModified($this->getDoctrine()->getConnection(), $place->getTgn()));
@@ -217,7 +219,8 @@ extends CrudController
 
             // meta
             'pageMeta' => [
-                'jsonLd' => $place->jsonLdSerialize($locale),
+                'jsonLd' => $place->jsonLdSerialize($locale, false,
+                                                    $this->getDoctrine()->getManager()),
             ],
         ]);
     }

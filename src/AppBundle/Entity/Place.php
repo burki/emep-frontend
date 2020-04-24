@@ -324,6 +324,7 @@ implements \JsonSerializable, JsonLdSerializable
             if ($ancestorOrSelf->type == 'inhabited places') {
                 return true;
             }
+
             $ancestorOrSelf = $ancestorOrSelf->getParent($em);
         }
 
@@ -582,6 +583,7 @@ implements \JsonSerializable, JsonLdSerializable
             $path[] = $parent;
             $parent = $parent->getParent($em);
         }
+
         return array_reverse($path);
     }
 
@@ -636,12 +638,11 @@ implements \JsonSerializable, JsonLdSerializable
             unset($ret['@context']);
         }
 
-        if (!(empty($this->geo) || false === strpos($this->geo, ','))) {
-            list($lat, $long) = explode(',', $this->geo, 2);
+        if (!empty($this->latitude) && !empty($this->longitude)) {
             $ret['geo'] = [
                 '@type' => 'GeoCoordinates',
-                'latitude' =>  $lat,
-                'longitude' => $long,
+                'latitude' =>  $this->latitude,
+                'longitude' => $this->longitude,
             ];
         }
 
