@@ -13,7 +13,7 @@
 
         {% if pageMeta is defined %}
             {% if pageMeta.description is defined %}
-            <meta property="description" content="{{ pageMeta.description }}">
+            <meta name="description" content="{{ pageMeta.description }}">
             {% endif %}
             {% if pageMeta.og is defined %}
                 {% for prop, val in pageMeta.og %}
@@ -25,7 +25,7 @@
         <meta property="{{ prop }}" content="{{ val }}">
         {% if prop == 'og:description' and pageMeta.description is not defined %}
         {# duplicate tag #}
-        <meta property="description" content="{{ val }}">
+        <meta name="description" content="{{ val }}">
         {% endif %}
                     {% endif %}
                 {% endfor %}
