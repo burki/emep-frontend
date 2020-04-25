@@ -621,51 +621,72 @@ extends CrudController
 
     public function detailDataNumberOfWorksPerType($catalogueEntries)
     {
-        $works = [];
+        $entriesPerType = [];
 
         foreach ($catalogueEntries as $catalogueEntry) {
             $currExhibition = $catalogueEntry[0]->exhibition;
 
             foreach ($catalogueEntry as $entry) {
                 if ($entry->type) {
-                    $currType = $entry->type->getName();
-                    $works[] = $currType == '0_unknown' ? 'unknown' : $currType;
+                    $id = $entry->type->getId();
+                    if (!array_key_exists($id, $entriesPerType)) {
+                        $name = $entry->type->getName();
+                        $entriesPerType[$id] = [
+                            'name' => $name == '0_unknown' ? 'unknown' : $name,
+                            'count' => 0,
+                        ];
+                    }
+
+                    ++$entriesPerType[$id]['count'];
                 }
             }
         }
 
-        $worksTotalPerType = array_count_values($works);
-        arsort($worksTotalPerType);
+        uasort($entriesPerType, function($a, $b) {
+            return $b['count'] <=> $a['count'];
+        });
 
-        $sumOfAllWorks = array_sum(array_values($worksTotalPerType));
+        $sumOfAllEntries = 0;
 
-        $finalData = array_map(function ($key) use ($worksTotalPerType) {
-                return [ 'name' => $key, 'y' => (int)$worksTotalPerType[$key]];
+        $finalData = array_map(function ($id) use ($entriesPerType, &$sumOfAllEntries) {
+                $entry = $entriesPerType[$id];
+
+                $count = (int)$entry['count'];
+
+                $sumOfAllEntries += $count;
+
+                return [
+                    'name' => $entry['name'],
+                    'y' => $count,
+                    'id' => $id,
+                ];
             },
-            array_keys($worksTotalPerType));
+            array_keys($entriesPerType));
 
-        return [ json_encode($finalData), $sumOfAllWorks ];
+        return [ json_encode($finalData), $sumOfAllEntries ];
     }
 
     public function detailDataNumberOfWorksPerYear($catalogueEntriesByExhibition)
     {
-        $works = [];
+        $entriesPerYear = [];
 
         foreach ($catalogueEntriesByExhibition as $catalogueEntries) {
             $currExhibition = $catalogueEntries[0]->exhibition;
 
             $currExhibitionYear = $currExhibition->getStartYear();
             if (!is_null($currExhibitionYear)) {
-                // very inefficient
+                if (!array_key_exists($currExhibitionYear, $entriesPerYear)) {
+                    $entriesPerYear[$currExhibitionYear] = 0;
+                }
+                // rather inefficient
                 foreach ($catalogueEntries as $entry) {
-                    $works[] = $currExhibitionYear;
+                    ++$entriesPerYear[$currExhibitionYear];
                 }
             }
         }
 
-        $worksTotalPerYear = array_count_values($works);
 
-        $yearsArray = array_keys($worksTotalPerYear);
+        $yearsArray = array_keys($entriesPerYear);
 
         if (!empty($yearsArray)) {
             $min = min($yearsArray);
@@ -680,12 +701,12 @@ extends CrudController
 
         // create an array without any year gaps inbetween
         for ($i = $min; $i <= $max; $i++) {
-            $arrayWithoutGaps[(string)$i] = array_key_exists($i, $worksTotalPerYear) ? $worksTotalPerYear[$i] : 0;
+            $arrayWithoutGaps[(string)$i] = array_key_exists($i, $entriesPerYear) ? $entriesPerYear[$i] : 0;
         }
 
         $yearsOnly = json_encode(array_keys($arrayWithoutGaps));
         $valuesOnly = json_encode(array_values($arrayWithoutGaps));
-        $sumOfAllExhibitions = array_sum(array_values($worksTotalPerYear));
+        $sumOfAllExhibitions = array_sum(array_values($entriesPerYear));
         $yearActive = $max - $min + 1;
 
         $averagePerYear = round($sumOfAllExhibitions / $yearActive, 1);
@@ -700,27 +721,47 @@ extends CrudController
         foreach ($person->getExhibitions(-1) as $exhibition) {
             $venue = $exhibition->getLocation();
             if (is_null($venue)) {
+                $id = '';
                 $name = '[unknown]';
             }
             else {
+                $id = $venue->getId();
                 $name = $venue->getNameListing();
                 $place = $venue->getPlace();
                 if (!is_null($place)) {
                     $name .= ', ' . $place->getNameLocalized();
                 }
             }
-            $exhibitionVenues[] = $name;
+
+            if (!array_key_exists($id, $exhibitionVenues)) {
+                $exhibitionVenues[$id] = [
+                    'name' => $name,
+                    'count' => 0,
+                ];
+            }
+
+            ++$exhibitionVenues[$id]['count'];
         }
 
-        $exhibitionVenuesTotal = array_count_values($exhibitionVenues);
-        arsort($exhibitionVenuesTotal);
+        uasort($exhibitionVenues, function($a, $b) {
+            return $b['count'] <=> $a['count'];
+        });
 
-        $finalData = array_map(function ($key) use ($exhibitionVenuesTotal) {
-                return [ 'name' => $key, 'y' => (int)$exhibitionVenuesTotal[$key]];
+        $sumOfAllExhibitions = 0;
+        $finalData = array_map(function ($id) use ($exhibitionVenues, &$sumOfAllExhibitions) {
+                $venue = $exhibitionVenues[$id];
+
+                $count = (int)$venue['count'];
+
+                $sumOfAllExhibitions += $count;
+
+                return [
+                    'name' => $venue['name'],
+                    'y' => $count,
+                    'id' => $id,
+                ];
             },
-            array_keys($exhibitionVenuesTotal));
-
-        $sumOfAllExhibitions = array_sum(array_values($exhibitionVenuesTotal));
+            array_keys($exhibitionVenues));
 
         return [ json_encode($finalData), $sumOfAllExhibitions ];
     }
@@ -748,7 +789,11 @@ extends CrudController
 
         $finalData = array_map(function ($key) use ($exhibitionPlacesByCountryTotal) {
                 $name = $this->expandCountryCode($key);
-                return [ 'name' => $name, 'y' => (int)$exhibitionPlacesByCountryTotal[$key]];
+                return [
+                    'name' => $name,
+                    'y' => (int)$exhibitionPlacesByCountryTotal[$key],
+                    'id' => 'cc:' . $key,
+                ];
             },
             array_keys($exhibitionPlacesByCountryTotal));
 
@@ -767,20 +812,43 @@ extends CrudController
                 continue;
             }
 
-            $exhibitionPlaces[] = $location->getPlaceLabel();
+            $key = $location->getPlaceLabel();
+            if (!array_key_exists($key, $exhibitionPlaces)) {
+                $exhibitionPlaces[$key] = [
+                    'name' => $key,
+                    'count' => 0,
+                ];
+            }
+
+            ++$exhibitionPlaces[$key]['count'];
+            if (!array_key_exists('id', $exhibitionPlaces[$key])) {
+                $place = $location->getPlace();
+                if (!is_null($place)) {
+                    $exhibitionPlaces[$key]['id'] = 'tgn:' . $place->getTgn();
+                }
+            }
         }
 
-        $exhibitionPlacesTotal = array_count_values($exhibitionPlaces);
-        arsort($exhibitionPlacesTotal);
+        uasort($exhibitionPlaces, function($a, $b) {
+            return $b['count'] <=> $a['count'];
+        });
 
-        $finalData = array_map(function ($key) use ($exhibitionPlacesTotal) {
-                return [ 'name' => $key, 'y' => (int)$exhibitionPlacesTotal[$key]];
+        $sumOfAllExhibitions = 0;
+        $finalData = array_map(function ($key) use ($exhibitionPlaces, &$sumOfAllExhibitions) {
+                $place = $exhibitionPlaces[$key];
+                $count = (int)$place['count'];
+
+                $sumOfAllExhibitions += $count;
+
+                return [
+                    'name' => $place['name'],
+                    'y' => $count,
+                    'id' => isset($place['id']) ? $place['id'] : '',
+                ];
             },
-            array_keys($exhibitionPlacesTotal));
+            array_keys($exhibitionPlaces));
 
-        $sumOfAllExhibitions = array_sum(array_values($exhibitionPlacesTotal));
-
-        return [ json_encode($finalData), $sumOfAllExhibitions, count(array_keys($exhibitionPlacesTotal)) ];
+        return [ json_encode($finalData), $sumOfAllExhibitions, count(array_keys($exhibitionPlaces)) ];
     }
 
     public function detailDataNumberOfExhibitionsPerYear($person)

@@ -42,10 +42,23 @@
                     name: 'Number of Exhibitions',
                     type: 'column',
                     data: {{ dataNumberOfExhibitionsPerYear[1]|raw }}
-                }]
+                }],
+                plotOptions: {
+                    series: {
+                        events: {
+                            click: function (event) {
+                                var url = '{{ path('search-index', { 'entity': 'Exhibition' }) }}';
+                                url += '&filter[person][person][]={{ person.id }}';
+                                url += '&filter[exhibition][date][from]=' + encodeURIComponent(event.point.category) + '&filter[exhibition][date][until]=' + encodeURIComponent(event.point.category);
+
+                                window.open(url);
+                            }
+                        }
+                    }
+                }
             });
 
-            $('#container-exhibitions-city-bar').highcharts({
+            $('#container-exhibitions-city-pie').highcharts({
                 chart: {
                     plotBackgroundColor: null,
                         plotBorderWidth: null,
@@ -58,16 +71,31 @@
                 tooltip: {
                     pointFormat: '{point.y} Exhibitions (<b>{point.percentage:.1f}%</b>)'
                 },
-                plotOptions: {
-                    pie: {
-                    }
-                },
                 series: [{
                     name: 'Number of Exhibitions',
                     type: 'pie',
                     innerSize: '50%',
                     data: {{ dataNumberOfExhibitionsPerCity[0]|raw }}
                 }],
+                plotOptions: {
+                    pie: {
+                    },
+                    series: {
+                        events: {
+                            click: function (event) {
+                                var geoname = event.point.id;
+                                if (geoname) {
+
+                                    var url = '{{ path('search-index', { 'entity': 'Exhibition' }) }}';
+                                    url += '&filter[person][person][]={{ person.id }}';
+                                    url += '&filter[location][geoname][]=' + encodeURIComponent(geoname);
+
+                                    window.open(url);
+                                }
+                            }
+                        }
+                    }
+                },
                 exporting: {
                     csv: {
                         {{ highcharts.pieChartCategoryHeader('City') }}
@@ -88,16 +116,31 @@
                 tooltip: {
                     pointFormat: '{point.y} Exhibitions (<b>{point.percentage:.1f}%</b>)'
                 },
-                plotOptions: {
-                    pie: {
-                    }
-                },
                 series: [{
                     name: 'Number of Exhibitions',
                     type: 'pie',
                     innerSize: '50%',
                     data: {{ dataNumberOfExhibitionsPerCountry[0]|raw }}
                 }],
+                plotOptions: {
+                    pie: {
+                    },
+                    series: {
+                        events: {
+                            click: function (event) {
+                                var countryCode = event.point.id;
+                                if (countryCode) {
+
+                                    var url = '{{ path('search-index', { 'entity': 'Exhibition' }) }}';
+                                    url += '&filter[person][person][]={{ person.id }}';
+                                    url += '&filter[location][geoname][]=' + encodeURIComponent(countryCode);
+
+                                    window.open(url);
+                                }
+                            }
+                        }
+                    }
+                },
                 exporting: {
                     csv: {
                         {{ highcharts.pieChartCategoryHeader('Country') }}
@@ -142,7 +185,20 @@
                     name: 'Number of Catalogue Entries',
                     type: 'column',
                     data: {{ dataNumberOfWorksPerYear[1]|raw }}
-                }]
+                }],
+                plotOptions: {
+                    series: {
+                        events: {
+                            click: function (event) {
+                                var url = '{{ path('search-index', { 'entity': 'ItemExhibition' }) }}';
+                                url += '&filter[person][person][]={{ person.id }}';
+                                url += '&filter[exhibition][date][from]=' + encodeURIComponent(event.point.category) + '&filter[exhibition][date][until]=' + encodeURIComponent(event.point.category);
+
+                                window.open(url);
+                            }
+                        }
+                    }
+                }
             });
 
             $('#container-works-by-type').highcharts({
@@ -158,16 +214,31 @@
                 tooltip: {
                     pointFormat: '{point.y} catalogue entries (<b>{point.percentage:.1f}%</b>)'
                 },
-                plotOptions: {
-                    pie: {
-                    }
-                },
                 series: [{
                     name: 'Catalogue Entries',
                     type: 'pie',
                     innerSize: '50%',
                     data: {{ dataNumberOfWorksPerType[0]|raw }}
                 }],
+                plotOptions: {
+                    pie: {
+                    },
+                    series: {
+                        events: {
+                            click: function (event) {
+                                var id = event.point.id;
+                                if (id) {
+
+                                    var url = '{{ path('search-index', { 'entity': 'ItemExhibition' }) }}';
+                                    url += '&filter[person][person][]={{ person.id }}';
+                                    url += '&filter[catentry][type][]=' + encodeURIComponent(id);
+
+                                    window.open(url);
+                                }
+                            }
+                        }
+                    }
+                },
                 exporting: {
                     csv: {
                         {{ highcharts.pieChartCategoryHeader('Type') }}
@@ -188,16 +259,30 @@
                 tooltip: {
                     pointFormat: '{point.y} exhibitions (<b>{point.percentage:.1f}%</b>)'
                 },
-                plotOptions: {
-                    pie: {
-                    }
-                },
                 series: [{
                     name: 'Number of Exhibitions',
                     type: 'pie',
                     innerSize: '50%',
                     data: {{ dataNumberOfExhibitionsPerVenue[0]|raw }}
                 }],
+                plotOptions: {
+                    pie: {
+                    },
+                    series: {
+                        events: {
+                            click: function (event) {
+                                var locationId = event.point.id;
+                                if (locationId) {
+                                    var url = '{{ path('search-index', { 'entity': 'Exhibition' }) }}';
+                                    url += '&filter[person][person][]={{ person.id }}';
+                                    url += '&filter[location][location][]=' + encodeURIComponent(locationId);
+
+                                    window.open(url);
+                                }
+                            }
+                        }
+                    }
+                },
                 exporting: {
                     csv: {
                         {{ highcharts.pieChartCategoryHeader('Type') }}
@@ -212,9 +297,9 @@
 
     <h3 class="chart-header" data-collapse="container-exhibitions-by-venue"><span class="chartsymbol">+</span>Exhibitions by Venue<span class="charttypeTitle">(Pie Chart)</span></h3>
     <div class="collapse" id="container-exhibitions-by-venue" style="width: 100%; height: 400px; margin: 0 auto;"></div>
-    
-    <h3 class="chart-header" data-collapse="container-exhibitions-city-bar"><span class="chartsymbol">+</span>Exhibitions by City<span class="charttypeTitle">(Pie Chart)</span></h3>
-    <div class="collapse" id="container-exhibitions-city-bar" style="width: 100%; height: 400px; margin: 0 auto;"></div>
+
+    <h3 class="chart-header" data-collapse="container-exhibitions-city-pie"><span class="chartsymbol">+</span>Exhibitions by City<span class="charttypeTitle">(Pie Chart)</span></h3>
+    <div class="collapse" id="container-exhibitions-city-pie" style="width: 100%; height: 400px; margin: 0 auto;"></div>
 
     <h3 class="chart-header" data-collapse="container-exhibitions-country-pie"><span class="chartsymbol">+</span>Exhibitions by Country<span class="charttypeTitle">(Pie Chart)</span></h3>
     <div class="collapse" id="container-exhibitions-country-pie" style="width: 100%; height: 400px; margin: 0 auto;"></div>
