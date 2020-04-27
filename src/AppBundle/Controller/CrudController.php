@@ -240,11 +240,27 @@ extends Controller
         return $geonames;
     }
 
-    protected function assoc2NameYArray($keyValue) {
+    protected function assoc2NameYArray($keyValue)
+    {
         $ret = [];
 
         foreach ($keyValue as $key => $value) {
             $ret[] = [ 'name' => $key, 'y' => (float)$value ];
+        }
+
+        return $ret;
+    }
+
+    protected function assoc2IdNameYArray($idDescr)
+    {
+        $ret = [];
+
+        foreach ($idDescr as $id => $descr) {
+            $ret[] = [
+                'name' => $descr['name'],
+                'y' => (float)$descr['count'],
+                'id' => $id,
+            ];
         }
 
         return $ret;

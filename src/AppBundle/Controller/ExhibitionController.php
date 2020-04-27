@@ -773,6 +773,7 @@ extends CrudController
 
                 ++$countByTgn[$tgn];
             }
+
             if (!$found) {
                 ++$countUnknown;
             }
@@ -812,15 +813,19 @@ extends CrudController
         // types of work
         $stats = $this->itemExhibitionTypeDistribution($em, $exhibition->getId());
         $data = [];
-        foreach ($stats['types'] as $type => $count) {
+        foreach ($stats['types'] as $id => $descr) {
+            $count = $descr['count'];
             $percentage = 100.0 * $count / $stats['total'];
             $dataEntry = [
-                'name' => $type,
+                'name' => $descr['name'],
                 'y' => (int)$count,
+                'id' => $id,
             ];
+
             if ($percentage < 5) {
                 $dataEntry['dataLabels'] = [ 'enabled' => false ];
             }
+
             $data[] = $dataEntry;
         }
 
@@ -829,7 +834,7 @@ extends CrudController
             'container' => 'container-type',
             'total' => $stats['total'],
             'data' => json_encode($data),
-            'exhibitionId' => $exhibition->getId()
+            'exhibitionId' => $exhibition->getId(),
         ]);
 
         // cat. entries by nationality of participating artists
@@ -842,12 +847,15 @@ extends CrudController
             $dataEntry = [
                 'name' => $counts['label'],
                 'y' => (int)$count,
+                'id' => $nationality,
                 'artists' => $counts['countArtists'],
                 'itemExhibition' => $counts['countItemExhibition'],
             ];
+
             if ($percentage < 5) {
                 $dataEntry['dataLabels'] = [ 'enabled' => false ];
             }
+
             $data[] = $dataEntry;
         }
 
@@ -857,6 +865,7 @@ extends CrudController
             'totalArtists' => $stats['totalArtists'],
             'totalItemExhibition' => $stats['totalItemExhibition'],
             'data' => json_encode($data),
+            'exhibitionId' => $exhibition->getId(),
         ]);
 
         return [
@@ -946,7 +955,6 @@ EOT;
     {
         $dbconn = $em->getConnection();
 
-
         $where = sprintf(' WHERE ItemExhibition.id_exhibition=%d',
                          intval($exhibitionId));
 
@@ -961,10 +969,15 @@ EOT;
         $total = 0;
         $stats = [];
         while ($row = $stmt->fetch()) {
-            $label = preg_match('/unknown/', $row['name'])
+            $name = preg_match('/unknown/', $row['name'])
                 ? 'unknown'
                 : $row['name'];
-            $stats[$label] = $row['how_many'];
+
+            $stats[$row['id']] = [
+                'name' => $name,
+                'count' => $row['how_many'],
+            ];
+
             $total += $row['how_many'];
         }
 
@@ -1049,9 +1062,12 @@ EOT;
             $nationality = empty($row['nationality'])
                 ? 'XX' : $row['nationality'];
 
+            /*
+            // currently disabled, since this is not consistent with other graph
             if (array_key_exists($nationality, self::$countryMap)) {
                 $nationality = self::$countryMap[$nationality];
             }
+            */
 
             if (array_key_exists($nationality, $statsByNationality)) {
                 // we merge different countries together
@@ -1067,14 +1083,16 @@ EOT;
                 ];
             }
 
-
             $totalArtists += $row['numArtists'];
             $totalItemExhibition += $row['numEntries'];
         }
 
         uasort($statsByNationality,
                function ($a, $b) {
-                    if ($a['countItemExhibition'] == $b['countItemExhibition']) return 0;
+                    if ($a['countItemExhibition'] == $b['countItemExhibition']) {
+                        return 0;
+                    }
+
                     return $a['countItemExhibition'] < $b['countItemExhibition'] ? 1 : -1;
                 });
 
@@ -1185,13 +1203,17 @@ EOT;
 
         $nationalityCounts = [];
         foreach ($qb->getQuery()->getResult() as $row) {
-            $country = $this->expandCountryCode($row['nationality']);
-            $nationalityCounts[$country] = $row['howMany'];
+            $nationalityCounts[$row['nationality']] = [
+                'count' => $row['howMany'],
+                'name' => $this->expandCountryCode($row['nationality']),
+            ];
         }
 
-        arsort($nationalityCounts);
+        uasort($nationalityCounts, function($a, $b) {
+            return $b['count'] <=> $a['count'];
+        });
 
-        return $this->assoc2NameYArray($nationalityCounts);
+        return $this->assoc2IdNameYArray($nationalityCounts);
     }
 
     private function artistsByGenderExhibitionStatistics($exhibitionId)

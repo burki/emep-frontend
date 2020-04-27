@@ -28,16 +28,30 @@
         tooltip: {
             pointFormat: '{point.y} cat. entries (<b>{point.percentage:.1f}%</b>)'
         },
-        plotOptions: {
-            pie: {
-            },
-        },
         series: [{
             name: 'Number of Catalogue Entries',
             type: 'pie',
             innerSize: '50%',
             data: {{ data|raw }}
         }],
+        plotOptions: {
+            pie: {
+            },
+            series: {
+                events: {
+                    click: function (event) {
+                        var id = event.point.id;
+                        if (id) {
+                            var url = '{{ path('search-index', { 'entity': 'ItemExhibition' }) }}';
+                            url += '&filter[exhibition][exhibition][]={{ exhibitionId }}';
+                            url += '&filter[catentry][type][]=' + encodeURIComponent(id);
+
+                            window.open(url);
+                        }
+                    }
+                }
+            }
+        },
         exporting: {
             csv: {
                 {{ highcharts.pieChartCategoryHeader('Type') }}

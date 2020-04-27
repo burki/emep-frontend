@@ -27,16 +27,37 @@
         tooltip: {
             pointFormat: '{point.y} artists (<b>{point.percentage:.1f}%</b>)'
         },
-        plotOptions: {
-            pie: {
-            }
-        },
         series: [{
             name: 'Number of Artists',
             type: 'pie',
             innerSize: '50%',
             data: {{ data|json_encode|raw }}
         }],
+        plotOptions: {
+            pie: {
+            },
+            series: {
+                events: {
+                    click: function (event) {
+                        var gender = event.point.name;
+                        if (gender) {
+                            // TODO: pass event.point.id along instead
+                            if ('male' == gender) {
+                                gender = 'M';
+                            }
+                            else if ('female' == gender) {
+                                gender = 'F';
+                            }
+                            var url = '{{ path('search-index', { 'entity': 'Person' }) }}';
+                            url += '&filter[exhibition][exhibition][]={{ exhibitionId }}';
+                            url += '&filter[person][gender]=' + encodeURIComponent(gender);
+
+                            window.open(url);
+                        }
+                    }
+                }
+            }
+        },
         exporting: {
             csv: {
                 {{ highcharts.pieChartCategoryHeader('Gender') }}

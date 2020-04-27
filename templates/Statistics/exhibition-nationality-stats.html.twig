@@ -26,16 +26,30 @@
         tooltip: {
             pointFormat: '{point.y} artists (<b>{point.percentage:.1f}%</b>)'
         },
-        plotOptions: {
-            pie: {
-            },
-        },
         series: [{
             name: 'Number of Artists',
             type: 'pie',
             innerSize: '50%',
             data: {{ data|json_encode|raw }}
         }],
+        plotOptions: {
+            pie: {
+            },
+            series: {
+                events: {
+                    click: function (event) {
+                        var nationality = event.point.id;
+                        if (nationality) {
+                            var url = '{{ path('search-index', { 'entity': 'Person' }) }}';
+                            url += '&filter[exhibition][exhibition][]={{ exhibitionId }}';
+                            url += '&filter[person][nationality][]=' + encodeURIComponent(nationality);
+
+                            window.open(url);
+                        }
+                    }
+                }
+            }
+        },
         exporting: {
             csv: {
                 {{ highcharts.pieChartCategoryHeader('Nationality') }}
