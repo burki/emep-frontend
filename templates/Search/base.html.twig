@@ -74,7 +74,9 @@
                                 {{ form_row(form.person.gender) }}
                                 {{ form_row(form.person.nationality) }}
                                 {{ form_row(form.person.birthdate) }}
+                                {{ form_row(form.person.birthplace) }}
                                 {{ form_row(form.person.deathdate) }}
+                                {{ form_row(form.person.deathplace) }}
                                 {{ form_row(form.person.additional) }}
                                 {{ form_row(form.person.person) }}
                             </div>
@@ -131,7 +133,7 @@
 
                 {# render active filters #}
                 <div class="additional-filter-container">
-                    {% for entity,filters in listBuilder.queryFilters %}
+                    {% for entity,filters in listBuilder.queryFilters(true) %}
                     <div class="filter-row"><div class="div-block-5">{{ entityLabels[entity] }}</div></div>
                         {% for key,val in filters %}
                             {% set fieldVars = form[entity][key].vars %}

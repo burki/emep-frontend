@@ -41,8 +41,42 @@ extends AbstractType
             'label' => 'Year of Birth',
         ]);
 
+        $builder->add('birthplace', Select2EntityType::class, [
+            'multiple' => true,
+            'label' => 'Place of Birth',
+            'remote_route' => 'search-select-birthplace',
+            'class' => '\AppBundle\Entity\Place',
+            'primary_key' => 'tgn',
+            'text_property' => 'nameLocalized',
+            'minimum_input_length' => 2,
+            'page_limit' => 30,
+            'allow_clear' => false,
+            'delay' => 25,
+            'cache' => true,
+            'cache_timeout' => 60000, // if 'cache' is true
+            'language' => 'en',
+            'placeholder' => '- all -',
+        ]);
+
         $builder->add('deathdate', YearRangeType::class, [
             'label' => 'Year of Death',
+        ]);
+
+        $builder->add('deathplace', Select2EntityType::class, [
+            'multiple' => true,
+            'label' => 'Place of Death',
+            'remote_route' => 'search-select-deathplace',
+            'class' => '\AppBundle\Entity\Place',
+            'primary_key' => 'tgn',
+            'text_property' => 'nameLocalized',
+            'minimum_input_length' => 2,
+            'page_limit' => 30,
+            'allow_clear' => false,
+            'delay' => 25,
+            'cache' => true,
+            'cache_timeout' => 60000, // if 'cache' is true
+            'language' => 'en',
+            'placeholder' => '- all -',
         ]);
 
         $builder->add('additional', ChoiceType::class, [

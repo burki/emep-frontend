@@ -50,6 +50,7 @@ extends \Twig\Extension\AbstractExtension
             // general
             new \Twig\TwigFilter('without', [ $this, 'withoutFilter' ]),
             new \Twig\TwigFilter('unique', 'array_unique'),
+            new \Twig\TwigFilter('values', 'array_values'),
 
             new \Twig\TwigFilter('dateincomplete', [ $this, 'dateincompleteFilter' ]),
             new \Twig\TwigFilter('datedecade', [ $this, 'datedecadeFilter' ]),

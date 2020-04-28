@@ -18,16 +18,30 @@
                 tooltip: {
                     pointFormat: '{point.y} exhibitions (<b>{point.percentage:.1f}%</b>)'
                 },
-                plotOptions: {
-                    pie: {
-                    }
-                },
                 series: [{
                     name: 'Number of Exhibitions',
                     type: 'pie',
                     innerSize: '50%',
                     data: {{ exhibitionTypeStatisticsFormat|json_encode|raw }}
                 }],
+                plotOptions: {
+                    pie: {
+                    },
+                    series: {
+                        events: {
+                            click: function (event) {
+                                var id = event.point.name;
+                                if (id) {
+                                    var url = '{{ path('search-index', { 'entity': 'Exhibition' }) }}';
+                                    url += '&filter[location][geoname][]=tgn:{{ place.tgn }}';
+                                    url += '&filter[exhibition][type][]=' + encodeURIComponent(id);
+
+                                    window.open(url);
+                                }
+                            }
+                        }
+                    }
+                },
                 exporting: {
                     csv: {
                         {{ highcharts.pieChartCategoryHeader('Type') }}
@@ -50,7 +64,7 @@
                         enabled: false, // only for export-data.js
                         text: 'Year'
                     },
-                    categories: {{ exhibitionsGroupedByYearStats[0]|json_encode|raw  }},
+                    categories: {{ exhibitionsGroupedByYearStats|keys|json_encode|raw  }},
                     labels: {
                         rotation: -45,
                         step: 1, // this will show one label for every year
@@ -72,8 +86,21 @@
                 series: [{
                     name: 'Number of Exhibitions',
                     type: 'column',
-                    data: {{ exhibitionsGroupedByYearStats[1]|json_encode|raw }}
-                }]
+                    data: {{ exhibitionsGroupedByYearStats|values|json_encode|raw }}
+                }],
+                plotOptions: {
+                    series: {
+                        events: {
+                            click: function (event) {
+                                var url = '{{ path('search-index', { 'entity': 'Exhibition' }) }}';
+                                url += '&filter[location][geoname][]=tgn:{{ place.tgn }}';
+                                url += '&filter[exhibition][date][from]=' + encodeURIComponent(event.point.category) + '&filter[exhibition][date][until]=' + encodeURIComponent(event.point.category);
+
+                                window.open(url);
+                            }
+                        }
+                    }
+                }
             });
         {% endif %}
 
@@ -90,6 +117,36 @@
                 tooltip: {
                     pointFormat: '{point.y} artists from {point.name} (<b>{point.percentage:.1f}%</b>)'
                 },
+                series: [{
+                    name: 'Number of Artists',
+                    type: 'pie',
+                    innerSize: '50%',
+                    data: {{ nationalitiesStats|json_encode|raw }}
+                }],
+                plotOptions: {
+                    pie: {
+                    },
+                },
+                exporting: {
+                    csv: {
+                        {{ highcharts.pieChartCategoryHeader('Nationality') }}
+                    }
+                }
+            });
+
+            $('#container-artist-by-gender').highcharts({
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie'
+                },
+                title: {
+                    text: ' '
+                },
+                tooltip: {
+                    pointFormat: '{point.y} artists (<b>{point.percentage:.1f}%</b>)'
+                },
                 plotOptions: {
                     pie: {
                     }
@@ -98,11 +155,11 @@
                     name: 'Number of Artists',
                     type: 'pie',
                     innerSize: '50%',
-                    data: {{ nationalitiesStats|json_encode|raw }}
+                    data: {{ genderStatsStatisticsFormat|json_encode|raw }}
                 }],
                 exporting: {
                     csv: {
-                        {{ highcharts.pieChartCategoryHeader('Nationality') }}
+                        {{ highcharts.pieChartCategoryHeader('Gender') }}
                     }
                 }
             });
@@ -145,35 +202,34 @@
                         { name: 'Active in City', y: {{ numberActive }} },
                         { name: 'Exhibited in City', y: {{ numberExhibited }} }
                     ]
-                }]
-            });
-
-            $('#container-artist-by-gender').highcharts({
-                chart: {
-                    plotBackgroundColor: null,
-                    plotBorderWidth: null,
-                    plotShadow: false,
-                    type: 'pie'
-                },
-                title: {
-                    text: ' '
-                },
-                tooltip: {
-                    pointFormat: '{point.y} artists (<b>{point.percentage:.1f}%</b>)'
-                },
-                plotOptions: {
-                    pie: {
-                    }
-                },
-                series: [{
-                    name: 'Number of Artists',
-                    type: 'pie',
-                    innerSize: '50%',
-                    data: {{ genderStatsStatisticsFormat|json_encode|raw }}
                 }],
-                exporting: {
-                    csv: {
-                        {{ highcharts.pieChartCategoryHeader('Gender') }}
+                plotOptions: {
+                    series: {
+                        events: {
+                            click: function (event) {
+                                var url = '{{ path('search-index', { 'entity': 'Person' }) }}';
+
+                                switch (event.point.name) {
+                                    case 'Born in City':
+                                        url += '&filter[person][birthplace][]={{ place.tgn }}';
+                                        break;
+
+                                    case 'Died in City':
+                                        url += '&filter[person][deathplace][]={{ place.tgn }}';
+                                        break;
+
+                                    case 'Exhibited in City':
+                                        url += '&filter[location][geoname][]=tgn:{{ place.tgn }}';
+                                        break;
+
+                                    default:
+                                        return false;
+                                }
+
+
+                                window.open(url);
+                            }
+                        }
                     }
                 }
             });

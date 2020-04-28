@@ -53,6 +53,11 @@ extends CrudController
         }
 
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, null, $settings['entity']);
+        /*
+        // debug
+        $query = $listBuilder->query();
+        dd($query);
+        */
 
         $listPagination = new SearchListPagination($listBuilder);
 
@@ -280,6 +285,8 @@ extends CrudController
      * @Route("/search/select/organizer", name="search-select-organizer")
      * @Route("/search/select/holder", name="search-select-holder")
      * @Route("/search/select/exhibition", name="search-select-exhibition")
+     * @Route("/search/select/birthplace", name="search-select-birthplace")
+     * @Route("/search/select/deathplace", name="search-select-deathplace")
      *
      * Builds autocompleters for entity-selection
      */
@@ -353,6 +360,24 @@ extends CrudController
                         ->select("E.id AS id, E.title AS text, E.startdate, E.enddate, E.displaydate")
                         ;
                     break;
+
+                case 'search-select-birthplace':
+                case 'search-select-deathplace':
+                    $listBuilder = new \AppBundle\Utils\PlaceListBuilder($connection, $request, $urlGenerator, []);
+                    $fields = [ 'PL.name_alternate', 'PL.name' ];
+                    $queryBuilder = $listBuilder->getQueryBuilder();
+
+                    $queryBuilder
+                        ->from('Geoname', 'Pl')
+                        ->innerJoin('Pl',
+                                    'Person', 'P',
+                                    'Pl.tgn = P.'
+                                    . str_replace('search-select-', '', $request->get('_route'))
+                                    . '_tgn AND P.status <> -1')
+                        ->select("PL.tgn AS id, COALESCE(PL.name_alternate, PL.name) AS text")
+                        ->distinct()
+                        ;
+                    break;
             }
 
             $condition = $listBuilder->buildLikeCondition($search, $fields);
@@ -369,7 +394,6 @@ extends CrudController
 
             $queryBuilder
                 ->orderBy('text');
-
 
             $maxResult = intval($request->get('page_limit'));
             if ($maxResult <= 0) {

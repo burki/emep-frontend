@@ -204,7 +204,7 @@ extends CrudController
             'numberDied' => $this->getNumberArtistsDied($tgn),
             'numberActive' => $this->getNumberArtistsActive($tgn),
             'numberExhibited' => $this->getNumberArtistsExhibited($tgn),
-            'numberExhibitions' => count($exhibitions), // $this->getNumberOfExhibitions($tgn),
+            'numberExhibitions' => count($exhibitions),
             'numberVenues' => count($venues),
             'exhibitionTypeStats' => $exhibitionTypeStats,
             'genderStats' => $genderCounts,
@@ -212,7 +212,7 @@ extends CrudController
             'em' => $this->getDoctrine()->getManager(),
 
             // tabcontent-statistics.html.twig
-            'nationalitiesStats' => $this->assoc2NameYArray($this->buildNationalityCounts($allArtists)),
+            'nationalitiesStats' => $this->assoc2IdNameYArray($this->buildNationalityCounts($allArtists)),
             'exhibitionsGroupedByYearStats' => $this->getExhibitionsGroupedByYearByTgn($tgn),
             'exhibitionTypeStatisticsFormat' => $this->assoc2NameYArray($exhibitionTypeStats),
             'genderStatsStatisticsFormat' => $this->assoc2NameYArray($genderCounts),
@@ -464,14 +464,13 @@ extends CrudController
         return $result[0];
     }
 
-    public function getExhibitionsGroupedByYearByTgn($tgn)
+    protected function getExhibitionsGroupedByYearByTgn($tgn)
     {
         $qb = $this->getDoctrine()
             ->getManager()
             ->createQueryBuilder();
 
         $qb->select([
-                // 'E.id as Id',
                 'YEAR(E.startdate) AS start_year',
                 'COUNT(DISTINCT E.id) AS how_many'
             ])
@@ -488,16 +487,12 @@ extends CrudController
             ->groupBy('start_year');
             ;
 
-        $exhibitions = $qb->getQuery()->getResult();
-
-        $xAxis = [];
-        $yAxis = [];
-        foreach ($exhibitions as $exhibition){
-            array_push($xAxis,$exhibition['start_year']);
-            array_push($yAxis, (float)$exhibition['how_many']);
+        $exhibitionByYear = [];
+        foreach ($qb->getQuery()->getResult() as $row){
+            $exhibitionByYear[$row['start_year']] = (int)$row['how_many'];
         }
 
-        return [ $xAxis, $yAxis ];
+        return $exhibitionByYear;
     }
 
     public function getExhibitionsByTgn($tgn)
@@ -591,25 +586,30 @@ extends CrudController
         return $allArtists;
     }
 
-    public function buildNationalityCounts($allArtists)
+    protected function buildNationalityCounts($allArtists)
     {
-        $stats = [];
+        $nationalityCounts = [];
 
         foreach ($allArtists as $info) {
             $person = $info[0];
 
-            $key = $this->expandCountryCode($person->getNationality());
+            $key = $person->getNationality();
 
-            if (!array_key_exists($key, $stats)) {
-                $stats[$key] = 0;
+            if (!array_key_exists($key, $nationalityCounts)) {
+                $nationalityCounts[$key] = [
+                    'name' => $this->expandCountryCode($key),
+                    'count' => 0,
+                ];
             }
 
-            ++$stats[$key];
+            ++$nationalityCounts[$key]['count'];
         }
 
-        arsort($stats);
+        uasort($nationalityCounts, function($a, $b) {
+            return $b['count'] <=> $a['count'];
+        });
 
-        return $stats;
+        return $nationalityCounts;
     }
 
     public function buildGenderCounts($allArtists)
@@ -770,7 +770,7 @@ extends CrudController
         return $exhibitions[0]['numExhibitions'];
     }
 
-    public function getStatsExhibitionTypes($tgn)
+    protected function getStatsExhibitionTypes($tgn)
     {
         $qb = $this->getDoctrine()
             ->getManager()
@@ -790,7 +790,6 @@ extends CrudController
             ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('tgn', $tgn)
             ->groupBy('E.type')
-            // ->groupBy('E.id')
             ;
 
         $exhibitions = $qb->getQuery()->getResult();

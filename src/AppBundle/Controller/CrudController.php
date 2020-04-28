@@ -539,6 +539,7 @@ extends Controller
                 'location' => [ 'geoname' ],
                 'organizer' => [ 'geoname' ],
                 'holder' => [ 'geoname' ],
+                'person' => [ 'birthplace', 'deathplace' ],
                 'exhibition' => [ 'organizer_type' ],
             ];
 

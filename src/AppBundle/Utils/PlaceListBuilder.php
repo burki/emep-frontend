@@ -22,7 +22,7 @@ extends SearchListBuilder
             . " LEFT OUTER JOIN ItemExhibition IE ON IE.id_exhibition=E.id"
             . " LEFT OUTER JOIN Person P ON IE.id_person=P.id"
             /*
-            // TODO: the followin kills performance, investigate
+            // TODO: the following kills performance, investigate
             . " LEFT OUTER JOIN ExhibitionLocation EL ON EL.id_location=L.id AND EL.role = 0"
             . " LEFT OUTER JOIN Exhibition EO ON EO.id = EL.id_exhibition=EO.id"
             . " LEFT OUTER JOIN ItemExhibition IEO ON IEO.id_exhibition=EO.id"

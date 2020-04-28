@@ -303,6 +303,15 @@ extends ListBuilder
         return $this;
     }
 
+    private function getObjectIdentifier($obj)
+    {
+        if ($obj instanceof \AppBundle\Entity\Place) {
+            return $obj->getTgn();
+        }
+
+        return $obj->getId();
+    }
+
     public function getQueryFilters($entityToId = false)
     {
         if (!$entityToId) {
@@ -313,7 +322,8 @@ extends ListBuilder
         if (is_array($ret)) {
             array_walk_recursive($ret, function (&$item, $key) {
                 if (is_object($item)) {
-                    $item = $item->getId();
+                    $itemIdentifier = $this->getObjectIdentifier($item);
+                    $item = $itemIdentifier;
                 }
             });
         }
@@ -380,7 +390,7 @@ extends ListBuilder
             if (is_array($filterValues) && 1 == count($filterValues)) {
                 $filterValues = $filterValues[0];
                 if (is_object($filterValues)) {
-                    $filterValues = $filterValues->getId();
+                    $filterValues = $this->getObjectIdentifier($filterValues);
                 }
             }
 
@@ -415,7 +425,9 @@ extends ListBuilder
                                                     $field, ':' . $key))
                         ->setParameter($key,
                                        array_map(function ($val) {
-                                            return is_object($val) ? $val->getId() : $val;
+                                            return is_object($val)
+                                                ? $this->getObjectIdentifier($val)
+                                                : $val;
                                         }, $filterValues),
                                        \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);
                 }
@@ -531,6 +543,8 @@ extends ListBuilder
             foreach ([
                 'gender' => 'P.sex',
                 'nationality' => 'P.country',
+                'birthplace' => 'P.birthplace_tgn',
+                'deathplace' => 'P.deathplace_tgn',
                 'person' => 'P.id',
                 ] as $key => $field)
             {
