@@ -368,10 +368,10 @@ extends CrudController
                     $queryBuilder = $listBuilder->getQueryBuilder();
 
                     $queryBuilder
-                        ->from('Geoname', 'Pl')
-                        ->innerJoin('Pl',
+                        ->from('Geoname', 'PL')
+                        ->innerJoin('PL',
                                     'Person', 'P',
-                                    'Pl.tgn = P.'
+                                    'PL.tgn = P.'
                                     . str_replace('search-select-', '', $request->get('_route'))
                                     . '_tgn AND P.status <> -1')
                         ->select("PL.tgn AS id, COALESCE(PL.name_alternate, PL.name) AS text")
