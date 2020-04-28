@@ -17,16 +17,16 @@
                 tooltip: {
                     pointFormat: '{point.y} Artists (<b>{point.percentage:.1f}%</b>)'
                 },
-                plotOptions: {
-                    pie: {
-                    }
-                },
                 series: [{
                     name: 'Number of Artists',
                     type: 'pie',
                     innerSize: '50%',
                     data: {{ dataNumberOfArtistsPerCountry[0]|raw }}
                 }],
+                plotOptions: {
+                    pie: {
+                    }
+                },
                 exporting: {
                     csv: {
                         {{ highcharts.pieChartCategoryHeader('Nationality') }}

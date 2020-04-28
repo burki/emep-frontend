@@ -157,9 +157,9 @@ extends CrudController
             ->createQueryBuilder();
 
         $qb->select([
-            'P.gender as gender',
-            'COUNT(DISTINCT P.id) AS how_many',
-        ])
+                'P.gender as gender',
+                'COUNT(DISTINCT P.id) AS how_many',
+            ])
             ->from('AppBundle:Person', 'P')
             ->innerJoin('AppBundle:ItemExhibition', 'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
@@ -169,7 +169,7 @@ extends CrudController
             ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('ids', $exhibitionIds)
             ->groupBy('gender')
-        ;
+            ;
 
         $results = $qb->getQuery()->getResult();
 
@@ -388,18 +388,20 @@ extends CrudController
 
     private function detailDataNumberOfArtistsPerCountry($artists)
     {
-        $artistNationalities = [];
-
         $artistNationalities = array_map(function ($artist) { return (string)$artist[0]->getNationality(); }, $artists);
 
         $artistNationalitiesTotal = array_count_values($artistNationalities);
         arsort($artistNationalitiesTotal);
 
-        $finalData = array_map(function ($key) use ($artistNationalitiesTotal) {
-                $name = $this->expandCountryCode($key);
-                return [ 'name' => $name, 'y' => (int)$artistNationalitiesTotal[$key]];
-            },
-            array_keys($artistNationalitiesTotal));
+        $finalData = [];
+
+        foreach ($artistNationalitiesTotal as $key => $count) {
+            $finalData[] = [
+                'name' => $this->expandCountryCode($key),
+                'y' => (int)$count,
+                'id' => $key,
+            ];
+        }
 
         return [ json_encode($finalData), count($artists), count(array_keys($artistNationalitiesTotal)) ];
     }
