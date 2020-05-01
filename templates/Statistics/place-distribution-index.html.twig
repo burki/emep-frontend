@@ -24,7 +24,7 @@
                 minorTickInterval: 0.1,
                 startOnTick: false,
                 title: {
-                    text: 'Number of Artists'
+                    text: 'Number of Cities'
                 }
             },
             legend: {
@@ -32,11 +32,11 @@
             },
             tooltip: {
                 headerFormat: '', // '<b>{series.name}</b><br />',
-                pointFormat: '{point.y} Artists with {point.x} Exhibitions'
+                pointFormat: '{point.y} Cities with {point.x} Exhibitions'
             },
             series: [
                 {
-                    name: 'Number of Artists',
+                    name: 'Number of Cities',
                     type: 'column',
                     data: {{ data|raw }},
                     pointStart: {{ min }},
@@ -47,5 +47,5 @@
     });
     </script>
 
-    <h3 class="chart-header" data-collapse="container-distribution"><span class="chartsymbol">+</span>Exhibitions per Person<span class="charttypeTitle">(Bar Chart)</span></h3>
-    <div class="collapse" id="container-distribution" style="width: 100%;  height: 400px; margin:auto;"></div>
+    <h3 class="chart-header" data-collapse="container-distribution"><span class="chartsymbol">+</span>Exhibitions per City<span class="charttypeTitle">(Bar Chart)</span></h3>
+    <div class="collapse" id="container-distribution" style="width: 100%; height: 400px; margin: 0 auto;"></div>

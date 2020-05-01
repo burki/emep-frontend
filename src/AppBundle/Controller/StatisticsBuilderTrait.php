@@ -470,7 +470,7 @@ trait StatisticsBuilderTrait
         ];
     }
 
-    function processPersonDistribution($queries)
+    function processDistribution($queries)
     {
         $data = [];
         $data_median = [];
@@ -774,7 +774,7 @@ EOT;
         // echo $query->getSQL();
 
         $stmt = $query->execute();
-        $renderParams = $this->processPersonDistribution([ 'exhibition' => $query ]);
+        $renderParams = $this->processDistribution([ 'exhibition' => $query ]);
         if (!empty($renderParams)) {
             $template = $this->get('twig')->loadTemplate('Statistics/person-distribution-index.html.twig');
 
@@ -854,6 +854,18 @@ EOT;
         $renderParams = $this->processLocationCountry($stmt);
         if (!empty($renderParams)) {
             $template = $this->get('twig')->loadTemplate('Statistics/place-country-index.html.twig');
+
+            $charts[] = $template->render($renderParams);
+        }
+
+        $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-exhibition-distribution', $listBuilder->getEntity());
+        $query = $listBuilder->query();
+        // echo $query->getSQL();
+
+        $stmt = $query->execute();
+        $renderParams = $this->processDistribution([ 'exhibition' => $query ]);
+        if (!empty($renderParams)) {
+            $template = $this->get('twig')->loadTemplate('Statistics/place-distribution-index.html.twig');
 
             $charts[] = $template->render($renderParams);
         }

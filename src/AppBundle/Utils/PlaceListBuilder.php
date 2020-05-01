@@ -132,7 +132,7 @@ extends SearchListBuilder
         if ('stats-type' == $this->mode) {
             $this->orders = [ 'default' => [ 'asc' => [ 'type' ] ] ];
         }
-        else if ('stats-country' == $this->mode) {
+        else if (in_array($this->mode, [ 'stats-country', 'stats-exhibition-distribution' ])) {
             $this->orders = [ 'default' => [ 'asc' => [ 'how_many DESC' ] ] ];
         }
         else if ('sitemap' == $this->mode) {
@@ -244,6 +244,15 @@ extends SearchListBuilder
             return $this;
         }
 
+        if ('stats-exhibition-distribution' == $this->mode) {
+            $queryBuilder->select([
+                'PL.tgn AS place_tgn',
+                'COUNT(DISTINCT IE.id_exhibition) AS how_many',
+            ]);
+
+            return $this;
+        }
+
         if ('sitemap' == $this->mode) {
             $queryBuilder->select([
                 $this->alias . '.id AS id',
@@ -342,6 +351,10 @@ extends SearchListBuilder
         ]);
 
         $this->addQueryFilters($queryBuilder);
+
+        if ('stats-exhibition-distribution' == $this->mode) {
+            $queryBuilder->having('how_many >= 1');
+        }
 
         return $this;
     }
