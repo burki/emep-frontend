@@ -16,6 +16,7 @@ implements JsonLdSerializable
 {
     use InfoTrait;
 
+    const FLAGS_JULIANDATE = 0x10;
     const FLAGS_CATIDBYARTIST = 0x20;
     const FLAGS_TRAVELING = 0x40;
     const FLAGS_PARTICIPANTADDRESSESLISTED = 0x80;
@@ -309,6 +310,25 @@ implements JsonLdSerializable
         return preg_replace('/\s+00:00:00$/', '', $datetime);
     }
 
+    public static function convertToJulian($datetime)
+    {
+        if (is_null($datetime)) {
+            return $datetime;
+        }
+
+        $dateParts = explode('-', $gregorian = self::stripTime($datetime));
+        if (3 == count($dateParts) && $dateParts[2] != 0) {
+            // only convert complete dates
+            $dateParts = explode('/',
+                                 jdtojulian(gregoriantojd($dateParts[1], $dateParts[2], $dateParts[0])));
+
+            return sprintf('%04d-%02d-%02d', $dateParts[2], $dateParts[0], $dateParts[1]);
+        }
+
+        return null;
+    }
+
+
     public static function extractYear($datetime)
     {
         if (is_null($datetime)) {
@@ -386,13 +406,21 @@ implements JsonLdSerializable
         return \AppBundle\Utils\SearchListBuilder::$STATUS_LABELS[$this->status];
     }
 
-    public function getStartdate()
+    public function getStartdate($convertToJulian = false)
     {
+        if ($convertToJulian) {
+            return self::convertToJulian($this->startdate);
+        }
+
         return self::stripTime($this->startdate);
     }
 
-    public function getEnddate()
+    public function getEnddate($convertToJulian = false)
     {
+        if ($convertToJulian) {
+            return self::convertToJulian($this->enddate);
+        }
+
         return self::stripTime($this->enddate);
     }
 
@@ -608,6 +636,17 @@ implements JsonLdSerializable
     public function isTraveling()
     {
         return 0 <> ($this->flags & self::FLAGS_TRAVELING);
+    }
+
+    public function appendJulianDate()
+    {
+        if (0 == ($this->flags & self::FLAGS_JULIANDATE)) {
+            return false;
+        }
+
+        $startdateJulian = self::convertToJulian($this->startdate);
+
+        return !is_null($startdateJulian);
     }
 
     public function getInfoFromFlags()

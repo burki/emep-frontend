@@ -4,6 +4,9 @@
         {{ exhibition.displaydate }}
     {% else %}
         {{ daterangeincomplete(exhibition.startdate, exhibition.enddate) }}
+        {% if exhibition.appendJulianDate() %}
+            ({{ daterangeincomplete(exhibition.getStartdate(true), exhibition.getEnddate(true)) }} o.S.)
+        {% endif %}
     {% endif %}
     {% endspaceless %}
 {% endmacro %}
