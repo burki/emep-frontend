@@ -110,7 +110,7 @@
                     <div class="filter-panel">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <a data-toggle="collapse" data-target="#filter-panel-organizer" href="#">Organizing Body</a>
+                                <a data-toggle="collapse" data-target="#filter-panel-organizer" href="#">Organizing Body</a> {{ helper.organizer_disclaimer() }}
                             </div>
                             <div id="filter-panel-organizer"  class="panel-body collapse">
                                 {{ form_row(form.organizer.geoname) }}
@@ -129,7 +129,6 @@
                         <button type="submit" id="filter_submit" name="filter[submit]" class="submit-button w-button submit-filter-visible">Search</button>
                     </div>
                 </div>
-
 
                 {# render active filters #}
                 <div class="additional-filter-container">

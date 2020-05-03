@@ -781,14 +781,27 @@ td.normal a, .listviewrow, .artist-text {
 .tooltip {
     display:none;
     position:absolute;
-    border:1px solid #333;
-    background-color:#161616;
+    border:1px solid rgb(164, 177, 186);
+    background-color: white;
     border-radius:5px;
     padding:10px;
     color:#fff;
+    font-family: inherit;
     font-size:12px;
     z-index: 99;
 }
+
+.tooltip.in {
+    opacity: 1;
+    filter: alpha(opacity=100);
+}
+
+.tooltip-inner {
+    color: rgb(164, 177, 186);
+    text-align: left;
+    background-color: white;
+}
+
 
 .coming-soon {
     color: rgba(91, 105, 116, .8) !important;

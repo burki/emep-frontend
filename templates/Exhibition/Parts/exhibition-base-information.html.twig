@@ -23,7 +23,7 @@
 {% if exhibition.organizers is not empty %}
     <div class="artist-information-container">
         <div class="artist-information-label">{{ 'Organizing Bodies'|trans }}:</div>
-        <div class="artist-information-text">
+        <div class="artist-information-text">{{ helper.organizer_disclaimer() }}
             {% for organizer in exhibition.organizers %}
                 <a href="{{ path('organizer', { 'id' : organizer.id }) }}">{{ organizer.name }}</a>{% if not loop.last %} / {% endif %}
             {% endfor %}

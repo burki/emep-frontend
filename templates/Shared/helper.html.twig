@@ -134,6 +134,20 @@
     <a href="{{ path('organizer', { 'id' : location.id }) }}">{{ location.nameAppend ? location.nameAppend : location.name }}</a>
 {%- endmacro %}
 
+{% macro organizer_disclaimer() -%}
+    <a class="tooltipDisclaimer" style="font-size: 1.2rem" data-toggle="tooltip" data-original-title="Organizing Bodies have mostly been compiled by deduction from the catalogues. However persons and/or institutions involved in the organizing of exhibitions are not always mentioned in the catalogue. Therefore their naming can be incomplete or erroneous.">
+        <i style="color: #ccc" class="glyphicon glyphicon-info-sign"></i>
+    </a>
+    <script>
+        $(function () {
+            $('a.tooltipDisclaimer').tooltip({
+                html: true,
+                placement: 'auto left'
+            });
+        });
+    </script>
+{%- endmacro %}
+
 {% macro render_info(entries) -%}
     {% for entry in entries %}
         {{ entry.note }}

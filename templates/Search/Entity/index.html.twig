@@ -38,7 +38,7 @@
 
 {% block body %}
     <div class="w-container">
-        <h1 class="heading">{{ pageTitle }}</h1>
+        <h1 class="heading">{{ pageTitle }}{% if pageTitle == 'Organizing Bodies' %}{{ helper.organizer_disclaimer() }}{% endif %}</h1>
 
         {% if listBuilder.entity == 'Exhibition' %}
             {% embed "Search/Entity/exhibition-filter.html.twig" %}
