@@ -23,7 +23,7 @@ extends AbstractType
             'multiple' => true,
             'required' => false,
             'choices' => $options['data']['choices']['exhibition_type'],
-            'label' => 'Type',
+            'label' => 'Type of Exhibition',
             'attr' => [
                 'data-placeholder' => '- all - ',
                 'class' => 'select2',
