@@ -49,7 +49,9 @@
                         {{ person.nationality }}
                     </td>
                     <td>
+                        <a href="{{ path('person', { 'id' : person.id }) }}#exhibition-{{ exhibition.id }}">
                         {{ catalogueEntriesByPersonCount[person.id] }}
+                        </a>
                     </td>
                 </tr>
             {% endfor %}
