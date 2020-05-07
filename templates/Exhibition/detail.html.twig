@@ -107,6 +107,11 @@
             <div class="artist-information-text" style="width: 100%; margin-bottom: 2rem;">
                 {{ exhibition.subtitle }}<br />
                 <strong>ID: {{ exhibition.id }}, Status: {{ exhibition.buildStatusLabel }}</strong>
+                {% if 0 == exhibition.status or -10 == exhibition.status %}
+                <div style="color: red">
+                    This exhibition has not yet been completely entered
+                </div>
+                {% endif %}
             </div>
             <div class="artist_information">
                 {% embed "Exhibition/Parts/exhibition-base-information.html.twig" %}
