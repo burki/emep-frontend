@@ -955,7 +955,7 @@ EOT;
     {
         $dbconn = $em->getConnection();
 
-        $where = sprintf(' WHERE ItemExhibition.id_exhibition=%d',
+        $where = sprintf(' WHERE ItemExhibition.id_exhibition=%d AND (ItemExhibition.title IS NOT NULL OR ItemExhibition.id_item IS NULL)',
                          intval($exhibitionId));
 
         $querystr = "SELECT TypeTerm.id, TypeTerm.name, TypeTerm.aat, COUNT(*) AS how_many"
