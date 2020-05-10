@@ -512,7 +512,8 @@ extends CrudController
             ? $this->lookupExhibitionGroup($em, $exhibition)
             : [];
 
-        list($charts, $placesActivityAvailable) = $this->buildDetailCharts($exhibition, $artists);
+        list($charts, $placesActivityAvailable, $catalogueEntriesByTypeCount)
+            = $this->buildDetailCharts($exhibition, $artists);
 
         $similar = $this->findSimilar($exhibition);
         return $this->render('Exhibition/detail.html.twig', [
@@ -523,6 +524,7 @@ extends CrudController
             'citeProc' => $citeProc,
             'artists' => $artists,
             'catalogueEntries' => $catalogueEntries,
+            'catalogueEntriesByTypeCount' => $catalogueEntriesByTypeCount,
             'catalogueEntriesByPersonCount' => $catalogueEntriesByPersonCount,
             'showWorks' => false, // !empty($_SESSION['user']),
             'related' => $relatedExhibitions,
@@ -812,6 +814,7 @@ extends CrudController
 
         // types of work
         $stats = $this->itemExhibitionTypeDistribution($em, $exhibition->getId());
+        $countByType = [];
         $data = [];
         foreach ($stats['types'] as $id => $descr) {
             $count = $descr['count'];
@@ -827,6 +830,23 @@ extends CrudController
             }
 
             $data[] = $dataEntry;
+
+            if (in_array($descr['name'], [ 'other medium', 'unknown'])) {
+                $countByType[$descr['name']] = (int)$descr['count'];
+            }
+        }
+
+        if (!empty($countByType)) {
+            $countDrawings = $stats['total'];
+            foreach ($countByType as $count) {
+                $countDrawings -= $count;
+            }
+
+            if ($countDrawings > 0) {
+                $countByType[' painting and drawing'] = $countDrawings;
+            }
+
+            ksort($countByType);
         }
 
         $template = $this->get('twig')->loadTemplate('Statistics/itemexhibition-type.html.twig');
@@ -871,6 +891,7 @@ extends CrudController
         return [
             join("\n", $charts),
             $placesOfActivityAvailable,
+            $countByType,
         ];
     }
 
