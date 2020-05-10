@@ -61,7 +61,7 @@
     <div class="statcontainer">
         <div class="artist-information-text-stats">Catalogue Entries: {{ catalogueEntries|length }}</div>
         {% if catalogueEntriesByTypeCount is not empty %}
-        <div class="artist-information-text-stats">
+        <div class="artist-information-text-stats">Types of Work:
             {% for label,count in catalogueEntriesByTypeCount %}{% if not loop.first %}, {% endif %}
                 {{ label }}: {{ count }}
             {%- endfor %}
