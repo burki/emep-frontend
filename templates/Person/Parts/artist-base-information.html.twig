@@ -136,6 +136,7 @@
     <div class="statcontainer">
         <div class="artist-information-text-stats">Exhibitions: {{ dataNumberOfExhibitionsPerYear[2] }}</div>
         <div class="artist-information-text-stats">Catalogue Entries: {{ catalogueEntries|length }}</div>
+        {{ helper.render_types_of_work_count(catalogueEntriesByTypeCount) }}
         <div class="artist-information-text-stats">Exhibiting Countries: {{ dataNumberOfExhibitionsPerCountry[2] }}</div>
         <div class="artist-information-text-stats">Exhibiting Cities: {{ dataNumberOfExhibitionsPerCity[2] }}</div>
     </div>

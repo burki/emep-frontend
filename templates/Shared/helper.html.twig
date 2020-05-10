@@ -157,6 +157,16 @@
     {% endfor %}
 {% endmacro %}
 
+{% macro render_types_of_work_count(catalogueEntriesByTypeCount) %}
+    {% if catalogueEntriesByTypeCount is not empty %}
+    <div class="artist-information-text-stats">Types of Work:
+        {% for label,count in catalogueEntriesByTypeCount %}{% if not loop.first %}, {% endif %}
+            {{ label }}: {{ count }}
+        {%- endfor %}
+    </div>
+    {% endif %}
+{% endmacro %}
+
 {% macro render_citation(name, lastModified, url) -%}
     <div class="citation">
         <b>Recommended Citation:</b>

@@ -436,6 +436,22 @@ extends CrudController
         }
 
         $catEntries = $this->findCatalogueEntries($person);
+        $catalogueEntriesByTypeCount = [];
+        foreach ($catEntries as $catEntry) {
+            $type = $catEntry[0]->getType();
+            $label = 'unknown';
+            if (!is_null($type)) {
+                $label = $type->getName();
+                if (!in_array($label, [ 'other medium', 'unknown' ])) {
+                    $label = 'painting and drawing';
+                }
+            }
+            if (!array_key_exists($label, $catalogueEntriesByTypeCount)) {
+                $catalogueEntriesByTypeCount[$label] = 0;
+            }
+            ++$catalogueEntriesByTypeCount[$label];
+        }
+
         $similar = $this->findSimilar($person);
 
         return $this->render('Person/detail.html.twig', [
@@ -444,6 +460,7 @@ extends CrudController
             'mapMarkers' => $this->buildMapMarkers($person),
             'showWorks' => false, // !empty($_SESSION['user']),
             'catalogueEntries' => $catEntries,
+            'catalogueEntriesByTypeCount' => $catalogueEntriesByTypeCount,
             'catalogueEntriesByExhibition' => $this->findCatalogueEntries($person, true),
             'similar' => $similar,
             'similarHydrated' => $this->hydrateSimilar($similar),
