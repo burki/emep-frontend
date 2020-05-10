@@ -337,11 +337,17 @@ extends CrudController
 
         $genderCounts = $this->getGenderCountsByExhibitionId($exhibitionIds);
 
+        $similar = [];
+        // TODO: handle organizer case before activating
+        // $similar = $this->findSimilar($location, $artists);
+
         return $this->render('Location/detail.html.twig', [
             'pageTitle' => $location->getName(),
             'location' => $location,
             'exhibitionStats' => $this->getExhibitionStatsByIds($exhibitionIds),
             'artists' => $artists,
+            'similar' => $similar,
+            'similarHydrated' => $this->hydrateSimilar($similar),
             'dataNumberOfArtistsPerCountry' => $this->detailDataNumberOfArtistsPerCountry($artists),
             'detailDataNumberItemTypes' => $this->detailDataNumberItemTypes($location),
             'genderStats' => $genderCounts,
@@ -354,6 +360,97 @@ extends CrudController
                 */
             ],
         ]);
+    }
+
+    /* TODO:
+     *  - Also handle case where Location is Organizer and not Venue
+     *    to make relation symmetric ($persons contains both)
+     *  - try to merge with method in ExhibitionController
+     */
+    protected function findSimilar($entity, &$persons)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $dbconn = $em->getConnection();
+
+        // build all the ids
+        $personIds = array_map(function ($person) { return $person[0]->getId(); },
+                               $persons);
+
+        $numArtists = count($personIds);
+        if (0 == $numArtists) {
+            return [];
+        }
+
+        $querystr = "SELECT DISTINCT id_person, id_location"
+                  . " FROM ItemExhibition"
+                  . " INNER JOIN Exhibition ON ItemExhibition.id_exhibition = Exhibition.id"
+                  . " AND " . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('Exhibition')
+                  . " WHERE id_person IN (" . join(', ', $personIds) . ')'
+                  . " AND id_location <> " . $entity->getId()
+                  . " ORDER BY id_location";
+
+        $personsByLocation = [];
+        $stmt = $dbconn->query($querystr);
+        while ($row = $stmt->fetch()) {
+            if (!array_key_exists($row['id_location'], $personsByLocation)) {
+                $personsByLocation[$row['id_location']] = [];
+            }
+            $personsByLocation[$row['id_location']][] = $row['id_person'];
+        }
+
+        $jaccardIndex = [];
+        $locationIds = array_keys($personsByLocation);
+
+        if (count($locationIds) > 0) {
+            $querystr = "SELECT Location.name AS title, id_location, COUNT(DISTINCT id_person) AS num_artists"
+                      . " FROM ItemExhibition"
+                      . " LEFT OUTER JOIN Exhibition ON ItemExhibition.id_exhibition=Exhibition.id"
+                      . " AND " . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('Exhibition')
+                      . " INNER JOIN Location ON Location.id=Exhibition.id_location"
+                      . " WHERE id_location IN (" . join(', ', $locationIds) . ')'
+                      . " GROUP BY id_location";
+            $stmt = $dbconn->query($querystr);
+            while ($row = $stmt->fetch()) {
+                $numShared = count($personsByLocation[$row['id_location']]);
+                $jaccardIndex[$row['id_location']] = [
+                    'title' => $row['title'],
+                    'count' => $numShared,
+                    'coefficient' =>
+                        1.0
+                            * $numShared // shared
+                            /
+                            ($row['num_artists'] + $numArtists - $numShared),
+                ];
+            }
+
+            uasort($jaccardIndex,
+                function ($a, $b) {
+                    if ($a['coefficient'] == $b['coefficient']) {
+                        return 0;
+                    }
+                    // highest first
+                    return $a['coefficient'] < $b['coefficient'] ? 1 : -1;
+                }
+            );
+        }
+
+        return $jaccardIndex;
+    }
+
+    protected function hydrateSimilar($result)
+    {
+        $locationsByIds = [];
+
+        $locationIds = array_keys($result);
+        if (!empty($locationIds)) {
+            $locations = $this->hydrateLocations($locationIds);
+            $locationsByIds = array_combine(
+                array_map(function ($location) { return $location->getId(); }, $locations),
+                $locations
+            );
+        }
+
+        return $locationsByIds;
     }
 
     private function detailDataNumberItemTypes($location)

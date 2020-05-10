@@ -63,6 +63,11 @@
                 {% endembed %}
                 {% set active = false %}
 
+                {% if numExhibitions > 0 %}
+                {% embed "Location/Parts/tabcontent-similiar.html.twig" %}
+                {% endembed %}
+                {% endif %}
+
                 {% embed "Location/Parts/tabcontent-statistics.html.twig" %}
                 {% endembed %}
                 {% set active = false %}

@@ -634,6 +634,25 @@ extends Controller
         return $hydrationQuery->getResult();
     }
 
+    protected function hydrateLocations($ids, $preserveOrder = false)
+    {
+        // hydrate with doctrine entity
+        $qb = $this->getDoctrine()
+            ->getManager()
+            ->createQueryBuilder();
+
+        $qb->select([ 'L', 'field(L.id, :ids) as HIDDEN field', 'L.name HIDDEN nameSort' ])
+            ->from('AppBundle:Location', 'L')
+            ->where('L.id IN (:ids)')
+            ->orderBy($preserveOrder ? 'field' : 'nameSort')
+            ;
+
+        $hydrationQuery = $qb->getQuery();
+        $hydrationQuery->setParameter('ids', $ids);
+
+        return $hydrationQuery->getResult();
+    }
+
     protected function hydratePersons($ids, $preserveOrder = false)
     {
         // hydrate with doctrine entity

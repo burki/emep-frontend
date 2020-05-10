@@ -1,0 +1,71 @@
+{% block similars %}
+    {% import 'Shared/helper.html.twig' as helper %}
+    {% if similar|length > 0 %}
+        <script>
+            $( document ).ready(function() {
+                $('#similartable').DataTable({
+                    dom: 'ilrtp',
+                    paging: true,
+                    pageLength: 25,
+                    searching: false,
+                    info: true,
+                    order: [[ 2, 'desc' ]],
+                    columns: [
+                        { "orderSequence": [ "asc", "desc" ] },
+                        { "orderSequence": [ "asc", "desc" ] },
+                        { "orderSequence": [ "asc", "desc" ] }
+                    ]
+                });
+            })
+        </script>
+
+        <div role="tabpanel" class="tab-pane" id="similars">
+            <table id="similartable" class="table table-striped table-bordered dataTable listviewcontainer">
+                <thead>
+                <tr class="listviewheading">
+                    <th class="all">Venue</th>
+                    <th class="all">City</th>
+                    <th class="all"># of common Artists</th>
+                </tr>
+                </thead>
+
+            {% set similar_keys = similar|keys %}
+            {% set similar_found = false %}
+            {% set numArtists = location.artists|length %}
+
+            {% for location_id in similar_keys %}
+               {% if similar[location_id]['count'] > 1 or numArtists == 1 %}
+                    {% if not similar_found %}
+                        {% set similar_found = true %}
+                <tbody>
+                    {% endif %}
+
+                    {% set aLocation = similarHydrated[location_id] %}
+                <tr class="listviewrow">
+                    <td class="normal" data-order="{{ aLocation.name }}">
+                        {{ helper.location_linked(aLocation) }}
+                    </td>
+                    <td class="normal" data-order="{{ aLocation.placeLabel }}">
+                        {% set place = aLocation.place %}
+                        {% if place is not null %}
+                        <a href="{% if place.tgn is not empty %}{{ path('place-by-tgn', { 'tgn' : place.tgn }) }}{% else %}{{ path('place', { 'id' : place.id }) }}{% endif %}">
+                            {{ aLocation.placeLabel }}
+                        </a>
+                        {% else %}
+                            {{ aLocation.placeLabel }}
+                        {% endif %}
+                    </td>
+                    <td class="normal" data-order="{{ similar[location_id]['count'] }}">
+                        {#<a href="{{ path('person-shared-partial', { 'exhibitions': [ exhibition.id, exhibition_id ]|join(',') }) }}" data-remote="false" data-toggle="modal" data-target="#detailModal">#}{{ similar[location_id]['count'] }} artists{#</a>#}
+                    </td>
+                </tr>
+                {% endif %}
+            {% endfor %}
+
+            {% if similar_found %}
+                </tbody>
+            {% endif %}
+            </table>
+        </div><!-- .tab-pane -->
+    {% endif %}
+{% endblock %}
