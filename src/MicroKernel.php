@@ -60,9 +60,8 @@ extends Kernel
             // login
             new \Symfony\Bundle\SecurityBundle\SecurityBundle(),
 
-            // asset management
-            // see http://symfony.com/doc/current/cookbook/assetic/asset_management.html
-            new \Symfony\Bundle\AsseticBundle\AsseticBundle(),
+            // https://github.com/a-r-m-i-n/scssphp-bundle
+            new \Armin\ScssphpBundle\ScssphpBundle(),
 
             // menu
             // see http://symfony.com/doc/current/bundles/KnpMenuBundle/index.html

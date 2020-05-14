@@ -13,10 +13,6 @@
         {
             "url": "https://github.com/burki/LiipUrlAutoConverterBundle.git",
             "type": "vcs"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/burki/assetic-bundle"
         }
     ],
 
@@ -53,8 +49,7 @@
         "knplabs/knp-menu-bundle": "^3.0",
 
         "symfony/asset": "^4.4",
-        "symfony/assetic-bundle": "dev-master as 2.8.3",
-        "leafo/scssphp": "^0.8",
+        "armin/scssphp-bundle": "^1.1",
 
         "symfony/filesystem": "^4.4",
         "symfony/finder": "^4.4",

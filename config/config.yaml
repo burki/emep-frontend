@@ -117,20 +117,6 @@ stof_doctrine_extensions:
         default:
             timestampable: true
 
-assetic:
-    debug:          '%kernel.debug%'
-    use_controller: '%kernel.debug%'
-    # assetic scans bundles to find assetic tags
-    # that's why we set it in
-    # AppBundle\Resources\views\Shared\stylesheets.html.twig
-    # and not directly in temples/Base/base.html.twig
-    # bundles: [ AppBundle ]
-    filters:
-        cssrewrite: ~
-        # see http://symfony.com/doc/current/cookbook/assetic/php.html
-        scssphp:
-            formatter: 'Leafo\ScssPhp\Formatter\Compressed'
-
 knp_menu:
     # use "twig: false" to disable the Twig extension and the TwigRenderer
     twig:
@@ -139,10 +125,22 @@ knp_menu:
     # the renderer to use, list is also available by default
     default_renderer: twig
 
+scssphp:
+    assets:
+        "css/base.css":
+            src: "web/assets/scss/base.scss"
+            sourceMap: true
+            outputFolder: web
+#            importPaths:
+#                - "vendor/twbs/bootstrap/scss"
+#            variables:
+#                primary: '#ff0066'
+
 liip_url_auto_converter:
     linkclass:
     target: _blank
     debugmode: false
+
 knp_paginator:
     page_range: 5                       # number of links showed in the pagination menu (e.g: you have 10 pages, a page_range of 3, on the 5th page you'll see links to page 4, 5, 6)
     default_options:
