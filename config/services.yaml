@@ -4,7 +4,7 @@ services:
         autowire: true
         autoconfigure: true
         public: false
-          
+
     # makes classes in src/AppBundle available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     # together with the above _defaults, this is needed for Command-classes to work as in Sf 3.4
@@ -16,12 +16,6 @@ services:
         class: Twig_Extensions_Extension_Text
         tags:
             - { name: twig.extension }
-
-    #app.twig_extension:
-    #    class: AppBundle\Twig\AppExtension
-    #    public: false
-    #    tags:
-    #        - { name: twig.extension }
 
     app.menu_builder:
         class: AppBundle\Menu\Builder
