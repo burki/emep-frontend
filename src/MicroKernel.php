@@ -53,49 +53,49 @@ extends Kernel
 
             new \Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
             new \Doctrine\Bundle\DoctrineCacheBundle\DoctrineCacheBundle(),
-            new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
+            new \Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
 
-            new Symfony\Bundle\MonologBundle\MonologBundle(), // required by JMS\TranslationBundle\JMSTranslationBundle
+            new \Symfony\Bundle\MonologBundle\MonologBundle(), // required by JMS\TranslationBundle\JMSTranslationBundle
 
             // login
             new \Symfony\Bundle\SecurityBundle\SecurityBundle(),
 
             // asset management
             // see http://symfony.com/doc/current/cookbook/assetic/asset_management.html
-            new Symfony\Bundle\AsseticBundle\AsseticBundle(),
+            new \Symfony\Bundle\AsseticBundle\AsseticBundle(),
 
             // menu
             // see http://symfony.com/doc/current/bundles/KnpMenuBundle/index.html
-            new Knp\Bundle\MenuBundle\KnpMenuBundle(),
+            new \Knp\Bundle\MenuBundle\KnpMenuBundle(),
 
             // search / filter / paginate
-            new Lexik\Bundle\FormFilterBundle\LexikFormFilterBundle(),
-            new Knp\Bundle\PaginatorBundle\KnpPaginatorBundle(),
+            new \Lexik\Bundle\FormFilterBundle\LexikFormFilterBundle(),
+            new \Knp\Bundle\PaginatorBundle\KnpPaginatorBundle(),
 
             // select2 integration
-            new Tetranz\Select2EntityBundle\TetranzSelect2EntityBundle(),
+            new \Tetranz\Select2EntityBundle\TetranzSelect2EntityBundle(),
 
             // converturls filter
-            new Liip\UrlAutoConverterBundle\LiipUrlAutoConverterBundle(),
+            new \Liip\UrlAutoConverterBundle\LiipUrlAutoConverterBundle(),
 
             // form
-            new Shapecode\Bundle\HiddenEntityTypeBundle\ShapecodeHiddenEntityTypeBundle(),
+            new \Shapecode\Bundle\HiddenEntityTypeBundle\ShapecodeHiddenEntityTypeBundle(),
 
             // contact
-            new Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle(),
+            new \Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle(),
 
             // $slug = $this->get('cocur_slugify')->slugify('Hello World!');
             // see https://github.com/cocur/slugify#user-content-symfony2
-            new Cocur\Slugify\Bridge\Symfony\CocurSlugifyBundle(),
+            new \Cocur\Slugify\Bridge\Symfony\CocurSlugifyBundle(),
 
             // pagination
-            new WhiteOctober\PagerfantaBundle\WhiteOctoberPagerfantaBundle(),
+            new \WhiteOctober\PagerfantaBundle\WhiteOctoberPagerfantaBundle(),
 
             // sitemap
-            new Presta\SitemapBundle\PrestaSitemapBundle(),
+            new \Presta\SitemapBundle\PrestaSitemapBundle(),
 
             // own code
-            new AppBundle\AppBundle(),
+            new \AppBundle\AppBundle(),
         ];
 
         if (in_array($this->getEnvironment(), ['dev', 'test'], true)) {
