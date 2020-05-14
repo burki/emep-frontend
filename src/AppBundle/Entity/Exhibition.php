@@ -50,7 +50,7 @@ implements JsonLdSerializable
     private $type = 'group';
 
     /**
-     * @ORM\ManyToOne(targetEntity="Location", cascade={"all"}, fetch="EAGER")
+     * @ORM\ManyToOne(targetEntity="Location", inversedBy="exhibitions", cascade={"all"}, fetch="EAGER")
      * @ORM\JoinColumn(name="id_location", referencedColumnName="id")
      */
     protected $location;

@@ -129,7 +129,7 @@ implements \JsonSerializable, JsonLdSerializable
     /**
      * @var Place The place of the location
      *
-     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Place")
+     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Place", inversedBy="locations")
      * @ORM\JoinColumn(name="place_tgn", referencedColumnName="tgn")
      */
     protected $place;

@@ -23,7 +23,7 @@ class ItemExhibition
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Exhibition")
+     * @ORM\ManyToOne(targetEntity="Exhibition", inversedBy="catalogueEntries")
      * @ORM\JoinColumn(name="id_exhibition", referencedColumnName="id")
      * @var Item
      */
@@ -37,7 +37,7 @@ class ItemExhibition
     private $item;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Person")
+     * @ORM\ManyToOne(targetEntity="Person", inversedBy="catalogueEntries")
      * @ORM\JoinColumn(name="id_person", referencedColumnName="id")
      * @var Person
      */
