@@ -85,7 +85,7 @@
         "ifedko/php-doctrine-dbal-pagination": "^2.0",
         "white-october/pagerfanta-bundle": "^1.2",
 
-        "presta/sitemap-bundle": "^1.7",
+        "presta/sitemap-bundle": "^2.1",
 
         "vnn/wordpress-rest-api-client": "^1.2",
         "guzzlehttp/guzzle": "^6.3"
