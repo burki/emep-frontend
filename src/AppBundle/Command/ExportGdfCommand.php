@@ -3,17 +3,36 @@
 // src/AppBundle/Command/ExportGdfCommand.php
 namespace AppBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
+
+use Doctrine\ORM\EntityManagerInterface;
 
 class ExportGdfCommand
-extends ContainerAwareCommand
+extends Command
 {
+    protected $em;
+    protected $kernel;
+    protected $params;
+
+    public function __construct(EntityManagerInterface $em,
+                                KernelInterface $kernel,
+                                ParameterBagInterface $params)
+    {
+        parent::__construct();
+
+        $this->em = $em;
+        $this->kernel = $kernel;
+        $this->params = $params;
+    }
+
     protected function configure()
     {
         $this
@@ -36,10 +55,9 @@ extends ContainerAwareCommand
     {
         $saveExportPath = $input->getOption('save-export-path');
         if ($saveExportPath !== false) {
-            $container = $this->getContainer();
-            $exportPath = $container->hasParameter('app.export.path')
-                ? $container->getParameter('app.export.path')
-                : $container->get('kernel')->getProjectDir() . '/../site/htdocs/uploads/export';
+            $exportPath = $this->params->has('app.export.path')
+                ? $this->params->get('app.export.path')
+                : $this->kernel->getProjectDir() . '/../site/htdocs/uploads/export';
 
             if (!file_exists($exportPath)) {
                 $output->writeln(sprintf('<error>app.export.path: %s does not exist</error>',
@@ -117,8 +135,7 @@ extends ContainerAwareCommand
 
     protected function exportPersonGdf($output)
     {
-        $em = $this->getContainer()->get('doctrine')->getManager();
-        $qb = $em->createQueryBuilder();
+        $qb = $this->em->createQueryBuilder();
 
         $qb->select([
                 'P',
@@ -158,7 +175,7 @@ extends ContainerAwareCommand
         $output->writeln(stream_get_contents($fp)); // Fetch the contents of our CSV
         fclose($fp); // Close our pointer and free up memory and /tmp space
 
-        $qb = $em->createQueryBuilder();
+        $qb = $this->em->createQueryBuilder();
         $qb->select('E.id as exhibitionId', 'P.id as personId')
             ->distinct()
             ->from('AppBundle:ItemExhibition', 'IE')
@@ -202,8 +219,7 @@ extends ContainerAwareCommand
 
     protected function exportLocationGdf()
     {
-        $em = $this->getContainer()->get('doctrine')->getManager();
-        $qb = $em->createQueryBuilder();
+        $qb = $this->em->createQueryBuilder();
 
         $qb->select([
                 'L',
@@ -243,7 +259,7 @@ extends ContainerAwareCommand
             echo implode(',', [ $nodeId, $nodeLabel ]), "\n";
         }
 
-        $qb = $em->createQueryBuilder();
+        $qb = $this->em->createQueryBuilder();
         $qb->select('L.id as locationId', 'P.id as personId')
             ->distinct()
             ->from('AppBundle:ItemExhibition', 'IE')

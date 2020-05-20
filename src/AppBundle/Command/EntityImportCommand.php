@@ -3,16 +3,29 @@
 // src/AppBundle/Command/EntityEnhanceCommand.php
 namespace AppBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use Symfony\Component\Intl\Countries;
 
-class EntityImportCommand extends ContainerAwareCommand
+use Doctrine\ORM\EntityManagerInterface;
+
+class EntityImportCommand
+extends Command
 {
+    protected $em;
+
+    public function __construct(EntityManagerInterface $em)
+    {
+        parent::__construct();
+
+        $this->em = $em;
+    }
+
     protected function configure()
     {
         $this
@@ -42,8 +55,7 @@ class EntityImportCommand extends ContainerAwareCommand
 
     protected function importCountry()
     {
-        $em = $this->getContainer()->get('doctrine')->getManager();
-        $qb = $em->createQueryBuilder();
+        $qb = $this->em->createQueryBuilder();
 
         $qb->select([
                 'P.countryCode',
@@ -60,13 +72,13 @@ class EntityImportCommand extends ContainerAwareCommand
         foreach ($qb->getQuery()->getResult() as $result) {
             $country = new \AppBundle\Entity\Country();
             $country->setCountryCode($result['countryCode']);
-            $country->setName(\Symfony\Component\Intl\Intl::getRegionBundle()->getCountryName($result['countryCode'], 'en'));
-            $em->persist($country);
+            $country->setName(Countries::getName($result['countryCode'], 'en'));
+            $this->em->persist($country);
             $flush = true;
         }
 
         if ($flush) {
-            $em->flush();
+            $this->em->flush();
         }
     }
 }

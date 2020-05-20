@@ -3,8 +3,7 @@
 // src/AppBundle/Command/PersonCommand.php
 namespace AppBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -12,9 +11,20 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
+use Doctrine\ORM\EntityManagerInterface;
+
 class PersonFetchCommand
-extends ContainerAwareCommand
+extends Command
 {
+    protected $em;
+
+    public function __construct(EntityManagerInterface $em)
+    {
+        parent::__construct();
+
+        $this->em = $em;
+    }
+
     protected function configure()
     {
         $this
@@ -100,8 +110,7 @@ EOT;
     {
         $sparqlClient = new \EasyRdf_Sparql_Client('https://query.wikidata.org/sparql');
 
-        $em = $this->getContainer()->get('doctrine')->getManager();
-        $personRepository = $em->getRepository('AppBundle:Person');
+        $personRepository = $this->em->getRepository('AppBundle:Person');
 
         $criteria = new \Doctrine\Common\Collections\Criteria();
         $criteria->where($criteria->expr()->neq(
@@ -131,8 +140,8 @@ EOT;
             $persist = true;
 
             if ($persist) {
-                $em->persist($person);
-                $em->flush();
+                $this->em->persist($person);
+                $this->em->flush();
             }
         }
     }
@@ -141,8 +150,7 @@ EOT;
     {
         $sparqlClient = new \EasyRdf_Sparql_Client('https://query.wikidata.org/sparql');
 
-        $em = $this->getContainer()->get('doctrine')->getManager();
-        $personRepository = $em->getRepository('AppBundle:Person');
+        $personRepository = $this->em->getRepository('AppBundle:Person');
 
         $criteria = new \Doctrine\Common\Collections\Criteria();
         $criteria->where($criteria->expr()->neq(
@@ -207,8 +215,8 @@ EOT;
             }
 
             if ($persist) {
-                $em->persist($person);
-                $em->flush();
+                $this->em->persist($person);
+                $this->em->flush();
             }
         }
     }
