@@ -18,6 +18,8 @@
 
 namespace AppBundle\Twig;
 
+use Symfony\Component\Intl\Countries;
+
 class AppExtension
 extends \Twig\Extension\AbstractExtension
 {
@@ -111,7 +113,7 @@ extends \Twig\Extension\AbstractExtension
     // see https://github.com/symfony/symfony/issues/13641
     public function getCountryName($country, $displayLocale = null)
     {
-        return \Symfony\Component\Intl\Intl::getRegionBundle()->getCountryName($country, $displayLocale);
+        return Countries::getName($country, $displayLocale);
     }
 
     public function daterangeincompleteFunction($datestrFrom, $datestrUntil, $locale = null)

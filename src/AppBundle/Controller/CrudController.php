@@ -4,7 +4,7 @@ namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Countries;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -47,7 +47,7 @@ extends Controller
             return $labelUnknown;
         }
 
-        return Intl::getRegionBundle()->getCountryName($countryCode);
+        return Countries::getName($countryCode);
     }
 
     protected function buildActiveCountries($qb)
