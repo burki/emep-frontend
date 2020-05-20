@@ -17,7 +17,6 @@
         {% import 'Shared/helper.html.twig' as helper %}
         <div class="filters-heading" style="margin-top: 25px;">
             <span style="margin-right: 20px; margin-top: 7px">Additional Filters:</span>
-
             {%
             set entityLabels = {
                 'exhibition-range': 'Exhibition Date Range',
@@ -26,12 +25,12 @@
                 'person-gender': 'Artists’ Gender'
             }
             %}
-
             {% for entity,label in entityLabels %}
                 <button type="button" class="btn" data-toggle="collapse" data-target="#filter-panel-{{ entity }}">
                     <span class="glyphicon glyphicon-cog"></span> {{ label }}
                 </button>
             {% endfor %}
+            <span style="margin-left: 20px; margin-top: 7px"><a href="{{ path('search-index', { 'entity' : 'Exhibition' }) }}">Advanced Search</a></span>
         </div>
 
         <div class="filter-combination-container">
@@ -76,6 +75,5 @@
 
             {{ helper.render_active_filters(listBuilder, form, entityLabels) }}
         </div><!-- .filter-combination-container -->
-
     {% endblock %}
 </form>

@@ -17,17 +17,17 @@
         {% import 'Shared/helper.html.twig' as helper %}
         <div class="filters-heading" style="margin-top: 25px;">
             <span style="margin-right: 20px; margin-top: 7px">Additional Filters:</span>
-
             {% set entityLabels = {
                 'person-birth': 'Year of Birth',
                 'person-death': 'Year of Death',
-            } %}
-
+            }
+            %}
             {% for entity,label in entityLabels %}
                 <button type="button" class="btn" data-toggle="collapse" data-target="#filter-panel-{{ entity }}">
                     <span class="glyphicon glyphicon-cog"></span> {{ label }}
                 </button>
             {% endfor %}
+            <span style="margin-left: 20px; margin-top: 7px"><a href="{{ path('search-index', { 'entity' : 'Person' }) }}">Advanced Search</a></span>
         </div>
 
         <div class="filter-combination-container">

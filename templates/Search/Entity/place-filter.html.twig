@@ -14,6 +14,10 @@
 
     {% block filters %}
         {% import 'Shared/helper.html.twig' as helper %}
+        <div class="filters-heading" style="margin-top: 25px;">
+            <span style="margin-left: 20px; margin-top: 7px"><a href="{{ path('search-index', { 'entity' : 'Place' }) }}">Advanced Search</a></span>
+        </div>
+
         <div class="filter-combination-container">
             {% form_theme form 'Search/bootstrap_3_adjusted.html.twig' %}
             <div style="display:none">{{ form_row(form.location.location) }}{# for checkbox filter #}</div>
