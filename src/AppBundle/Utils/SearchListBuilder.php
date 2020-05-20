@@ -527,6 +527,12 @@ extends ListBuilder
                     if ('preface' == $flag) {
                         $queryBuilder->andWhere('E.preface IS NOT NULL');
                     }
+                    else if ('itemexhibition-missing' == $flag) {
+                        $queryBuilder->andWhere('IE.id IS NULL');
+                    }
+                    else if ('itemexhibition-required' == $flag) {
+                        $queryBuilder->andWhere('IE.id IS NOT NULL');
+                    }
                     else if (0 <> intval($flag)) {
                         $paramName = 'exhibition_flags_' . $i;
                         $queryBuilder->andWhere(sprintf('(E.flags & %s) <> 0',

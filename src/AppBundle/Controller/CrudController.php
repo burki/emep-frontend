@@ -506,6 +506,8 @@ extends Controller
                 'exhibition_flags' => array_flip([
                     \AppBundle\Entity\Exhibition::FLAGS_TRAVELING => 'Traveling Exhibition',
                     \AppBundle\Entity\Exhibition::FLAGS_NOCATALOGUE => 'No Catalogue available',
+                    'itemexhibition-missing' => 'No Catalogue Entries available',
+                    'itemexhibition-required' => '- Exclude Exhibitions without Catalogue Entries -',
                     \AppBundle\Entity\Exhibition::FLAGS_ALTEREDSTRUCTURE => 'Catalogue Structure altered',
                     'preface' => 'Catalogue Preface available',
                     \AppBundle\Entity\Exhibition::FLAGS_OTHERMEDIUMSLISTED => 'Other Mediums listed',
