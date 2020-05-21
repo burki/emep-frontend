@@ -20,13 +20,6 @@ extends SearchListBuilder
             . " LEFT OUTER JOIN Geoname PL ON L.place_tgn=PL.tgn"
             . " LEFT OUTER JOIN ItemExhibition IE ON IE.id_exhibition=E.id"
             . " LEFT OUTER JOIN Person P ON IE.id_person=P.id"
-            /*
-            // TODO: check correctness / performance
-            . " LEFT OUTER JOIN ExhibitionLocation EL ON EL.id_location=L.id AND EL.role = 0"
-            . " LEFT OUTER JOIN Exhibition EO ON EO.id = EL.id_exhibition=EO.id"
-            . " LEFT OUTER JOIN ItemExhibition IEO ON IE.id_exhibition=EO.id"
-            . " LEFT OUTER JOIN Person PO ON IEO.id_person=PO.id"
-            */
             . " WHERE L.id=?";
 
         $stmt = $connection->executeQuery($querystr, [ $id ]);

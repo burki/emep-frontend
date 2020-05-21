@@ -455,6 +455,13 @@ extends SearchListBuilder
 
         $this->addQueryFilters($queryBuilder);
 
+        if (array_key_exists('organizer', $this->queryFilters)) {
+            // so we can filter on PO.*
+            $queryBuilder->leftJoin('O',
+                                    'Geoname', 'PO',
+                                    'O.place_tgn=PO.tgn');
+        }
+
         return $this;
     }
 }

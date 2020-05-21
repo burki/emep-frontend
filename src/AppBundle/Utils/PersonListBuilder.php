@@ -497,11 +497,10 @@ extends SearchListBuilder
                                         'Location', 'O',
                                         'EL.id_location=O.id AND EL.role = 0');
 
-                /*
+                // so we can filter on PO.*
                 $queryBuilder->leftJoin('O',
                                         'Geoname', 'PO',
-                                        'L.place_tgn=P=.tgn');
-                */
+                                        'O.place_tgn=PO.tgn');
             }
         }
 

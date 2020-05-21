@@ -21,13 +21,6 @@ extends SearchListBuilder
             . " LEFT OUTER JOIN Exhibition E ON E.id_location=L.id"
             . " LEFT OUTER JOIN ItemExhibition IE ON IE.id_exhibition=E.id"
             . " LEFT OUTER JOIN Person P ON IE.id_person=P.id"
-            /*
-            // TODO: the following kills performance, investigate
-            . " LEFT OUTER JOIN ExhibitionLocation EL ON EL.id_location=L.id AND EL.role = 0"
-            . " LEFT OUTER JOIN Exhibition EO ON EO.id = EL.id_exhibition=EO.id"
-            . " LEFT OUTER JOIN ItemExhibition IEO ON IEO.id_exhibition=EO.id"
-            . " LEFT OUTER JOIN Person PO ON IEO.id_person=PO.id"
-            */
             . " WHERE PL.tgn=?";
 
         $stmt = $connection->executeQuery($querystr, [ $tgn ]);
@@ -334,6 +327,11 @@ extends SearchListBuilder
             $queryBuilder->innerJoin('EL',
                                     'Location', 'O',
                                     'EL.id_location=O.id AND EL.role = 0');
+
+            // so we can filter on PO.*
+            $queryBuilder->leftJoin('O',
+                                    'Geoname', 'PO',
+                                    'O.place_tgn=PO.tgn');
         }
 
         return $this;
