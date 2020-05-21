@@ -320,7 +320,7 @@ extends SearchListBuilder
         if ('stats-gender' == $this->mode) {
             $queryBuilder->select([
                 'P.sex as person_gender',
-                'COUNT( DISTINCT P.id) AS how_many',
+                'COUNT(DISTINCT P.id) AS how_many',
             ]);
 
             return $this;

@@ -217,7 +217,12 @@ extends SearchListBuilder
         // TODO: it might be better to use a new map-$mode instead of _route
         $this->joinLatLong = in_array($request->get('_route'), [ 'search-map', 'person-index-map' ]);
 
-        if (in_array($this->mode, [ 'stats-nationality', 'stats-exhibition-distribution' ])) {
+        if ($this->joinLatLong) {
+            // make sure we ignore sort=count_itemexhibition
+            // since we don't care for order in map display, lets just use one order
+            $this->orders = [ 'default' => $this->orders['person'] ];
+        }
+        else if (in_array($this->mode, [ 'stats-nationality', 'stats-exhibition-distribution' ])) {
             $this->orders = [ 'default' => [ 'asc' => [ 'how_many DESC' ] ] ];
         }
         else if (in_array($this->mode, [ 'stats-by-year-birth', 'stats-by-year-death' ])) {
