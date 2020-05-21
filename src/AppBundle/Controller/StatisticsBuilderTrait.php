@@ -397,7 +397,9 @@ trait StatisticsBuilderTrait
         $data = [];
         while ($row = $stmt->fetch()) {
             $data[] = [
-                'name' => empty($row['nationality']) ? 'unknown' : $row['nationality'],
+                'name' => empty($row['nationality'])
+                    ? '[unknown]'
+                    : $this->expandCountryCode($row['nationality']),
                 'y' => (int)$row['how_many'],
             ];
         }
