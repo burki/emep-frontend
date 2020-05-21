@@ -613,7 +613,7 @@ extends ListBuilder
                 $this->addGeonameFilter($queryBuilder, [
                                             'cc' => 'PO.country_code',
                                             'tgn' => 'O.place_tgn',
-                                        ], $key, $organizerFilters[$key]);
+                                        ], $key . '_organizer', $organizerFilters[$key]);
             }
         }
 
