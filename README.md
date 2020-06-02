@@ -22,10 +22,15 @@ Adjust Settings (database user/password and mail-delivery settings)
 - vi config/parameters.yaml
 
 
-If you get errors due to var not being writable, adjust directory dermissions as
-described in https://symfony.com/doc/3.3/setup/file_permissions.html
+If you get errors due to var not being writable, adjust directory permissions as
+described in https://symfony.com/doc/3.4/setup/file_permissions.html
 - sudo setfacl -R -m u:www-data:rwX /path/to/var
 - sudo setfacl -dR -m u:www-data:rwX /path/to/var
+
+If you get errors due to web/css not being writable, adjust directory permissions as
+described in https://symfony.com/doc/3.4/setup/file_permissions.html
+- sudo setfacl -R -m u:www-data:rwX /path/to/web/css
+- sudo setfacl -dR -m u:www-data:rwX /path/to/web/css
 
 Adjust your web-server configuration to point to web-folder, e.g.
     Alias /data /path/to/web
