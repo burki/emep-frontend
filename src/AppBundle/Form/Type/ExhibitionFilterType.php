@@ -60,7 +60,7 @@ extends AbstractType
             'primary_key' => 'id',
             'text_property' => 'title',
             'minimum_input_length' => 2,
-            'page_limit' => 10,
+            'page_limit' => 20, // so Nus shows despite many Turnus Exhibhitions
             'allow_clear' => false,
             'delay' => 25,
             'cache' => true,
