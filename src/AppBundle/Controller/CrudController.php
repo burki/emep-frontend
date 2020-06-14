@@ -6,14 +6,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Intl\Countries;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Knp\Component\Pager\PaginatorInterface;
 
 /**
  * Shared settings and methods for the various Controllers
  */
 abstract class CrudController
-extends Controller
+extends BaseController
 {
     protected $pageSize = 50;
 
@@ -355,7 +356,8 @@ extends Controller
      */
     protected function handleSaveSearchAction(Request $request,
                                               UrlGeneratorInterface $urlGenerator,
-                                              UserInterface $user)
+                                              UserInterface $user,
+                                              TranslatorInterface $translator)
     {
         list($route, $routeParams) = $this->buildSaveSearchParams($request, $urlGenerator);
 
@@ -389,7 +391,7 @@ extends Controller
         }
 
         return $this->render('User/save.html.twig', [
-            'pageTitle' => $this->get('translator')->trans('Save your query'),
+            'pageTitle' => $translator->trans('Save your query'),
             'form' => $form->createView(),
         ]);
     }
@@ -467,10 +469,10 @@ extends Controller
         return $types;
     }
 
-    protected function buildPagination(Request $request, $query, $options = [])
+    protected function buildPagination(Request $request,
+                                       PaginatorInterface $paginator,
+                                       $query, $options = [])
     {
-        $paginator = $this->get('knp_paginator');
-
         $limit = $this->pageSize;
         if (array_key_exists('pageSize', $options)) {
             $limit = $options['pageSize'];
@@ -487,6 +489,7 @@ extends Controller
     protected function createSearchForm(Request $request, $urlGenerator)
     {
         $venueTypes = $this->buildVenueTypes();
+
         $venueGeonames = $this->buildVenueGeonames();
         // carry the countries over
         $placeGeonames = [];
@@ -522,7 +525,7 @@ extends Controller
                 'location_geoname' => array_flip($venueGeonames),
                 'location_type' => array_combine($venueTypes, $venueTypes),
                 'organizer_geoname' => array_flip($this->buildOrganizerGeonames($request, $urlGenerator)),
-                'organizer_type' => array_combine($venueTypes, $venueTypes),
+                'organizer_type' => array_combine($exhibitionOrganizerTypes, $exhibitionOrganizerTypes),
                 'holder_geoname' => array_flip($this->buildHolderGeonames()),
                 'place_geoname' => array_flip($placeGeonames),
                 'itemexhibition_type' => array_flip($this->buildItemExhibitionTypes()),
@@ -712,8 +715,7 @@ extends Controller
 
     protected function instantiateCiteProc($locale)
     {
-        $kernel = $this->get('kernel');
-        $path = $kernel->locateResource('@AppBundle/Resources/csl/infoclio-de.csl.xml');
+        $path = $this->kernel->locateResource('@AppBundle/Resources/csl/infoclio-de.csl.xml');
 
         return new \AcademicPuma\CiteProc\CiteProc(file_get_contents($path), $locale);
     }

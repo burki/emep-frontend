@@ -10,6 +10,8 @@
 
 namespace AppBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
+
 trait SharingBuilderTrait
 {
     /*
@@ -18,7 +20,7 @@ trait SharingBuilderTrait
      */
     protected function buildOgLocale()
     {
-        $locale = $this->get('request_stack')->getCurrentRequest()->getLocale();
+        $locale = $this->translator->getLocale();
 
         switch ($locale) {
             case 'en':
@@ -38,36 +40,20 @@ trait SharingBuilderTrait
      * Debug through https://developers.facebook.com/tools/debug/sharing/
      *
      */
-    public function buildOg($entity, $routeName, $routeParams = [])
+    public function buildOg(Request $request, $entity, $routeName, $routeParams = [])
     {
-        $translator = $this->container->get('translator');
         $twig = $this->container->get('twig');
-        $globals = $twig->getGlobals();
 
         if (empty($routeParams)) {
             $routeParams = [ 'id' => $entity->getId() ];
         }
 
         $og = [
-            'og:site_name' => $translator->trans($globals['siteName']),
+            'og:site_name' => $this->translator->trans($this->getGlobal('siteName')),
             'og:locale' => $this->buildOgLocale(),
             'og:url' => $this->generateUrl($routeName, $routeParams,
                                            \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL),
         ];
-
-        /*
-        foreach ($app['app_allowed_locales'] as $locale) {
-            $locale_full = $this->buildOgLocale($request, $app, $locale);
-            if ($locale_full != $og['og:locale']) {
-                if (!isset($og['og:locale:alternate'])) {
-                    $og['og:locale:alternate'] = [];
-                }
-                $og['og:locale:alternate'][] = $locale_full;
-            }
-        }
-        */
-
-        $request = $this->get('request_stack')->getCurrentRequest();
 
         $baseUri = $request->getUriForPath('/');
 
@@ -76,7 +62,7 @@ trait SharingBuilderTrait
             if (isset($ogEntity)) {
                 $og = array_merge($og, $ogEntity);
                 if (array_key_exists('article:section', $og)) {
-                    $og['article:section'] = $translator->trans($og['article:section']);
+                    $og['article:section'] = $this->translator->trans($og['article:section']);
                 }
             }
         }

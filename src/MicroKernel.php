@@ -52,7 +52,7 @@ extends Kernel
             new \Symfony\Bundle\TwigBundle\TwigBundle(),
 
             new \Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
-            new \Doctrine\Bundle\DoctrineCacheBundle\DoctrineCacheBundle(),
+            // new \Doctrine\Bundle\DoctrineCacheBundle\DoctrineCacheBundle(),
             new \Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
 
             new \Symfony\Bundle\MonologBundle\MonologBundle(), // required by JMS\TranslationBundle\JMSTranslationBundle
@@ -88,7 +88,7 @@ extends Kernel
             new \Cocur\Slugify\Bridge\Symfony\CocurSlugifyBundle(),
 
             // pagination
-            new \WhiteOctober\PagerfantaBundle\WhiteOctoberPagerfantaBundle(),
+            new \BabDev\PagerfantaBundle\BabDevPagerfantaBundle(),
 
             // sitemap
             new \Presta\SitemapBundle\PrestaSitemapBundle(),
@@ -145,7 +145,7 @@ extends Kernel
 
             $routes->mount(
                 '/_error',
-                $routes->import('@TwigBundle/Resources/config/routing/errors.xml')
+                $routes->import('@FrameworkBundle/Resources/config/routing/errors.xml')
             );
         }
 

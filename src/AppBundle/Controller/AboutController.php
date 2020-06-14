@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  *
@@ -11,15 +12,14 @@ use Symfony\Component\Routing\Annotation\Route;
 class AboutController
 extends DefaultController
 {
-    protected function sendMessage($data)
+    protected function sendMessage($mailer, $data)
     {
         $template = $this->get('twig')->loadTemplate('About/contact.email.twig');
         $subject = $template->renderBlock('subject', [ 'data' => $data ]);
         $textBody = $template->renderBlock('body_text', [ 'data' => $data ]);
         $htmlBody = $template->renderBlock('body_html', [ 'data' => $data ]);
 
-        $message = \Swift_Message::newInstance()
-            ->setSubject($subject)
+        $message = (new \Swift_Message($subject))
             ->setFrom('burckhardtd@geschichte.hu-berlin.de')
             ->setTo('burckhardtd@geschichte.hu-berlin.de')
             ->setReplyTo($data['email']);
@@ -34,7 +34,7 @@ extends DefaultController
         }
 
         try {
-            return $this->get('mailer')->send($message);
+            return $mailer->send($message);
         }
         catch (\Exception $e) {
             return false;
@@ -135,15 +135,16 @@ extends DefaultController
     /**
      * @Route("/contact", name="contact", options={"sitemap" = true})
      */
-    public function contactAction(Request $request)
+    public function contactAction(Request $request,
+                                  TranslatorInterface $translator,
+                                  \Swift_Mailer $mailer)
     {
         $form = $this->createForm(\AppBundle\Form\Type\ContactType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $translator = $this->get('translator');
             return $this->render('About/contact-sent.html.twig', [
                 'pageTitle' => $translator->trans('Contact'),
-                'success' => $this->sendMessage($form->getData()),
+                'success' => $this->sendMessage($mailer, $form->getData()),
             ]);
         }
 

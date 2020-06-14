@@ -355,7 +355,7 @@ extends CrudController
             'pageMeta' => [
                 /*
                 'jsonLd' => $location->jsonLdSerialize($locale),
-                'og' => $this->buildOg($location, $routeName, $routeParams),
+                'og' => $this->buildOg($request, $location, $routeName, $routeParams),
                 'twitter' => $this->buildTwitter($location, $routeName, $routeParams),
                 */
             ],

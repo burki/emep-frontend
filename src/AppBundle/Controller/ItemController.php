@@ -4,14 +4,14 @@ namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Various functions for work-related analysis, currently not tested in public front-end
  */
 class ItemController
-extends Controller
+extends BaseController
 {
     use SharingBuilderTrait;
 
@@ -39,7 +39,8 @@ extends Controller
      * @Route("/work/by-exhibition", name="item-by-exhibition")
      * @Route("/work/by-style", name="item-by-style")
      */
-    public function indexAction(Request $request)
+    public function indexAction(Request $request,
+                                TranslatorInterface $translator)
     {
         $route = $request->get('_route');
 
@@ -138,7 +139,7 @@ extends Controller
         return $this->render('Item/index'
                              . $templateAppend
                              . '.html.twig', [
-            'pageTitle' => $this->get('translator')->trans('Works'),
+            'pageTitle' => $translator->trans('Works'),
             'results' => $results,
             'persons' => $persons,
             'collections' => $collections,
@@ -176,7 +177,7 @@ extends Controller
             'pageMeta' => [
                 /*
                 'jsonLd' => $item->jsonLdSerialize($locale),
-                'og' => $this->buildOg($item, $routeName, $routeParams),
+                'og' => $this->buildOg($request, $item, $routeName, $routeParams),
                 'twitter' => $this->buildTwitter($item, $routeName, $routeParams),
                 */
             ],
@@ -230,11 +231,11 @@ extends Controller
      * @Route("/work/assessment", name="item-assessment")
      */
     public function assignStyleAction(Request $request,
-                                      \Symfony\Component\HttpFoundation\Session\SessionInterface $session)
+                                      \Symfony\Component\HttpFoundation\Session\SessionInterface $session,
+                                      UserInterface $user)
     {
         $this->denyAccessUnlessGranted('ROLE_EXPERT', null, 'Unable to access this page!');
 
-        $user = $this->get('security.token_storage')->getToken()->getUser();
         $assessment = new \AppBundle\Entity\UserItem();
         $assessment->setUser($user);
 
@@ -262,8 +263,8 @@ extends Controller
             'action' => $this->generateUrl('item-assessment'), // so ?id= isn't passed on
         ];
 
-        $form = $this->get('form.factory')->create(\AppBundle\Form\Type\AssessmentType::class,
-                                                   $assessment, $formOptions);
+        $form = $this->createForm(\AppBundle\Form\Type\AssessmentType::class,
+                                  $assessment, $formOptions);
         if ($request->getMethod() == 'POST' && array_key_exists('submit', $_POST['assessment'])) {
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
@@ -351,8 +352,8 @@ extends Controller
             }
         }
 
-        $form = $this->get('form.factory')->create(\AppBundle\Form\Type\AssessmentType::class,
-                                                   $assessment, $formOptions);
+        $form = $this->createForm(\AppBundle\Form\Type\AssessmentType::class,
+                                  $assessment, $formOptions);
 
         return $this->render('Item/assessment.html.twig', [
             'pageTitle' => 'Assign Style',
@@ -397,7 +398,7 @@ extends Controller
             ->getResult();
 
         return $this->render('Item/assessment-overview.html.twig', [
-            'pageTitle' => $this->get('translator')->trans('Assessed Works'),
+            'pageTitle' => $translator->trans('Assessed Works'),
             'results' => $results,
         ]);
     }

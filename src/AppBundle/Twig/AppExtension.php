@@ -113,6 +113,10 @@ extends \Twig\Extension\AbstractExtension
     // see https://github.com/symfony/symfony/issues/13641
     public function getCountryName($country, $displayLocale = null)
     {
+        if (is_null($country)) {
+            return '';
+        }
+
         return Countries::getName($country, $displayLocale);
     }
 

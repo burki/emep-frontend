@@ -133,7 +133,7 @@ extends CrudController
     {
     }
 
-    protected function sendMessage($template, $data)
+    protected function sendMessage($mailer, $template, $data)
     {
         $template = $this->get('twig')->loadTemplate($template);
 
@@ -155,7 +155,7 @@ extends CrudController
         }
 
         try {
-            return $this->get('mailer')->send($message);
+            return $mailer->send($message);
         }
         catch (\Exception $e) {
             // var_dump($e->getMessage());
@@ -199,7 +199,10 @@ extends CrudController
     /**
      * @Route("/forgot-password", name="user_recoverpassword")
      */
-    public function sendRecoverAction(Request $request, UrlGeneratorInterface $router, AuthenticationUtils $authenticationUtils = null)
+    public function sendRecoverAction(Request $request,
+                                      UrlGeneratorInterface $router,
+                                      \Swift_Mailer $mailer,
+                                      AuthenticationUtils $authenticationUtils = null)
     {
         // 1) build the form
         $form = $this->createForm(\AppBundle\Form\Type\UserRecoverType::class);
@@ -222,7 +225,7 @@ extends CrudController
                         $entityManager->persist($user);
                         $entityManager->flush();
 
-                        $success = $this->sendMessage('user/reset-password.twig', [
+                        $success = $this->sendMessage($mailer, 'user/reset-password.twig', [
                             'to' => $email,
                             'resetUrl' => $router->generate('user_checkrecoverpassword', [ 'username' => $user->getUsername(), 'token' => $user->getConfirmationToken() ], UrlGeneratorInterface::ABSOLUTE_URL),
                         ]);

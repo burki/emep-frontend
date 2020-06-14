@@ -5,7 +5,7 @@ services:
         autoconfigure: true
         public: false
         bind:
-            $rootDir: '%kernel.root_dir%'
+            $projectDir: '%kernel.project_dir%'
 
     # makes classes in src/AppBundle available to be used as services
     # this creates a service per class whose id is the fully-qualified class name

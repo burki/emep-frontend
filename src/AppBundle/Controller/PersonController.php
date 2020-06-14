@@ -8,6 +8,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+use Knp\Component\Pager\PaginatorInterface;
+
 use AppBundle\Utils\CsvResponse;
 
 /**
@@ -79,7 +81,10 @@ extends CrudController
      * @Route("/person/shared.embed/{exhibitions}", name="person-shared-partial")
      * @Route("/person/shared/{exhibitions}", name="person-shared")
      */
-    public function sharedAction(Request $request, $exhibitions = null)
+    public function sharedAction(Request $request,
+                                 PaginatorInterface $paginator,
+                                 TranslatorInterface $translator,
+                                 $exhibitions = null)
     {
         if (!is_null($exhibitions)) {
             $exhibitions = explode(',', $exhibitions);
@@ -133,14 +138,14 @@ extends CrudController
             ->orderBy('nameSort')
             ;
 
-        $pagination = $this->buildPagination($request, $qb->getQuery(), [
+        $pagination = $this->buildPagination($request, $paginator, $qb->getQuery(), [
             'defaultSortFieldName' => 'nameSort', 'defaultSortDirection' => 'asc',
             'pageSize' => 1000,
         ]);
 
         return $this->render('Person/shared.html.twig', [
-            'pageTitle' => $this->get('translator')->trans('Common Artists of')
-                . ' ' . implode(' and ', $names),
+            'pageTitle' => $translator->trans('Common Artists of')
+                . ' ' . implode($translator->trans(' and '), $names),
             'pagination' => $pagination,
         ]);
     }
@@ -474,7 +479,7 @@ extends CrudController
             'dataNumberOfWorksPerType' => $this->detailDataNumberOfWorksPerType($catEntries),
             'pageMeta' => [
                 'jsonLd' => $person->jsonLdSerialize($locale),
-                'og' => $this->buildOg($person, $routeName, $routeParams),
+                'og' => $this->buildOg($request, $person, $routeName, $routeParams),
                 'twitter' => $this->buildTwitter($person, $routeName, $routeParams),
             ],
         ]);

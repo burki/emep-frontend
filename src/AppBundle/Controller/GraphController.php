@@ -8,15 +8,13 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 use Symfony\Component\Routing\Annotation\Route;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-
 use Cocur\BackgroundProcess\BackgroundProcess;
 
 /**
  *
  */
 class GraphController
-extends Controller
+extends BaseController
 {
     static function getPhpBin()
     {
@@ -43,7 +41,7 @@ extends Controller
 
         $exportPath = $this->container->hasParameter('app.export.path')
             ? $this->getParameter('app.export.path')
-            : $this->get('kernel')->getProjectDir() . '/../site/htdocs/uploads/export';
+            : $this->kernel->getProjectDir() . '/../site/htdocs/uploads/export';
 
         if (false === realpath($exportPath)) {
             throw new \InvalidArgumentException($exportPath . ' does not exist');

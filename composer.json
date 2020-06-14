@@ -11,68 +11,73 @@
             "type": "vcs"
         },
         {
+            "url": "https://github.com/burki/hidden-entity-type-bundle.git",
+            "type": "vcs"
+        },
+        {
             "url": "https://github.com/burki/LiipUrlAutoConverterBundle.git",
             "type": "vcs"
         }
     ],
 
     "require": {
-        "symfony/yaml": "^4.4",
-        "symfony/console": "^4.4",
-        "symfony/framework-bundle": "^4.4",
+        "symfony/yaml": "^5.1",
+        "symfony/console": "^5.1",
+        "symfony/framework-bundle": "^5.1",
 
-        "symfony/templating": "^4.4",
-        "symfony/translation": "^4.4",
-        "symfony/twig-bridge": "^4.4",
-        "symfony/twig-bundle": "^4.4",
-        "symfony/intl": "^4.4",
+        "symfony/templating": "^5.1",
+        "symfony/translation": "^5.1",
+        "symfony/twig-bridge": "^5.1",
+        "symfony/twig-bundle": "^5.1",
+        "symfony/intl": "^5.1",
 
-        "symfony/security-bundle": "^4.4",
-        "symfony/security-core": "^4.4",
-        "symfony/security-csrf": "^4.4",
+        "symfony/security-bundle": "^5.1",
+        "symfony/security-core": "^5.1",
+        "symfony/security-csrf": "^5.1",
 
-        "symfony/web-profiler-bundle": "^4.4",
-        "symfony/debug-bundle": "^4.4",
-        "symfony/var-dumper": "^4.4",
-        "symfony/var-exporter": "^4.4",
-        "symfony/http-foundation": "^4.4",
-        "symfony/mime": "^4.4",
+        "symfony/web-profiler-bundle": "^5.1",
+        "symfony/debug-bundle": "^5.1",
+        "symfony/var-dumper": "^5.1",
+        "symfony/var-exporter": "^5.1",
+        "symfony/http-foundation": "^5.1",
+        "symfony/mime": "^5.1",
 
-        "symfony/validator": "^4.4",
-        "symfony/form": "^4.4",
-        "symfony/inflector": "^4.4",
-        "shapecode/hidden-entity-type-bundle": "^3.0",
+        "symfony/validator": "^5.1",
+        "symfony/form": "^5.1",
+        "symfony/inflector": "^5.1",
+        "shapecode/hidden-entity-type-bundle": "dev-master",
 
-        "symfony/monolog-bundle": "^3.3",
-        "symfony/monolog-bridge": "^4.4",
-        "symfony/swiftmailer-bundle": "^3.2",
+        "symfony/monolog-bundle": "^3.5",
+        "symfony/monolog-bridge": "^5.1",
+        "symfony/swiftmailer-bundle": "^3.4",
         "knplabs/knp-menu-bundle": "^3.0",
 
-        "symfony/asset": "^4.4",
+        "symfony/asset": "^5.1",
         "armin/scssphp-bundle": "^1.1",
 
-        "symfony/filesystem": "^4.4",
-        "symfony/finder": "^4.4",
+        "symfony/filesystem": "^5.1",
+        "symfony/finder": "^5.1",
 
-        "lexik/form-filter-bundle": "^5.0",
-        "knplabs/knp-paginator-bundle": "^3.0",
+        "lexik/form-filter-bundle": "^6.0",
+        "knplabs/knp-paginator-bundle": "^5.2",
 
         "cocur/slugify": "^3.2",
         "twig/twig": "^2.11",
         "twig/extensions": "^1.5",
         "liip/url-auto-converter-bundle": "dev-master",
 
-        "doctrine/doctrine-bundle": "^1.10",
+        "doctrine/doctrine-bundle": "^2.0",
+        "symfony/cache": "^5.1",
+
         "stof/doctrine-extensions-bundle": "~1.2",
         "beberlei/doctrineextensions": "@stable",
         "scienta/doctrine-json-functions": "^4.0",
 
-        "tetranz/select2entity-bundle": "2.*",
+        "tetranz/select2entity-bundle": "^3.0",
 
         "wikimedia/utfnormal": "^2.0",
 
-        "semsol/arc2": "^2.4",
-        "easyrdf/easyrdf": "^0.9",
+        "sweetyrdf/easyrdf": "1.0.0-RC1",
         "seboettg/citeproc-php": "dev-name-as-sort-order-fix#bf446dc",
         "fale/isbn": "3.*",
 
@@ -83,7 +88,7 @@
         "cocur/background-process": "0.7.*",
 
         "ifedko/php-doctrine-dbal-pagination": "^2.0",
-        "white-october/pagerfanta-bundle": "^1.2",
+        "babdev/pagerfanta-bundle": "^2.2",
 
         "presta/sitemap-bundle": "^2.1",
 

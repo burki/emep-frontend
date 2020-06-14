@@ -7,6 +7,11 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Intl\Intl;
+use Symfony\Contracts\Translation\TranslatorInterface;
+
+use Knp\Component\Pager\PaginatorInterface;
+
+use Lexik\Bundle\FormFilterBundle\Filter\FilterBuilderUpdaterInterface;
 
 /**
  *
@@ -44,7 +49,10 @@ extends CrudController
     /**
      * @Route("/place", name="place-inhabited")
      */
-    public function indexAction(Request $request)
+    public function indexAction(Request $request,
+                                TranslatorInterface $translator,
+                                PaginatorInterface $paginator,
+                                FilterBuilderUpdaterInterface $queryBuilderUpdater)
     {
         $qb = $this->getDoctrine()
                 ->getManager()
@@ -73,7 +81,7 @@ extends CrudController
             ->orderBy('nameSort')
             ;
 
-        $form = $this->get('form.factory')->create(\AppBundle\Filter\PlaceFilterType::class, [
+        $form = $this->createForm(\AppBundle\Filter\PlaceFilterType::class, [
             'choices' => array_flip($this->buildCountries()),
         ]);
 
@@ -82,17 +90,17 @@ extends CrudController
             $form->submit($request->query->get($form->getName()));
 
             // build the query from the given form object
-            $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($form, $qb);
+            $queryBuilderUpdater->addFilterConditions($form, $qb);
         }
 
-        $pagination = $this->buildPagination($request, $qb->getQuery(), [
+        $pagination = $this->buildPagination($request, $paginator, $qb->getQuery(), [
             // the following leads to wrong display in combination with our
             // helper.pagination_sortable()
             // 'defaultSortFieldName' => 'nameSort', 'defaultSortDirection' => 'asc',
         ]);
 
         return $this->render('Place/index.html.twig', [
-            'pageTitle' => $this->get('translator')->trans('Places'),
+            'pageTitle' => $translator->trans('Places'),
             'pagination' => $pagination,
             'form' => $form->createView(),
         ]);

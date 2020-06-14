@@ -7,6 +7,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+use Knp\Component\Pager\PaginatorInterface;
+
 use AppBundle\Utils\CsvResponse;
 
 /**
@@ -73,7 +75,10 @@ extends CrudController
      * @Route("/exhibition/shared.embed/{persons}", name="exhibition-shared-partial")
      * @Route("/exhibition/shared/{persons}", name="exhibition-shared")
      */
-    public function sharedAction(Request $request, $persons = null)
+    public function sharedAction(Request $request,
+                                 PaginatorInterface $paginator,
+                                 TranslatorInterface $translator,
+                                 $persons = null)
     {
         if (!is_null($persons)) {
             $persons = explode(',', $persons);
@@ -131,14 +136,14 @@ extends CrudController
             ->orderBy('dateSort')
             ;
 
-        $pagination = $this->buildPagination($request, $qb->getQuery(), [
+        $pagination = $this->buildPagination($request, $paginator, $qb->getQuery(), [
             'defaultSortFieldName' => 'dateSort', 'defaultSortDirection' => 'asc',
             'pageSize' => 1000,
         ]);
 
         return $this->render('Exhibition/shared.html.twig', [
-            'pageTitle' => $this->get('translator')->trans('Common Exhibitions of')
-                . ' ' . implode(' and ', $names),
+            'pageTitle' => $translator->trans('Common Exhibitions of')
+                . ' ' . implode($translator->trans(' and '), $names),
             'pagination' => $pagination,
         ]);
     }
@@ -544,7 +549,7 @@ extends CrudController
                 ),
                 'jsonLd' => $exhibition->jsonLdSerialize($request->getLocale()),
                 /*
-                'og' => $this->buildOg($exhibition, $routeName, $routeParams),
+                'og' => $this->buildOg($request, $exhibition, $routeName, $routeParams),
                 'twitter' => $this->buildTwitter($exhibition, $routeName, $routeParams),
                 */
             ],

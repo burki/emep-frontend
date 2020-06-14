@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 use Pagerfanta\Pagerfanta;
 
@@ -52,6 +53,7 @@ extends CrudController
      */
     public function indexAction(Request $request,
                                 UrlGeneratorInterface $urlGenerator,
+                                TranslatorInterface $translator,
                                 UserInterface $user = null)
     {
         $settings = $this->lookupSettingsFromRequest($request);
@@ -76,7 +78,7 @@ extends CrudController
         $pager->setCurrentPage(intval($listPage['offset'] / $listPage['limit']) + 1);
 
         return $this->render('Holder/index.html.twig', [
-            'pageTitle' => $this->get('translator')->trans('Holding Institutions'),
+            'pageTitle' => $translator->trans('Holding Institutions'),
             'pager' => $pager,
 
             'listBuilder' => $listBuilder,
@@ -176,7 +178,7 @@ extends CrudController
             'pageMeta' => [
                 /*
                 'jsonLd' => $holder->jsonLdSerialize($locale),
-                'og' => $this->buildOg($holder, $routeName, $routeParams),
+                'og' => $this->buildOg($request, $holder, $routeName, $routeParams),
                 'twitter' => $this->buildTwitter($holder, $routeName, $routeParams),
                 */
             ],

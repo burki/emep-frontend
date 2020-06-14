@@ -6,33 +6,37 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-
 use AppBundle\Utils\SearchListPagination;
 
 /**
  * Base Controller for home-page and other blog- and info-pages
  */
 class DefaultController
-extends Controller
+extends BaseController
 {
     protected function instantiateWpApiClient()
     {
-        /* check if we have settings for wp-rest */
-        $url = $this->container->hasParameter('app.wp-rest.url')
-            ? $this->getParameter('app.wp-rest.url') : null;
+        try {
+            /* the following can fail */
+            $url = $this->getParameter('app.wp-rest.url');
 
-        if (empty($url)) {
-            return false;
+            if (empty($url)) {
+                return false;
+            }
+
+            $client = new \Vnn\WpApiClient\WpClient(
+                new \Vnn\WpApiClient\Http\GuzzleAdapter(new \GuzzleHttp\Client()),
+                    $url);
+            $client->setCredentials(new \Vnn\WpApiClient\Auth\WpBasicAuth($this->getParameter('app.wp-rest.user'),
+                                                                          $this->getParameter('app.wp-rest.password')));
+
+            return $client;
+        }
+        catch (\InvalidArgumentException $e) {
+            ; // ignore
         }
 
-        $client = new \Vnn\WpApiClient\WpClient(
-            new \Vnn\WpApiClient\Http\GuzzleAdapter(new \GuzzleHttp\Client()),
-                $url);
-        $client->setCredentials(new \Vnn\WpApiClient\Auth\WpBasicAuth($this->getParameter('app.wp-rest.user'),
-                                                                      $this->getParameter('app.wp-rest.password')));
-
-        return $client;
+        return false;
     }
 
     /**

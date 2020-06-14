@@ -21,11 +21,11 @@ extends Command
 {
     protected $em;
     protected $googleapisKey = '';
-    protected $rootDir;
+    protected $projectDir;
 
     public function __construct(EntityManagerInterface $em,
                                 ParameterBagInterface $params,
-                                string $rootDir)
+                                string $projectDir)
     {
         parent::__construct();
 
@@ -35,7 +35,7 @@ extends Command
             $this->googleapisKey = $params->get('googleapis.key');
         }
 
-        $this->rootDir = $rootDir;
+        $this->projectDir = $projectDir;
     }
 
     protected function configure()
@@ -152,8 +152,8 @@ extends Command
         {
             $info = [];
 
-            $fnameFull = $this->rootDir
-                       . '/Resources/data/' . $fname;
+            $fnameFull = $this->projectDir
+                       . '/data/' . $fname;
             $lines = file($fnameFull);
             foreach ($lines as $line) {
                 if (empty($line)) {

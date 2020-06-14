@@ -10,11 +10,6 @@ parameters:
     
 framework:
     secret: '%kernel.secret%'
-    # TODO: remove templating
-    # https://stackoverflow.com/a/58380813
-    templating:
-        engines: ['twig']
-        hinclude_default_template: hinclude.html.twig # TODO: move to fragments, but it seems as assetic needs to be replaced before
     # knp_paginator needs translate bundle
     translator:
         fallbacks: ['%locale%']
@@ -25,11 +20,14 @@ framework:
         name: dome
     fragments:
         path: /_fragment
-        #hinclude_default_template: hinclude.html.twig # see https://symfony.com/blog/new-in-symfony-4-3-deprecated-the-templating-component-integration 
-        
+        hinclude_default_template: hinclude.html.twig # see https://symfony.com/blog/new-in-symfony-4-3-deprecated-the-templating-component-integration
+
     # Symfony 4.3 adds automatic search-enging protection in debug-mode
     # You can override, see https://symfony.com/blog/new-in-symfony-4-3-automatic-search-engine-protection
     disallow_search_engine_index: false
+    
+    router:
+        utf8: true
 
 twig:
     globals:
@@ -38,13 +36,16 @@ twig:
         webDir: "%kernel.project_dir%/web"
         gaTracking: '%ga.site_id%'
     paths:
+        '%kernel.project_dir%/vendor/knplabs/knp-paginator-bundle/templates': KnpPaginatorBundle
         '%kernel.project_dir%/templates': __main__
     form_themes:
-        - LexikFormFilterBundle:Form:form_div_layout.html.twig
-        - TetranzSelect2EntityBundle:Form:fields.html.twig        
+        - '@LexikFormFilter/Form/form_div_layout.html.twig'
+        - '@TetranzSelect2Entity/Form/fields.html.twig'
     #form:
     #    resources: ['bootstrap_3_horizontal_layout.html.twig']
-        
+    exception_controller: null
+    strict_variables: false     # TODO: make safe for '%kernel.debug%'
+
 # Doctrine Configuration
 doctrine:
     dbal:
@@ -65,7 +66,6 @@ doctrine:
                     collate: '%database.charset%_unicode_ci'
                     engine:  MyISAM     # InnoDB
     orm:
-        # TODO: set a cache, see http://www.craftitonline.com/2015/04/doctrine-file-system-caching-with-doctrine-cache-bundle/
         connection: default        
         auto_generate_proxy_classes: '%kernel.debug%'
         auto_mapping: true
@@ -82,35 +82,29 @@ doctrine:
             datetime_functions:
                 YEAR: DoctrineExtensions\Query\Mysql\Year
                 
-        metadata_cache_driver: '%database.cache_driver%'
-        result_cache_driver: '%database.cache_driver%'
-        query_cache_driver: '%database.cache_driver%'
-        #metadata_cache_driver:
-        #    type: service
-        #    id: doctrine_cache.providers.vendor_filesystem_metadata_cache
-        #result_cache_driver:
-        #    type: service
-        #    id: doctrine_cache.providers.vendor_filesystem_result_cache
-        #query_cache_driver:
-        #    type: service
-        #    id: doctrine_cache.providers.vendor_filesystem_query_cache
+        #metadata_cache_driver: '%database.cache_driver%'
+        #result_cache_driver: '%database.cache_driver%'
+        #query_cache_driver: '%database.cache_driver%'
+        metadata_cache_driver: ~
+        result_cache_driver: ~
+        query_cache_driver: ~
         second_level_cache:
             enabled: false                
 
-doctrine_cache:
-    providers:
-        vendor_filesystem_metadata_cache:
-            file_system:
-                extension: cache
-                directory: '%kernel.cache_dir%/doctrine'
-        vendor_filesystem_result_cache:
-            file_system:
-                extension: cache
-                directory: '%kernel.cache_dir%/doctrine'
-        vendor_filesystem_query_cache:
-            file_system:
-                extension: cache
-                directory: '%kernel.cache_dir%/doctrine'
+#doctrine_cache:
+#    providers:
+#        vendor_filesystem_metadata_cache:
+#            file_system:
+#                extension: cache
+#                directory: '%kernel.cache_dir%/doctrine'
+#        vendor_filesystem_result_cache:
+#            file_system:
+#                extension: cache
+#                directory: '%kernel.cache_dir%/doctrine'
+#        vendor_filesystem_query_cache:
+#            file_system:
+#                extension: cache
+#                directory: '%kernel.cache_dir%/doctrine'
             
 stof_doctrine_extensions:
     orm:
@@ -152,9 +146,9 @@ knp_paginator:
         filter_value_name: filterValue  # filter value query paameter name
     template:
         # pagination: 'KnpPaginatorBundle:Pagination:sliding.html.twig'     # sliding pagination controls template
-        pagination: 'KnpPaginatorBundle:Pagination:twitter_bootstrap_v3_pagination.html.twig'
-        sortable: 'KnpPaginatorBundle:Pagination:sortable_link.html.twig' # sort link template
-        filtration: 'KnpPaginatorBundle:Pagination:filtration.html.twig'  # filters template
+        pagination: '@KnpPaginatorBundle/Pagination/twitter_bootstrap_v3_pagination.html.twig'
+        sortable: '@KnpPaginatorBundle/Pagination/sortable_link.html.twig' # sort link template
+        filtration: '@KnpPaginatorBundle/Pagination/filtration.html.twig'  # filters template
 
 swiftmailer:
     # disable_delivery:  true
@@ -174,4 +168,4 @@ swiftmailer:
             verify_peer_name: false
 
 debug:
-  dump_destination: "tcp://%env(VAR_DUMPER_SERVER)%"
+    dump_destination: "tcp://%env(VAR_DUMPER_SERVER)%"

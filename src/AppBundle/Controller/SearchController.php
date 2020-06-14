@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 use Ifedko\DoctrineDbalPagination\ListBuilder;
 
@@ -43,6 +44,7 @@ extends CrudController
      */
     public function searchAction(Request $request,
                                  UrlGeneratorInterface $urlGenerator,
+                                 TranslatorInterface $translator,
                                  UserInterface $user = null)
     {
         $settings = $this->lookupSettingsFromRequest($request);
@@ -75,7 +77,7 @@ extends CrudController
         }
 
         return $this->render($templatePath, [
-            'pageTitle' => $this->get('translator')->trans($settings['pageTitle']),
+            'pageTitle' => $translator->trans($settings['pageTitle']),
             'type' => $settings['view'],
             'pager' => $pager,
 
@@ -154,6 +156,7 @@ extends CrudController
      */
     public function statsAction(Request $request,
                                 UrlGeneratorInterface $urlGenerator,
+                                TranslatorInterface $translator,
                                 UserInterface $user = null)
     {
         $settings = $this->lookupSettingsFromRequest($request);
@@ -187,9 +190,8 @@ extends CrudController
                 $stmt = $query->execute();
                 $renderParams = $this->processItemExhibitionType($stmt);
                 if (!empty($renderParams)) {
-                    $template = $this->get('twig')->loadTemplate('Statistics/exhibition-type-index.html.twig');
-
-                    $charts[] = $template->render($renderParams);
+                    $charts[] = $this->renderView('Statistics/exhibition-type-index.html.twig',
+                                                  $renderParams);
                 }
 
                 break;
@@ -216,7 +218,7 @@ extends CrudController
         }
 
         return $this->render($templatePath, [
-            'pageTitle' => $this->get('translator')->trans($settings['pageTitle']),
+            'pageTitle' => $translator->trans($settings['pageTitle']),
             'type' => $settings['view'],
             'listBuilder' => $listBuilder,
             'form' => $this->form->createView(),
@@ -236,6 +238,7 @@ extends CrudController
      */
     public function mapAction(Request $request,
                               UrlGeneratorInterface $urlGenerator,
+                              TranslatorInterface $translator,
                               UserInterface $user = null)
     {
         $settings = $this->lookupSettingsFromRequest($request);
@@ -268,7 +271,7 @@ extends CrudController
         }
 
         return $this->render($templatePath, $renderParams + [
-            'pageTitle' => $this->get('translator')->trans($settings['pageTitle']),
+            'pageTitle' => $translator->trans($settings['pageTitle']),
             'type' => $settings['view'],
             'disableClusteringAtZoom' => 'Person' == $entity ? 7 : 5,
             'showHeatMap' => 'Person' == $entity,
