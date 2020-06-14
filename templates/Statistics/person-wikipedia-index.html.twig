@@ -36,25 +36,12 @@
             },
             tooltip: {
                 formatter: function () {
-                    return '<a target="_blank" href="{{ path('person') }}/' + decodeURIComponent(this.point.id) + '"><b>'
-                      + decodeURIComponent(this.point.name) + '</b></a><br>'
+                    return '<!--<a target="_blank" href="{{ path('person') }}/' + decodeURIComponent(this.point.id) + '">--><b>'
+                      + decodeURIComponent(this.point.name) + '</b><!--</a>--><br>'
                       + this.y + ' page views';
                 },
                 hideDelay: 1500, // default is 500
                 useHTML: true
-            },
-            plotOptions: {
-                scatter: {
-                    marker: {
-                        radius: 3,
-                        states: {
-                            hover: {
-                                enabled: true,
-                                lineColor: 'rgb(100,100,100)'
-                            }
-                        }
-                    }
-                }
             },
             series: [{
                 dataLabels: {
@@ -67,6 +54,27 @@
                 data: {{ data|raw }},
                 color: 'rgba(128, 133, 233, .7)'
             }],
+            plotOptions: {
+                scatter: {
+                    marker: {
+                        radius: 3,
+                        states: {
+                            hover: {
+                                enabled: true,
+                                lineColor: 'rgb(100,100,100)'
+                            }
+                        }
+                    }
+                },
+                series: {
+                    events: {
+                        click: function (event) {
+                            var url = '{{ path('person') }}/' + event.point.id;
+                            window.open(url);
+                        }
+                    }
+                }
+            },
             exporting: {
                 {{ highcharts.disableDataExport() }}
             }
