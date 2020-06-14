@@ -14,16 +14,29 @@
                 tooltip: {
                     pointFormat: '{point.y} Venues (<b>{point.percentage:.1f}%</b>)'
                 },
-                plotOptions: {
-                    pie: {
-                    }
-                },
                 series: [{
                     name: 'Number of Venues',
                     type: 'pie',
                     innerSize: '50%',
                     data: {{ data|raw }}
                 }],
+                plotOptions: {
+                    pie: {
+                    },
+                    series: {
+                        events: {
+                            click: function (event) {
+                                var countryCode = event.point.id;
+                                if (countryCode) {
+                                    var url = '{{ path('search-index', { 'entity': 'Venue', 'filter': filter })|raw }}';
+                                    url += '&filter[location][geoname][]=' + encodeURIComponent(countryCode);
+
+                                    window.open(url);
+                                }
+                            }
+                        }
+                    }
+                },
                 exporting: {
                     csv: {
                         {{ highcharts.pieChartCategoryHeader('Country') }}

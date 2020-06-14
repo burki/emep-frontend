@@ -1,8 +1,8 @@
+{% import 'Shared/highcharts.html.twig' as highcharts %}
 <h3 class="chart-header" data-collapse="{{ container|raw }}"><span class="chartsymbol">+</span>Gender Distribution<span class="charttypeTitle">(Pie Chart)</span></h3>
 <div class="collapse"  id="{{ container|raw }}" style="width: 100%;  height: 400px; margin: 0 auto"></div>
 
 <script type="text/javascript">
-    var chart;
     Highcharts.chart('{{ container|raw }}', {
         chart: {
             plotBackgroundColor: null,
@@ -13,37 +13,42 @@
             text: ' ',
         },
         subtitle: {
-            text: '{{ total }} catalogue entries'
+            text: '{{ total }} artists'
         },
         tooltip: {
-            pointFormat: '<b>{point.percentage:.1f}%</b> ({point.y} cat. entries)'
+            pointFormat: '<b>{point.percentage:.1f}%</b> ({point.y} artists)'
         },
+        series: [{
+            name: 'Number of Artists',
+            type: 'pie',
+            innerSize: '50%',
+            data: {{ data|raw }}
+        }],
         plotOptions: {
             pie: {
             },
             series: {
-                stacking: 'normal',
-                borderWidth: 1,
-                groupPadding: 0,
-                pointPadding: 0 /*,
+                {#
+                // currently disabled since numbers don't match due to persons without exhibition
+                // would need a new Person-filter: exclude without exhibition
                 events: {
                     click: function (event) {
-                        var url = '{{ path('exhibition-stats-info', { 'id': exhibitionId }) }}?chart={{ container|raw }}';
-                        url += '&series=' + encodeURIComponent(this.name);
-                        url += '&point=' + encodeURIComponent(event.point.name);
+                        var gender = event.point.id;
+                        if (gender) {
+                            var url = '{{ path('search-index', { 'entity': 'Person', 'filter': filter })|raw }}';
+                            url += '&filter[person][gender]=' + encodeURIComponent(gender);
 
-                        $('#detailModal').modal('show');
-                        $('#detailModal').find('.modal-body').load(url);
+                            window.open(url);
+                        }
                     }
                 }
-                */
+                #}
             },
         },
-        series: [{
-            name: 'Type of Work',
-            type: 'pie',
-            innerSize: '50%',
-            data: {{ data|raw }}
-        }]
+        exporting: {
+            csv: {
+                {{ highcharts.pieChartCategoryHeader('Gender') }}
+            }
+        }
     });
 </script>

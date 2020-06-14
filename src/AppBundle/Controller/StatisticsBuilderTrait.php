@@ -158,6 +158,8 @@ trait StatisticsBuilderTrait
 
         while ($row = $stmt->fetch()) {
             $gender = '[unknown]';
+            $key = !empty($row['person_gender'])
+                ? $row['person_gender'] : '';
 
             if ($row['person_gender'] == 'M') {
                 $gender = 'male';
@@ -166,19 +168,22 @@ trait StatisticsBuilderTrait
                 $gender = 'female';
             }
 
-            $key = $gender;
             $how_many = (int)$row['how_many'];
-            $stats[$key] = $how_many;
-            $total += $row['how_many'];
+            $stats[$key] = [
+                'label' => $gender,
+                'count' => $how_many,
+            ];
+            $total += $how_many;
         }
 
         $data = [];
 
-        foreach ($stats as $gender => $count) {
-            // $percentage = 100.0 * $count / $total;
+        foreach ($stats as $id => $descr) {
+            // $percentage = 100.0 * $descr['count'] / $total;
             $dataEntry = [
-                'name' => $gender,
-                'y' => (int)$count,
+                'name' => $descr['label'],
+                'y' => $descr['count'],
+                'id' => $id,
             ];
             $data[] = $dataEntry;
         }
@@ -401,6 +406,7 @@ trait StatisticsBuilderTrait
                     ? '[unknown]'
                     : $this->expandCountryCode($row['nationality']),
                 'y' => (int)$row['how_many'],
+                'id' => empty($row['nationality']) ? '' : $row['nationality'],
             ];
         }
 
@@ -602,6 +608,7 @@ trait StatisticsBuilderTrait
             $data[] = [
                 'name' => empty($row['type']) ? '[not set]' : $row['type'],
                 'y' => (int)$row['how_many'],
+                'id' => empty($row['type']) ? '' : $row['type'],
             ];
         }
 
@@ -617,6 +624,9 @@ trait StatisticsBuilderTrait
             $data[] = [
                 'name' => $this->expandCountryCode($row['country_code']),
                 'y' => (int)$row['how_many'],
+                'id' => !empty($row['country_code'])
+                    ? 'cc:' . $row['country_code']
+                    : '',
             ];
         }
 
@@ -636,11 +646,10 @@ trait StatisticsBuilderTrait
 
         $stmt = $query->execute();
         $renderParams = $this->processExhibitionGender($stmt);
-
         if (!empty($renderParams)) {
-            $template = $this->get('twig')->loadTemplate('Statistics/exhibition-gender-artists-index.html.twig');
-
-            $charts[] = $template->render($renderParams);
+            $renderParams['filter'] = $listBuilder->getQueryFilters();
+            $charts[] = $this->renderView('Statistics/exhibition-gender-index.html.twig',
+                                          $renderParams);
         }
 
         // exhibition country-nationality matrix
@@ -651,9 +660,8 @@ trait StatisticsBuilderTrait
         $stmt = $query->execute();
         $renderParams = $this->processExhibitionNationality($stmt);
         if (!empty($renderParams)) {
-            $template = $this->get('twig')->loadTemplate('Statistics/exhibition-nationality-index.html.twig');
-
-            $charts[] = $template->render($renderParams);
+            $charts[] = $this->renderView('Statistics/exhibition-nationality-index.html.twig',
+                                          $renderParams);
         }
 
         // by month
@@ -665,9 +673,8 @@ trait StatisticsBuilderTrait
         $stmt = $query->execute();
         $renderParams = $this->processExhibitionByMonth($stmt);
         if (!empty($renderParams)) {
-            $template = $this->get('twig')->loadTemplate('Statistics/exhibition-by-month-index.html.twig');
-
-            $charts[] = $template->render($renderParams);
+            $charts[] = $this->renderView('Statistics/exhibition-by-month-index.html.twig',
+                                          $renderParams);
         }
 
         // exhibition age
@@ -699,9 +706,8 @@ EOT;
         $stmt = $connection->executeQuery($sql, $params);
         $renderParams = $this->processExhibitionAge($stmt);
         if (!empty($renderParams)) {
-            $template = $this->get('twig')->loadTemplate('Statistics/person-exhibition-age-index.html.twig');
-
-            $charts[] = $template->render($renderParams);
+            $charts[] = $this->renderView('Statistics/person-exhibition-age-index.html.twig',
+                                          $renderParams);
         }
 
         // place
@@ -712,9 +718,8 @@ EOT;
         $stmt = $query->execute();
         $renderParams = $this->processExhibitionPlace($stmt);
         if (!empty($renderParams)) {
-            $template = $this->get('twig')->loadTemplate('Statistics/exhibition-city-index.html.twig');
-
-            $charts[] = $template->render($renderParams);
+            $charts[] = $this->renderView('Statistics/exhibition-city-index.html.twig',
+                                          $renderParams);
         }
 
         // type of organizer
@@ -725,9 +730,8 @@ EOT;
         $stmt = $query->execute();
         $renderParams = $this->processExhibitionOrganizerType($stmt);
         if (!empty($renderParams)) {
-            $template = $this->get('twig')->loadTemplate('Statistics/exhibition-organizer-index.html.twig');
-
-            $charts[] = $template->render($renderParams);
+            $charts[] = $this->renderView('Statistics/exhibition-organizer-index.html.twig',
+                                          $renderParams);
         }
 
         return $charts;
@@ -745,9 +749,8 @@ EOT;
         $stmt = $query->execute();
         $renderParams = $this->processPersonNationality($stmt);
         if (!empty($renderParams)) {
-            $template = $this->get('twig')->loadTemplate('Statistics/person-nationality-index.html.twig');
-
-            $charts[] = $template->render($renderParams);
+            $renderParams['filter'] = $listBuilder->getQueryFilters();
+            $charts[] = $this->renderView('Statistics/person-nationality-index.html.twig', $renderParams);
         }
 
         // birth/death
@@ -765,9 +768,8 @@ EOT;
         ]);
 
         if (!empty($renderParams)) {
-            $template = $this->get('twig')->loadTemplate('Statistics/person-by-year-index.html.twig');
-
-            $charts[] = $template->render($renderParams);
+            $charts[] = $this->renderView('Statistics/person-by-year-index.html.twig',
+                                          $renderParams);
         }
 
         // exhibition-distribution
@@ -778,9 +780,8 @@ EOT;
         $stmt = $query->execute();
         $renderParams = $this->processDistribution([ 'exhibition' => $query ]);
         if (!empty($renderParams)) {
-            $template = $this->get('twig')->loadTemplate('Statistics/person-distribution-index.html.twig');
-
-            $charts[] = $template->render($renderParams);
+            $charts[] = $this->renderView('Statistics/person-distribution-index.html.twig',
+                                          $renderParams);
         }
 
         // wikipedia
@@ -794,9 +795,8 @@ EOT;
         $stmt = $query->execute();
         $renderParams = $this->processPersonPopularity($stmt, $lang);
         if (!empty($renderParams)) {
-            $template = $this->get('twig')->loadTemplate('Statistics/person-wikipedia-index.html.twig');
-
-            $charts[] = $template->render($renderParams);
+            $charts[] = $this->renderView('Statistics/person-wikipedia-index.html.twig',
+                                          $renderParams);
         }
 
         return $charts;
@@ -819,9 +819,9 @@ EOT;
         $stmt = $query->execute();
         $renderParams = $this->processLocationType($stmt);
         if (!empty($renderParams)) {
-            $template = $this->get('twig')->loadTemplate('Statistics/' . $prefix . '-type-index.html.twig');
-
-            $charts[] = $template->render($renderParams);
+            $renderParams['filter'] = $listBuilder->getQueryFilters();
+            $charts[] = $this->renderView('Statistics/' . $prefix . '-type-index.html.twig',
+                                          $renderParams);
         }
 
         // country
@@ -832,9 +832,9 @@ EOT;
         $stmt = $query->execute();
         $renderParams = $this->processLocationCountry($stmt);
         if (!empty($renderParams)) {
-            $template = $this->get('twig')->loadTemplate('Statistics/' . $prefix . '-country-index.html.twig');
-
-            $charts[] = $template->render($renderParams);
+            $renderParams['filter'] = $listBuilder->getQueryFilters();
+            $charts[] = $this->renderView('Statistics/' . $prefix . '-country-index.html.twig',
+                                          $renderParams);
         }
 
         return $charts;
@@ -855,9 +855,9 @@ EOT;
         $stmt = $query->execute();
         $renderParams = $this->processLocationCountry($stmt);
         if (!empty($renderParams)) {
-            $template = $this->get('twig')->loadTemplate('Statistics/place-country-index.html.twig');
-
-            $charts[] = $template->render($renderParams);
+            $renderParams['filter'] = $listBuilder->getQueryFilters();
+            $charts[] = $this->renderView('Statistics/place-country-index.html.twig',
+                                          $renderParams);
         }
 
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-exhibition-distribution', $listBuilder->getEntity());
@@ -867,9 +867,8 @@ EOT;
         $stmt = $query->execute();
         $renderParams = $this->processDistribution([ 'exhibition' => $query ]);
         if (!empty($renderParams)) {
-            $template = $this->get('twig')->loadTemplate('Statistics/place-distribution-index.html.twig');
-
-            $charts[] = $template->render($renderParams);
+            $charts[] = $this->renderView('Statistics/place-distribution-index.html.twig',
+                                          $renderParams);
         }
 
         return $charts;
