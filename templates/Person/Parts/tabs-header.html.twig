@@ -21,7 +21,7 @@
             {% endif %}
 
             {# authority files #}
-            {% if person.gnd is not empty or person.ulan is not empty %}
+            {% if person.gnd is not empty or person.ulan is not empty or person.wikidata is not empty %}
                 <li role="presentation"><a href="#authority" aria-controls="authority" role="tab" data-toggle="tab">{{ 'Integrated Authority File'|trans }}</a></li>
             {% endif %}
         </ul>

@@ -1,5 +1,5 @@
 {% block authority %}
-    {% if person.gnd is not empty or person.ulan is not empty %}
+    {% if person.gnd is not empty or person.ulan is not empty or person.wikidata %}
         <div role="tabpanel" class="tab-pane" id="authority">
             <div class="container-fluid box">
                 <div class="row box-color-title">
@@ -15,12 +15,17 @@
                     </div>
                 </div>
                 <div class="row box-color-content-inverse">
-                    {% if person.ulan is not empty or person.additional.beacon is not empty %}
+                    {% if person.ulan is not empty or person.wikidata is not empty or person.additional.beacon is not empty %}
                         <div class="col-sm-12 beacon-ul">
                             <ul>
                                 {% if person.ulan is not empty %}
                                     <li>
                                         <a href="http://vocab.getty.edu/page/ulan/{{ person.ulan }}" target="_blank">Getty ULAN</a>
+                                    </li>
+                                {% endif %}
+                                {% if person.wikidata is not empty %}
+                                    <li>
+                                        <a href="https://tools.wmflabs.org/reasonator/?q={{ person.wikidata }}" target="_blank">Wikidata</a>
                                     </li>
                                 {% endif %}
                                 {% if person.additional.beacon is not empty %}
