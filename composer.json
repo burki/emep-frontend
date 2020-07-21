@@ -59,17 +59,17 @@
         "symfony/finder": "^5.1",
 
         "lexik/form-filter-bundle": "^6.0",
-        "knplabs/knp-paginator-bundle": "^5.2",
+        "knplabs/knp-paginator-bundle": "^5.3",
 
-        "cocur/slugify": "^3.2",
-        "twig/twig": "^2.11",
-        "twig/extensions": "^1.5",
+        "cocur/slugify": "^4.0",
+        "twig/twig": "^2.13",
+        "twig/string-extra": "^3.0",
         "liip/url-auto-converter-bundle": "dev-master",
 
         "doctrine/doctrine-bundle": "^2.0",
         "symfony/cache": "^5.1",
 
-        "stof/doctrine-extensions-bundle": "~1.2",
+        "stof/doctrine-extensions-bundle": "^1.4",
         "beberlei/doctrineextensions": "@stable",
         "scienta/doctrine-json-functions": "^4.0",
 
@@ -77,9 +77,9 @@
 
         "wikimedia/utfnormal": "^2.0",
 
-        "sweetyrdf/easyrdf": "1.0.0-RC1",
+        "sweetyrdf/easyrdf": "^1.0",
         "seboettg/citeproc-php": "dev-name-as-sort-order-fix#bf446dc",
-        "fale/isbn": "3.*",
+        "fale/isbn": "^3.1",
 
         "ddeboer/data-import": "0.20.*",
         "phpoffice/phpexcel": "1.8.*",

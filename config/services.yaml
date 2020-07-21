@@ -14,21 +14,18 @@ services:
         resource: '../src/AppBundle'
         exclude: '../src/AppBundle/{Entity,Migrations,Tests}'
 
-    twig.extension.text:
-        class: Twig_Extensions_Extension_Text
-        tags:
-            - { name: twig.extension }
-
-    app.menu_builder:
-        class: AppBundle\Menu\Builder
+    AppBundle\Menu\Builder:
         arguments: ["@knp_menu.factory", "@security.authorization_checker", "@request_stack", ]
         tags:
             - { name: knp_menu.menu_builder, method: createTopMenu, alias: top } # The alias is what is used to retrieve the menu
             - { name: knp_menu.menu_builder, method: createMainMenu, alias: main } # The alias is what is used to retrieve the menu
             - { name: knp_menu.menu_builder, method: createFooterMainMenu, alias: footer-main } # The alias is what is used to retrieve the menu
 
-    app.menu_request_voter:
-        class: AppBundle\Menu\RequestVoter
+    AppBundle\Menu\RequestVoter:
         arguments: [ "@request_stack" ]
         tags:
             - { name: knp_menu.voter }
+
+    Twig\Extra\String\StringExtension:
+        tags:
+            - { name: twig.extension }
