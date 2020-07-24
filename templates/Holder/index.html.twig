@@ -14,41 +14,46 @@
             $('.select2').select2();
 
             {{ helper.checkmark_actions(listBuilder.entity) }}
-            {{ helper.indexform_actions('holder-save') }}
+            {{ helper.indexform_actions(listBuilder.entity|lower ~ '-save') }}
         });
     </script>
 {% endblock %}
 
 {% block body %}
-    <h1 class="heading">{{ pageTitle }}</h1>
+    <div class="w-container">
+        <h1 class="heading">{{ pageTitle }}</h1>
 
-    <form class="indexForm" method="get" action="{{ path(app.request.attributes.get('_route')) }}">
-        <div class="searchbarcontainer">
-            <div class="searchbarinputcontainer">
-                {{ form_widget(form.search) }}
-                {{ form_widget(form.holder.geoname) }}
-            </div>
-            <div class="searchbuttoncontainer"><input type="submit" name="submit-filter" value="Search" class="submit-button w-button submit-filter-visible">
-            </div>
+    <form id="search" method="get" class="indexForm holderFilterForm" action="{{ path(app.request.attributes.get('_route')) }}">
+    <div class="searchbarcontainer">
+        <div class="searchbarinputcontainer">
+            {{ form_widget(form.search) }}
+            {{ form_widget(form.holder.geoname) }}
         </div>
 
-        <div class="searchbarcontainer w-form hidden-form">
-            <div class="searchbarinputcontainer">
-                {{ form_rest(form) }}
-            </div>
+        <div class="searchbuttoncontainer">
+            <button type="submit" id="filter_submit" name="filter[submit]" class="submit-button w-button submit-filter-visible">Search</button>
         </div>
+    </div>
 
-        {% block filters %}
-            {% import 'Shared/helper.html.twig' as helper %}
 
-            <div class="filter-combination-container">
-                {% form_theme form 'Search/bootstrap_3_adjusted.html.twig' %}
-                <div style="display:none">{{ form_row(form.holder.holder) }}{# for checkbox filter #}</div>
+    {% block filters %}
+        {% import 'Shared/helper.html.twig' as helper %}
 
-                {{ helper.render_active_filters(listBuilder, form, entityLabels) }}
-            </div><!-- .filter-combination-container -->
-        {% endblock %}
+        <div class="filter-combination-container">
+            {% form_theme form 'Search/bootstrap_3_adjusted.html.twig' %}
+            <div style="display:none">{{ form_row(form.holder.holder) }}{# for checkbox filter #}</div>
+
+            {{ helper.render_active_filters(listBuilder, form, entityLabels) }}
+        </div><!-- .filter-combination-container -->
+    {% endblock %}
+
+    <div class="searchbarcontainer w-form hidden-form">
+        <div class="searchbarinputcontainer">
+            {{ form_rest(form) }}
+        </div>
+    </div>
     </form>
+    </div><!-- .w-container -->
 
     <div class="contentcontainer w-container">
         <div class="listviewrow">
