@@ -97,6 +97,11 @@
                         {% embed "Person/Parts/tabcontent-catalogue-entries.html.twig" %}
                         {% endembed %}
 
+                        {% if items is not empty %}
+                        {% embed "Person/Parts/tabcontent-items.html.twig" %}
+                        {% endembed %}
+                        {% endif %}
+
                         {% embed "Person/Parts/tabcontent-similiar.html.twig" %}
                         {% endembed %}
 

@@ -445,19 +445,43 @@ extends CrudController
         foreach ($catEntries as $catEntry) {
             $type = $catEntry[0]->getType();
             $label = 'unknown';
+
             if (!is_null($type)) {
                 $label = $type->getName();
                 if (!in_array($label, [ 'other medium', 'unknown' ])) {
                     $label = 'painting and drawing';
                 }
             }
+
             if (!array_key_exists($label, $catalogueEntriesByTypeCount)) {
                 $catalogueEntriesByTypeCount[$label] = 0;
             }
+
             ++$catalogueEntriesByTypeCount[$label];
         }
 
         $similar = $this->findSimilar($person);
+
+        // works
+        $qbItems = $this->getDoctrine()
+                ->getManager()
+                ->createQueryBuilder();
+
+        $qbItems->select([
+                'I',
+                "COALESCE(I.earliestdate, I.creatordate) HIDDEN dateSort",
+                "I.catalogueId HIDDEN catSort",
+            ])
+            ->from('AppBundle:Item', 'I')
+            ->leftJoin('I.creators', 'P')
+            ->where('I.status <> -1 AND P.status <> -1')
+            ->orderBy('dateSort, catSort')
+            ->andWhere(sprintf('P.id=%d', $person->getId())) // TODO: bind
+            ;
+
+        $items = $qbItems->getQuery()
+            // ->setMaxResults(10) // for testing
+            ->getResult();
 
         return $this->render('Person/detail.html.twig', [
             'pageTitle' => $person->getFullname(true), // TODO: lifespan in brackets
@@ -467,6 +491,7 @@ extends CrudController
             'catalogueEntries' => $catEntries,
             'catalogueEntriesByTypeCount' => $catalogueEntriesByTypeCount,
             'catalogueEntriesByExhibition' => $this->findCatalogueEntries($person, true),
+            'items' => $items,
             'similar' => $similar,
             'similarHydrated' => $this->hydrateSimilar($similar),
             'currentPageId' => $id,

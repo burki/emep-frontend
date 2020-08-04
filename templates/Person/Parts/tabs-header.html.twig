@@ -11,6 +11,10 @@
                 <li role="presentation" class="cat-entries-tab"><a href="#entries" aria-controls="entries" role="tab" data-toggle="tab">{{ 'Catalogue Entries'|trans }}</a></li>
             {% endif %}
 
+            {% if items is not empty %}
+                <li role="presentation" class="items-tab"><a href="#items" aria-controls="entries" role="tab" data-toggle="tab">{{ 'Works'|trans }}</a></li>
+            {% endif %}
+
             {# co-appearances #}
             {% if similar|length > 0 %}
                 <li role="presentation" class="similars-tab"><a href="#similar" aria-controls="similar" role="tab" data-toggle="tab">{{ 'Frequent Co-Appearances'|trans }}</a></li>
@@ -42,8 +46,12 @@
             hideAll();
 
             setInterval(function() {
-                if( $('.exhibitions-tab').hasClass('active') ){ hideAll(); $('.download-csv-exhibition').show(); }
-                else if( $('.similars-tab').hasClass('active') ){ hideAll(); $('.download-csv-coappearances').show(); }
+                if( $('.exhibitions-tab').hasClass('active') ){
+                    hideAll(); $('.download-csv-exhibition').show();
+                }
+                else if( $('.similars-tab').hasClass('active') ){
+                    hideAll(); $('.download-csv-coappearances').show();
+                }
                 else {
                     hideAll();
                 }
@@ -55,5 +63,4 @@
             $('.download-csv-coappearances').hide();
         }
     </script>
-
 {% endblock %}

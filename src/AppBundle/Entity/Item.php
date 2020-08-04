@@ -249,7 +249,6 @@ class Item
      * #ORM\ManyToOne(targetEntity="Publisher", cascade={"all"}, fetch="EAGER")
      * #ORM\JoinColumn(name="publisher_id", referencedColumnName="id")
      */
-
     private $publisher;
 
     /**
@@ -572,6 +571,11 @@ class Item
         return $this->title;
     }
 
+    public function getTitleAlternate()
+    {
+        return $this->titleAlternate;
+    }
+
     public function getStatus()
     {
         return $this->status;
@@ -592,6 +596,21 @@ class Item
         return $this->displaydate;
     }
 
+    public function getCatalogueId()
+    {
+        return $this->catalogueId;
+    }
+
+    public function getSignature()
+    {
+        return $this->signature;
+    }
+
+    public function getCurrentlocation()
+    {
+        return $this->currentlocation;
+    }
+
     public function getStyle()
     {
         return $this->style;
@@ -607,6 +626,7 @@ class Item
             if ($img->getStatus() == -1) {
                 continue;
             }
+
             if ('preview00' == $img->getName()) {
                 return $img;
             }
@@ -615,13 +635,16 @@ class Item
         return null;
     }
 
-    public function setPersons($persons, $em) {
+    public function setPersons($persons, $em)
+    {
         $this->personRefs = [];
         $ord = 0;
+
         foreach ($persons as $person) {
             // might already exist
             $item_id = $this->id;
             $personRef = null;
+
             if (isset($item_id)) {
                 $personRef = $em->getRepository('ItemPerson')
                     ->findOneBy([
@@ -629,11 +652,13 @@ class Item
                         'item' => $this,
                     ]);
             }
+
             if (!isset($personRef)) {
                 $personRef = new ItemPerson();
                 $personRef->setItem($this);
                 $personRef->setPerson($person);
             }
+
             $personRef->setOrd($ord++);
             $em->persist($personRef);
             $this->personRefs[] = $personRef;

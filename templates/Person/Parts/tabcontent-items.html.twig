@@ -1,0 +1,75 @@
+{% block items %}
+    {% import 'Shared/helper.html.twig' as helper %}
+    {% import 'Shared/datatables.html.twig' as datatables %}
+    {{ datatables.head() }}
+
+    <script>
+        $( document ).ready(function() {
+            $('#item-table').DataTable({
+                dom: 'ilrtp',
+                responsive: true,
+                paging: true,
+                pageLength: 25,
+                searching: false,
+                info: true,
+                order: [[ 0, "asc" ]],
+                columns: [
+                    { "orderSequence": [ "asc", "desc" ] },
+                    { "orderSequence": [ "asc", "desc" ] },
+                    { "orderSequence": [ "asc", "desc" ] },
+                    { },
+                    { }
+                ]
+            });
+        })
+    </script>
+
+    <div role="tabpanel" class="tab-pane" id="items">
+        <table id="item-table" class="table table-striped table-bordered dataTable listviewcontainer">
+            <thead>
+            <tr class="listviewheading">
+                <th class="all">Date</th>
+                <th class="all">Title</th>
+                <th class="all">Technique</th>
+                <th class="min-tablet-p">Measurements</th>
+                <th class="min-tablet-p">Additional</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for item in items %}
+                <tr class="listviewrow">
+                    <td class="date" data-order="{{ item.__get('earliestdate') }}">
+                        {% if item.displaydate is not empty %}
+                            {{ item.displaydate }}
+                        {% else %}
+                            {{ item.earliestdate|dateincomplete }}{# - {{  item.latestdate|dateincomplete  }}#}
+                        {% endif %}
+                    </td>
+                    <td>
+                        <b>{{ item.title }}</b> [{{ item.catalogueId }}]
+                        {% if item.titleAlternate is not empty %}
+                            <div>{{ item.titleAlternate|nl2br }}</div>
+                        {% endif %}
+                    </td>
+                    <td class="normal">
+                        {{ item.__get('technique') }}
+                    </td>
+                    <td class="normal">
+                        {{ item.__get('measurements') }}
+                    </td>
+                    <td>
+                        {% if item.signature is not empty %}
+                        <div>{{ item.signature }}</div>
+                        {% endif %}
+                        {% if item.currentlocation is not empty %}
+                        <div>{{ item.currentlocation }}</div>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div><!-- .tab-pane -->
+{% endblock %}
