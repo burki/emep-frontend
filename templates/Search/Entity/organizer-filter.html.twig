@@ -1,4 +1,4 @@
-<form id="search" class="indexForm exhibitionFilterForm indexForm" action="{{ path(app.request.get('_route')) }}" method="GET">
+<form id="search" method="get" class="indexForm exhibitionFilterForm" action="{{ path(app.request.get('_route')) }}">
     {% set filter = listBuilder.queryFilters %}
 
     <div class="searchbarcontainer">

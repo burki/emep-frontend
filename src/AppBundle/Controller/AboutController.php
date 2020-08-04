@@ -14,7 +14,7 @@ extends DefaultController
 {
     protected function sendMessage($mailer, $data)
     {
-        $template = $this->get('twig')->loadTemplate('About/contact.email.twig');
+        $template = $this->get('twig')->load('About/contact.email.twig');
         $subject = $template->renderBlock('subject', [ 'data' => $data ]);
         $textBody = $template->renderBlock('body_text', [ 'data' => $data ]);
         $htmlBody = $template->renderBlock('body_html', [ 'data' => $data ]);

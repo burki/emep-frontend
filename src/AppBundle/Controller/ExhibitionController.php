@@ -720,7 +720,7 @@ extends CrudController
         $charts = [];
 
         // genderStatsStatisticsFormat
-        $template = $this->get('twig')->loadTemplate('Statistics/exhibition-gender-stats.html.twig');
+        $template = $this->get('twig')->load('Statistics/exhibition-gender-stats.html.twig');
         $charts[] = $template->renderBlock('chart', [
             'container' => 'container-artist-by-gender',
             'data' => $this->assoc2NameYArray($this->artistsByGenderExhibitionStatistics($exhibition->getId())),
@@ -744,7 +744,7 @@ extends CrudController
             }
         }
 
-        $template = $this->get('twig')->loadTemplate('Statistics/person-exhibition-age.html.twig');
+        $template = $this->get('twig')->load('Statistics/person-exhibition-age.html.twig');
         $charts[] = $template->renderBlock('chart', [
             'container' => 'container-age',
             'categories' => json_encode($categories),
@@ -754,7 +754,7 @@ extends CrudController
         ]);
 
         // artists' nationality
-        $template = $this->get('twig')->loadTemplate('Statistics/exhibition-nationality-stats.html.twig');
+        $template = $this->get('twig')->load('Statistics/exhibition-nationality-stats.html.twig');
         $charts[] = $template->renderBlock('chart', [
             'container' => 'container-nationalities-pie',
             'data' => $this->artistsNationalityByExhibitionStatistics($exhibition->getId()),
@@ -801,7 +801,7 @@ extends CrudController
 
             arsort($placesOfActivity);
 
-            $template = $this->get('twig')->loadTemplate('Statistics/exhibition-places-activity-stats.html.twig');
+            $template = $this->get('twig')->load('Statistics/exhibition-places-activity-stats.html.twig');
             $charts[] = $chart = $template->renderBlock('chart', [
                 'container' => 'container-places-activity-pie',
                 'data' => $this->assoc2NameYArray($placesOfActivity),
@@ -810,7 +810,7 @@ extends CrudController
         }
 
         // exhibiting cities of artists
-        $template = $this->get('twig')->loadTemplate('Statistics/exhibition-city-stats.html.twig');
+        $template = $this->get('twig')->load('Statistics/exhibition-city-stats.html.twig');
         $charts[] = $template->renderBlock('chart', [
             'container' => 'container-exhibiting-pie',
             'data' => $this->assoc2NameYArray($this->artistExhibitingInCityStats($this->getArtistsExhibitingAtExhibitionByExhibitionId($exhibition->getId()))),
@@ -854,7 +854,7 @@ extends CrudController
             ksort($countByType);
         }
 
-        $template = $this->get('twig')->loadTemplate('Statistics/itemexhibition-type.html.twig');
+        $template = $this->get('twig')->load('Statistics/itemexhibition-type.html.twig');
         $charts[] = $template->renderBlock('chart', [
             'container' => 'container-type',
             'total' => $stats['total'],
@@ -884,7 +884,7 @@ extends CrudController
             $data[] = $dataEntry;
         }
 
-        $template = $this->get('twig')->loadTemplate('Statistics/itemexhibition-nationality.html.twig');
+        $template = $this->get('twig')->load('Statistics/itemexhibition-nationality.html.twig');
         $charts[] = $template->renderBlock('chart', [
             'container' => 'container-nationality',
             'totalArtists' => $stats['totalArtists'],

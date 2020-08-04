@@ -1,5 +1,5 @@
 {% macro exhibition_period(exhibition) %}
-    {% spaceless %}
+    {% apply spaceless %}
     {% if exhibition.displaydate is not empty %}
         {{ exhibition.displaydate }}
     {% else %}
@@ -8,7 +8,7 @@
             ({{ daterangeincomplete(exhibition.getStartdate(true), exhibition.getEnddate(true)) }} o.S.)
         {% endif %}
     {% endif %}
-    {% endspaceless %}
+    {% endapply %}
 {% endmacro %}
 
 {% macro exhibition_itemexhibition_sort_control(exhibition) %}
@@ -388,8 +388,8 @@
                             {% for choiceVal in fieldVal %}
                                 {% set choiceLabel = choiceVal %}
                                 {% set break = false %}
-                                {% for choice in fieldVars.choices if not break %}
-                                    {% if choice.value == choiceVal %}
+                                {% for choice in fieldVars.choices %}
+                                    {% if not break and choice.value == choiceVal %}
                                         {% set choiceLabel = choice.label %}
                                         {% set break = true %}
                                     {% endif %}

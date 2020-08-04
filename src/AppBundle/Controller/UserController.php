@@ -135,7 +135,7 @@ extends CrudController
 
     protected function sendMessage($mailer, $template, $data)
     {
-        $template = $this->get('twig')->loadTemplate($template);
+        $template = $this->get('twig')->load($template);
 
         $subject = $template->renderBlock('subject', [ 'data' => $data ]);
         $textBody = $template->renderBlock('body_text', [ 'data' => $data ]);
