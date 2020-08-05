@@ -7,6 +7,7 @@ use Symfony\Component\Intl\Intl;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 use Knp\Component\Pager\PaginatorInterface;
 
@@ -75,6 +76,48 @@ extends CrudController
                                      UserInterface $user)
     {
         return $this->handleSaveSearchAction($request, $urlGenerator, $user);
+    }
+
+    /**
+     * @Route("/person/item.embed/{item}", name="person-item-partial", requirements={"item"="\d+"})
+     */
+    public function exhibitionsByItemAction(Request $request,
+                                            PaginatorInterface $paginator,
+                                            TranslatorInterface $translator,
+                                            $item = null)
+    {
+        $qb = $this->getDoctrine()
+                ->getManager()
+                ->createQueryBuilder();
+
+        $qb->select([
+                'E',
+                "E.startdate HIDDEN dateSort",
+                "CONCAT(COALESCE(P.alternateName, P.name), E.startdate) HIDDEN placeSort"
+            ])
+            ->from('AppBundle:Exhibition', 'E')
+            ->leftJoin('E.location', 'L')
+            ->leftJoin('L.place', 'P')
+            ->innerJoin('AppBundle:ItemExhibition', 'IE',
+                       \Doctrine\ORM\Query\Expr\Join::WITH,
+                       'IE.exhibition = E')
+            ->innerJoin('IE.item', 'I')
+            ->where('I.id = :item')
+            ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
+            ->setParameters([ 'item' => $item ])
+            ->groupBy('E.id')
+            ->orderBy('dateSort')
+            ;
+
+        $pagination = $this->buildPagination($request, $paginator, $qb->getQuery(), [
+            'defaultSortFieldName' => 'dateSort', 'defaultSortDirection' => 'asc',
+            'pageSize' => 1000,
+        ]);
+
+        return $this->render('Person/exhibitions-by-item.html.twig', [
+            'pageTitle' => $translator->trans('Exhibited at'),
+            'pagination' => $pagination,
+        ]);
     }
 
     /**
@@ -468,13 +511,19 @@ extends CrudController
                 ->createQueryBuilder();
 
         $qbItems->select([
-                'I',
+                'I AS item',
+                'COUNT(DISTINCT(E.id)) AS exhibitionCount',
                 "COALESCE(I.earliestdate, I.creatordate) HIDDEN dateSort",
                 "I.catalogueId HIDDEN catSort",
             ])
             ->from('AppBundle:Item', 'I')
-            ->leftJoin('I.creators', 'P')
+            ->innerJoin('I.creators', 'P')
+            ->leftJoin('AppBundle:Exhibition', 'E',
+                       \Doctrine\ORM\Query\Expr\Join::WITH,
+                       'E MEMBER OF I.exhibitions AND '
+                       . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->where('I.status <> -1 AND P.status <> -1')
+            ->groupBy('I.id')
             ->orderBy('dateSort, catSort')
             ->andWhere(sprintf('P.id=%d', $person->getId())) // TODO: bind
             ;

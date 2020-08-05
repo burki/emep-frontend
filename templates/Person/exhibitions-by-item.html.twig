@@ -1,0 +1,60 @@
+{% extends app.request.attributes.get('_route') == 'person-item-partial'
+    ? 'Base/partial.html.twig'
+    : 'Base/base.html.twig'
+%}
+
+{% import 'Shared/helper.html.twig' as helper %}
+
+{% block body %}
+    <h3>{{ pageTitle }}</h3>
+    <div class="row">
+        <div class="col-sm-12">
+        {% set sortField = app.request.get('sort') %}
+
+        {% set last_initial = '' %}
+        {% for row in pagination %}
+            {% set exhibition = row %}
+            {% if 'placeSort' == sortField %}
+                {% if exhibition.location is not null and exhibition.location.place is not null %}
+                    {% set initial = exhibition.location.place.nameLocalized %}
+                {% else %}
+                    {% set initial = '' %}
+                {% endif %}
+            {% elseif 'numCatEntrySort' == sortField %}
+                {% set initial = row['numCatEntrySort'] %}
+            {% else %}
+                {% set initial = slugify.slugify(person.fullname|first)|upper %}
+            {% endif %}
+            {% if initial != last_initial %}
+                {% if last_initial != '' %}
+            </ul>
+                {% endif %}
+            <h2>{{ initial }} </h2>
+            {% set last_initial = initial %}
+            <ul class="list-group">
+            {% endif %}
+            <li class="list-group-item">
+                {{ helper.exhibition_period(exhibition) }}
+
+                <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">
+                    <b>{{ exhibition.title }}</b> {{ exhibition.titleAppend }}</a>
+                {#% if 'numCatEntrySort' != sortField %}{{ row['numCatEntrySort'] }} entr.{% endif %#}
+
+                {% if exhibition.location is not null %}
+                    {% set location = exhibition.location %}
+                    <div>
+                    {% if location.place is not null %}
+                        {{ helper.place_linked(location.place) }}:
+                    {% endif %}
+                    <a href="{{ path('location', { 'id' : location.id }) }}">
+                        {{ location.name }}</a>
+                    </div>
+                {% endif %}
+            </li>
+        {% else %}
+            No Exhibitions found
+        {% endfor %}
+            </ul>
+        </div>
+    </div><!-- .row -->
+{% endblock %}

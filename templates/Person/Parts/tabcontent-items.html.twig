@@ -18,7 +18,8 @@
                     { "orderSequence": [ "asc", "desc" ] },
                     { "orderSequence": [ "asc", "desc" ] },
                     { },
-                    { }
+                    { },
+                    { "orderSequence": [ "desc", "asc" ] },
                 ]
             });
         })
@@ -33,11 +34,13 @@
                 <th class="all">Technique</th>
                 <th class="min-tablet-p">Measurements</th>
                 <th class="min-tablet-p">Additional</th>
+                <th class="all"># of Exhibitons</th>
             </tr>
             </thead>
 
             <tbody>
-            {% for item in items %}
+            {% for result in items %}
+                {% set item = result.item %}
                 <tr class="listviewrow">
                     <td class="date" data-order="{{ item.__get('earliestdate') }}">
                         {% if item.displaydate is not empty %}
@@ -65,6 +68,9 @@
                         {% if item.currentlocation is not empty %}
                         <div>{{ item.currentlocation }}</div>
                         {% endif %}
+                    </td>
+                    <td class="normal" data-order="{{ result.exhibitionCount }}">
+                        <a href="{{ path('person-item-partial', { 'item': item.id }) }}" data-remote="false" data-toggle="modal" data-target="#detailModal">{{ result.exhibitionCount }}</a>
                     </td>
                 </tr>
             {% endfor %}
