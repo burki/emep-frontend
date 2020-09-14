@@ -62,7 +62,7 @@
         "knplabs/knp-paginator-bundle": "^5.3",
 
         "cocur/slugify": "^4.0",
-        "twig/twig": "^2.13",
+        "twig/twig": "^3.0",
         "twig/string-extra": "^3.0",
         "liip/url-auto-converter-bundle": "dev-master",
 
