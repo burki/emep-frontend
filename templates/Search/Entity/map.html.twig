@@ -136,11 +136,11 @@
                         opacity: 1,
                         fillOpacity: 0.7
                     };
+
                     marker = L.circleMarker(L.latLng(a[0], a[1]), markerProperties);
 
                     marker.bindTooltip(title + ' (' + a[4] + ')',
                         { className: 'my-tooltip'});
-
                 }
                 else {
                     // pie
