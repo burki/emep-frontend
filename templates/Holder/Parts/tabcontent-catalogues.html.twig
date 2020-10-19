@@ -25,7 +25,19 @@
                     { orderSequence: [ 'asc', 'desc' ] },
                     { orderSequence: [ 'asc', 'desc' ] },
                     { orderable: false}
-                ]
+                ],
+                initComplete: function( settings, json ) {
+                    table = settings.oInstance.api();
+
+                    // used to link to a specific publication (which might be on a different page)
+                    if (0 == window.location.hash.indexOf('#publication-')) {
+                        var row = table.row(window.location.hash);
+                        if (null != row) {
+                            row.show().draw(false);
+                            $(document).scrollTop($(window.location.hash).offset().top);
+                        }
+                    }
+                }
             });
         } );
     </script>
@@ -45,7 +57,7 @@
             <tbody>
             {% for row in bibitems %}
                 {% set bibitem = row[0] %}
-                <tr class="listviewrow">
+                <tr class="listviewrow" id="publication-{{ bibitem.id }}">
                     <td class="normal">
                     {% for exhibitionRef in bibitem.exhibitionRefs %}
                         {% if exhibitionRef.role == 1 %}
@@ -54,7 +66,7 @@
                         {% endif %}
                     {% endfor %}
                     </td>
-                    <td id="publication-{{ bibitem.id }}" class="title" data-sort="{{ bibitem.datePublished|date('Y') }}-{{ bibitem.title }}">{{ bibitem.renderCitationAsHtml(citeProc, false)|raw }}</td>
+                    <td class="title" data-sort="{{ bibitem.datePublished|date('Y') }}-{{ bibitem.title }}">{{ bibitem.renderCitationAsHtml(citeProc, false)|raw }}</td>
                     <td class="normal">
                     {% for exhibitionRef in bibitem.exhibitionRefs %}
                         {% if exhibitionRef.role == 1 %}
