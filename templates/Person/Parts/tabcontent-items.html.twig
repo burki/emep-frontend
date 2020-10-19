@@ -70,7 +70,11 @@
                         {% endif %}
                     </td>
                     <td class="normal" data-order="{{ result.exhibitionCount }}">
-                        <a href="{{ path('person-item-partial', { 'item': item.id }) }}" data-remote="false" data-toggle="modal" data-target="#detailModal">{{ result.exhibitionCount }}</a>
+                        {% if result.exhibitionCount > 0 %}
+                        <a href="{{ path('person-item-partial', { 'itemId': item.id }) }}" data-remote="false" data-toggle="modal" data-target="#detailModal">{{ result.exhibitionCount }}</a>
+                        {% else %}
+                        0
+                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}

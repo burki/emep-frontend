@@ -79,43 +79,49 @@ extends CrudController
     }
 
     /**
-     * @Route("/person/item.embed/{item}", name="person-item-partial", requirements={"item"="\d+"})
+     * @Route("/person/item.embed/{itemId}", name="person-item-partial", requirements={"itemId"="\d+"})
      */
     public function exhibitionsByItemAction(Request $request,
                                             PaginatorInterface $paginator,
                                             TranslatorInterface $translator,
-                                            $item = null)
+                                            $itemId)
     {
+        $repo = $this->getDoctrine()
+                ->getRepository('AppBundle:Item');
+
+        $item = $repo->findOneById($itemId);
+
         $qb = $this->getDoctrine()
                 ->getManager()
                 ->createQueryBuilder();
 
         $qb->select([
-                'E',
+                'IE',
                 "E.startdate HIDDEN dateSort",
                 "CONCAT(COALESCE(P.alternateName, P.name), E.startdate) HIDDEN placeSort"
             ])
             ->from('AppBundle:Exhibition', 'E')
-            ->leftJoin('E.location', 'L')
-            ->leftJoin('L.place', 'P')
             ->innerJoin('AppBundle:ItemExhibition', 'IE',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'IE.exhibition = E')
             ->innerJoin('IE.item', 'I')
+            ->leftJoin('E.location', 'L')
+            ->leftJoin('L.place', 'P')
             ->where('I.id = :item')
             ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
-            ->setParameters([ 'item' => $item ])
-            ->groupBy('E.id')
+            ->setParameters([ 'item' => $itemId ])
             ->orderBy('dateSort')
             ;
 
         $pagination = $this->buildPagination($request, $paginator, $qb->getQuery(), [
-            'defaultSortFieldName' => 'dateSort', 'defaultSortDirection' => 'asc',
+            'defaultSortFieldName' => 'dateSort',
+            'defaultSortDirection' => 'asc',
             'pageSize' => 1000,
         ]);
 
         return $this->render('Person/exhibitions-by-item.html.twig', [
             'pageTitle' => $translator->trans('Exhibited at'),
+            'item' => $item,
             'pagination' => $pagination,
         ]);
     }

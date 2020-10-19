@@ -140,7 +140,7 @@
 
             <tbody>
             {% for catalogueEntry in catalogueEntries %}
-                {% set catalogueEntry  = catalogueEntry[0] %}
+                {% set catalogueEntry = catalogueEntry[0] %}
 
                 <tr data-rowname="{{ catalogueEntry.exhibition.id }}" data-collapsed="true" class="listviewrow collapsed collapseRow">
                     <td>{{ helper.itemexhibition_detail(catalogueEntry) }}</td>
