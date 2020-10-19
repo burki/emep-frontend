@@ -20,7 +20,20 @@
                     { },
                     { },
                     { "orderSequence": [ "desc", "asc" ] },
-                ]
+                ],
+                initComplete: function( settings, json ) {
+                    table = settings.oInstance.api();
+
+                    // used to link to a specific work
+                    if (0 == window.location.hash.indexOf('#item-')) {
+                        $('.items-tab a[href="#items"]').tab('show');
+                        var row = table.row(window.location.hash);
+                        if (null != row) {
+                            row.show().draw(false);
+                            $(document).scrollTop($(window.location.hash).offset().top);
+                        }
+                    }
+                }
             });
         })
     </script>
@@ -41,7 +54,7 @@
             <tbody>
             {% for result in items %}
                 {% set item = result.item %}
-                <tr class="listviewrow">
+                <tr class="listviewrow" id="item-{{ item.id }}">
                     <td class="date" data-order="{{ item.__get('earliestdate') }}">
                         {% if item.displaydate is not empty %}
                             {{ item.displaydate }}

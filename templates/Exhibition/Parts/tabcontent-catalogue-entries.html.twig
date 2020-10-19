@@ -179,9 +179,20 @@
             </thead>
             <tbody>
             {% for catalogueEntry in catalogueEntries %}
+                {% set personUrl = path('person', { 'id' : catalogueEntry.person.id }) %}
+                {% if catalogueEntry.person.ulan is not empty %}
+                    {% set personUrl = path('person-by-ulan', { 'ulan' : catalogueEntry.person.ulan }) %}
+                {% elseif catalogueEntry.person.gnd is not empty %}
+                    {% set personUrl = path('person-by-gnd', { 'gnd' : catalogueEntry.person.gnd }) %}
+                {% endif %}
+
+                {% set itemUrl = null %}
+                {% if catalogueEntry.item is not null %}
+                    {% set itemUrl = personUrl ~ '#item-' ~ catalogueEntry.item.id %}
+                {% endif %}
                 <tr class="listviewrow">
-                    <td data-order="{{ catalogueEntry.catalogueIdSortIndex }}">{{ catalogueEntry.titleFull }}</td>
-                    <td data-order="{{ catalogueEntry.person.fullname(false) }}"><a href="{% if catalogueEntry.person.ulan is not empty %}{{ path('person-by-ulan', { 'ulan' : catalogueEntry.person.ulan }) }}{% elseif catalogueEntry.person.gnd is not empty %}{{ path('person-by-gnd', { 'gnd' : catalogueEntry.person.gnd }) }}{% else %}{{ path('person', { 'id' : catalogueEntry.person.id }) }}{% endif %}">{{ catalogueEntry.person.fullname(true) }}</a></td>
+                    <td data-order="{{ catalogueEntry.catalogueIdSortIndex }}">{% if itemUrl is not null %}<a href="{{ itemUrl }}">{% endif %}{{ catalogueEntry.titleFull }}{% if itemUrl is not null %}</a>{% endif %}</td>
+                    <td data-order="{{ catalogueEntry.person.fullname(false) }}"><a href="{{ personUrl }}">{{ catalogueEntry.person.fullname(true) }}</a></td>
                     <td>{{ catalogueEntry.displaylocation }}</td>
                     <td>{{ catalogueEntry.typeName }}</td>
                     <td>{{ catalogueEntry.getTypeParts(false) }}</td>
