@@ -47,16 +47,20 @@
                 {% set bibitem = row[0] %}
                 <tr class="listviewrow">
                     <td class="normal">
-                    {% for exhibitionRef in bibitem.exhibitionRefs if exhibitionRef.role == 1 %}
-                        {% set exhibition = exhibitionRef.exhibition %}
-                        <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">{{ helper.exhibition_period(exhibition) }}</a>
+                    {% for exhibitionRef in bibitem.exhibitionRefs %}
+                        {% if exhibitionRef.role == 1 %}
+                            {% set exhibition = exhibitionRef.exhibition %}
+                            <a href="{{ path('exhibition', { 'id' : exhibition.id }) }}">{{ helper.exhibition_period(exhibition) }}</a>
+                        {% endif %}
                     {% endfor %}
                     </td>
                     <td id="publication-{{ bibitem.id }}" class="title" data-sort="{{ bibitem.datePublished|date('Y') }}-{{ bibitem.title }}">{{ bibitem.renderCitationAsHtml(citeProc, false)|raw }}</td>
                     <td class="normal">
-                    {% for exhibitionRef in bibitem.exhibitionRefs if exhibitionRef.role == 1 %}
-                        {% set exhibition = exhibitionRef.exhibition %}
-                        {{ helper.location_linked(exhibition.location) }}
+                    {% for exhibitionRef in bibitem.exhibitionRefs %}
+                        {% if exhibitionRef.role == 1 %}
+                            {% set exhibition = exhibitionRef.exhibition %}
+                            {{ helper.location_linked(exhibition.location) }}
+                        {% endif %}
                     {% endfor %}
                     </td>
                     <td class="normal">{% if row.signature is not empty %}

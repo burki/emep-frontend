@@ -1,6 +1,3 @@
-<script src="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.js"></script>
-<script src="{{ app.request.basepath }}/js/datatables-mobile.min.js"></script>
-
 <script>
     $( document ).ready(function() {
         $('#holderTable').DataTable({
@@ -13,7 +10,6 @@
         });
     })
 </script>
-
 
 <div role="tabpanel" class="tab-pane active" id="exhibitions">
         {% if pager.getNbResults() > 0 %}
