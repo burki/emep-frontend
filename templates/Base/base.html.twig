@@ -77,7 +77,9 @@
         <script src="{{ app.request.basepath }}/js/collapseChart.js"></script>
         <script src="{{ app.request.basepath }}/js/wNumb.js"></script>
         <script src="{{ app.request.basepath }}/js/nouislider.js"></script>
-        <script src="{{ app.request.basepath }}/vendor/datatables-1.10.16/datatables.min.js"></script>
+
+        {% import 'Shared/datatables.html.twig' as datatables %}
+        {{ datatables.head() }}
 
         {% include 'Shared/stylesheets.html.twig' %}
 

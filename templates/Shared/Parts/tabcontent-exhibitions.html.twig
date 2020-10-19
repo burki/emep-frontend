@@ -1,10 +1,4 @@
 {% block exhibitions %}
-    {% import 'Shared/helper.html.twig' as helper %}
-    {% import 'Shared/datatables.html.twig' as datatables %}
-    {{ datatables.head() }}
-
-    <script src="{{ app.request.basepath }}/js/datatables-mobile.min.js"></script>
-
     <script>
         $( document ).ready(function() {
             $('#exhibitions').DataTable({
