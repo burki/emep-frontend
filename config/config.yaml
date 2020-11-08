@@ -25,7 +25,6 @@ framework:
     # Symfony 4.3 adds automatic search-enging protection in debug-mode
     # You can override, see https://symfony.com/blog/new-in-symfony-4-3-automatic-search-engine-protection
     disallow_search_engine_index: false
-    
     router:
         utf8: true
 
@@ -89,7 +88,7 @@ doctrine:
         result_cache_driver: ~
         query_cache_driver: ~
         second_level_cache:
-            enabled: false                
+            enabled: false
 
 #doctrine_cache:
 #    providers:
@@ -115,6 +114,7 @@ knp_menu:
     # use "twig: false" to disable the Twig extension and the TwigRenderer
     twig:
         template: KnpMenuBundle::menu.html.twig
+    #  if true, enables the helper for PHP templates
     templating: false
     # the renderer to use, list is also available by default
     default_renderer: twig
