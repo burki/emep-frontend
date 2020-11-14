@@ -108,15 +108,32 @@ extends BaseController
     {
         $em = $this->getDoctrine()
             ->getManager();
-        $result = $em->createQuery("SELECT DISTINCT O.type AS type"
-            . " FROM AppBundle:Location O"
-            . " INNER JOIN AppBundle:Exhibition E"
-            . " WITH O MEMBER OF E.organizers"
-            . ' AND ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E')
-            . " ORDER BY type")
-            ->getScalarResult();
 
-        return array_column($result, 'type');
+        if (false) {
+            // doctrine is too expensive
+            $result = $em->createQuery("SELECT DISTINCT O.type AS type"
+                . " FROM AppBundle:Location O"
+                . " INNER JOIN AppBundle:Exhibition E"
+                . " WITH O MEMBER OF E.organizers"
+                . ' AND ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E')
+                . " ORDER BY type")
+                ->getScalarResult();
+
+            return array_column($result, 'type');
+        }
+
+        $organizerListBuilder = new \AppBundle\Utils\OrganizerListBuilder($em->getConnection());
+
+        $queryBuilder = $organizerListBuilder->getQueryBuilder();
+
+        $queryBuilder->from('Location', 'O'); // $organizerListBuilder->setFrom() not public
+        $organizerListBuilder->setExhibitionJoin($queryBuilder);
+
+        $queryBuilder->select('DISTINCT O.type AS type')
+            ->orderBy('type')
+            ;
+
+        return $queryBuilder->execute()->fetchAll(\PDO::FETCH_COLUMN);
     }
 
     /**
