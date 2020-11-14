@@ -95,7 +95,7 @@ nav {
             font-size: 22px;
             padding: 0;
             a:hover {
-                color: white * 0.9;
+                color: scale-color(white, $lightness: -10%);
                 text-decoration: none;
             }
         }
