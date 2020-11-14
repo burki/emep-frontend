@@ -141,7 +141,7 @@ extends SearchListBuilder
 
     public function __construct(\Doctrine\DBAL\Connection $connection,
                                 Request $request = null,
-                                UrlGeneratorInterface $urlGenerator,
+                                UrlGeneratorInterface $urlGenerator = null,
                                 $queryFilters = null,
                                 $mode = '')
     {
