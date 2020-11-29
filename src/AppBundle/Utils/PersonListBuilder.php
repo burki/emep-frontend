@@ -468,7 +468,14 @@ extends SearchListBuilder
             $queryBuilder->groupBy('P.id');
         }
 
+        /*
         $queryBuilder->leftJoin('P',
+                                '(SELECT ItemExhibition.* FROM ItemExhibition'
+                                . ' INNER JOIN Exhibition ON ItemExhibition.id_exhibition=Exhibition.id AND ' . $this->buildExhibitionVisibleCondition('Exhibition') . ')', 'IE',
+                                'IE.id_person=P.id AND (IE.title IS NOT NULL OR IE.id_item IS NULL)');
+        */
+        // new mode is to exclude those without cat entry
+        $queryBuilder->innerJoin('P',
                                 '(SELECT ItemExhibition.* FROM ItemExhibition'
                                 . ' INNER JOIN Exhibition ON ItemExhibition.id_exhibition=Exhibition.id AND ' . $this->buildExhibitionVisibleCondition('Exhibition') . ')', 'IE',
                                 'IE.id_person=P.id AND (IE.title IS NOT NULL OR IE.id_item IS NULL)');
