@@ -112,9 +112,10 @@ extends CrudController
      */
     public function saveSearchAction(Request $request,
                                      UrlGeneratorInterface $urlGenerator,
-                                     UserInterface $user)
+                                     UserInterface $user,
+                                     TranslatorInterface $translator)
     {
-        return $this->handleSaveSearchAction($request, $urlGenerator, $user);
+        return $this->handleSaveSearchAction($request, $urlGenerator, $user, $translator);
     }
 
     /**

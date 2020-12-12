@@ -84,7 +84,7 @@
                     {% endif %}
                     <div class="icontab download-csv"><a title="Download as Excel-File" href="{{ path('search-export', { 'entity' : listBuilder.entity }|merge(app.request.query.all)) }}"><img src="{{ app.request.basepath }}/img/download_icon_blue.svg" class="iconimage"></a></div>
 
-                    {% if app.user  %}
+                    {% if true or app.user  %}
                         <form action="{{ path(app.request.get('_route')) }}" method="POST" style="margin-left: 10px">
                             {% if searches is not empty %}
                                 <select name="useraction" id="saved-searches" class="w-input select-queries" onchange="this.form.submit()">
