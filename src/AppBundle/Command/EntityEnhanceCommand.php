@@ -58,9 +58,11 @@ extends Command
                 return $this->enhancePerson();
                 break;
 
+            /*
             case 'place':
                 return $this->enhancePlace();
                 break;
+            */
 
             case 'location':
                 return $this->enhanceLocation();
@@ -112,7 +114,7 @@ extends Command
     protected function executeJsonQuery($url, $headers = [], $assoc = false)
     {
         if (!isset($this->client)) {
-            $this->client = new \EasyRdf_Http_Client();
+            $this->client = new \EasyRdf\Http\Client();
         }
 
         $this->client->setUri($url);
@@ -348,11 +350,10 @@ extends Command
             // write to csv
             $headers = array_merge(['id', 'name', 'identifier'], array_values($UPDATE_PROPERTIES));
 
-            $fname = $this->getContainer()->get('kernel')->getProjectDir()
+            $fname = $this->projectDir
                         . '/person-enhance.csv';
             $writer = new \Ddeboer\DataImport\Writer\CsvWriter();
             $writer->setStream(fopen($fname, 'w'));
-            $writer->prepare();
             $writer->prepare();
             $writer->writeItem($headers);
             foreach ($items as $id => $item) {

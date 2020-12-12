@@ -108,7 +108,7 @@ EOT;
 
     protected function fetchWikilinks($update = false)
     {
-        $sparqlClient = new \EasyRdf_Sparql_Client('https://query.wikidata.org/sparql');
+        $sparqlClient = new \EasyRdf\Sparql\Client('https://query.wikidata.org/sparql');
 
         $personRepository = $this->em->getRepository('AppBundle:Person');
 
@@ -148,7 +148,7 @@ EOT;
 
     protected function fetchWikistats($update = false)
     {
-        $sparqlClient = new \EasyRdf_Sparql_Client('https://query.wikidata.org/sparql');
+        $sparqlClient = new \EasyRdf\Sparql\Client('https://query.wikidata.org/sparql');
 
         $personRepository = $this->em->getRepository('AppBundle:Person');
 
