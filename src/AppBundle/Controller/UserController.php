@@ -20,7 +20,6 @@ use AppBundle\Entity\User;
 class UserController
 extends CrudController
 {
-
     /**
      * @Route("/my-data", name="my-data")
      */
@@ -225,7 +224,7 @@ extends CrudController
                         $entityManager->persist($user);
                         $entityManager->flush();
 
-                        $success = $this->sendMessage($mailer, 'user/reset-password.twig', [
+                        $success = $this->sendMessage($mailer, 'User/reset-password.twig', [
                             'to' => $email,
                             'resetUrl' => $router->generate('user_checkrecoverpassword', [ 'username' => $user->getUsername(), 'token' => $user->getConfirmationToken() ], UrlGeneratorInterface::ABSOLUTE_URL),
                         ]);
