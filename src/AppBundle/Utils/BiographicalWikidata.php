@@ -40,7 +40,7 @@ class BiographicalWikidata
             $bio->$key = $value;
         }
 
-        $sparql = new \EasyRdf_Sparql_Client(self::SPARQL_URL);
+        $sparql = new \EasyRdf\Sparql\Client(self::SPARQL_URL);
 
         $query = <<<EOT
 SELECT ?item ?itemLabel
