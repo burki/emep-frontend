@@ -430,7 +430,7 @@ implements \JsonSerializable, JsonLdSerializable
         if (!empty($this->nameTransliterated)) {
             $append = [];
 
-            if (!empty(!empty($this->nameTransliterated))) {
+            if (!empty($this->nameTransliterated)) {
                 $append[] = $this->nameTransliterated;
             }
 

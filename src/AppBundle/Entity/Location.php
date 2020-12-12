@@ -443,11 +443,11 @@ implements \JsonSerializable, JsonLdSerializable
         if (!empty($this->nameTransliterated) || !empty($this->nameAlternate)) {
             $append = [];
 
-            if (!empty(!empty($this->nameTransliterated))) {
+            if (!empty($this->nameTransliterated)) {
                 $append[] = $this->nameTransliterated;
             }
 
-            if (!empty(!empty($this->nameAlternate))) {
+            if (!empty($this->nameAlternate)) {
                 $append[] = $this->nameAlternate;
             }
 

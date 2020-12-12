@@ -355,11 +355,11 @@ implements JsonLdSerializable
         if (!empty($this->titleTransliterated) || !empty($this->titleAlternate)) {
             $append = [];
 
-            if (!empty(!empty($this->titleTransliterated))) {
+            if (!empty($this->titleTransliterated)) {
                 $append[] = $this->titleTransliterated;
             }
 
-            if (!empty(!empty($this->titleAlternate))) {
+            if (!empty($this->titleAlternate)) {
                 $append[] = $this->titleAlternate;
             }
 
