@@ -1,7 +1,7 @@
 {
     "config": {
         "platform": {
-            "php": "7.2.9"
+            "php": "7.3.0"
         }
     },
 
@@ -21,42 +21,43 @@
     ],
 
     "require": {
-        "symfony/yaml": "^5.1",
-        "symfony/console": "^5.1",
-        "symfony/framework-bundle": "^5.1",
+        "symfony/yaml": "^5.2",
+        "symfony/console": "^5.2",
+        "symfony/framework-bundle": "^5.2",
 
-        "symfony/templating": "^5.1",
-        "symfony/translation": "^5.1",
-        "symfony/twig-bridge": "^5.1",
-        "symfony/twig-bundle": "^5.1",
-        "symfony/intl": "^5.1",
+        "symfony/templating": "^5.2",
+        "symfony/translation": "^5.2",
+        "symfony/twig-bridge": "^5.2",
+        "symfony/twig-bundle": "^5.2",
+        "symfony/intl": "^5.2",
 
-        "symfony/security-bundle": "^5.1",
-        "symfony/security-core": "^5.1",
-        "symfony/security-csrf": "^5.1",
+        "symfony/security-bundle": "^5.2",
+        "symfony/security-core": "^5.2",
+        "symfony/security-csrf": "^5.2",
 
-        "symfony/web-profiler-bundle": "^5.1",
-        "symfony/debug-bundle": "^5.1",
-        "symfony/var-dumper": "^5.1",
-        "symfony/var-exporter": "^5.1",
-        "symfony/http-foundation": "^5.1",
-        "symfony/mime": "^5.1",
+        "symfony/web-profiler-bundle": "^5.2",
+        "symfony/debug-bundle": "^5.2",
+        "symfony/var-dumper": "^5.2",
+        "symfony/var-exporter": "^5.2",
+        "symfony/http-foundation": "^5.2",
+        "symfony/mime": "^5.2",
 
-        "symfony/validator": "^5.1",
-        "symfony/form": "^5.1",
-        "symfony/inflector": "^5.1",
+        "symfony/validator": "^5.2",
+        "symfony/form": "^5.2",
+        "symfony/inflector": "^5.2",
         "shapecode/hidden-entity-type-bundle": "dev-master",
 
         "symfony/monolog-bundle": "^3.5",
-        "symfony/monolog-bridge": "^5.1",
+        "symfony/monolog-bridge": "^5.2",
         "symfony/swiftmailer-bundle": "^3.4",
         "knplabs/knp-menu-bundle": "^3.0",
 
-        "symfony/asset": "^5.1",
+        "symfony/asset": "^5.2",
         "armin/scssphp-bundle": "^1.1",
 
-        "symfony/filesystem": "^5.1",
-        "symfony/finder": "^5.1",
+        "symfony/filesystem": "^5.2",
+        "symfony/finder": "^5.2",
+        "symfony/process": "^5.2",
 
         "lexik/form-filter-bundle": "^6.0",
         "knplabs/knp-paginator-bundle": "^5.3",
@@ -67,7 +68,7 @@
         "liip/url-auto-converter-bundle": "dev-master",
 
         "doctrine/doctrine-bundle": "^2.0",
-        "symfony/cache": "^5.1",
+        "symfony/cache": "^5.2",
 
         "stof/doctrine-extensions-bundle": "^1.4",
         "beberlei/doctrineextensions": "@stable",
@@ -99,5 +100,8 @@
         "psr-4": {
             "AppBundle\\": "src/AppBundle/"
         }
+    },
+    "require-dev": {
+        "vimeo/psalm": "^4.2"
     }
 }
