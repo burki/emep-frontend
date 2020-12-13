@@ -27,7 +27,7 @@ class UserItem
     /**
      * @ORM\ManyToOne(targetEntity="User")
      * @ORM\JoinColumn(name="id_user", referencedColumnName="id")
-     * @var Item
+     * @var User
      */
     private $user;
 

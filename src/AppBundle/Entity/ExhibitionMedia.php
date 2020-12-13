@@ -5,11 +5,12 @@ namespace AppBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * PersonMedia
+ * ExhibitionMedia
  *
  * @ORM\Entity
  */
-class ExhibitionMedia extends Media
+class ExhibitionMedia
+extends Media
 {
     /**
      *
@@ -19,4 +20,14 @@ class ExhibitionMedia extends Media
      * @ORM\JoinColumn(name="item_id", referencedColumnName="id")
      */
     protected $exhibition;
+
+    public function getPathPrefix()
+    {
+        return 'exhibition';
+    }
+
+    public function getReferencedId()
+    {
+        return $this->exhibition->getId();
+    }
 }

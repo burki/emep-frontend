@@ -39,6 +39,8 @@ implements \JsonSerializable, JsonLdSerializable /*, OgSerializable, TwitterSeri
      */
     protected $status = 0;
 
+    protected $itemType = 'journal';
+
     /**
      * @var string The place(s) of publication
      *
@@ -199,7 +201,7 @@ implements \JsonSerializable, JsonLdSerializable /*, OgSerializable, TwitterSeri
      */
     public function setDateModified(\DateTime $dateModified = null)
     {
-        $this->dateModified = $dateModified;
+        $this->changedAt = $dateModified;
 
         return $this;
     }
@@ -211,7 +213,7 @@ implements \JsonSerializable, JsonLdSerializable /*, OgSerializable, TwitterSeri
      */
     public function getDateModified()
     {
-        return $this->dateModified;
+        return $this->changedAt;
     }
 
     /**
@@ -221,7 +223,7 @@ implements \JsonSerializable, JsonLdSerializable /*, OgSerializable, TwitterSeri
      *
      * @return $this
      */
-    public function setName($title)
+    public function setName($name)
     {
         $this->name = $name;
 
@@ -367,10 +369,8 @@ implements \JsonSerializable, JsonLdSerializable /*, OgSerializable, TwitterSeri
                 }
             }
 
-            if (!empty($this->publisher)) {
-                $publisher = new Organization();
-                $publisher->setName($this->publisher);
-                $ret['publisher'] = $publisher->jsonLdSerialize($locale, true);
+            if (!is_null($this->publisher)) {
+                $ret['publisher'] = $this->publisher->jsonLdSerialize($locale, true);
                 if (!empty($this->publicationLocation)) {
                     $location = new Place();
                     $location->setName($this->publicationLocation);

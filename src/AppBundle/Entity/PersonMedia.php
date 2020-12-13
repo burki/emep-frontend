@@ -9,7 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Entity
  */
-class PersonMedia extends Media
+class PersonMedia
+extends Media
 {
     /**
      *
@@ -19,4 +20,14 @@ class PersonMedia extends Media
      * @ORM\JoinColumn(name="item_id", referencedColumnName="id")
      */
     protected $person;
+
+    public function getPathPrefix()
+    {
+        return 'person';
+    }
+
+    public function getReferencedId()
+    {
+        return $this->person->getId();
+    }
 }

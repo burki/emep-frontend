@@ -2,6 +2,7 @@
 
 namespace AppBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -40,7 +41,7 @@ implements JsonLdSerializable
      *
      * @ORM\Column(name="status", type="integer", nullable=false)
      */
-    private $status = '0';
+    private $status = 0;
 
     /**
      * @var string
@@ -56,7 +57,7 @@ implements JsonLdSerializable
     protected $location;
 
     /**
-     * @var ArrayCollection<Location> The organizer(s) of this exhibition.
+     * @var ArrayCollection<int, Location> The organizer(s) of this exhibition.
      *
      * @ORM\ManyToMany(targetEntity="Location", inversedBy="organizerOf")
      * @ORM\JoinTable(name="ExhibitionLocation",
@@ -224,7 +225,7 @@ implements JsonLdSerializable
      *
      * @ORM\Column(name="flags", type="integer", nullable=false)
      */
-    private $flags = '0';
+    private $flags = 0;
 
     /**
      * Deprecated property
@@ -283,7 +284,7 @@ implements JsonLdSerializable
     protected $items;
 
     /**
-     * @var ArrayCollection<ItemExhibition> The catalogue entries of this exhibition.
+     * @var ArrayCollection<int,ItemExhibition> The catalogue entries of this exhibition.
      *
      * @ORM\OneToMany(targetEntity="ItemExhibition", mappedBy="exhibition")
      */
@@ -462,6 +463,7 @@ implements JsonLdSerializable
     public function getOrganizerType()
     {
         $types = [];
+
         if (!is_null($this->organizers)) {
             foreach ($this->organizers as $organizer) {
                 $type = $organizer->getType();

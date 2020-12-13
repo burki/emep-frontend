@@ -12,6 +12,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 if (!function_exists('mb_ucfirst') && function_exists('mb_substr')) {
     function mb_ucfirst($string) {
         $string = mb_strtoupper(mb_substr($string, 0, 1)) . mb_substr($string, 1);
+
         return $string;
     }
 }
@@ -138,6 +139,13 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
     protected $itemType;
 
     /**
+     * @var array The author/contributor/editor of this CreativeWork.
+     *
+     * xORM\Column(type="json_array", nullable=true)
+     */
+    protected $creators;
+
+    /**
      * @var string The author of this CreativeWork.
      * @ORM\Column(type="string", nullable=true)
      *
@@ -159,11 +167,25 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
     protected $series;
 
     /**
+     * @var string The number within the series of books the book was published in
+     *
+     * xORM\Column(type="string", nullable=true)
+     */
+    protected $seriesNumber;
+
+    /**
      * @var string The volume of a journal or multi-volume book
      *
      * @ORM\Column(type="string", nullable=true)
      */
     protected $volume;
+
+    /**
+     * @var string The number of volumes of a multi-volume book
+     *
+     * xORM\Column(type="string", nullable=true)
+     */
+    protected $numberOfVolumes;
 
     /**
      * @var string The issue of a journal, magazine, or tech-report, if applicable
@@ -230,6 +252,13 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
     protected $info;
 
     /**
+     * @var string The doi of the article
+     *
+     * xORM\Column(type="string", nullable=true)
+     */
+    protected $doi;
+
+    /**
      * @var string The isbn of the book
      *
      * @ORM\Column(type="string", nullable=true)
@@ -289,14 +318,14 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
     protected $note;
 
     /**
-     * @var ArrayCollection<BibitemExhibition> The exhibition reference.
+     * @var ArrayCollection<int, BibitemExhibition> The exhibition reference.
      *
      * @ORM\OneToMany(targetEntity="BibitemExhibition", mappedBy="bibitem")
      */
     public $exhibitionRefs;
 
     /**
-     * @var ArrayCollection<BibitemHolder> The holder reference.
+     * @var ArrayCollection<int, BibitemHolder> The holder reference.
      *
      * @ORM\OneToMany(targetEntity="BibitemHolder", mappedBy="bibitem")
      */
@@ -364,6 +393,30 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
     public function getStatus()
     {
         return $this->status;
+    }
+
+    /**
+     * Sets creators.
+     *
+     * @param array $creators
+     *
+     * @return $this
+     */
+    public function setCreators($creators = null)
+    {
+        $this->creators = $creators;
+
+        return $this;
+    }
+
+    /**
+     * Gets creators.
+     *
+     * @return array
+     */
+    public function getCreators()
+    {
+        return $this->creators;
     }
 
     /**
@@ -763,17 +816,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
      */
     public function getDateModified()
     {
-        return $this->dateModified;
-    }
-
-    /**
-     * Gets description.
-     *
-     * @return string
-     */
-    public function getDescription()
-    {
-        return $this->description;
+        return $this->changedAt;
     }
 
     /**
@@ -1310,7 +1353,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
                 if (!is_null($parentItemType)) {
                     $parent = clone $this;
                     $parent->setItemType($parentItemType);
-                    $parent->setName($this->containerName);
+                    $parent->setTitle($this->containerName);
                     if ('Chapter' == $type && !empty($this->creators)) {
                         $creatorsParent = [];
                         foreach ($this->creators as $creator) {
@@ -1320,6 +1363,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
                         }
                         $parent->setCreators($creatorsParent);
                     }
+
                     $ret['isPartOf'] = $parent->jsonLdSerialize($locale, true);
                 }
             }
@@ -1379,7 +1423,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
 
         $ret = [
             'og:type' => $type,
-            'og:title' => $this->name,
+            'og:title' => $this->getName(),
         ];
 
         $isbns = $this->getIsbnListNormalized(false);

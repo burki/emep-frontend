@@ -2,6 +2,7 @@
 
 namespace AppBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -505,7 +506,7 @@ class Item
     private $personRefs;
 
     /**
-     * @var ArrayCollection<Person> The creator(s) of this item.
+     * @var ArrayCollection<int,Person> The creator(s) of this item.
      *
      * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Person", inversedBy="items")
      * @ORM\JoinTable(name="ItemPerson",
@@ -516,7 +517,7 @@ class Item
     public $creators;
 
     /**
-     * @var ArrayCollection<Exhibition> The exhibition(s) of this item.
+     * @var ArrayCollection<int,Exhibition> The exhibition(s) of this item.
      *
      * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Exhibition", inversedBy="items")
      * @ORM\JoinTable(name="ItemExhibition",
@@ -527,7 +528,7 @@ class Item
     public $exhibitions;
 
     /**
-     * @var Keywords[]
+     * @var ItemKeyword[]
      *
      * @ORM\OneToMany(targetEntity="ItemKeyword", mappedBy="idItem", fetch="EAGER")
      * @ORM\OrderBy({"type" = "ASC", "ord" = "ASC"})

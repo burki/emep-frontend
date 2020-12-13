@@ -160,6 +160,9 @@ abstract class Media
         }
     }
 
+    abstract public function getReferencedId();
+    abstract public function getPathPrefix();
+
     public function getPath()
     {
         $id = $this->getReferencedId();

@@ -2,8 +2,8 @@
 
 namespace AppBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Mapping\Annotation as Gedmo; // alias for Gedmo extensions annotations
 
 /**
  * A person (alive, dead, undead, or fictional).
@@ -270,7 +270,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
     protected $items;
 
     /**
-     * @var ArrayCollection<Exhibition> The exhibition(s) of this person.
+     * @var ArrayCollection<int,Exhibition> The exhibition(s) of this person.
      *
      * @ORM\ManyToMany(targetEntity="Exhibition", inversedBy="artists")
      * @ORM\JoinTable(name="ItemExhibition",
@@ -282,7 +282,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
     public $exhibitions;
 
     /**
-     * @var ArrayCollection<ItemExhibition> The catalogue entri(s) of this person.
+     * @var ArrayCollection<int,ItemExhibition> The catalogue entry(s) of this person.
      *
      * @ORM\OneToMany(targetEntity="ItemExhibition", mappedBy="person")
      */
@@ -435,7 +435,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
     /**
      * Sets description.
      *
-     * @param array|null $description
+     * @param string|null $description
      *
      * @return $this
      */
@@ -449,13 +449,18 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
     /**
      * Gets description.
      *
-     * @return array|null
+     * @return string|null
      */
     public function getDescription()
     {
         return $this->description;
     }
 
+    /**
+     * Gets description in $locale.
+     *
+     * @return string|null
+     */
     public function getDescriptionLocalized($locale)
     {
         if (empty($this->description)) {
@@ -466,10 +471,11 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
             if (array_key_exists($locale, $this->description)) {
                 return $this->description[$locale];
             }
+
+            return;
         }
-        else {
-            return $this->description;
-        }
+
+        return $this->description;
     }
 
     /**
@@ -674,7 +680,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
     /**
      * Gets birthPlace.
      *
-     * @return Place
+     * @return string
      */
     public function getBirthPlaceLabel()
     {
