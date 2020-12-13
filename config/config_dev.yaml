@@ -10,6 +10,9 @@ web_profiler:
     toolbar: true
     intercept_redirects: false
 
+debug:
+    dump_destination: "tcp://%env(VAR_DUMPER_SERVER)%"
+
 monolog:
     handlers:
 #        doctrine:
