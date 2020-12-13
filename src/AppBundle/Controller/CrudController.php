@@ -17,6 +17,7 @@ abstract class CrudController
 extends BaseController
 {
     protected $pageSize = 50;
+    protected $form;
 
     static function array_filter_recursive($array, $callback = null, $remove_empty_arrays = false)
     {
@@ -358,15 +359,7 @@ extends BaseController
         }
     }
 
-    protected function expandSaveSearchRoute($route)
-    {
-        if (!preg_match('/\-index$/', $route)) {
-            // we only save the base, so append the -index
-            $route .= '-index';
-        }
-
-        return $route;
-    }
+    abstract protected function buildSaveSearchParams(Request $request, UrlGeneratorInterface $urlGenerator);
 
     /**
      * Saves a search

@@ -18,7 +18,7 @@ use AppBundle\Entity\User;
  *
  */
 class UserController
-extends CrudController
+extends BaseController
 {
     /**
      * @Route("/my-data", name="my-data")

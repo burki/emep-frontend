@@ -38,4 +38,14 @@ extends AbstractController
         return array_key_exists($key, $this->globals)
             ? $this->globals[$key] : null;
     }
+
+    protected function expandSaveSearchRoute($route)
+    {
+        if (!preg_match('/\-index$/', $route)) {
+            // we only save the base, so append the -index
+            $route .= '-index';
+        }
+
+        return $route;
+    }
 }
