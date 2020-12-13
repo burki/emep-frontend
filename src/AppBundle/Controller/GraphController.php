@@ -39,9 +39,13 @@ extends BaseController
     {
         $route = $request->get('_route');
 
-        $exportPath = $this->container->hasParameter('app.export.path')
-            ? $this->getParameter('app.export.path')
-            : $this->kernel->getProjectDir() . '/../site/htdocs/uploads/export';
+        try {
+            $exportPath = $this->getParameter('app.export.path');
+        }
+        catch (\InvalidArgumentException $e) {
+            // set a default
+            $exportPath = $this->kernel->getProjectDir() . '/../site/htdocs/uploads/export';
+        }
 
         if (false === realpath($exportPath)) {
             throw new \InvalidArgumentException($exportPath . ' does not exist');
@@ -60,17 +64,16 @@ extends BaseController
 
         if ($regenerate || file_exists($fnameLock)) {
             if (!file_exists($fnameLock)) {
-                $phpBin = self::getPhpBin();
 
-                $builder = new ProcessBuilder();
-                $builder->setPrefix($phpBin);
-                $command = $builder->setArguments([
-                        realpath(__DIR__ .'/../../../bin/console'),
-                        'export:gdf',
-                        'person',
-                        '--save-export-path'
-                    ])
-                    ->getProcess()
+                $processArguments = [
+                    $phpBin = self::getPhpBin(),
+                    realpath(__DIR__ .'/../../../bin/console'),
+                    'export:gdf',
+                    'person',
+                    '--save-export-path'
+                ];
+
+                $command = (new Process($processArguments))
                     ->getCommandLine();
 
                 $process = new BackgroundProcess($command);
