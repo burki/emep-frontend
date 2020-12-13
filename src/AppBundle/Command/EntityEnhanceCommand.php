@@ -109,7 +109,7 @@ extends Command
      *
      * @throws NoResultException
      *
-     * @return json object representing the query result
+     * @return array json object representing the query result
      */
     protected function executeJsonQuery($url, $headers = [], $assoc = false)
     {
