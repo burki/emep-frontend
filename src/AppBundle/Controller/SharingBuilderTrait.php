@@ -97,11 +97,13 @@ trait SharingBuilderTrait
             return $twitter;
         }
 
-        // we don't put @ in parameters.yaml since @keydocuments looks like a service
+        // we don't put @ in parameters.yaml since @twitterhandle looks like a service
         $twitter['twitter:card'] = 'summary';
         $twitter['twitter:site'] = '@' . $globals['twitterSite'];
 
         $request = $this->get('request_stack')->getCurrentRequest();
+        /*
+        // TwitterSerializable currently not defined
         if ($entity instanceof \AppBundle\Entity\TwitterSerializable) {
             $baseUri = $request->getUriForPath('/');
             $twitterEntity = $entity->twitterSerialize($request->getLocale(), $baseUri, $params);
@@ -109,6 +111,7 @@ trait SharingBuilderTrait
                 $twitter = array_merge($twitter, $twitterEntity);
             }
         }
+        */
 
         return $twitter;
     }

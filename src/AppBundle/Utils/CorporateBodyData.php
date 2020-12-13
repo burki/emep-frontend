@@ -1,7 +1,8 @@
 <?php
 namespace AppBundle\Utils;
 
-class CorporateBodyData extends DnbData
+class CorporateBodyData
+extends DnbData
 {
     function processTriple($triple)
     {

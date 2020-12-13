@@ -19,6 +19,7 @@
 namespace AppBundle\Twig;
 
 use Symfony\Component\Intl\Countries;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AppExtension
 extends \Twig\Extension\AbstractExtension
@@ -26,7 +27,7 @@ extends \Twig\Extension\AbstractExtension
     private $translator;
     private $slugifyer;
 
-    public function __construct(\Symfony\Component\Translation\TranslatorInterface $translator = null,
+    public function __construct(TranslatorInterface $translator = null,
                                 $slugifyer = null)
     {
         $this->translator = $translator;

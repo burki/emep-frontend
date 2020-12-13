@@ -22,6 +22,22 @@ class BiographicalWikidata
         245 => 'ulan',
     ];
 
+    static $nationalityToIso = null;
+
+    static function mapNationality ($nationality)
+    {
+        if (is_null(self::$nationalityToIso)) {
+            // TODO: build
+            self::$nationalityToIso = [];
+        }
+
+        if (array_key_exists($nationality, self::$nationalityToIso)) {
+            return self::$nationalityToIso[$nationality];
+        }
+
+        return $nationality;
+    }
+
     public static function fetchByUlan($ulan, $locale)
     {
         return self::fetchByProperty(245, $ulan, $locale);

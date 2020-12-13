@@ -138,6 +138,7 @@ extends ListBuilder
     var $urlGenerator = null;
     var $orders = [];
     var $queryFilters = [];
+    var $mode = null;
 
     public function __construct(\Doctrine\DBAL\Connection $connection,
                                 Request $request = null,

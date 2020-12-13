@@ -141,8 +141,8 @@ class Builder
         return $menu;
     }
 
-    public function breadcrumbMenu(FactoryInterface $factory, array $options)
+    public function createBreadcrumbMenu(array $options)
     {
-        return $this->mainMenu($factory, $options + [ 'position' => 'breadcrumb' ]);
+        return $this->createMainMenu($options + [ 'position' => 'breadcrumb' ]);
     }
 }

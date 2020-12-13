@@ -3,7 +3,7 @@ namespace AppBundle\Utils;
 
 abstract class DnbData
 {
-    private static $RDFParser = NULL;
+    private static $RDFParser = null;
 
     protected static function getRDFParser()
     {
@@ -33,7 +33,7 @@ abstract class DnbData
             }
             $dateParts[$i] = sprintf('%02d', $dateParts[$i]);
         }
-        
+
         return implode('-', $dateParts);
     }
 
@@ -70,12 +70,14 @@ abstract class DnbData
     {
         $type = $index['http://www.w3.org/1999/02/22-rdf-syntax-ns#type'][0]['value'];
         switch ($type) {
+            /*
             case 'http://d-nb.info/standards/elementset/gnd#DifferentiatedPerson':
             case 'http://d-nb.info/standards/elementset/gnd#Pseudonym':
             case 'http://d-nb.info/standards/elementset/gnd#RoyalOrMemberOfARoyalHouse':
             case 'http://d-nb.info/standards/elementset/gnd#UndifferentiatedPerson':
                 return new BiographicalData();
                 break;
+            */
 
             case 'http://d-nb.info/standards/elementset/gnd#CorporateBody':
             case 'http://d-nb.info/standards/elementset/gnd#OrganOfCorporateBody':

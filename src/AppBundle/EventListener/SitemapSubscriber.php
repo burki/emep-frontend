@@ -25,7 +25,7 @@ implements EventSubscriberInterface
     private $urlGenerator;
 
     /**
-     * @var EntityManager
+     * @var EntityManagerInterface
      */
     private $entityManager;
 
