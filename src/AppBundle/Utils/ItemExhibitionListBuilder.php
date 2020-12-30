@@ -343,6 +343,12 @@ extends SearchListBuilder
             return $this;
         }
 
+        $selectTitle = 'IE.title AS title';
+        if (!is_null(\AppBundle\Entity\ItemExhibition::TYPE_OTHER_MEDIA)) {
+            $selectTitle = sprintf("IF(IE.type = %d, '', IE.title) AS title",
+                                   \AppBundle\Entity\ItemExhibition::TYPE_OTHER_MEDIA);
+        }
+
         $queryBuilder->select([
             'SQL_CALC_FOUND_ROWS IE.id',
             'IE.id AS id',
@@ -352,7 +358,7 @@ extends SearchListBuilder
             'P.sex AS gender',
             'P.country AS nationality',
             'IE.catalogueId AS catalogueId',
-            'IE.title AS title',
+             $selectTitle,
             'IE.title_alternate AS title_alternate',
             'IE.title_translit AS title_translit',
             'TypeTerm.name AS type',

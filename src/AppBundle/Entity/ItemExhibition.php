@@ -1,6 +1,5 @@
 <?php
 
-
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -13,6 +12,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class ItemExhibition
 {
+    public const TYPE_OTHER_MEDIA = 43; // if set, return empty properties for $title and similar property
+
     /**
      * @var integer
      *
@@ -76,6 +77,13 @@ class ItemExhibition
      * @ORM\JoinColumn(name="type", referencedColumnName="id")
      */
     private $type;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="type", type="integer")
+     */
+    private $typeId;
 
     /**
      * @ORM\ManyToOne(targetEntity="Term", cascade={"all"}, fetch="EAGER")
@@ -228,6 +236,10 @@ class ItemExhibition
 
     public function getDisplaydate()
     {
+        if ($this->ignoreProperty()) {
+            return;
+        }
+
         return $this->displaydate;
     }
 
@@ -238,6 +250,10 @@ class ItemExhibition
 
     public function getPrice()
     {
+        if ($this->ignoreProperty()) {
+            return;
+        }
+
         return $this->price;
     }
 
@@ -246,7 +262,7 @@ class ItemExhibition
      */
     public function isForsale()
     {
-        if (is_null($this->forsale)) {
+        if (is_null($this->forsale) || $this->ignoreProperty()) {
             return null;
         }
 
@@ -265,6 +281,10 @@ class ItemExhibition
 
     public function getDescription()
     {
+        if ($this->ignoreProperty()) {
+            return;
+        }
+
         return $this->description;
     }
 
@@ -294,6 +314,11 @@ class ItemExhibition
         if (!empty($this->catalogueId)) {
             $parts[] = $this->catalogueId . '.';
         }
+
+        if ($this->ignoreProperty()) {
+            return implode(' ', $parts);
+        }
+
 
         if (!empty($this->displaycreator)) {
             $parts[] = $this->displaycreator . ':';
@@ -371,5 +396,14 @@ class ItemExhibition
     {
         // corresponds to IE.title IS NOT NULL OR IE.item IS NULL
         return !empty($this->title) || is_null($this->item);
+    }
+
+    private function ignoreProperty()
+    {
+        if (is_null(self::TYPE_OTHER_MEDIA)) {
+            return false;
+        }
+
+        return $this->typeId === self::TYPE_OTHER_MEDIA;
     }
 }

@@ -352,9 +352,25 @@ extends ListBuilder
             $bind[$key] = '%' . $term . '%';
 
             $orParts = [];
+            $orPartsOtherMedia = [];
+
             for ($j = 0; $j < count($fields); $j++) {
-                $orParts[] = $fields[$j] . " LIKE :" . $key;
+                if (!is_null(\AppBundle\Entity\ItemExhibition::TYPE_OTHER_MEDIA)
+                    && preg_match('/^IE\./', $fields[$j]))
+                {
+                    $orPartsOtherMedia[] = $fields[$j] . " LIKE :" . $key;
+                }
+                else {
+                    $orParts[] = $fields[$j] . " LIKE :" . $key;
+                }
             }
+
+            if (!empty($orPartsOtherMedia)) {
+                $orParts[] = sprintf('(IE.type <> %s AND (%s))',
+                                     \AppBundle\Entity\ItemExhibition::TYPE_OTHER_MEDIA,
+                                     implode(' OR ', $orPartsOtherMedia));
+            }
+
             $andParts[] = '(' . implode(' OR ', $orParts) . ')';
         }
 
