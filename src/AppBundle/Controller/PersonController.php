@@ -999,9 +999,8 @@ extends CrudController
      * Provide a BEACON file as described in
      *  https://de.wikipedia.org/wiki/Wikipedia:BEACON
      */
-    public function gndBeaconAction()
+    public function gndBeaconAction(TranslatorInterface $translator)
     {
-        $translator = $this->container->get('translator');
         $twig = $this->container->get('twig');
 
         $personRepo = $this->getDoctrine()
