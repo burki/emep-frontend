@@ -192,10 +192,10 @@ extends SearchListBuilder
 
     protected function setBibitemJoin($queryBuilder)
     {
-        $queryBuilder->leftJoin($this->alias,
+        $queryBuilder->innerJoin($this->alias,
                                 'HolderPublication', 'BH',
                                 'BH.id_holder = ' . $this->alias . '.id');
-        $queryBuilder->leftJoin('BH',
+        $queryBuilder->innerJoin('BH',
                                 'Publication', 'B',
                                 'BH.id_publication = B.id AND B.status <> -1');
         $queryBuilder->leftJoin('BH',

@@ -148,6 +148,20 @@
     </script>
 {%- endmacro %}
 
+{% macro holder_disclaimer() -%}
+    <a class="tooltipDisclaimer" style="font-size: 1.2rem" data-toggle="tooltip" data-original-title="The following list contains the institutions which are holding the exhibition catalogues that were used as sources in our database.">
+        <i style="color: #ccc" class="glyphicon glyphicon-info-sign"></i>
+    </a>
+    <script>
+        $(function () {
+            $('a.tooltipDisclaimer').tooltip({
+                html: true,
+                placement: 'auto left'
+            });
+        });
+    </script>
+{%- endmacro %}
+
 {% macro render_info(entries) -%}
     {% for entry in entries %}
         {{ entry.note }}

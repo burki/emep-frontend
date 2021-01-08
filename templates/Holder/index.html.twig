@@ -21,7 +21,8 @@
 
 {% block body %}
     <div class="w-container">
-        <h1 class="heading">{{ pageTitle }}</h1>
+        <h1 class="heading">{{ pageTitle }}{{ helper.holder_disclaimer() }}</h1>
+
 
     <form id="search" method="get" class="indexForm holderFilterForm" action="{{ path(app.request.attributes.get('_route')) }}">
     <div class="searchbarcontainer">
