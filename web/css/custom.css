@@ -423,8 +423,9 @@ div#footer-fwf {
     color: #1869a3 !important;
 }
 
-a.heading-beta, a.heading-beta:visited {
-    color: #ff0000 !important;
+a.heading-info, a.heading-info:visited {
+    color: #95a3ac !important;
+    font-weight: normal;
 }
 
 .groupHeader a, .groupHeader {
