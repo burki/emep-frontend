@@ -1283,4 +1283,52 @@ EOT;
 
         return $genderStats;
     }
+
+    /**
+     * @Route("/exhibition/oclc/beacon", name="exhibition-oclc-beacon")
+     *
+     * Provide a BEACON file as described in
+     *  https://de.wikipedia.org/wiki/Wikipedia:BEACON
+     */
+    public function oclcBeaconAction(TranslatorInterface $translator)
+    {
+        $twig = $this->container->get('twig');
+
+        $ret = '#FORMAT: BEACON' . "\n"
+             . '#PREFIX: http://www.worldcat.org/oclc/'
+             . "\n";
+        $ret .= sprintf('#TARGET: %s/{ID}',
+                        $this->generateUrl('exhibition-index', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL))
+              . "\n";
+
+        $globals = $twig->getGlobals();
+        $ret .= '#NAME: ' . $translator->trans($globals['siteName'])
+              . "\n";
+        // $ret .= '#MESSAGE: ' . "\n";
+
+        $querystr = "SELECT oclc, Exhibition.id AS exhibitionId"
+            . " FROM Publication"
+            . " INNER JOIN ExhibitionPublication ON ExhibitionPublication.id_publication=Publication.id AND ExhibitionPublication.role = 1"
+            . " INNER JOIN Exhibition ON Exhibition.id=ExhibitionPublication.id_exhibition AND Exhibition.status <> -1"
+            . " WHERE oclc IS NOT NULL AND Publication.status <> -1";
+
+        $em = $this->getDoctrine()->getManager();
+        $dbconn = $em->getConnection();
+
+        $stmt = $dbconn->query($querystr);
+        $ids = [];
+        while ($row = $stmt->fetch()) {
+            $oclcIds = preg_split('/\s*,\s*/', $row['oclc']);
+            foreach ($oclcIds as $oclcId) {
+                $ids[$oclcId] = $row['exhibitionId'];
+            }
+        }
+
+        foreach ($ids as $oclc => $exhibitionId) {
+            $ret .=  $oclc . '||' . $exhibitionId . "\n";
+        }
+
+        return new \Symfony\Component\HttpFoundation\Response($ret, \Symfony\Component\HttpFoundation\Response::HTTP_OK,
+                                                              [ 'Content-Type' => 'text/plain; charset=UTF-8' ]);
+    }
 }
