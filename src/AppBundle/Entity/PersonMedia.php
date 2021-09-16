@@ -14,7 +14,7 @@ extends Media
 {
     /**
      *
-     * @var Item
+     * @var Person
      *
      * @ORM\ManyToOne(targetEntity="Person", inversedBy="media", fetch="EXTRA_LAZY")
      * @ORM\JoinColumn(name="item_id", referencedColumnName="id")
