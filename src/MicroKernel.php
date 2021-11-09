@@ -116,13 +116,18 @@ extends Kernel
         return $this->getProjectDir().'/var/logs';
     }
 
+    public function getConfigDir()
+    {
+        return $this->getProjectDir().'/config';
+    }
+
     /*
      * {@inheritDoc}
      */
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader)
     {
-        $loader->load($this->getProjectDir().'/config/config_' . $this->getEnvironment() . '.yaml');
-        $loader->load($this->getProjectDir().'/config/services.yaml');
+        $loader->load($this->getConfigDir().'/config_'.$this->getEnvironment().'.yaml');
+        $loader->load($this->getConfigDir().'/services.yaml');
     }
 
     /*
@@ -153,7 +158,7 @@ extends Kernel
         $routes->mount('/', $routes->import('@PrestaSitemapBundle/Resources/config/routing.yml'));
 
         // our controllers
-        $confDir = $this->getProjectDir().'/config';
+        $confDir = $this->getConfigDir();
 
         $routes->import($confDir.'/{routes}/*'.self::CONFIG_EXTS, '/', 'glob');
         $routes->import($confDir.'/{routes}/'.$this->environment.'/**/*'.self::CONFIG_EXTS, '/', 'glob');
