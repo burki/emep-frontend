@@ -1,8 +1,10 @@
 # config/security.yaml
 
-# see https://symfony.com/doc/3.4/security.html
+# see https://symfony.com/doc/5.3/security.html
 security:
-    encoders:
+    enable_authenticator_manager: true
+
+    password_hashers:
         AppBundle\Entity\User:
             algorithm: bcrypt
 
@@ -18,7 +20,6 @@ security:
             security: false
             
         main:
-            anonymous: ~
             provider: db_provider
             form_login:
                 login_path: login

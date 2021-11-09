@@ -81,10 +81,8 @@ doctrine:
             datetime_functions:
                 YEAR: DoctrineExtensions\Query\Mysql\Year
                 
-        #metadata_cache_driver: '%database.cache_driver%'
         #result_cache_driver: '%database.cache_driver%'
         #query_cache_driver: '%database.cache_driver%'
-        metadata_cache_driver: ~
         result_cache_driver: ~
         query_cache_driver: ~
         second_level_cache:
