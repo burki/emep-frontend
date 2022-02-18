@@ -191,7 +191,7 @@ extends BaseController
                 'DISTINCT C.cc AS countryCode',
                 'C.name AS country',
                 'P' . $alias . '.tgn',
-                'COALESCE(P' . $alias . '.name_alternate,P' . $alias . '.name) AS name',
+                'COALESCE(P' . $alias . '.name_alternate, P' . $alias . '.name) AS name',
             ])
             ->from('Location', $alias)
             ->innerJoin($alias,
@@ -206,7 +206,7 @@ extends BaseController
             ->innerJoin('EL',
                                 'Exhibition', 'E',
                                 'EL.id_exhibition=E.id AND ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
-            ->orderBy('country, place')
+            ->orderBy('country, name')
             ;
 
         $geonames = [];

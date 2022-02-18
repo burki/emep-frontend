@@ -402,7 +402,7 @@ extends SearchListBuilder
             'L.name_translit AS location_translit',
             'L.id AS location_id',
             'L.place_geo',
-            'PL.latitude', 'PL.longitude',
+            'ANY_VALUE(PL.latitude) AS latitude', 'ANY_VALUE(PL.longitude) AS longitude',
             'E.status AS status',
             "GROUP_CONCAT(DISTINCT(O.name) ORDER BY EL.ord SEPARATOR '; ') AS organizers",
             'COUNT(DISTINCT IE.id) AS count_itemexhibition',
