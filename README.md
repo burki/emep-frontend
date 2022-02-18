@@ -9,7 +9,8 @@ MySQL
 
 If you want to create a dedicated user for this table
 - mysql -u root -p emep
-- GRANT ALL ON `emep`.* TO 'emep'@'localhost' IDENTIFIED BY 'mysql-password';
+- CREATE USER 'emep'@'localhost' IDENTIFIED BY 'mysql-password';
+- GRANT ALL ON `emep`.* TO 'emep'@'localhost';
 
 Import dump
 - mysql -u emep -p < emep.latest.sql
