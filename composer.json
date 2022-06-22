@@ -7,8 +7,28 @@
 
     "repositories": [
         {
-            "url": "https://github.com/burki/citeproc-php.git",
-            "type": "vcs"
+            "type": "package",
+            "package": {
+                "name": "citation-style-language/locales",
+                "version": "1.0.0",
+                "source": {
+                    "type": "git",
+                    "url": "https://github.com/citation-style-language/locales.git",
+                    "reference": "master"
+                }
+            }
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "citation-style-language/styles-distribution",
+                "version": "1.0.0",
+                "source": {
+                    "type": "git",
+                    "url": "https://github.com/citation-style-language/styles-distribution.git",
+                    "reference": "master"
+                }
+            }
         },
         {
             "url": "https://github.com/burki/hidden-entity-type-bundle.git",
@@ -79,7 +99,8 @@
         "wikimedia/utfnormal": "^2.0",
 
         "sweetyrdf/easyrdf": "^1.0",
-        "seboettg/citeproc-php": "dev-name-as-sort-order-fix#bf446dc",
+        "seboettg/citeproc-php": "2.4.1",
+        "citation-style-language/locales": "^1.0",
         "fale/isbn": "^3.1",
 
         "ddeboer/data-import": "0.20.*",

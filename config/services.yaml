@@ -15,7 +15,7 @@ services:
         exclude: '../src/AppBundle/{Entity,Migrations,Tests}'
 
     AppBundle\Menu\Builder:
-        arguments: ["@knp_menu.factory", "@security.authorization_checker", "@request_stack", ]
+        arguments: [ "@knp_menu.factory", "@security.authorization_checker", "@request_stack", ]
         tags:
             - { name: knp_menu.menu_builder, method: createTopMenu, alias: top } # The alias is what is used to retrieve the menu
             - { name: knp_menu.menu_builder, method: createMainMenu, alias: main } # The alias is what is used to retrieve the menu

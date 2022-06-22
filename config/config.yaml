@@ -22,7 +22,7 @@ framework:
         path: /_fragment
         hinclude_default_template: hinclude.html.twig # see https://symfony.com/blog/new-in-symfony-4-3-deprecated-the-templating-component-integration
 
-    # Symfony 4.3 adds automatic search-enging protection in debug-mode
+    # Symfony 4.3 adds automatic search-engine protection in debug-mode
     # You can override, see https://symfony.com/blog/new-in-symfony-4-3-automatic-search-engine-protection
     disallow_search_engine_index: false
     router:
@@ -144,9 +144,9 @@ knp_paginator:
         filter_value_name: filterValue  # filter value query paameter name
     template:
         # pagination: 'KnpPaginatorBundle:Pagination:sliding.html.twig'     # sliding pagination controls template
-        pagination: '@KnpPaginatorBundle/Pagination/twitter_bootstrap_v3_pagination.html.twig'
-        sortable: '@KnpPaginatorBundle/Pagination/sortable_link.html.twig' # sort link template
-        filtration: '@KnpPaginatorBundle/Pagination/filtration.html.twig'  # filters template
+        pagination: KnpPaginatorBundle:Pagination:twitter_bootstrap_v3_pagination.html.twig
+        sortable: 'KnpPaginatorBundle:Pagination:sortable_link.html.twig' # sort link template                                
+        filtration: 'KnpPaginatorBundle:Pagination:filtration.html.twig'  # filters template
 
 swiftmailer:
     # disable_delivery:  true

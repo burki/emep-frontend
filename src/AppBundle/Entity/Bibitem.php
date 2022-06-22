@@ -10,7 +10,8 @@ use Gedmo\Mapping\Annotation as Gedmo; // alias for Gedmo extensions annotations
 use Symfony\Component\Validator\Constraints as Assert;
 
 if (!function_exists('mb_ucfirst') && function_exists('mb_substr')) {
-    function mb_ucfirst($string) {
+    function mb_ucfirst($string)
+    {
         $string = mb_strtoupper(mb_substr($string, 0, 1)) . mb_substr($string, 1);
 
         return $string;
@@ -964,12 +965,12 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
         return $this->note;
     }
 
-    public function renderCitationAsHtml($citeProc, $extended = false, $mode = null)
+    public function renderCitationAsHtml($citeProc, $extended = false)
     {
         $data = json_decode(json_encode($this->jsonSerialize()));
         // var_dump($data);
 
-        $ret = $citeProc->render($data, $mode);
+        $ret = $citeProc->render([ $data ]);
 
         /* vertical-align: super doesn't render nicely:
            http://stackoverflow.com/a/1530819/2114681
@@ -1129,7 +1130,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
      * We transfer to Citeproc JSON
      * see https://github.com/citation-style-language/schema/blob/master/csl-data.json
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         // see http://aurimasv.github.io/z2csl/typeMap.xml
         static $typeMap = [
