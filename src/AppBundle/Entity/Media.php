@@ -151,6 +151,7 @@ abstract class Media
         if (!empty($this->caption)) {
             $parts[] = $this->caption;
         }
+
         if (!empty($this->copyright)) {
             $parts[] = html_entity_decode('&#169;', ENT_NOQUOTES, 'UTF-8') . ' ' . $this->copyright;
         }
