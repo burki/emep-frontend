@@ -17,7 +17,7 @@ parameters:
     mailer.username: ~
     mailer.password: ~
 
-    ga.site_id: ~   # Google analytics code, e.g. 'UA-122763666-1'
+    ga.site_id: ~   # Google analytics code, e.g. 'G-JV91BHH5ZY'
 
     # blog-integration
     # app.wp-rest.url: "https://exhibitions.univie.ac.at"
