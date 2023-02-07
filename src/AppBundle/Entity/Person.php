@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * A person (alive, dead, undead, or fictional).
  *
- * @see http://schema.org/Person Documentation on Schema.org
+ * @see https://schema.org/Person Documentation on Schema.org
  *
  * @ORM\Entity
  * @ORM\Table(name="Person")
@@ -159,7 +159,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
     protected $birthPlace;
 
     /**
-     * @var string Name of the birthplace.
+     * @var string Name of the birthPlace.
      *
      * @ORM\Column(nullable=true,name="birthplace")
      */
@@ -174,7 +174,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
     protected $deathPlace;
 
     /**
-     * @var string Name of the deathplace.
+     * @var string Name of the deathPlace.
      *
      * @ORM\Column(nullable=true,name="deathplace")
      */
@@ -1234,6 +1234,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
 
             }
         }
+
         if (!empty($this->honoricPrefix)) {
             $ret['honorificPrefix'] = $this->honoricPrefix;
         }
@@ -1246,9 +1247,11 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
         if (!empty($this->ulan)) {
             $sameAs[] = 'http://vocab.getty.edu/ulan/' . $this->ulan;
         }
+
         if (!empty($this->gnd)) {
-            $sameAs[] = 'http://d-nb.info/gnd/' . $this->gnd;
+            $sameAs[] = 'https://d-nb.info/gnd/' . $this->gnd;
         }
+
         if (!empty($this->wikidata)) {
             $sameAs[] = 'http://www.wikidata.org/entity/' . $this->wikidata;
         }
