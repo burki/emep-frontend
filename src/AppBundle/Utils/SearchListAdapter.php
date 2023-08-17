@@ -15,7 +15,7 @@ implements \Pagerfanta\Adapter\AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function getNbResults()
+    public function getNbResults(): int
     {
         return $this->listPaginationResult['total'];
     }
@@ -23,7 +23,7 @@ implements \Pagerfanta\Adapter\AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function getSlice($offset, $length)
+    public function getSlice(int $offset, int $length): iterable
     {
         return $this->listPaginationResult['items'];
     }

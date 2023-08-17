@@ -113,6 +113,7 @@
 
         "ifedko/php-doctrine-dbal-pagination": "^2.0",
         "babdev/pagerfanta-bundle": "^3.8",
+        "pagerfanta/twig": "^3.8",
 
         "presta/sitemap-bundle": "^2.1",
 
