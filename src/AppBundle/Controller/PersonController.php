@@ -33,7 +33,7 @@ extends CrudController
                 'P.nationality',
             ])
             ->distinct()
-            ->from('AppBundle:Person', 'P')
+            ->from('AppBundle\Entity\Person', 'P')
             ->where('P.status <> -1 AND P.nationality IS NOT NULL')
             ;
 
@@ -88,7 +88,7 @@ extends CrudController
                                             $itemId)
     {
         $repo = $this->getDoctrine()
-                ->getRepository('AppBundle:Item');
+                ->getRepository('AppBundle\Entity\Item');
 
         $item = $repo->findOneById($itemId);
 
@@ -101,8 +101,8 @@ extends CrudController
                 "E.startdate HIDDEN dateSort",
                 "CONCAT(COALESCE(P.alternateName, P.name), E.startdate) HIDDEN placeSort"
             ])
-            ->from('AppBundle:Exhibition', 'E')
-            ->innerJoin('AppBundle:ItemExhibition', 'IE',
+            ->from('AppBundle\Entity\Exhibition', 'E')
+            ->innerJoin('AppBundle\Entity\ItemExhibition', 'IE',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'IE.exhibition = E')
             ->innerJoin('IE.item', 'I')
@@ -146,7 +146,7 @@ extends CrudController
 
         $names = [];
         $exhibitionRepo = $this->getDoctrine()
-                ->getRepository('AppBundle:Exhibition');
+                ->getRepository('AppBundle\Entity\Exhibition');
         for ($i = 0; $i < 2; $i++) {
             $criteria = new \Doctrine\Common\Collections\Criteria();
 
@@ -169,17 +169,17 @@ extends CrudController
                 'P',
                 "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort"
             ])
-            ->from('AppBundle:Person', 'P')
-            ->innerJoin('AppBundle:ItemExhibition', 'IE1',
+            ->from('AppBundle\Entity\Person', 'P')
+            ->innerJoin('AppBundle\Entity\ItemExhibition', 'IE1',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'IE1.person = P')
-            ->innerJoin('AppBundle:Exhibition', 'E1',
+            ->innerJoin('AppBundle\Entity\Exhibition', 'E1',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'IE1.exhibition = E1 AND E1.id=:exhibition1')
-            ->innerJoin('AppBundle:ItemExhibition', 'IE2',
+            ->innerJoin('AppBundle\Entity\ItemExhibition', 'IE2',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'IE2.person = P')
-            ->innerJoin('AppBundle:Exhibition', 'E2',
+            ->innerJoin('AppBundle\Entity\Exhibition', 'E2',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'IE2.exhibition = E2 AND E2.id=:exhibition2')
             ->setParameters([ 'exhibition1' => $exhibitions[0], 'exhibition2' => $exhibitions[1] ])
@@ -282,8 +282,8 @@ extends CrudController
                 'E.id AS exhibitionId',
                 'E.title'
             ])
-            ->from('AppBundle:ItemExhibition', 'IE')
-            ->innerJoin('AppBundle:Exhibition', 'E',
+            ->from('AppBundle\Entity\ItemExhibition', 'IE')
+            ->innerJoin('AppBundle\Entity\Exhibition', 'E',
                         \Doctrine\ORM\Query\Expr\Join::WITH,
                         'IE.exhibition = E AND '
                         . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
@@ -340,7 +340,7 @@ extends CrudController
 
         $criteria = new \Doctrine\Common\Collections\Criteria();
         $personRepo = $this->getDoctrine()
-            ->getRepository('AppBundle:Person');
+            ->getRepository('AppBundle\Entity\Person');
 
         if (!empty($id)) {
             $routeParams = [ 'id' => $id ];
@@ -394,7 +394,7 @@ extends CrudController
 
         $criteria = new \Doctrine\Common\Collections\Criteria();
         $personRepo = $this->getDoctrine()
-            ->getRepository('AppBundle:Person');
+            ->getRepository('AppBundle\Entity\Person');
 
         if (!empty($id)) {
             $routeParams = [ 'id' => $id ];
@@ -451,7 +451,7 @@ extends CrudController
     {
         $criteria = new \Doctrine\Common\Collections\Criteria();
         $personRepo = $this->getDoctrine()
-                ->getRepository('AppBundle:Person');
+                ->getRepository('AppBundle\Entity\Person');
 
         if (!empty($id)) {
             $criteria->where($criteria->expr()->eq('id', $id));
@@ -523,9 +523,9 @@ extends CrudController
                 "COALESCE(I.earliestdate, I.creatordate) HIDDEN dateSort",
                 "I.catalogueId HIDDEN catSort",
             ])
-            ->from('AppBundle:Item', 'I')
+            ->from('AppBundle\Entity\Item', 'I')
             ->innerJoin('I.creators', 'P')
-            ->leftJoin('AppBundle:Exhibition', 'E',
+            ->leftJoin('AppBundle\Entity\Exhibition', 'E',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'E MEMBER OF I.exhibitions AND '
                        . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
@@ -1004,7 +1004,7 @@ extends CrudController
         $twig = $this->container->get('twig');
 
         $personRepo = $this->getDoctrine()
-                ->getRepository('AppBundle:Person');
+                ->getRepository('AppBundle\Entity\Person');
 
         $query = $personRepo
                 ->createQueryBuilder('P')

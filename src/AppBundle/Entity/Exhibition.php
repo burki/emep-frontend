@@ -597,9 +597,9 @@ implements JsonLdSerializable
                 "COALESCE(B.author, B.editor) HIDDEN creatorSort",
             ])
             ->distinct()
-            ->from('AppBundle:Bibitem', 'B')
-            ->innerJoin('AppBundle:BibitemExhibition', 'BE', 'WITH', 'BE.bibitem=B')
-            ->innerJoin('AppBundle:Exhibition', 'E', 'WITH', 'BE.exhibition=E')
+            ->from('AppBundle\Entity\Bibitem', 'B')
+            ->innerJoin('AppBundle\Entity\BibitemExhibition', 'BE', 'WITH', 'BE.bibitem=B')
+            ->innerJoin('AppBundle\Entity\Exhibition', 'E', 'WITH', 'BE.exhibition=E')
             ->where('E = :exhibition AND B.status <> -1')
             ->orderBy('creatorSort, B.datePublished, B.title')
             ;

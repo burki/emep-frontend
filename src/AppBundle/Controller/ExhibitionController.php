@@ -32,7 +32,7 @@ extends CrudController
                 'PL.countryCode',
             ])
             ->distinct()
-            ->from('AppBundle:Exhibition', 'E')
+            ->from('AppBundle\Entity\Exhibition', 'E')
             ->innerJoin('E.location', 'L')
             ->innerJoin('L.place', 'PL')
             ->where(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
@@ -92,7 +92,7 @@ extends CrudController
 
         $names = [];
         $personRepo = $this->getDoctrine()
-                ->getRepository('AppBundle:Person');
+                ->getRepository('AppBundle\Entity\Person');
         for ($i = 0; $i < 2; $i++) {
             $criteria = new \Doctrine\Common\Collections\Criteria();
 
@@ -117,19 +117,19 @@ extends CrudController
                 "E.startdate HIDDEN dateSort",
                 "CONCAT(COALESCE(P.alternateName, P.name), E.startdate) HIDDEN placeSort"
             ])
-            ->from('AppBundle:Exhibition', 'E')
+            ->from('AppBundle\Entity\Exhibition', 'E')
             ->leftJoin('E.location', 'L')
             ->leftJoin('L.place', 'P')
-            ->innerJoin('AppBundle:ItemExhibition', 'IE1',
+            ->innerJoin('AppBundle\Entity\ItemExhibition', 'IE1',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'IE1.exhibition = E')
-            ->innerJoin('AppBundle:Person', 'P1',
+            ->innerJoin('AppBundle\Entity\Person', 'P1',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'IE1.person = P1 AND P1.id=:person1')
-            ->innerJoin('AppBundle:ItemExhibition', 'IE2',
+            ->innerJoin('AppBundle\Entity\ItemExhibition', 'IE2',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'IE2.exhibition = E')
-            ->innerJoin('AppBundle:Person', 'P2',
+            ->innerJoin('AppBundle\Entity\Person', 'P2',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'IE2.person = P2 AND P2.id=:person2')
             ->setParameters([ 'person1' => $persons[0], 'person2' => $persons[1] ])
@@ -249,7 +249,7 @@ extends CrudController
         $qb->select([
                 'IE',
             ])
-            ->from('AppBundle:ItemExhibition', 'IE')
+            ->from('AppBundle\Entity\ItemExhibition', 'IE')
             ->leftJoin('IE.person', 'P')
             ->where("IE.exhibition = :exhibition")
             ->andWhere('IE.title IS NOT NULL OR IE.item IS NULL')
@@ -287,7 +287,7 @@ extends CrudController
         $routeName = $request->get('_route'); $routeParams = [];
 
         $repo = $this->getDoctrine()
-            ->getRepository('AppBundle:Exhibition');
+            ->getRepository('AppBundle\Entity\Exhibition');
 
         if (!empty($id)) {
             $routeParams = [ 'id' => $id ];
@@ -331,7 +331,7 @@ extends CrudController
         $routeName = $request->get('_route'); $routeParams = [];
 
         $repo = $this->getDoctrine()
-            ->getRepository('AppBundle:Exhibition');
+            ->getRepository('AppBundle\Entity\Exhibition');
 
         if (!empty($id)) {
             $routeParams = [ 'id' => $id ];
@@ -369,7 +369,7 @@ extends CrudController
     public function detailActionArtistsCsv(Request $request, $id = null)
     {
         $repo = $this->getDoctrine()
-            ->getRepository('AppBundle:Exhibition');
+            ->getRepository('AppBundle\Entity\Exhibition');
 
         if (!empty($id)) {
             $routeParams = [ 'id' => $id ];
@@ -463,7 +463,7 @@ extends CrudController
         $routeName = $request->get('_route'); $routeParams = [];
 
         $repo = $this->getDoctrine()
-            ->getRepository('AppBundle:Exhibition');
+            ->getRepository('AppBundle\Entity\Exhibition');
 
         if (!empty($id)) {
             $routeParams = [ 'id' => $id ];
@@ -1069,14 +1069,14 @@ EOT;
                 'COUNT(DISTINCT P.id) AS numArtists',
                 'COUNT(DISTINCT IE.id) AS numEntries'
             ])
-            ->from('AppBundle:ItemExhibition', 'IE')
+            ->from('AppBundle\Entity\ItemExhibition', 'IE')
             ->innerJoin('IE.person', 'P')
             ->where('IE.title IS NOT NULL OR IE.item IS NULL')
             ->groupBy('P.nationality')
             ;
 
         if (!is_null($exhibitionId)) {
-            $qb->innerJoin('AppBundle:Exhibition', 'E',
+            $qb->innerJoin('AppBundle\Entity\Exhibition', 'E',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'IE.exhibition = E AND E.id = :exhibitionId')
                 ->setParameter('exhibitionId', $exhibitionId);
@@ -1161,7 +1161,7 @@ EOT;
         $qb->select([
                 'P'
             ])
-            ->from('AppBundle:Person', 'P')
+            ->from('AppBundle\Entity\Person', 'P')
             ->where('P.id IN (:artists) AND P.status <> -1')
             ->setParameter('artists', $artists )
             ;
@@ -1191,11 +1191,11 @@ EOT;
                 'P.id AS id',
                 'P.nationality AS nationality'
             ])
-            ->from('AppBundle:Exhibition', 'E')
-            ->leftJoin('AppBundle:ItemExhibition', 'IE',
+            ->from('AppBundle\Entity\Exhibition', 'E')
+            ->leftJoin('AppBundle\Entity\ItemExhibition', 'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
-            ->leftJoin('AppBundle:Person', 'P',
+            ->leftJoin('AppBundle\Entity\Person', 'P',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'P.id = IE.person AND P.id IS NOT NULL')
             // ->leftJoin('IE.person', 'P')
@@ -1217,11 +1217,11 @@ EOT;
                 'COUNT(DISTINCT P.id) AS howMany',
                 'P.nationality AS nationality'
             ])
-            ->from('AppBundle:Exhibition', 'E')
-            ->innerJoin('AppBundle:ItemExhibition', 'IE',
+            ->from('AppBundle\Entity\Exhibition', 'E')
+            ->innerJoin('AppBundle\Entity\ItemExhibition', 'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
-            ->innerJoin('AppBundle:Person', 'P',
+            ->innerJoin('AppBundle\Entity\Person', 'P',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'P.id = IE.person AND P.status <> -1')
             ->where('E.id = :exhibitionId' )
@@ -1254,11 +1254,11 @@ EOT;
                 'P.id AS id',
                 'P.gender as gender'
             ])
-            ->from('AppBundle:Exhibition', 'E')
-            ->innerJoin('AppBundle:ItemExhibition', 'IE',
+            ->from('AppBundle\Entity\Exhibition', 'E')
+            ->innerJoin('AppBundle\Entity\ItemExhibition', 'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
-            ->innerJoin('AppBundle:Person', 'P',
+            ->innerJoin('AppBundle\Entity\Person', 'P',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'P.id = IE.person AND P.status <> -1')
             ->where('E.id = :exhibitionId' )

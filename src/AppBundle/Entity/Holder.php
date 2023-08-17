@@ -659,14 +659,14 @@ implements \JsonSerializable, JsonLdSerializable
                 "COALESCE(B.author, B.editor) HIDDEN creatorSort",
             ])
             ->distinct()
-            ->from('AppBundle:Bibitem', 'B')
-            ->innerJoin('AppBundle:BibitemHolder', 'BH', 'WITH', 'BH.bibitem=B')
-            ->innerJoin('AppBundle:Holder', 'H', 'WITH', 'BH.holder=H')
+            ->from('AppBundle\Entity\Bibitem', 'B')
+            ->innerJoin('AppBundle\Entity\BibitemHolder', 'BH', 'WITH', 'BH.bibitem=B')
+            ->innerJoin('AppBundle\Entity\Holder', 'H', 'WITH', 'BH.holder=H')
             ->where('H = :holder AND B.status <> -1')
             ->orderBy('B.datePublished, creatorSort, B.title');
 
         if ($catalogueEntriesOnly) {
-            $qb->innerJoin('AppBundle:BibitemExhibition', 'BE',
+            $qb->innerJoin('AppBundle\Entity\BibitemExhibition', 'BE',
                            \Doctrine\ORM\Query\Expr\Join::WITH,
                            'BE.bibitem = B AND BE.role = 1'); // catalogues only
         }

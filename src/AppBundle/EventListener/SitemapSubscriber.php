@@ -135,7 +135,7 @@ implements EventSubscriberInterface
     public function registerPersonUrls(UrlContainerInterface $urls): void
     {
         $personRepo = $this->entityManager
-                ->getRepository('AppBundle:Person');
+                ->getRepository('AppBundle\Entity\Person');
 
         $query = $personRepo
                 ->createQueryBuilder('P')

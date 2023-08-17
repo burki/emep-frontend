@@ -44,7 +44,7 @@ extends Command
             ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         switch ($input->getArgument('action')) {
             case 'wikilinks':
@@ -106,11 +106,11 @@ EOT;
         }
     }
 
-    protected function fetchWikilinks($update = false)
+    protected function fetchWikilinks($update = false): int
     {
         $sparqlClient = new \EasyRdf\Sparql\Client('https://query.wikidata.org/sparql');
 
-        $personRepository = $this->em->getRepository('AppBundle:Person');
+        $personRepository = $this->em->getRepository('AppBundle\Entity\Person');
 
         $criteria = new \Doctrine\Common\Collections\Criteria();
         $criteria->where($criteria->expr()->neq(
@@ -144,13 +144,15 @@ EOT;
                 $this->em->flush();
             }
         }
+
+        return 0;
     }
 
-    protected function fetchWikistats($update = false)
+    protected function fetchWikistats($update = false): int
     {
         $sparqlClient = new \EasyRdf\Sparql\Client('https://query.wikidata.org/sparql');
 
-        $personRepository = $this->em->getRepository('AppBundle:Person');
+        $personRepository = $this->em->getRepository('AppBundle\Entity\Person');
 
         $criteria = new \Doctrine\Common\Collections\Criteria();
         $criteria->where($criteria->expr()->neq(
@@ -219,5 +221,7 @@ EOT;
                 $this->em->flush();
             }
         }
+
+        return 0;
     }
 }

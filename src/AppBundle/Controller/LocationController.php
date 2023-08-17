@@ -32,7 +32,7 @@ extends CrudController
                 'P.countryCode',
             ])
             ->distinct()
-            ->from('AppBundle:Location', 'L')
+            ->from('AppBundle\Entity\Location', 'L')
             ->leftJoin('L.place', 'P')
             ->where('L.status <> -1 AND 0 = BIT_AND(L.flags, 256) AND P.countryCode IS NOT NULL')
             ;
@@ -132,8 +132,8 @@ extends CrudController
                 'COUNT(DISTINCT IE.id) AS numCatEntrySort',
                 "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort"
             ])
-            ->from('AppBundle:Person', 'P')
-            ->innerJoin('AppBundle:ItemExhibition', 'IE',
+            ->from('AppBundle\Entity\Person', 'P')
+            ->innerJoin('AppBundle\Entity\ItemExhibition', 'IE',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'IE.person = P AND (IE.title IS NOT NULL OR IE.item IS NULL)')
             ->innerJoin('IE.exhibition', 'E')
@@ -162,8 +162,8 @@ extends CrudController
                 'P.gender as gender',
                 'COUNT(DISTINCT P.id) AS how_many',
             ])
-            ->from('AppBundle:Person', 'P')
-            ->innerJoin('AppBundle:ItemExhibition', 'IE',
+            ->from('AppBundle\Entity\Person', 'P')
+            ->innerJoin('AppBundle\Entity\ItemExhibition', 'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'IE.person = P AND (IE.title IS NOT NULL OR IE.item IS NULL)')
             ->innerJoin('IE.exhibition', 'E')
@@ -210,8 +210,8 @@ extends CrudController
                 'COUNT(DISTINCT IE.id) AS numCatEntrySort',
                 'COUNT(DISTINCT P.id) AS numPersonSort',
             ])
-            ->from('AppBundle:Exhibition', 'E')
-            ->leftJoin('AppBundle:ItemExhibition', 'IE',
+            ->from('AppBundle\Entity\Exhibition', 'E')
+            ->leftJoin('AppBundle\Entity\ItemExhibition', 'IE',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
             ->leftJoin('IE.person', 'P')
@@ -236,7 +236,7 @@ extends CrudController
         $routeName = $request->get('_route'); $routeParams = [];
 
         $repo = $this->getDoctrine()
-            ->getRepository('AppBundle:Location');
+            ->getRepository('AppBundle\Entity\Location');
 
         if (!empty($id)) {
             $routeParams = [ 'id' => $id ];
@@ -272,7 +272,7 @@ extends CrudController
         $routeName = $request->get('_route'); $routeParams = [];
 
         $repo = $this->getDoctrine()
-            ->getRepository('AppBundle:Location');
+            ->getRepository('AppBundle\Entity\Location');
 
         if (!empty($id)) {
             $routeParams = [ 'id' => $id ];
@@ -315,7 +315,7 @@ extends CrudController
         $routeName = $request->get('_route'); $routeParams = [];
 
         $repo = $this->getDoctrine()
-                ->getRepository('AppBundle:Location');
+                ->getRepository('AppBundle\Entity\Location');
 
         if (!empty($id)) {
             $routeParams = [ 'id' => $id ];

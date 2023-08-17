@@ -51,7 +51,7 @@ extends BaseController
             ->createQueryBuilder();
 
         $qb->select('UA')
-            ->from('AppBundle:UserAction', 'UA')
+            ->from('AppBundle\Entity\UserAction', 'UA')
             ->andWhere("UA.user = :user")
             ->orderBy("UA.createdAt", "DESC")
             ->setParameter('user', $user)
@@ -80,7 +80,7 @@ extends BaseController
     {
         // check if we can authenticate from backend-session
         if (!empty($_SESSION['user']) && !empty($_SESSION['user']['login'])) {
-            $userRepo = $this->getDoctrine()->getRepository('AppBundle:User');
+            $userRepo = $this->getDoctrine()->getRepository('AppBundle\Entity\User');
             $user = $userRepo->loadUserByUsername($_SESSION['user']['login']);
             if (!is_null($user)) {
                 $firewall = 'main';
@@ -215,7 +215,7 @@ extends BaseController
                 if (!empty($data['email'])) {
                     $email = trim($data['email']);
 
-                    $userRepo = $this->getDoctrine()->getRepository('AppBundle:User');
+                    $userRepo = $this->getDoctrine()->getRepository('AppBundle\Entity\User');
                     $user = $userRepo->loadUserByUsername(trim($email));
                     if (!is_null($user)) {
                         $user->setGeneratedConfirmationToken();
@@ -266,7 +266,7 @@ extends BaseController
      */
     public function checkRecoverAction(Request $request, UserPasswordEncoderInterface $passwordEncoder, $username, $token)
     {
-        $userRepo = $this->getDoctrine()->getRepository('AppBundle:User');
+        $userRepo = $this->getDoctrine()->getRepository('AppBundle\Entity\User');
 
         $user = null;
 

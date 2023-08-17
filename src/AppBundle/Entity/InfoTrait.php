@@ -39,7 +39,7 @@ trait InfoTrait
             $qb = $em->createQueryBuilder();
 
             $qb->select([ 'B' ])
-                ->from('AppBundle:Bibitem', 'B')
+                ->from('AppBundle\Entity\Bibitem', 'B')
                 ->andWhere('B.id IN (:ids) AND B.status <> -1')
                 ->setParameter('ids', array_keys($publicationsById))
                 ;
@@ -55,7 +55,7 @@ trait InfoTrait
             $qb = $em->createQueryBuilder();
 
             $qb->select([ 'B' ])
-                ->from('AppBundle:Journal', 'B')
+                ->from('AppBundle\Entity\Journal', 'B')
                 ->andWhere('B.id IN (:ids) AND B.status <> -1')
                 ->setParameter('ids', array_keys($journalsById))
                 ;

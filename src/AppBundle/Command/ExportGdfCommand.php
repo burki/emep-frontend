@@ -51,7 +51,7 @@ extends Command
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $saveExportPath = $input->getOption('save-export-path');
         if ($saveExportPath !== false) {
@@ -141,7 +141,7 @@ extends Command
                 'P',
                 'COUNT(DISTINCT E.id) AS numExhibitionSort',
             ])
-            ->from('AppBundle:Person', 'P')
+            ->from('AppBundle\Entity\Person', 'P')
             ->leftJoin('P.exhibitions', 'E')
             ->where('P.status <> -1')
             ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
@@ -178,11 +178,11 @@ extends Command
         $qb = $this->em->createQueryBuilder();
         $qb->select('E.id as exhibitionId', 'P.id as personId')
             ->distinct()
-            ->from('AppBundle:ItemExhibition', 'IE')
-            ->join('AppBundle:Exhibition', 'E',
+            ->from('AppBundle\Entity\ItemExhibition', 'IE')
+            ->join('AppBundle\Entity\Exhibition', 'E',
                    \Doctrine\ORM\Query\Expr\Join::WITH,
                    'E = IE.exhibition')
-            ->join('AppBundle:Person', 'P',
+            ->join('AppBundle\Entity\Person', 'P',
                    \Doctrine\ORM\Query\Expr\Join::WITH,
                    'P = IE.person')
             ->orderBy('exhibitionId', 'ASC');
@@ -226,13 +226,13 @@ extends Command
                 'COUNT(DISTINCT E.id) AS numExhibitionSort',
                 'COUNT(DISTINCT IE.id) AS numCatEntrySort',
             ])
-            ->from('AppBundle:Location', 'L')
+            ->from('AppBundle\Entity\Location', 'L')
             ->leftJoin('L.place', 'P')
             ->leftJoin('P.country', 'C')
-            ->innerJoin('AppBundle:Exhibition', 'E',
+            ->innerJoin('AppBundle\Entity\Exhibition', 'E',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'E.location = L AND ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
-            ->innerJoin('AppBundle:ItemExhibition', 'IE',
+            ->innerJoin('AppBundle\Entity\ItemExhibition', 'IE',
                        \Doctrine\ORM\Query\Expr\Join::WITH,
                        'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
             ->where('L.status <> -1')
@@ -262,12 +262,12 @@ extends Command
         $qb = $this->em->createQueryBuilder();
         $qb->select('L.id as locationId', 'P.id as personId')
             ->distinct()
-            ->from('AppBundle:ItemExhibition', 'IE')
-            ->join('AppBundle:Exhibition', 'E',
+            ->from('AppBundle\Entity\ItemExhibition', 'IE')
+            ->join('AppBundle\Entity\Exhibition', 'E',
                    \Doctrine\ORM\Query\Expr\Join::WITH,
                    'E = IE.exhibition')
             ->join('E.location', 'L')
-            ->join('AppBundle:Person', 'P',
+            ->join('AppBundle\Entity\Person', 'P',
                    \Doctrine\ORM\Query\Expr\Join::WITH,
                    'P = IE.person')
             ->orderBy('personId', 'ASC');

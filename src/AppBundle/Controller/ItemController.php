@@ -20,7 +20,7 @@ extends BaseController
         $em = $this->getDoctrine()
                 ->getManager();
 
-        $result = $em->createQuery("SELECT C.id, C.name FROM AppBundle:Collection C"
+        $result = $em->createQuery("SELECT C.id, C.name FROM AppBundle\Entity\Collection C"
                                    . " WHERE C.status <> -1"
                                    . " ORDER BY C.name")
                 ->getResult();
@@ -54,9 +54,9 @@ extends BaseController
 
         $qbPerson->select('P')
             ->distinct()
-            ->from('AppBundle:Person', 'P')
-            ->innerJoin('AppBundle:ItemPerson', 'IP', 'WITH', 'IP.person=P')
-            ->innerJoin('AppBundle:Item', 'I', 'WITH', 'IP.item=I')
+            ->from('AppBundle\Entity\Person', 'P')
+            ->innerJoin('AppBundle\Entity\ItemPerson', 'IP', 'WITH', 'IP.person=P')
+            ->innerJoin('AppBundle\Entity\Item', 'I', 'WITH', 'IP.item=I')
             ->where('I.status <> -1')
             ->orderBy('P.familyName');
 
@@ -69,7 +69,7 @@ extends BaseController
                     "COALESCE(I.earliestdate, I.creatordate) HIDDEN dateSort",
                     "I.catalogueId HIDDEN catSort",
                 ])
-                ->from('AppBundle:Exhibition', 'E')
+                ->from('AppBundle\Entity\Exhibition', 'E')
                 ->innerJoin('E.items', 'I')
                 ->leftJoin('I.creators', 'P')
                 ->leftJoin('I.media', 'M')
@@ -90,7 +90,7 @@ extends BaseController
                     "P.familyName HIDDEN nameSort",
                     "I.catalogueId HIDDEN catSort",
                 ])
-                ->from('AppBundle:Item', 'I')
+                ->from('AppBundle\Entity\Item', 'I')
                 ->leftJoin('I.creators', 'P')
                 ->leftJoin('I.style', 'T')
                 ->where('I.status <> -1 AND P.status <> -1')
@@ -106,7 +106,7 @@ extends BaseController
                     "COALESCE(I.earliestdate, I.creatordate) HIDDEN dateSort",
                     "I.catalogueId HIDDEN catSort",
                 ])
-                ->from('AppBundle:Item', 'I')
+                ->from('AppBundle\Entity\Item', 'I')
                 ->leftJoin('I.creators', 'P')
                 ->where('I.status <> -1 AND P.status <> -1')
                 ->orderBy('nameSort, dateSort, catSort')
@@ -155,7 +155,7 @@ extends BaseController
         $routeName = $request->get('_route'); $routeParams = [];
 
         $repo = $this->getDoctrine()
-                ->getRepository('AppBundle:Item');
+                ->getRepository('AppBundle\Entity\Item');
 
         if (!empty($id)) {
             $routeParams = [ 'id' => $id ];

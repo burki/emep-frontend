@@ -39,7 +39,7 @@ extends Command
             ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         switch ($input->getArgument('type')) {
             case 'country':
@@ -62,7 +62,7 @@ extends Command
                 'C.countryCode AS ignore',
             ])
             ->distinct()
-            ->from('AppBundle:Place', 'P')
+            ->from('AppBundle\Entity\Place', 'P')
             ->leftJoin('P.country', 'C')
             ->where("P.type IN ('inhabited places') AND P.countryCode IS NOT NULL")
             ->having('C.countryCode IS NULL')
@@ -80,5 +80,7 @@ extends Command
         if ($flush) {
             $this->em->flush();
         }
+
+        return 0;
     }
 }

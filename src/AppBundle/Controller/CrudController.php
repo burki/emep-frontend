@@ -77,7 +77,7 @@ extends BaseController
                 'P.nationality',
             ])
             ->distinct()
-            ->from('AppBundle:Person', 'P')
+            ->from('AppBundle\Entity\Person', 'P')
             ->where('P.status <> -1 AND P.nationality IS NOT NULL')
             ;
 
@@ -96,7 +96,7 @@ extends BaseController
     {
         $em = $this->getDoctrine()
             ->getManager();
-        $result = $em->createQuery('SELECT DISTINCT L.type FROM AppBundle:Location L'
+        $result = $em->createQuery('SELECT DISTINCT L.type FROM AppBundle\Entity\Location L'
             . ' WHERE L.status <> -1 AND 0 = BIT_AND(L.flags, 256) AND L.type IS NOT NULL'
             . ' ORDER BY L.type')
             ->getScalarResult();
@@ -113,8 +113,8 @@ extends BaseController
         if (false) {
             // doctrine is too expensive
             $result = $em->createQuery("SELECT DISTINCT O.type AS type"
-                . " FROM AppBundle:Location O"
-                . " INNER JOIN AppBundle:Exhibition E"
+                . " FROM AppBundle\Entity\Location O"
+                . " INNER JOIN AppBundle\Entity\Exhibition E"
                 . " WITH O MEMBER OF E.organizers"
                 . ' AND ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E')
                 . " ORDER BY type")
@@ -155,7 +155,7 @@ extends BaseController
                 'COALESCE(PL.alternateName,PL.name) AS name'
             ])
             ->distinct()
-            ->from('AppBundle:Location', 'L')
+            ->from('AppBundle\Entity\Location', 'L')
             ->leftJoin('L.place', 'PL')
             ->leftJoin('PL.country', 'C')
             ->where('L.status <> -1 AND 0 = BIT_AND(L.flags, 256) AND PL.countryCode IS NOT NULL')
@@ -242,7 +242,7 @@ extends BaseController
                 'H.countryCode AS country',
             ])
             ->distinct()
-            ->from('AppBundle:Holder', 'H')
+            ->from('AppBundle\Entity\Holder', 'H')
             ->where('H.status <> -1')
             ->orderBy('country')
             ;
@@ -343,7 +343,7 @@ extends BaseController
             if (!empty($userActionId)) {
                 $userAction = $this->getDoctrine()
                     ->getManager()
-                    ->getRepository('AppBundle:UserAction')
+                    ->getRepository('AppBundle\Entity\UserAction')
                     ->findOneBy([
                         'id' => $userActionId,
                         'user' => $user,
@@ -419,7 +419,7 @@ extends BaseController
             ->getManager()
             ->createQueryBuilder();
         $qb->select('UA')
-            ->from('AppBundle:UserAction', 'UA')
+            ->from('AppBundle\Entity\UserAction', 'UA')
             ->where("UA.route = :route")
             ->andWhere("UA.user = :user")
             ->orderBy("UA.createdAt", "DESC")
@@ -634,7 +634,7 @@ extends BaseController
             ->createQueryBuilder();
 
         $qb->select([ 'E', 'field(E.id, :ids) as HIDDEN field', 'E.startdate HIDDEN dateSort' ])
-            ->from('AppBundle:Exhibition', 'E')
+            ->from('AppBundle\Entity\Exhibition', 'E')
             ->where('E.id IN (:ids)')
             ->orderBy($preserveOrder ? 'field' : 'dateSort')
             ;
@@ -657,7 +657,7 @@ extends BaseController
             ->createQueryBuilder();
 
         $qb->select([ 'L', 'field(L.id, :ids) as HIDDEN field', 'L.name HIDDEN nameSort' ])
-            ->from('AppBundle:Location', 'L')
+            ->from('AppBundle\Entity\Location', 'L')
             ->where('L.id IN (:ids)')
             ->orderBy($preserveOrder ? 'field' : 'nameSort')
             ;
@@ -675,7 +675,7 @@ extends BaseController
             ->getManager()
             ->createQueryBuilder();
         $hydrationQuery = $qb->select([ 'P', 'field(P.id, :ids) as HIDDEN field', 'P.sortName HIDDEN nameSort' ])
-            ->from('AppBundle:Person', 'P')
+            ->from('AppBundle\Entity\Person', 'P')
             ->where('P.id IN (:ids)')
             ->orderBy($preserveOrder ? 'field' : 'nameSort')
             ->getQuery();
@@ -693,7 +693,7 @@ extends BaseController
             ->getManager()
             ->createQueryBuilder();
         $hydrationQuery = $qb->select([ 'PL', 'field(PL.tgn, :tgns) as HIDDEN field', 'COALESCE(PL.alternateName, PL.name) HIDDEN nameSort' ])
-            ->from('AppBundle:Place', 'PL')
+            ->from('AppBundle\Entity\Place', 'PL')
             ->where('PL.tgn IN (:tgns)')
             ->orderBy($preserveOrder ? 'field' : 'nameSort')
             ->getQuery();
@@ -712,7 +712,7 @@ extends BaseController
             ->createQueryBuilder();
 
         $hydrationQuery = $qb->select([ 'IE', 'field(IE.id, :ids) as HIDDEN field', 'IE.title as nameSort', 'IE.titleTransliterated','IE.measurements', 'IE.technique', 'IE.forsale', 'IE.price', 'IE.owner' ])
-            ->from('AppBundle:ItemExhibition', 'IE')
+            ->from('AppBundle\Entity\ItemExhibition', 'IE')
             ->where('IE.id IN (:ids)')
             ->orderBy($preserveOrder ? 'field' : 'nameSort')
             ->getQuery();

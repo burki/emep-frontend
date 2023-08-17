@@ -32,7 +32,7 @@ extends CrudController
                 'H.countryCode',
             ])
             ->distinct()
-            ->from('AppBundle:Holder', 'H')
+            ->from('AppBundle\Entity\Holder', 'H')
             ->where('H.status <> -1 AND H.countryCode IS NOT NULL')
             ;
 
@@ -127,7 +127,7 @@ extends CrudController
         $routeName = $request->get('_route'); $routeParams = [];
 
         $repo = $this->getDoctrine()
-                ->getRepository('AppBundle:Holder');
+                ->getRepository('AppBundle\Entity\Holder');
 
         if (!empty($id)) {
             $routeParams = [ 'id' => $id ];
@@ -159,8 +159,8 @@ extends CrudController
                     'P.latitude',
                     'P.longitude'
                 ])
-                ->from('AppBundle:Holder', 'H')
-                ->leftJoin('AppBundle:Place', 'P',
+                ->from('AppBundle\Entity\Holder', 'H')
+                ->leftJoin('AppBundle\Entity\Place', 'P',
                            \Doctrine\ORM\Query\Expr\Join::WITH,
                            "P.type='inhabited places' AND (P.name = H.placeLabel OR P.alternateName = H.placeLabel)")
                 ->where('H.id = ' . $id)
@@ -194,7 +194,7 @@ extends CrudController
         $routeName = $request->get('_route'); $routeParams = [];
 
         $repo = $this->getDoctrine()
-            ->getRepository('AppBundle:Holder');
+            ->getRepository('AppBundle\Entity\Holder');
 
         if (!empty($id)) {
             $routeParams = [ 'id' => $id ];

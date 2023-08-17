@@ -490,7 +490,7 @@ implements \JsonSerializable, JsonLdSerializable
             return null;
         }
 
-        return $em->getRepository('AppBundle:Place')->findOneBy(['tgn' => $this->parentTgn]);
+        return $em->getRepository('AppBundle\Entity\Place')->findOneBy(['tgn' => $this->parentTgn]);
     }
 
     public function getChildren($em)
@@ -505,7 +505,7 @@ implements \JsonSerializable, JsonLdSerializable
                 'P',
                 "COALESCE(P.alternateName,P.name) HIDDEN nameSort"
             ])
-            ->from('AppBundle:Place', 'P')
+            ->from('AppBundle\Entity\Place', 'P')
             ->where("P.parentTgn = :tgn")
             ->setParameter('tgn', $this->tgn)
             ->orderBy('nameSort')

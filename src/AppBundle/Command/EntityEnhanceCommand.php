@@ -42,16 +42,16 @@ extends Command
     {
         $this
             ->setName('entity:enhance')
-            ->setDescription('Enhance Person/Place/Location/Bibitem Entities')
+            ->setDescription('Enhance Person/Location/Country/Bibitem Entities')
             ->addArgument(
                 'type',
                 InputArgument::REQUIRED,
-                'which entities do you want to enhance (person / place / location / bibitem)'
+                'which entities do you want to enhance (person / location / country / bibitem)'
             )
             ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         switch ($input->getArgument('type')) {
             case 'person':
@@ -213,7 +213,7 @@ extends Command
                 'P',
                 "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort"
             ])
-            ->from('AppBundle:Person', 'P')
+            ->from('AppBundle\Entity\Person', 'P')
             ->where('P.status <> -1')
             ->andWhere('P.gnd IS NOT NULL OR P.ulan IS NOT NULL')
             ->andWhere('P.birthDate IS NULL OR P.birthPlaceLabel IS NULL OR P.deathDate IS NULL OR P.deathPlaceLabel IS NULL')
@@ -379,15 +379,13 @@ extends Command
      */
     protected function fetchMissingEntityfacts()
     {
-
-
         // lookup people who have gnd but entityfacts is null
         $qb = $this->em->createQueryBuilder();
 
         $qb->select([
                 'P',
             ])
-            ->from('AppBundle:Person', 'P')
+            ->from('AppBundle\Entity\Person', 'P')
             ->where('P.status <> -1')
             ->andWhere('P.gnd IS NOT NULL')
             ->andWhere('P.entityfacts IS NULL')
@@ -434,17 +432,19 @@ extends Command
     /**
      * Fetch entitifacts and try to set additional properties
      */
-    protected function enhancePerson()
+    protected function enhancePerson(): int
     {
         $this->fetchMissingEntityfacts();
 
         $this->enhancePersonProperties();
+
+        return 0;
     }
 
-    protected function enhanceLocation()
+    protected function enhanceLocation(): int
     {
         // currently only homepages
-        $organizationRepository = $this->em->getRepository('AppBundle:Location');
+        $organizationRepository = $this->em->getRepository('AppBundle\Entity\Location');
 
         $criteria = new \Doctrine\Common\Collections\Criteria();
         $criteria->where($criteria->expr()->orX(
@@ -509,12 +509,14 @@ extends Command
                 $this->em->flush();
             }
         }
+
+        return 0;
     }
 
     /**
      * TODO: add additional fields to Country-table
      */
-    protected function enhanceCountry()
+    protected function enhanceCountry(): int
     {
         // currently info from http://api.geonames.org/countryInfo?username=burckhardtd';
         $url = 'http://api.geonames.org/countryInfo?username=burckhardtd';
@@ -530,7 +532,7 @@ extends Command
             $info_by_geonames[$info['geonameId']] = $info;
         }
 
-        $placeRepository = $this->em->getRepository('AppBundle:Place');
+        $placeRepository = $this->em->getRepository('AppBundle\Entity\Place');
         foreach ([ 'nation' ] as $type) {
             $places = $placeRepository->findBy([ 'type' => $type ]);
             foreach ($places as $country) {
@@ -579,12 +581,14 @@ extends Command
                 }
             }
         }
+
+        return 0;
     }
 
-    protected function enhanceBibitem()
+    protected function enhanceBibitem(): int
     {
         // currently googleapis.com/books
-        $bibitemRepository = $this->em->getRepository('AppBundle:Bibitem');
+        $bibitemRepository = $this->em->getRepository('AppBundle\Entity\Bibitem');
         $items = $bibitemRepository->findBy([ 'status' => [0, 1] ]);
         foreach ($items as $item) {
             $persist = false;
@@ -633,5 +637,7 @@ extends Command
                 $this->em->flush();
             }
         }
+
+        return 0;
     }
 }
