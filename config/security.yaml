@@ -33,5 +33,4 @@ security:
         - { path: ^/my-data, roles: ROLE_USER }
         - { path: ^/(exhibition|person|location|organizer|holder|search)/save, roles: ROLE_USER }
         # everything else is free
-        - { path: ^/, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-
+        - { path: ^/, roles: PUBLIC_ACCESS }
