@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "096e4f3205d30846dbd02501bab9e4b0",
+    "content-hash": "4625a756799102984f2df6357cdbe144",
     "packages": [
         {
             "name": "armin/scssphp-bundle",
@@ -3893,36 +3893,39 @@
             "time": "2023-05-22T18:25:15+00:00"
         },
         {
-            "name": "sweetyrdf/easyrdf",
-            "version": "1.1.1",
+            "name": "sweetrdf/easyrdf",
+            "version": "1.8.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/sweetyrdf/easyrdf.git",
-                "reference": "2423a740ed4c461d28b445214950c3a36692d7f0"
+                "url": "https://github.com/sweetrdf/easyrdf.git",
+                "reference": "2c57de7380ed16f5017e95810bcd08c0dffae640"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sweetyrdf/easyrdf/zipball/2423a740ed4c461d28b445214950c3a36692d7f0",
-                "reference": "2423a740ed4c461d28b445214950c3a36692d7f0",
+                "url": "https://api.github.com/repos/sweetrdf/easyrdf/zipball/2c57de7380ed16f5017e95810bcd08c0dffae640",
+                "reference": "2c57de7380ed16f5017e95810bcd08c0dffae640",
                 "shasum": ""
             },
             "require": {
+                "ext-dom": "*",
                 "ext-mbstring": "*",
                 "ext-pcre": "*",
-                "php": ">=5.5"
+                "ext-xmlreader": "*",
+                "lib-libxml": "*",
+                "php": "^7.1|^8.0"
+            },
+            "replace": {
+                "easyrdf/easyrdf": "1.0.*|1.1.*"
             },
             "require-dev": {
-                "ml/json-ld": "^1.1",
-                "php-coveralls/php-coveralls": "^2.2",
-                "phpunit/phpunit": "~4.8.36|^6|^7",
-                "sami/sami": ">=3.3",
+                "friendsofphp/php-cs-fixer": "^3.0",
+                "laminas/laminas-http": "^2",
+                "ml/json-ld": "^1.0",
+                "phpstan/phpstan": "^1.0",
+                "phpstan/phpstan-phpunit": "^1.0",
+                "phpunit/phpunit": "^7.5|^8.5|^9.5",
                 "semsol/arc2": "^2.4",
-                "squizlabs/php_codesniffer": "~1.4.3",
-                "zendframework/zend-http": "^2.3"
-            },
-            "suggest": {
-                "ml/json-ld": "^1.1",
-                "semsol/arc2": "^2.4"
+                "zendframework/zend-http": "^2"
             },
             "type": "library",
             "autoload": {
@@ -3949,8 +3952,9 @@
                 },
                 {
                     "name": "Konrad Abicht",
-                    "email": "k.abicht@gmail.com",
-                    "role": "Maintainer"
+                    "email": "hi@inspirito.de",
+                    "homepage": "http://inspirito.de/",
+                    "role": "Maintainer, Developer"
                 }
             ],
             "description": "EasyRdf is a PHP library designed to make it easy to consume and produce RDF.",
@@ -3963,11 +3967,10 @@
                 "sparql"
             ],
             "support": {
-                "issues": "http://github.com/sweetyrdf/easyrdf/issues",
-                "source": "https://github.com/sweetyrdf/easyrdf/tree/master"
+                "issues": "https://github.com/sweetrdf/easyrdf/issues",
+                "source": "https://github.com/sweetrdf/easyrdf/tree/1.8.0"
             },
-            "abandoned": "sweetrdf/easyrdf",
-            "time": "2020-06-25T15:56:32+00:00"
+            "time": "2023-01-16T11:43:21+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
