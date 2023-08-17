@@ -7,16 +7,12 @@
 
     "repositories": [
         {
-            "type": "package",
-            "package": {
-                "name": "citation-style-language/locales",
-                "version": "1.0.0",
-                "source": {
-                    "type": "git",
-                    "url": "https://github.com/citation-style-language/locales.git",
-                    "reference": "master"
-                }
-            }
+            "type": "vcs",
+            "url": "https://github.com/burki/LiipUrlAutoConverterBundle"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/burki/arc2"
         },
         {
             "type": "package",
@@ -29,14 +25,6 @@
                     "reference": "master"
                 }
             }
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/burki/LiipUrlAutoConverterBundle"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/burki/arc2"
         }
     ],
 
@@ -101,8 +89,7 @@
         "semsol/arc2": "dev-master",
         "sweetrdf/easyrdf": "^1.8",
 
-        "seboettg/citeproc-php": "2.4.1",
-        "citation-style-language/locales": "^1.0",
+        "seboettg/citeproc-php": "^2.6",
         "fale/isbn": "^3.1",
 
         "ddeboer/data-import": "0.20.*",
