@@ -12,6 +12,9 @@ use Lexik\Bundle\FormFilterBundle\Filter\Form\Type as Filters;
 class CrudFilterType
 extends AbstractType
 {
+    /**
+     * probably only used in /place at the moment
+     */
     protected function addSearchFilter(FormBuilderInterface $builder, array $searchFields, $useFulltext = false)
     {
         $builder->add('search', Filters\TextFilterType::class, [
