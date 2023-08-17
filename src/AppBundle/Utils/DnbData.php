@@ -49,8 +49,8 @@ abstract class DnbData
         $triples = $parser->getTriples();
         $index = \ARC2::getSimpleIndex($triples, true) ; /* true -> flat version */
 
-        if (isset($index[$uri]['http://d-nb.info/standards/elementset/gnd#preferredNameForThePlaceOrGeographicName'])) {
-            return self::normalizeString($index[$uri]['http://d-nb.info/standards/elementset/gnd#preferredNameForThePlaceOrGeographicName'][0]);
+        if (isset($index[$uri]['https://d-nb.info/standards/elementset/gnd#preferredNameForThePlaceOrGeographicName'])) {
+            return self::normalizeString($index[$uri]['https://d-nb.info/standards/elementset/gnd#preferredNameForThePlaceOrGeographicName'][0]);
         }
 
         if (isset($index[$uri]['preferredNameForThePlaceOrGeographicName'])) {
@@ -71,21 +71,22 @@ abstract class DnbData
         $type = $index['http://www.w3.org/1999/02/22-rdf-syntax-ns#type'][0]['value'];
         switch ($type) {
             /*
-            case 'http://d-nb.info/standards/elementset/gnd#DifferentiatedPerson':
-            case 'http://d-nb.info/standards/elementset/gnd#Pseudonym':
-            case 'http://d-nb.info/standards/elementset/gnd#RoyalOrMemberOfARoyalHouse':
-            case 'http://d-nb.info/standards/elementset/gnd#UndifferentiatedPerson':
+            case 'https://d-nb.info/standards/elementset/gnd#DifferentiatedPerson':
+            case 'https://d-nb.info/standards/elementset/gnd#Pseudonym':
+            case 'https://d-nb.info/standards/elementset/gnd#RoyalOrMemberOfARoyalHouse':
+            case 'https://d-nb.info/standards/elementset/gnd#UndifferentiatedPerson':
                 return new BiographicalData();
                 break;
             */
 
-            case 'http://d-nb.info/standards/elementset/gnd#CorporateBody':
-            case 'http://d-nb.info/standards/elementset/gnd#OrganOfCorporateBody':
-            case 'http://d-nb.info/standards/elementset/gnd#TerritorialCorporateBodyOrAdministrativeUnit':
+            case 'https://d-nb.info/standards/elementset/gnd#Company':
+            case 'https://d-nb.info/standards/elementset/gnd#CorporateBody':
+            case 'https://d-nb.info/standards/elementset/gnd#OrganOfCorporateBody':
+            case 'https://d-nb.info/standards/elementset/gnd#TerritorialCorporateBodyOrAdministrativeUnit':
                 return new CorporateBodyData();
                 break;
 
-            case 'http://d-nb.info/standards/elementset/gnd#HistoricSingleEventOrEra':
+            case 'https://d-nb.info/standards/elementset/gnd#HistoricSingleEventOrEra':
                 break; // currently ignore
 
             default:
@@ -111,7 +112,15 @@ abstract class DnbData
 
         $index = \ARC2::getSimpleIndex($triples, false) ; /* false -> non-flat version */
 
-        $res = self::instantiateResult($index['http://d-nb.info/gnd/' . $gnd], $gnd);
+        $uri = 'https://d-nb.info/gnd/' . $gnd;
+
+        if (!array_key_exists($uri, $index)) {
+            echo $uri . " not found" . "\n";
+            // probably redirected to new identifier
+            return null;
+        }
+
+        $res = self::instantiateResult($index[$uri], $gnd);
         if (is_null($res)) {
             // type not handled
             return null;
