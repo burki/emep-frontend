@@ -11,7 +11,7 @@ security:
     providers:
         db_provider:
             entity:
-                class: AppBundle:User
+                class: AppBundle\Entity\User
                 property: email
 
     firewalls:
