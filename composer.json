@@ -31,8 +31,12 @@
             }
         },
         {
-            "url": "https://github.com/burki/LiipUrlAutoConverterBundle",
-            "type": "vcs"
+            "type": "vcs",
+            "url": "https://github.com/burki/LiipUrlAutoConverterBundle"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/burki/arc2"
         }
     ],
 
@@ -94,7 +98,9 @@
 
         "wikimedia/utfnormal": "^2.0",
 
+        "semsol/arc2": "dev-master",
         "sweetrdf/easyrdf": "^1.8",
+
         "seboettg/citeproc-php": "2.4.1",
         "citation-style-language/locales": "^1.0",
         "fale/isbn": "^3.1",
