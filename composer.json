@@ -19,6 +19,10 @@
             "url": "https://github.com/proxima-research/swiftmailer-bundle"
         },
         {
+            "type": "vcs",
+            "url": "https://github.com/cwilby/wordpress-rest-api-client"
+        },
+        {
             "type": "package",
             "package": {
                 "name": "citation-style-language/styles-distribution",
@@ -108,7 +112,7 @@
 
         "presta/sitemap-bundle": "^3.3",
 
-        "vnn/wordpress-rest-api-client": "^1.2",
+        "vnn/wordpress-rest-api-client": "dev-master#9e4a7a1",
         "guzzlehttp/guzzle": "^6.3"
     },
     "autoload": {
