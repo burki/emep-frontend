@@ -102,7 +102,7 @@
         "babdev/pagerfanta-bundle": "^3.8",
         "pagerfanta/twig": "^3.8",
 
-        "presta/sitemap-bundle": "^2.1",
+        "presta/sitemap-bundle": "^3.3",
 
         "vnn/wordpress-rest-api-client": "^1.2",
         "guzzlehttp/guzzle": "^6.3"

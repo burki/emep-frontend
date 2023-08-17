@@ -154,9 +154,6 @@ extends Kernel
             );
         }
 
-        // for /sitemap.xml
-        $routes->mount('/', $routes->import('@PrestaSitemapBundle/Resources/config/routing.yml'));
-
         // our controllers
         $confDir = $this->getConfigDir();
 
