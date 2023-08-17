@@ -27,7 +27,6 @@ extends AbstractType
                 }
 
                 if ($useFulltext) {
-
                     // on Innodb, this needs a FULLTEXT index matching the column list
                     $fulltextCondition = \AppBundle\Utils\MysqlFulltextSimpleParser::parseFulltextBoolean($values['value'], true);
 
@@ -46,14 +45,12 @@ extends AbstractType
                     $orWords = explode(";", $values['value'] );
 
                     $orExpressions = [];
-                    // build a matching REGEX
+                    // build a matching REGEXP
                     $counter = 0;
                     foreach ($orWords as $currValues) {
                         $words = preg_split('/\,?\s+/', trim($currValues));
                         if (count($words) > 0) {
                             $andParts = [];
-
-
 
                             for ($i = 0; $i < count($words); $i++) {
                                 if (empty($words[$i])) {
@@ -63,12 +60,13 @@ extends AbstractType
                                 // print_r($i);
 
                                 $bindKey = 'regexp' . $counter;
-                                $parameters[$bindKey] = '[[:<:]]' . $words[$i];
+                                // $parameters[$bindKey] = '[[:<:]]' . $words[$i]; // MySQL 5.7
+                                $parameters[$bindKey] = '\\b' . $words[$i]; // MySQL 8.0
+
 
                                 $orParts = [];
                                 for ($j = 0; $j < count($searchFields); $j++) {
                                     // see https://stackoverflow.com/a/29034983/2114681
-                                    // TODO: use $parameters instead of addslashes
                                     $orParts[] = sprintf("REGEXP(%s, :%s) = true",
                                                          $searchFields[$j], $bindKey);
                                 }
@@ -102,8 +100,6 @@ extends AbstractType
                     /*$words = preg_split('/\,?\s+/', trim($values['value']));
                     if (count($words) > 0) {
                         $andParts = [];
-
-
 
                         for ($i = 0; $i < count($words); $i++) {
                             if (empty($words[$i])) {
