@@ -15,6 +15,10 @@
             "url": "https://github.com/burki/arc2"
         },
         {
+            "type": "vcs",
+            "url": "https://github.com/proxima-research/swiftmailer-bundle"
+        },
+        {
             "type": "package",
             "package": {
                 "name": "citation-style-language/styles-distribution",
@@ -57,7 +61,7 @@
 
         "symfony/monolog-bundle": "^3.5",
         "symfony/monolog-bridge": "^5.4",
-        "symfony/swiftmailer-bundle": "^3.4",
+        "symfony/swiftmailer-bundle": "dev-main#d247a62",
         "knplabs/knp-menu-bundle": "^3.0",
 
         "symfony/asset": "^5.4",
