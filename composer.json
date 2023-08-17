@@ -112,7 +112,7 @@
         "cocur/background-process": "0.7.*",
 
         "ifedko/php-doctrine-dbal-pagination": "^2.0",
-        "babdev/pagerfanta-bundle": "^2.2",
+        "babdev/pagerfanta-bundle": "^3.8",
 
         "presta/sitemap-bundle": "^2.1",
 
