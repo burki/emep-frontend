@@ -68,7 +68,7 @@ extends Kernel
             new \Knp\Bundle\MenuBundle\KnpMenuBundle(),
 
             // search / filter / paginate
-            new \Lexik\Bundle\FormFilterBundle\LexikFormFilterBundle(),
+            new \Spiriit\Bundle\FormFilterBundle\SpiriitFormFilterBundle(),
             new \Knp\Bundle\PaginatorBundle\KnpPaginatorBundle(),
 
             // select2 integration

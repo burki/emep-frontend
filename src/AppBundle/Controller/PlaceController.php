@@ -11,7 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 use Knp\Component\Pager\PaginatorInterface;
 
-use Lexik\Bundle\FormFilterBundle\Filter\FilterBuilderUpdaterInterface;
+use Spiriit\Bundle\FormFilterBundle\Filter\FilterBuilderUpdaterInterface;
 
 /**
  *

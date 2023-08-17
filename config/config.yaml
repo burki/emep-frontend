@@ -38,7 +38,7 @@ twig:
         '%kernel.project_dir%/vendor/knplabs/knp-paginator-bundle/templates': KnpPaginator
         '%kernel.project_dir%/templates': __main__
     form_themes:
-        - '@LexikFormFilter/Form/form_div_layout.html.twig'
+        - '@SpiriitFormFilter/Form/form_div_layout.html.twig'
         - '@TetranzSelect2Entity/Form/fields.html.twig'
     #form:
     #    resources: ['bootstrap_3_horizontal_layout.html.twig']

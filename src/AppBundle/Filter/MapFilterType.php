@@ -4,7 +4,7 @@ namespace AppBundle\Filter;
 
 use Symfony\Component\Form\FormBuilderInterface;
 
-use Lexik\Bundle\FormFilterBundle\Filter\Form\Type as Filters;
+use Spiriit\Bundle\FormFilterBundle\Filter\Form\Type as Filters;
 
 class MapFilterType
 extends \Symfony\Component\Form\AbstractType
