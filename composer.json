@@ -79,7 +79,7 @@
         "symfony/finder": "^5.4",
         "symfony/process": "^5.4",
 
-        "lexik/form-filter-bundle": "^6.0",
+        "lexik/form-filter-bundle": "^8.0",
         "knplabs/knp-paginator-bundle": "^5.3",
 
         "cocur/slugify": "^4.0",
