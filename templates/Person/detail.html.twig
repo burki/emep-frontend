@@ -28,20 +28,8 @@
     </script>
 
     {{ map.head() }}
-    <script src="{{ app.request.basepath }}/js/seealso.js"></script>
-    <script>
-        var service = new SeeAlsoCollection();
-        service.services = {
-            'pndaks' : new SeeAlsoService('https://beacon.findbuch.de/seealso/pnd-aks/-lemo@ap/-dome{% if person.wikidata is not empty %}/-wikidata{% endif %}')
-        };
-        service.views = {
-            'seealso-ul' : new SeeAlsoUL({
-                linkTarget: '_blank',
-                maxItems: 100
-            })
-        };
-        service.replaceTagsOnLoad();
-    </script>
+
+    {{ helper.seealso_head_gnd() }}
 
     <style>
         .tooltip {
