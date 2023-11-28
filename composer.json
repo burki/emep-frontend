@@ -1,7 +1,7 @@
 {
     "config": {
         "platform": {
-            "php": "7.2.9"
+            "php": "7.4.0"
         }
     },
 
@@ -21,21 +21,22 @@
     ],
 
     "require": {
-        "symfony/yaml": "^4.1",
-        "symfony/console": "^4.1",
-        "symfony/framework-bundle": "^4.1",
+        "symfony/yaml": "^4.4",
+        "symfony/console": "^4.4",
+        "symfony/framework-bundle": "^4.4",
 
-        "symfony/templating": "^4.1",
-        "symfony/translation": "^4.1",
-        "symfony/twig-bundle": "^4.1",
+        "symfony/templating": "^4.4",
+        "symfony/translation": "^4.4",
+        "symfony/twig-bundle": "^4.4",
 
-        "symfony/security-bundle": "^4.1",
+        "symfony/security-bundle": "^4.4",
 
-        "symfony/web-profiler-bundle": "^4.1",
-        "symfony/debug-bundle": "^4.1",
+        "symfony/web-profiler-bundle": "^4.4",
+        "symfony/debug-bundle": "^4.4",
 
-        "symfony/validator": "^4.1",
-        "symfony/form": "^4.1",
+        "symfony/validator": "^4.4",
+        "symfony/intl": "^4.4",
+        "symfony/form": "^4.4",
         "shapecode/hidden-entity-type-bundle": "^3.0",
 
         "symfony/monolog-bundle": "^3.3",
@@ -43,7 +44,7 @@
         "sensio/framework-extra-bundle": "@stable",
         "knplabs/knp-menu-bundle": "@stable",
 
-        "symfony/asset": "^4.1",
+        "symfony/asset": "^4.4",
         "symfony/assetic-bundle": "dev-master as 2.8.3",
         "leafo/scssphp": "@stable",
 
@@ -64,7 +65,8 @@
 
         "semsol/arc2": "@stable",
         "easyrdf/easyrdf": "@stable",
-        "seboettg/citeproc-php": "dev-name-as-sort-order-fix#bf446dc",
+        "seboettg/citeproc-php": "@stable",
+        "citation-style-language/locales": "@dev",
         "fale/isbn": "3.*",
 
         "ddeboer/data-import": "0.20.*",
