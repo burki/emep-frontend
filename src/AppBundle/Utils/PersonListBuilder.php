@@ -284,6 +284,10 @@ extends SearchListBuilder
             $this->rowDescr['birthdate']['buildValue']
                 = $this->rowDescr['deathdate']['buildValue']
                 = function (&$row, $val, $listBuilder, $key, $format) {
+                    if (is_null($val)) {
+                        return '';
+                    }
+
                     // year only
                     return preg_match('/^(\d+)\-/', $val, $matches)
                         && $matches[1] > 0 ? $matches[1] : '';
