@@ -11,28 +11,48 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 use Cocur\Slugify\SlugifyInterface;
+use Doctrine\Persistence\ManagerRegistry;
 
 abstract class BaseController
 extends AbstractController
 {
     protected $kernel;
     protected $translator;
+    private $doctrine;
     protected $slugify;
+    private $twig;
+
     private $globals = null;
 
     public function __construct(KernelInterface $kernel,
                                 TranslatorInterface $translator,
-                                SlugifyInterface $slugify)
+                                ManagerRegistry $doctrine,
+                                SlugifyInterface $slugify,
+                                \Twig\Environment $twig)
     {
         $this->kernel = $kernel;
         $this->translator = $translator;
+        $this->doctrine = $doctrine;
         $this->slugify = $slugify;
+        $this->twig = $twig;
+
     }
 
+    /**
+     * Add deprecated method for forward compatibility
+     */
+    protected function getDoctrine(): ManagerRegistry
+    {
+        return $this->doctrine;
+    }
+
+    /**
+     * Get a global twig variable by $key
+     */
     protected function getGlobal($key)
     {
         if (is_null($this->globals)) {
-            $this->globals = $this->get('twig')->getGlobals();
+            $this->globals = $this->twig->getGlobals();
         }
 
         return array_key_exists($key, $this->globals)
