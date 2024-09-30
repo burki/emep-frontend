@@ -678,7 +678,7 @@ implements \JsonSerializable, JsonLdSerializable
         return $results;
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return [
             'id' => $this->id,

@@ -615,7 +615,7 @@ implements \JsonSerializable, JsonLdSerializable
         return $this->changedAt;
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return [
             'id' => $this->id,

@@ -308,7 +308,7 @@ implements \JsonSerializable, JsonLdSerializable /*, OgSerializable, TwitterSeri
      * We transfer to Citeproc JSON
      * see https://github.com/citation-style-language/schema/blob/master/csl-data.json
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         // see http://aurimasv.github.io/z2csl/typeMap.xml
         static $typeMap = [
