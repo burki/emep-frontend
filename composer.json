@@ -71,7 +71,7 @@
         "symfony/finder": "^6.4",
         "symfony/process": "^6.4",
 
-        "spiriitlabs/form-filter-bundle": "^9.0",
+        "spiriitlabs/form-filter-bundle": "^10.0",
         "knplabs/knp-paginator-bundle": "^5.3",
 
         "cocur/slugify": "^4.0",
