@@ -151,7 +151,7 @@ implements \JsonSerializable, JsonLdSerializable
     /**
      * @var string Addresses.
      *
-     * @ORM\Column(name="address_additional", type="json_array", nullable=true)
+     * @ORM\Column(name="address_additional", type="json", nullable=true)
      */
     protected $addresses;
 
@@ -198,7 +198,7 @@ implements \JsonSerializable, JsonLdSerializable
     protected $slug;
 
     /**
-    * @ORM\Column(type="json_array", nullable=true)
+    * @ORM\Column(type="json", nullable=true)
     */
     protected $additional;
 

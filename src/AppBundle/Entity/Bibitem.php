@@ -142,7 +142,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
     /**
      * @var array The author/contributor/editor of this CreativeWork.
      *
-     * xORM\Column(type="json_array", nullable=true)
+     * xORM\Column(type="json", nullable=true)
      */
     protected $creators;
 
@@ -248,7 +248,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
     /**
      * @var
      *
-     * @ORM\Column(name="info", type="json_array", nullable=true)
+     * @ORM\Column(name="info", type="json", nullable=true)
      */
     protected $info;
 
@@ -799,11 +799,11 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
     /**
      * Sets dateModified.
      *
-     * @param \DateTime $dateModified
+     * @param \DateTime|null $dateModified
      *
      * @return $this
      */
-    public function setDateModified(\DateTime $dateModified = null)
+    public function setDateModified(?\DateTime $dateModified = null)
     {
         $this->dateModified = $dateModified;
 
@@ -813,7 +813,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable /*, TwitterSeri
     /**
      * Gets dateModified.
      *
-     * @return \DateTime
+     * @return \DateTime|null
      */
     public function getDateModified()
     {

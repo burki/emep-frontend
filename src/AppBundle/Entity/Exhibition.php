@@ -273,7 +273,7 @@ implements JsonLdSerializable
     /**
      * @var
      *
-     * @ORM\Column(name="info", type="json_array", nullable=true)
+     * @ORM\Column(name="info", type="json", nullable=true)
      */
     protected $info;
 

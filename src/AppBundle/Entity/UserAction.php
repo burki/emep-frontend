@@ -51,7 +51,7 @@ class UserAction
     private $route;
 
     /**
-    * @ORM\Column(name="route_params", type="json_array", nullable=true)
+    * @ORM\Column(name="route_params", type="json", nullable=true)
     */
     protected $routeParams;
 

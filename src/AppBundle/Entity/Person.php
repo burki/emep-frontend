@@ -183,7 +183,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
     /**
      * @var
      *
-     * @ORM\Column(name="actionplace", type="json_array", nullable=true)
+     * @ORM\Column(name="actionplace", type="json", nullable=true)
      */
     protected $addresses;
 
@@ -227,14 +227,14 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
     protected $wikidata;
 
     /**
-    * @ORM\Column(type="json_array", nullable=true)
+    * @ORM\Column(type="json", nullable=true)
     */
     protected $entityfacts;
 
     /**
      * @var
      *
-     * @ORM\Column(type="json_array", nullable=true)
+     * @ORM\Column(type="json", nullable=true)
      */
     protected $additional;
 
