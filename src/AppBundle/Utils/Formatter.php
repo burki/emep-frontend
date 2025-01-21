@@ -35,8 +35,12 @@ class Formatter
      */
     protected static function buildDatePartsReduced($datestr)
     {
-        $dateParts = preg_split('/\-/', $datestr);
         $datePartsReduced = [];
+        if (is_null($datestr)) {
+            return $datePartsReduced;
+        }
+
+        $dateParts = preg_split('/\-/', $datestr);
 
         for ($i = 0; $i < count($dateParts); $i++) {
             if (0 == $dateParts[$i]) {

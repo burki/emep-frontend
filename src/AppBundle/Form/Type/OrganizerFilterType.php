@@ -12,7 +12,7 @@ use Tetranz\Select2EntityBundle\Form\Type\Select2EntityType;
 class OrganizerFilterType
 extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('geoname', ChoiceType::class, [
             'choices' => $options['data']['choices']['organizer_geoname'],

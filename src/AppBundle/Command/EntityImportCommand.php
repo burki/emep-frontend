@@ -26,7 +26,7 @@ extends Command
         $this->em = $em;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('entity:import')

@@ -13,7 +13,7 @@ use Tetranz\Select2EntityBundle\Form\Type\Select2EntityType;
 class PersonFilterType
 extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('gender', ChoiceType::class, [
             'choices' => [

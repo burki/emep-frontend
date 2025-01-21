@@ -15,8 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class YearRangeType
 extends AbstractType
 {
-
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // $transformer = new DurationToIntegerTransformer();
 
@@ -38,7 +37,7 @@ extends AbstractType
         // $builder->addModelTransformer($transformer);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             /*

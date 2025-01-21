@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class SaveSearchType
 extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('name', TextType::class, [

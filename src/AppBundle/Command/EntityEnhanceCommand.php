@@ -38,7 +38,7 @@ extends Command
         $this->projectDir = $projectDir;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('entity:enhance')

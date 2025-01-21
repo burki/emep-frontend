@@ -33,7 +33,7 @@ extends Command
         $this->params = $params;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('export:gdf')

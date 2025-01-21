@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class AssessmentType
 extends AbstractType
 {
-    public function configureOptions(\Symfony\Component\OptionsResolver\OptionsResolver $resolver)
+    public function configureOptions(\Symfony\Component\OptionsResolver\OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => \AppBundle\Entity\UserItem::class,
@@ -25,7 +25,7 @@ extends AbstractType
         ]);
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('show', ChoiceType::class, [

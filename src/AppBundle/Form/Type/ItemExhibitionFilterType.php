@@ -11,7 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 class ItemExhibitionFilterType
 extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('type', ChoiceType::class, [
             'choices' => [ '- all - ' => '' ] + $options['data']['choices']['itemexhibition_type'],

@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class UserRecoverType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('email', EmailType::class, [
