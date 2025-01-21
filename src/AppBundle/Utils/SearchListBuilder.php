@@ -141,8 +141,8 @@ extends ListBuilder
     var $mode = null;
 
     public function __construct(\Doctrine\DBAL\Connection $connection,
-                                Request $request = null,
-                                UrlGeneratorInterface $urlGenerator = null,
+                                ?Request $request = null,
+                                ?UrlGeneratorInterface $urlGenerator = null,
                                 $queryFilters = null)
     {
         parent::__construct($connection);
