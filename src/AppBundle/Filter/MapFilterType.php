@@ -18,7 +18,7 @@ extends \Symfony\Component\Form\AbstractType
         ]);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'map_filter';
     }

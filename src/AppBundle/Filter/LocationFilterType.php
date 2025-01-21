@@ -76,7 +76,7 @@ extends CrudFilterType
         $builder->add('location', get_class($locationClass), $options);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'filter';
     }

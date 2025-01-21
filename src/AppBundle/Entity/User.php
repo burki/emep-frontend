@@ -87,7 +87,7 @@ implements UserInterface, PasswordAuthenticatedUserInterface, \Serializable
         return $this;
     }
 
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->email;
     }

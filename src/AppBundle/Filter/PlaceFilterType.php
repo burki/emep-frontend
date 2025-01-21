@@ -36,7 +36,7 @@ extends CrudFilterType
         ]);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'place_filter';
     }

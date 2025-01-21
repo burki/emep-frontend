@@ -91,7 +91,7 @@ extends CrudFilterType
         $builder->add('exhibition', get_class($exhibitionClass), $options);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'filter';
     }

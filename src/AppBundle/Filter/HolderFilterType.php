@@ -65,7 +65,7 @@ extends CrudFilterType
         $builder->add('holder', get_class($holderClass), $options);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'filter';
     }

@@ -76,7 +76,7 @@ extends CrudFilterType
         $builder->add('organizer', get_class($organizerClass), $options);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'filter';
     }

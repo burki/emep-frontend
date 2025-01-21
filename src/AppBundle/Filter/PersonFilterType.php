@@ -73,7 +73,7 @@ extends CrudFilterType
         $builder->add('person', get_class($personClass), $options);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'filter';
     }
