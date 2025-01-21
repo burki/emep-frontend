@@ -15,10 +15,6 @@
         },
         {
             "type": "vcs",
-            "url": "https://github.com/proxima-research/swiftmailer-bundle"
-        },
-        {
-            "type": "vcs",
             "url": "https://github.com/cwilby/wordpress-rest-api-client"
         },
         {
@@ -63,7 +59,7 @@
 
         "symfony/monolog-bundle": "^3.5",
         "symfony/monolog-bridge": "^5.4",
-        "symfony/swiftmailer-bundle": "dev-main#d247a62",
+        "symfony/mailer": "^5.4",
         "knplabs/knp-menu-bundle": "^3.0",
 
         "symfony/asset": "^5.4",
@@ -111,7 +107,7 @@
         "presta/sitemap-bundle": "^3.3",
 
         "vnn/wordpress-rest-api-client": "dev-master#9e4a7a1",
-        "guzzlehttp/guzzle": "^6.3"
+        "guzzlehttp/guzzle": "^7.5"
     },
     "conflict": {
         "cocur/slugify": "4.5.0"

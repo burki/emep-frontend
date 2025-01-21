@@ -78,9 +78,6 @@ extends Kernel
             // form
             new \Shapecode\Bundle\HiddenEntityTypeBundle\ShapecodeHiddenEntityTypeBundle(),
 
-            // contact
-            new \Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle(),
-
             // $slug = $this->get('cocur_slugify')->slugify('Hello World!');
             // see https://github.com/cocur/slugify#user-content-symfony2
             new \Cocur\Slugify\Bridge\Symfony\CocurSlugifyBundle(),

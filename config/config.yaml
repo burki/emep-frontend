@@ -7,7 +7,7 @@ imports:
 parameters:
     locale: en
     # knp_menu.voter.router.class: Knp\Menu\Matcher\Voter\RegexVoter
-    
+
 framework:
     secret: '%kernel.secret%'
     # knp_paginator needs translate bundle
@@ -27,6 +27,8 @@ framework:
     disallow_search_engine_index: false
     router:
         utf8: true
+    mailer:
+        dsn: '%mailer.dsn%'
 
 twig:
     globals:
@@ -65,7 +67,7 @@ doctrine:
                     collate: '%database.charset%_unicode_ci'
                     engine:  MyISAM     # InnoDB
     orm:
-        connection: default        
+        connection: default
         auto_generate_proxy_classes: '%kernel.debug%'
         auto_mapping: true
         dql:
@@ -80,7 +82,7 @@ doctrine:
                 RAND: DoctrineExtensions\Query\Mysql\Rand
             datetime_functions:
                 YEAR: DoctrineExtensions\Query\Mysql\Year
-                
+
         #result_cache_driver: '%database.cache_driver%'
         #query_cache_driver: '%database.cache_driver%'
         result_cache_driver: ~
@@ -102,7 +104,7 @@ doctrine:
 #            file_system:
 #                extension: cache
 #                directory: '%kernel.cache_dir%/doctrine'
-            
+
 stof_doctrine_extensions:
     orm:
         default:
@@ -148,23 +150,6 @@ knp_paginator:
         pagination: '@KnpPaginator/Pagination/twitter_bootstrap_v3_pagination.html.twig'
         sortable: '@KnpPaginator/Pagination/sortable_link.html.twig' # sort link template
         filtration: '@KnpPaginator/Pagination/filtration.html.twig'  # filters template
-
-swiftmailer:
-    # disable_delivery:  true
-    # delivery_address: daniel.burckhardt@sur-gmbh.ch
-    # or use: delivery_whitelist
-    transport: '%mailer.transport%'
-    host: '%mailer.host%'
-    port: '%mailer.port%'
-    username: '%mailer.username%'
-    password: '%mailer.password%'
-    encryption: ssl
-    # self-signed, see https://github.com/swiftmailer/swiftmailer/issues/544
-    stream_options:
-        ssl:
-            allow_self_signed: true
-            verify_peer: false
-            verify_peer_name: false
 
 #debug:
 #    dump_destination: "tcp://%env(VAR_DUMPER_SERVER)%"

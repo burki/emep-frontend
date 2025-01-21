@@ -3,6 +3,8 @@
 namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -12,33 +14,36 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class AboutController
 extends DefaultController
 {
-    protected function sendMessage($mailer, $data)
+    protected function sendMessage(MailerInterface $mailer, $data)
     {
-        $template = $this->get('twig')->load('About/contact.email.twig');
+        $template = $this->getTwig()->load('About/contact.email.twig');
         $subject = $template->renderBlock('subject', [ 'data' => $data ]);
         $textBody = $template->renderBlock('body_text', [ 'data' => $data ]);
         $htmlBody = $template->renderBlock('body_html', [ 'data' => $data ]);
 
-        $message = (new \Swift_Message($subject))
-            ->setFrom('burckhardtd@geschichte.hu-berlin.de')
-            ->setTo('burckhardtd@geschichte.hu-berlin.de')
-            ->setReplyTo($data['email']);
+        $message = (new Email())
+            ->subject($subject)
+            ->from('burckhardtd@geschichte.hu-berlin.de')
+            ->to('burckhardtd@geschichte.hu-berlin.de')
+            ->replyTo($data['email']);
             ;
 
         if (!empty($htmlBody)) {
-            $message->setBody($htmlBody, 'text/html')
-                ->addPart($textBody, 'text/plain');
+            $message->html($htmlBody)
+                ->text($textBody);
         }
         else {
-            $message->setBody($textBody);
+            $message->text($textBody);
         }
 
         try {
-            return $mailer->send($message);
+            $mailer->send($message);
         }
         catch (\Exception $e) {
             return false;
         }
+
+        return true;
     }
 
     protected function fetchWordpressPage($slug)
@@ -137,7 +142,7 @@ extends DefaultController
      */
     public function contactAction(Request $request,
                                   TranslatorInterface $translator,
-                                  \Swift_Mailer $mailer)
+                                  MailerInterface $mailer)
     {
         $form = $this->createForm(\AppBundle\Form\Type\ContactType::class);
         $form->handleRequest($request);

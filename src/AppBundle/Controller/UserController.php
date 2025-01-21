@@ -3,6 +3,8 @@
 namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -25,7 +27,7 @@ extends BaseController
      */
     public function myDataAction(Request $request,
                                  UrlGeneratorInterface $urlGenerator,
-                                 UserInterface $user = null)
+                                 ?UserInterface $user = null)
     {
         if (is_null($user)) {
             return $this->redirectToRoute('login');
@@ -76,7 +78,7 @@ extends BaseController
     /**
      * @Route("/login", name="login")
      */
-    public function loginAction(Request $request, AuthenticationUtils $authenticationUtils = null)
+    public function loginAction(Request $request, ?AuthenticationUtils $authenticationUtils = null)
     {
         // check if we can authenticate from backend-session
         if (!empty($_SESSION['user']) && !empty($_SESSION['user']['login'])) {
@@ -132,35 +134,38 @@ extends BaseController
     {
     }
 
-    protected function sendMessage($mailer, $template, $data)
+    protected function sendMessage(MailerInterface $mailer, $template, $data)
     {
-        $template = $this->get('twig')->load($template);
+        $template = $this->getTwig()->load($template);
 
         $subject = $template->renderBlock('subject', [ 'data' => $data ]);
         $textBody = $template->renderBlock('body_text', [ 'data' => $data ]);
         $htmlBody = $template->renderBlock('body_html', [ 'data' => $data ]);
 
-        $message = (new \Swift_Message($subject))
-            ->setFrom('burckhardtd@geschichte.hu-berlin.de')
-            ->setTo($data['to'])
+        $message = (new Email())
+            ->subject($subject)
+            ->from('burckhardtd@geschichte.hu-berlin.de')
+            ->to($data['to'])
             ;
 
         if (!empty($htmlBody)) {
-            $message->setBody($htmlBody, 'text/html')
-                ->addPart($textBody, 'text/plain');
+            $message->html($htmlBody)
+                ->text($textBody);
         }
         else {
-            $message->setBody($textBody);
+            $message->text($textBody);
         }
 
         try {
-            return $mailer->send($message);
+            $mailer->send($message);
         }
         catch (\Exception $e) {
             // var_dump($e->getMessage());
 
             return false;
         }
+
+        return true;
     }
 
     /**
@@ -200,8 +205,8 @@ extends BaseController
      */
     public function sendRecoverAction(Request $request,
                                       UrlGeneratorInterface $router,
-                                      \Swift_Mailer $mailer,
-                                      AuthenticationUtils $authenticationUtils = null)
+                                      MailerInterface $mailer,
+                                      ?AuthenticationUtils $authenticationUtils = null)
     {
         // 1) build the form
         $form = $this->createForm(\AppBundle\Form\Type\UserRecoverType::class);
