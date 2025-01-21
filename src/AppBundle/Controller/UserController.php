@@ -8,7 +8,7 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -171,7 +171,7 @@ extends BaseController
     /**
      * @Route("/register", name="user_registration")
      */
-    public function registerAction(Request $request, UserPasswordEncoderInterface $passwordEncoder)
+    public function registerAction(Request $request, UserPasswordHasherInterface $passwordHasher)
     {
         // 1) build the form
         $user = new User();
@@ -180,8 +180,8 @@ extends BaseController
         // 2) handle the submit (will only happen on POST)
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            // 3) Encode the password (you could also do this via Doctrine listener)
-            $password = $passwordEncoder->encodePassword($user, $user->getPlainPassword());
+            // 3) Hash the password (you could also do this via Doctrine listener)
+            $password = $passwordHasher->hashPassword($user, $user->getPlainPassword());
             $user->setPassword($password);
 
             // 4) save the User!
@@ -269,7 +269,7 @@ extends BaseController
     /**
      * @Route("/reset-password/{username}/{token}", name="user_checkrecoverpassword")
      */
-    public function checkRecoverAction(Request $request, UserPasswordEncoderInterface $passwordEncoder, $username, $token)
+    public function checkRecoverAction(Request $request, UserPasswordHasherInterface $passwordHasher, $username, $token)
     {
         $userRepo = $this->getDoctrine()->getRepository('AppBundle\Entity\User');
 
@@ -297,8 +297,8 @@ extends BaseController
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                // 3) Encode the password (you could also do this via Doctrine listener)
-                $password = $passwordEncoder->encodePassword($user, $user->getPlainPassword());
+                // 3) Hash the password (you could also do this via Doctrine listener)
+                $password = $passwordHasher->hashPassword($user, $user->getPlainPassword());
                 $user->setPassword($password);
 
                 // 4) save the User!
