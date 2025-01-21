@@ -35,7 +35,6 @@ extends AbstractController
         $this->doctrine = $doctrine;
         $this->slugify = $slugify;
         $this->twig = $twig;
-
     }
 
     /**
@@ -44,6 +43,14 @@ extends AbstractController
     protected function getDoctrine(): ManagerRegistry
     {
         return $this->doctrine;
+    }
+
+    /**
+     * Add deprecated method for forward compatibility
+     */
+    protected function getTwig(): \Twig\Environment
+    {
+        return $this->twig;
     }
 
     /**

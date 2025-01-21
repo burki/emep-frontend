@@ -6,6 +6,7 @@ namespace AppBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -14,7 +15,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @UniqueEntity(fields="email", message="This E-Mail is already registered")
  * */
 class User
-implements UserInterface, \Serializable
+implements UserInterface, PasswordAuthenticatedUserInterface, \Serializable
 {
     static $ROLE_TO_PRIVS = [
         'ROLE_EXPERT' => 0x10, // access to works
@@ -69,6 +70,11 @@ implements UserInterface, \Serializable
         $this->status = 0;
     }
 
+    public function getUserIdentifier(): string
+    {
+        return $this->getEmail();
+    }
+
     public function getEmail()
     {
         return $this->email;
@@ -106,7 +112,7 @@ implements UserInterface, \Serializable
     /**
      * @inheritDoc
      */
-    public function getPassword()
+    public function getPassword(): ?string
     {
         return $this->password;
     }
@@ -141,7 +147,7 @@ implements UserInterface, \Serializable
         return $this;
     }
 
-    public function getRoles()
+    public function getRoles(): array
     {
         if ($this->status < 0) {
             return [];
