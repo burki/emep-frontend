@@ -45,7 +45,7 @@ extends CrudController
     public function searchAction(Request $request,
                                  UrlGeneratorInterface $urlGenerator,
                                  TranslatorInterface $translator,
-                                 UserInterface $user = null)
+                                 ?UserInterface $user = null)
     {
         $settings = $this->lookupSettingsFromRequest($request);
 
@@ -158,7 +158,7 @@ extends CrudController
     public function statsAction(Request $request,
                                 UrlGeneratorInterface $urlGenerator,
                                 TranslatorInterface $translator,
-                                UserInterface $user = null)
+                                ?UserInterface $user = null)
     {
         $settings = $this->lookupSettingsFromRequest($request);
 
@@ -240,7 +240,7 @@ extends CrudController
     public function mapAction(Request $request,
                               UrlGeneratorInterface $urlGenerator,
                               TranslatorInterface $translator,
-                              UserInterface $user = null)
+                              ?UserInterface $user = null)
     {
         $settings = $this->lookupSettingsFromRequest($request);
 

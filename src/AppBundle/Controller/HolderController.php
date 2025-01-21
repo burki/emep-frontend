@@ -54,7 +54,7 @@ extends CrudController
     public function indexAction(Request $request,
                                 UrlGeneratorInterface $urlGenerator,
                                 TranslatorInterface $translator,
-                                UserInterface $user = null)
+                                ?UserInterface $user = null)
     {
         $settings = $this->lookupSettingsFromRequest($request);
 
