@@ -722,7 +722,7 @@ extends CrudController
         $charts = [];
 
         // genderStatsStatisticsFormat
-        $template = $this->get('twig')->load('Statistics/exhibition-gender-stats.html.twig');
+        $template = $this->getTwig()->load('Statistics/exhibition-gender-stats.html.twig');
         $charts[] = $template->renderBlock('chart', [
             'container' => 'container-artist-by-gender',
             'data' => $this->assoc2NameYArray($this->artistsByGenderExhibitionStatistics($exhibition->getId())),
