@@ -78,7 +78,7 @@ implements \JsonSerializable, JsonLdSerializable
     /**
      * @var string A short description of the item.
      *
-     * @ORM\Column(type="json_array", nullable=true)
+     * @ORM\Column(type="string", nullable=true)
      */
     protected $description;
 
