@@ -334,7 +334,7 @@ extends BaseController
     /**
      * Checks if a saved search is requested and if so, looks it up and redirects
      */
-    protected function handleUserAction(Request $request, UserInterface $user = null, $route)
+    protected function handleUserAction(Request $request, ?UserInterface $user, $route)
     {
         if ('POST' == $request->getMethod() && !is_null($user)) {
             // check a useraction was requested
