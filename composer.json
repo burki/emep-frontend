@@ -80,7 +80,7 @@
         "liip/url-auto-converter-bundle": "dev-master",
 
         "doctrine/annotations": "^1.4",
-        "doctrine/dbal": "^2.13",
+        "doctrine/dbal": "^3.9",
         "doctrine/doctrine-bundle": "^2.0",
         "symfony/cache": "^6.4",
 
