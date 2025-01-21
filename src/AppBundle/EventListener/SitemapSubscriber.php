@@ -53,7 +53,7 @@ implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            SitemapPopulateEvent::ON_SITEMAP_POPULATE => 'populate',
+            SitemapPopulateEvent::class => 'populate',
         ];
     }
 
@@ -199,7 +199,8 @@ implements EventSubscriberInterface
 
         $client = new \Vnn\WpApiClient\WpClient(
             new \Vnn\WpApiClient\Http\GuzzleAdapter(new \GuzzleHttp\Client()),
-                $url);
+            $url
+        );
         $client->setCredentials(new \Vnn\WpApiClient\Auth\WpBasicAuth($this->params->get('app.wp-rest.user'),
                                                                       $this->params->get('app.wp-rest.password')));
         $posts = [];
