@@ -62,10 +62,10 @@
         "symfony/monolog-bundle": "^3.5",
         "symfony/monolog-bridge": "^6.4",
         "symfony/mailer": "^6.4",
-        "knplabs/knp-menu-bundle": "^3.0",
+        "knplabs/knp-menu-bundle": "^3.5",
 
         "symfony/asset": "^6.4",
-        "armin/scssphp-bundle": "^1.1",
+        "armin/scssphp-bundle": "^1.2",
 
         "symfony/filesystem": "^6.4",
         "symfony/finder": "^6.4",
@@ -75,8 +75,8 @@
         "knplabs/knp-paginator-bundle": "^5.3",
 
         "cocur/slugify": "^4.0",
-        "twig/twig": "^3.0",
-        "twig/string-extra": "^3.0",
+        "twig/twig": "^3.18",
+        "twig/string-extra": "^3.18",
         "liip/url-auto-converter-bundle": "dev-master",
 
         "doctrine/annotations": "^1.4",
@@ -88,12 +88,12 @@
         "beberlei/doctrineextensions": "@stable",
         "scienta/doctrine-json-functions": "^4.0",
 
-        "tetranz/select2entity-bundle": "^3.0",
+        "tetranz/select2entity-bundle": "^3.1",
 
         "wikimedia/utfnormal": "^2.0",
 
         "semsol/arc2": "dev-master",
-        "sweetrdf/easyrdf": "^1.8",
+        "sweetrdf/easyrdf": "^1.16",
 
         "seboettg/citeproc-php": "^2.6",
         "fale/isbn": "^3.1",
