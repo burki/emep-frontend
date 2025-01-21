@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "34885d2e6e824fd62d5da9b83cfcf468",
+    "content-hash": "18a92b79d60538f8b0cd26a01f5c04c6",
     "packages": [
         {
             "name": "armin/scssphp-bundle",
@@ -9311,13 +9311,13 @@
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/cwilby/wordpress-rest-api-client.git",
-                "reference": "9e4a7a1"
+                "url": "https://github.com/burki/wordpress-rest-api-client.git",
+                "reference": "d2f863bdc7a3ff08ce2f21305b078e2b74840f29"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cwilby/wordpress-rest-api-client/zipball/9e4a7a1",
-                "reference": "9e4a7a1",
+                "url": "https://api.github.com/repos/burki/wordpress-rest-api-client/zipball/d2f863bdc7a3ff08ce2f21305b078e2b74840f29",
+                "reference": "d2f863bdc7a3ff08ce2f21305b078e2b74840f29",
                 "shasum": ""
             },
             "require": {
@@ -9342,9 +9342,9 @@
                 }
             },
             "support": {
-                "source": "https://github.com/cwilby/wordpress-rest-api-client/tree/master"
+                "source": "https://github.com/burki/wordpress-rest-api-client/tree/master"
             },
-            "time": "2021-06-16T22:21:37+00:00"
+            "time": "2024-12-30T12:57:58+00:00"
         },
         {
             "name": "webmozart/assert",
