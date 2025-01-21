@@ -78,6 +78,8 @@
         "twig/string-extra": "^3.0",
         "liip/url-auto-converter-bundle": "dev-master",
 
+        "doctrine/annotations": "^1.4",
+        "doctrine/dbal": "^2.13",
         "doctrine/doctrine-bundle": "^2.0",
         "symfony/cache": "^5.4",
 
@@ -101,7 +103,7 @@
 
         "cocur/background-process": "0.7.*",
 
-        "ifedko/php-doctrine-dbal-pagination": "^2.0",
+        "ifedko/php-doctrine-dbal-pagination": "^3.0",
         "babdev/pagerfanta-bundle": "^3.8",
         "pagerfanta/twig": "^3.8",
 
