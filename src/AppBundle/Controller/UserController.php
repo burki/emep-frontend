@@ -12,23 +12,22 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Core\User\UserInterface;
-
 use AppBundle\Form\Type\UserType;
 use AppBundle\Entity\User;
 
 /**
  *
  */
-class UserController
-extends BaseController
+class UserController extends BaseController
 {
     /**
      * @Route("/my-data", name="my-data")
      */
-    public function myDataAction(Request $request,
-                                 UrlGeneratorInterface $urlGenerator,
-                                 ?UserInterface $user = null)
-    {
+    public function myDataAction(
+        Request $request,
+        UrlGeneratorInterface $urlGenerator,
+        ?UserInterface $user = null
+    ) {
         if (is_null($user)) {
             return $this->redirectToRoute('login');
         }
@@ -41,9 +40,10 @@ extends BaseController
         ]);
     }
 
-    protected function lookupAllSearches(UrlGeneratorInterface $urlGenerator,
-                                         UserInterface $user)
-    {
+    protected function lookupAllSearches(
+        UrlGeneratorInterface $urlGenerator,
+        UserInterface $user
+    ) {
         if (is_null($user)) {
             return [];
         }
@@ -57,7 +57,7 @@ extends BaseController
             ->andWhere("UA.user = :user")
             ->orderBy("UA.createdAt", "DESC")
             ->setParameter('user', $user)
-            ;
+        ;
 
         $searches = [];
 
@@ -67,8 +67,10 @@ extends BaseController
             $searches[$userAction->getId()] = [
                 'name' => $userAction->getName(),
                 'route' => $userAction->getRoute(),
-                'url' => $urlGenerator->generate($this->expandSaveSearchRoute($route),
-                                                 $userAction->getRouteParams()),
+                'url' => $urlGenerator->generate(
+                    $this->expandSaveSearchRoute($route),
+                    $userAction->getRouteParams()
+                ),
             ];
         }
 
@@ -130,9 +132,7 @@ extends BaseController
     /**
      * @Route("/logout", name="logout")
      */
-    public function logoutAction()
-    {
-    }
+    public function logoutAction() {}
 
     protected function sendMessage(MailerInterface $mailer, $template, $data)
     {
@@ -146,7 +146,7 @@ extends BaseController
             ->subject($subject)
             ->from('burckhardtd@geschichte.hu-berlin.de')
             ->to($data['to'])
-            ;
+        ;
 
         if (!empty($htmlBody)) {
             $message->html($htmlBody)
@@ -203,11 +203,12 @@ extends BaseController
     /**
      * @Route("/forgot-password", name="user_recoverpassword")
      */
-    public function sendRecoverAction(Request $request,
-                                      UrlGeneratorInterface $router,
-                                      MailerInterface $mailer,
-                                      ?AuthenticationUtils $authenticationUtils = null)
-    {
+    public function sendRecoverAction(
+        Request $request,
+        UrlGeneratorInterface $router,
+        MailerInterface $mailer,
+        ?AuthenticationUtils $authenticationUtils = null
+    ) {
         // 1) build the form
         $form = $this->createForm(\AppBundle\Form\Type\UserRecoverType::class);
 

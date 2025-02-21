@@ -8,16 +8,13 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Intl\Intl;
 use Symfony\Contracts\Translation\TranslatorInterface;
-
 use Knp\Component\Pager\PaginatorInterface;
-
 use Spiriit\Bundle\FormFilterBundle\Filter\FilterBuilderUpdaterInterface;
 
 /**
  *
  */
-class PlaceController
-extends CrudController
+class PlaceController extends CrudController
 {
     protected $pageSize = 200;
 
@@ -28,12 +25,12 @@ extends CrudController
                 ->createQueryBuilder();
 
         $qb->select([
-                'P.countryCode',
-            ])
+            'P.countryCode',
+        ])
             ->distinct()
             ->from('AppBundle\Entity\Place', 'P')
             ->where("P.type IN ('inhabited places') AND P.countryCode IS NOT NULL")
-            ;
+        ;
 
         $countriesActive = [];
 
@@ -49,37 +46,47 @@ extends CrudController
     /**
      * @Route("/place", name="place-inhabited")
      */
-    public function indexAction(Request $request,
-                                TranslatorInterface $translator,
-                                PaginatorInterface $paginator,
-                                FilterBuilderUpdaterInterface $queryBuilderUpdater)
-    {
+    public function indexAction(
+        Request $request,
+        TranslatorInterface $translator,
+        PaginatorInterface $paginator,
+        FilterBuilderUpdaterInterface $queryBuilderUpdater
+    ) {
         $qb = $this->getDoctrine()
                 ->getManager()
                 ->createQueryBuilder();
 
         $qb->select([
-                'P', 'C',
-                'COUNT(DISTINCT E.id) AS numExhibitionSort',
-                'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-                "COALESCE(P.alternateName,P.name) HIDDEN nameSort",
-                "CONCAT(COALESCE(C.name, P.countryCode), COALESCE(P.alternateName,P.name)) HIDDEN countrySort",
-            ])
+            'P', 'C',
+            'COUNT(DISTINCT E.id) AS numExhibitionSort',
+            'COUNT(DISTINCT IE.id) AS numCatEntrySort',
+            "COALESCE(P.alternateName,P.name) HIDDEN nameSort",
+            "CONCAT(COALESCE(C.name, P.countryCode), COALESCE(P.alternateName,P.name)) HIDDEN countrySort",
+        ])
             ->from('AppBundle\Entity\Place', 'P')
             ->leftJoin('P.country', 'C')
-            ->leftJoin('AppBundle\Entity\Location', 'L',
-                       \Doctrine\ORM\Query\Expr\Join::WITH,
-                       'L.place = P')
-            ->leftJoin('AppBundle\Entity\Exhibition', 'E',
-                       \Doctrine\ORM\Query\Expr\Join::WITH,
-                       'E.location = L AND ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
-            ->leftJoin('AppBundle\Entity\ItemExhibition', 'IE',
-                       \Doctrine\ORM\Query\Expr\Join::WITH,
-                       'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
+            ->leftJoin(
+                'AppBundle\Entity\Location',
+                'L',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'L.place = P'
+            )
+            ->leftJoin(
+                'AppBundle\Entity\Exhibition',
+                'E',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'E.location = L AND ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E')
+            )
+            ->leftJoin(
+                'AppBundle\Entity\ItemExhibition',
+                'IE',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)'
+            )
             ->where("P.type IN ('inhabited places')")
             ->groupBy('P.id')
             ->orderBy('nameSort')
-            ;
+        ;
 
         $form = $this->createForm(\AppBundle\Filter\PlaceFilterType::class, [
             'choices' => array_flip($this->buildCountries()),
@@ -129,11 +136,12 @@ extends CrudController
     /**
      * @Route("/place/save", name="place-save")
      */
-    public function saveSearchAction(Request $request,
-                                     UrlGeneratorInterface $urlGenerator,
-                                     UserInterface $user,
-                                     TranslatorInterface $translator)
-    {
+    public function saveSearchAction(
+        Request $request,
+        UrlGeneratorInterface $urlGenerator,
+        UserInterface $user,
+        TranslatorInterface $translator
+    ) {
         return $this->handleSaveSearchAction($request, $urlGenerator, $user, $translator);
     }
 
@@ -173,21 +181,24 @@ extends CrudController
             ->createQueryBuilder();
 
         $qb->select([
-                'E.id AS id',
-                'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-                'COUNT(DISTINCT P.id) AS numPersonSort',
-            ])
+            'E.id AS id',
+            'COUNT(DISTINCT IE.id) AS numCatEntrySort',
+            'COUNT(DISTINCT P.id) AS numPersonSort',
+        ])
             ->from('AppBundle\Entity\Exhibition', 'E')
             ->leftJoin('E.location', 'L')
-            ->leftJoin('AppBundle\Entity\ItemExhibition', 'IE',
+            ->leftJoin(
+                'AppBundle\Entity\ItemExhibition',
+                'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
+                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)'
+            )
             ->leftJoin('IE.person', 'P')
             ->where('L.place = :place AND L.status <> -1')
             ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('place', $place)
             ->groupBy('E.id')
-            ;
+        ;
 
         $exhibitionStats = [];
         foreach ($qb->getQuery()->getResult() as $row) {
@@ -228,8 +239,11 @@ extends CrudController
 
             // meta
             'pageMeta' => [
-                'jsonLd' => $place->jsonLdSerialize($locale, false,
-                                                    $this->getDoctrine()->getManager()),
+                'jsonLd' => $place->jsonLdSerialize(
+                    $locale,
+                    false,
+                    $this->getDoctrine()->getManager()
+                ),
             ],
         ]);
     }
@@ -247,21 +261,24 @@ extends CrudController
             ->createQueryBuilder();
 
         $qb->select([
-                'L AS location',
-                'L.id AS id',
-                'L.name AS name',
-                'L.type AS type',
-            ])
+            'L AS location',
+            'L.id AS id',
+            'L.name AS name',
+            'L.type AS type',
+        ])
             ->from('AppBundle\Entity\Location', 'L')
-            ->innerJoin('AppBundle\Entity\Exhibition', 'E',
+            ->innerJoin(
+                'AppBundle\Entity\Exhibition',
+                'E',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
-                'E.location = L AND ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
+                'E.location = L AND ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E')
+            )
             ->where('L.place = :tgn')
             ->andWhere('L.status <> -1 AND 0 = BIT_AND(L.flags, 256)')
             ->setParameter('tgn', $tgn)
             ->groupBy('E.id')
             ->groupBy('L.id')
-            ;
+        ;
 
         $venues = [];
         foreach ($qb->getQuery()->getResult() as $venue) {
@@ -293,16 +310,19 @@ extends CrudController
             ->createQueryBuilder();
 
         $qb->select([
-                'COUNT(DISTINCT IE.id) as numItems',
-            ])
+            'COUNT(DISTINCT IE.id) as numItems',
+        ])
             ->from('AppBundle\Entity\Exhibition', 'E')
-            ->innerJoin('AppBundle\Entity\ItemExhibition', 'IE',
+            ->innerJoin(
+                'AppBundle\Entity\ItemExhibition',
+                'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
+                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)'
+            )
             ->where('E.location = :location')
             ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('location', $id)
-            ;
+        ;
 
         $result = $qb->getQuery()->getResult();
 
@@ -316,17 +336,20 @@ extends CrudController
             ->createQueryBuilder();
 
         $qb->select([
-                'COUNT(DISTINCT P.id) as numArtists',
-            ])
+            'COUNT(DISTINCT P.id) as numArtists',
+        ])
             ->from('AppBundle\Entity\Person', 'P')
-            ->innerJoin('AppBundle\Entity\ItemExhibition', 'IE',
+            ->innerJoin(
+                'AppBundle\Entity\ItemExhibition',
+                'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.person = P AND (IE.title IS NOT NULL OR IE.item IS NULL)')
+                'IE.person = P AND (IE.title IS NOT NULL OR IE.item IS NULL)'
+            )
             ->innerJoin('IE.exhibition', 'E')
             ->where('E.location = :location AND P.status <> -1')
             ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('location', $id)
-            ;
+        ;
 
         $result = $qb->getQuery()->getResult();
 
@@ -340,17 +363,20 @@ extends CrudController
             ->createQueryBuilder();
 
         $qb->select([
-                "COUNT (DISTINCT COALESCE(P.nationality, '_unknown')) AS total", // we want to count NULL as well
-            ])
+            "COUNT (DISTINCT COALESCE(P.nationality, '_unknown')) AS total", // we want to count NULL as well
+        ])
             ->from('AppBundle\Entity\Person', 'P')
-            ->innerJoin('AppBundle\Entity\ItemExhibition', 'IE',
+            ->innerJoin(
+                'AppBundle\Entity\ItemExhibition',
+                'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.person = P AND (IE.title IS NOT NULL OR IE.item IS NULL)')
+                'IE.person = P AND (IE.title IS NOT NULL OR IE.item IS NULL)'
+            )
             ->innerJoin('IE.exhibition', 'E')
             ->where('E.location = :location AND P.status <> -1')
             ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('location', $id)
-            ;
+        ;
 
         $result = $qb->getQuery()->getResult();
 
@@ -364,15 +390,15 @@ extends CrudController
             ->createQueryBuilder();
 
         $qb->select([
-                'E.type',
-                'COUNT(DISTINCT E.id) AS numExhibitions'
-            ])
+            'E.type',
+            'COUNT(DISTINCT E.id) AS numExhibitions',
+        ])
             ->from('AppBundle\Entity\Exhibition', 'E')
             ->where('E.location = :location')
             ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('location', $id)
             ->groupBy('E.type');
-            ;
+        ;
 
         $countExhibitionsByType = [];
 
@@ -391,13 +417,13 @@ extends CrudController
             ->createQueryBuilder();
 
         $qb->select([
-                'COUNT(E.id) AS numExhibitions'
-            ])
+            'COUNT(E.id) AS numExhibitions',
+        ])
             ->from('AppBundle\Entity\Exhibition', 'E')
             ->where('E.location = :location')
             ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('location', $id)
-            ;
+        ;
 
         $result = $qb->getQuery()->getResult();
 
@@ -414,29 +440,35 @@ extends CrudController
             ->createQueryBuilder();
 
         $qb->select([
-                'L AS location',
-                'L.id AS id',
-                'L.name AS name',
-                'L.type AS type',
-                'COUNT(DISTINCT E.id) as numExhibitions',
-                'COUNT(DISTINCT IE.id) as numItems',
-                'COUNT(DISTINCT P.id) as numArtists',
-            ])
+            'L AS location',
+            'L.id AS id',
+            'L.name AS name',
+            'L.type AS type',
+            'COUNT(DISTINCT E.id) as numExhibitions',
+            'COUNT(DISTINCT IE.id) as numItems',
+            'COUNT(DISTINCT P.id) as numArtists',
+        ])
             ->from('AppBundle\Entity\Location', 'L')
-            ->innerJoin('AppBundle\Entity\Exhibition', 'E',
+            ->innerJoin(
+                'AppBundle\Entity\Exhibition',
+                'E',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'L MEMBER OF E.organizers'
-                . ' AND ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
-            ->leftJoin('AppBundle\Entity\ItemExhibition', 'IE',
+                . ' AND ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E')
+            )
+            ->leftJoin(
+                'AppBundle\Entity\ItemExhibition',
+                'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
+                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)'
+            )
             ->leftJoin('IE.person', 'P')
             ->where('L.place = :tgn')
             ->andWhere('L.status <> -1')
             ->setParameter('tgn', $tgn)
             ->groupBy('E.id')
             ->groupBy('L.id')
-            ;
+        ;
 
         $organizers = [];
         foreach ($qb->getQuery()->getResult() as $organizer) {
@@ -453,20 +485,26 @@ extends CrudController
             ->createQueryBuilder();
 
         $qb->select([
-                "COUNT(DISTINCT COALESCE(P.nationality, '_unknown')) AS numNationalities", // we want to count NULL as well
-            ])
+            "COUNT(DISTINCT COALESCE(P.nationality, '_unknown')) AS numNationalities", // we want to count NULL as well
+        ])
             ->from('AppBundle\Entity\Person', 'P')
-            ->innerJoin('AppBundle\Entity\ItemExhibition', 'IE',
+            ->innerJoin(
+                'AppBundle\Entity\ItemExhibition',
+                'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.person = P AND (IE.title IS NOT NULL OR IE.item IS NULL)')
+                'IE.person = P AND (IE.title IS NOT NULL OR IE.item IS NULL)'
+            )
             ->innerJoin('IE.exhibition', 'E')
-            ->innerJoin('AppBundle\Entity\Location', 'L',
+            ->innerJoin(
+                'AppBundle\Entity\Location',
+                'L',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 'L MEMBER OF E.organizers'
-                . ' AND ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
+                . ' AND ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E')
+            )
             ->where('L = :location')
             ->setParameter('location', $organizer)
-            ;
+        ;
 
         $result = $qb->getQuery()->getResult();
 
@@ -480,25 +518,28 @@ extends CrudController
             ->createQueryBuilder();
 
         $qb->select([
-                'YEAR(E.startdate) AS start_year',
-                'COUNT(DISTINCT E.id) AS how_many'
-            ])
+            'YEAR(E.startdate) AS start_year',
+            'COUNT(DISTINCT E.id) AS how_many',
+        ])
             ->from('AppBundle\Entity\Exhibition', 'E')
             ->leftJoin('E.location', 'L')
-            ->leftJoin('AppBundle\Entity\ItemExhibition', 'IE',
+            ->leftJoin(
+                'AppBundle\Entity\ItemExhibition',
+                'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
+                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)'
+            )
             ->leftJoin('IE.person', 'P')
             ->where('L.place = :tgn')
             ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('tgn', $tgn)
             ->groupBy('E.id')
             ->groupBy('start_year');
-            ;
+        ;
 
         $exhibitionByYear = [];
-        foreach ($qb->getQuery()->getResult() as $row){
-            $exhibitionByYear[$row['start_year']] = (int)$row['how_many'];
+        foreach ($qb->getQuery()->getResult() as $row) {
+            $exhibitionByYear[$row['start_year']] = (int) $row['how_many'];
         }
 
         return $exhibitionByYear;
@@ -511,19 +552,22 @@ extends CrudController
             ->createQueryBuilder();
 
         $qb->select([
-                'E'
-            ])
+            'E',
+        ])
             ->from('AppBundle\Entity\Exhibition', 'E')
             ->leftJoin('E.location', 'L')
-            ->leftJoin('AppBundle\Entity\ItemExhibition', 'IE',
+            ->leftJoin(
+                'AppBundle\Entity\ItemExhibition',
+                'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
+                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)'
+            )
             ->leftJoin('IE.person', 'P')
             ->where('L.place = :tgn')
             ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('tgn', $tgn)
             ->groupBy('E.id');
-            ;
+        ;
 
         $exhibitions = $qb->getQuery()->getResult();
 
@@ -537,23 +581,29 @@ extends CrudController
             ->createQueryBuilder();
 
         $qb->select([
-                'P',
-                'P.id AS id',
-                "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort",
-                "0 AS exhibited"
-            ])
+            'P',
+            'P.id AS id',
+            "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort",
+            "0 AS exhibited",
+        ])
             ->from('AppBundle\Entity\Exhibition', 'E')
             ->leftJoin('E.location', 'L')
-            ->leftJoin('AppBundle\Entity\ItemExhibition', 'IE',
+            ->leftJoin(
+                'AppBundle\Entity\ItemExhibition',
+                'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
-            ->innerJoin('AppBundle\Entity\Person', 'P',
+                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)'
+            )
+            ->innerJoin(
+                'AppBundle\Entity\Person',
+                'P',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
-                'P.id = IE.person AND P.status <> -1')
-            ->where('L.place = :tgn AND P.id IS NOT NULL' )
+                'P.id = IE.person AND P.status <> -1'
+            )
+            ->where('L.place = :tgn AND P.id IS NOT NULL')
             ->groupBy('P.id')
             ->setParameter('tgn', $tgn)
-            ;
+        ;
 
         $artists = $qb->getQuery()->getResult();
 
@@ -562,16 +612,16 @@ extends CrudController
             ->createQueryBuilder();
 
         $qb2->select([
-                'P',
-                'P.id AS id',
-                "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort",
-                "0 AS exhibited",
-            ])
+            'P',
+            'P.id AS id',
+            "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort",
+            "0 AS exhibited",
+        ])
             ->from('AppBundle\Entity\Person', 'P')
             ->where('P.status <> -1 AND (P.birthPlace = :tgn or P.deathPlace = :tgn OR JSON_CONTAINS(P.addresses, :placeTgn) = 1)')
             ->setParameter('tgn', $tgn)
             ->setParameter('placeTgn', sprintf('{"place_tgn": "%s"}', $tgn))
-            ;
+        ;
 
 
         $artistsLiving = $qb2->getQuery()->getResult();
@@ -614,7 +664,7 @@ extends CrudController
             ++$nationalityCounts[$key]['count'];
         }
 
-        uasort($nationalityCounts, function($a, $b) {
+        uasort($nationalityCounts, function ($a, $b) {
             return $b['count'] <=> $a['count'];
         });
 
@@ -655,19 +705,22 @@ extends CrudController
             ->createQueryBuilder();
 
         $qb->select([
-                'COUNT(DISTINCT P.id) AS total',
-            ])
+            'COUNT(DISTINCT P.id) AS total',
+        ])
             ->from('AppBundle\Entity\Exhibition', 'E')
             ->innerJoin('E.location', 'L')
-            ->innerJoin('AppBundle\Entity\ItemExhibition', 'IE',
+            ->innerJoin(
+                'AppBundle\Entity\ItemExhibition',
+                'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
+                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)'
+            )
             ->innerJoin('IE.person', 'P')
             ->where(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->andWhere('L.place = :tgn AND L.status <> -1')
             ->andWhere('P.status <> -1')
             ->setParameter('tgn', $tgn)
-            ;
+        ;
 
         $result = $qb->getQuery()->getResult();
 
@@ -684,7 +737,7 @@ extends CrudController
             ->from('AppBundle\Entity\Person', 'P')
             ->where('P.birthPlace = :tgn AND P.status <> -1')
             ->setParameter('tgn', $tgn)
-            ;
+        ;
 
         $result = $qb->getQuery()->getResult();
 
@@ -698,12 +751,12 @@ extends CrudController
             ->createQueryBuilder();
 
         $qb->select([
-                'COUNT(DISTINCT P.id) AS total',
-            ])
+            'COUNT(DISTINCT P.id) AS total',
+        ])
             ->from('AppBundle\Entity\Person', 'P')
             ->where('P.deathPlace = :tgn AND P.status <> -1')
             ->setParameter('tgn', $tgn)
-            ;
+        ;
 
         $result = $qb->getQuery()->getResult();
 
@@ -717,12 +770,12 @@ extends CrudController
             ->createQueryBuilder();
 
         $qb->select([
-                'COUNT(DISTINCT P.id) AS total',
-            ])
+            'COUNT(DISTINCT P.id) AS total',
+        ])
             ->from('AppBundle\Entity\Person', 'P')
             ->where('P.status <> -1 AND JSON_CONTAINS(P.addresses, :placeTgn) = 1')
             ->setParameter('placeTgn', sprintf('{"place_tgn": "%s"}', $tgn))
-            ;
+        ;
 
         $result = $qb->getQuery()->getResult();
 
@@ -737,13 +790,16 @@ extends CrudController
             ->createQueryBuilder();
 
         $qb->select([
-                'COUNT(DISTINCT P.id) AS numArtists',
-            ])
+            'COUNT(DISTINCT P.id) AS numArtists',
+        ])
             ->from('AppBundle\Entity\Exhibition', 'E')
             ->innerJoin('E.location', 'L')
-            ->innerJoin('AppBundle\Entity\ItemExhibition', 'IE',
+            ->innerJoin(
+                'AppBundle\Entity\ItemExhibition',
+                'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
+                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)'
+            )
             ->innerJoin('IE.person', 'P')
             ->where('L.place = :tgn AND L.status <> -1')
             ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
@@ -764,14 +820,14 @@ extends CrudController
             ->createQueryBuilder();
 
         $qb->select([
-                'COUNT(DISTINCT E.id) AS numExhibitions',
-            ])
+            'COUNT(DISTINCT E.id) AS numExhibitions',
+        ])
             ->from('AppBundle\Entity\Exhibition', 'E')
             ->innerJoin('E.location', 'L')
             ->where('L.place = :tgn AND L.status <> -1')
             ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('tgn', $tgn)
-            ;
+        ;
 
 
         $exhibitions = $qb->getQuery()->getResult();
@@ -786,20 +842,23 @@ extends CrudController
             ->createQueryBuilder();
 
         $qb->select([
-                'COUNT(DISTINCT E.id) AS numExhibitions',
-                'E.type'
-            ])
+            'COUNT(DISTINCT E.id) AS numExhibitions',
+            'E.type',
+        ])
             ->from('AppBundle\Entity\Exhibition', 'E')
             ->leftJoin('E.location', 'L')
-            ->leftJoin('AppBundle\Entity\ItemExhibition', 'IE',
+            ->leftJoin(
+                'AppBundle\Entity\ItemExhibition',
+                'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
+                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)'
+            )
             ->leftJoin('IE.person', 'P')
             ->where('L.place = :tgn')
             ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('tgn', $tgn)
             ->groupBy('E.type')
-            ;
+        ;
 
         $exhibitions = $qb->getQuery()->getResult();
 

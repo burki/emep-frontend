@@ -13,8 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity
  * @ORM\Table(name="Person")
  */
-class Person
-implements \JsonSerializable, JsonLdSerializable, OgSerializable
+class Person implements \JsonSerializable, JsonLdSerializable, OgSerializable
 {
     use AddressesTrait;
 
@@ -737,8 +736,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
             $uri = $place['@id'];
             if (preg_match('/^'
                            . preg_quote('http://d-nb.info/gnd/', '/')
-                           . '(\d+\-?[\dxX]?)$/', $uri, $matches))
-            {
+                           . '(\d+\-?[\dxX]?)$/', $uri, $matches)) {
                 $placeInfo['gnd'] = $matches[1];
             }
         }
@@ -1137,7 +1135,7 @@ implements \JsonSerializable, JsonLdSerializable, OgSerializable
 
         return $this->items->filter(
             function ($entity) use ($minStatus) {
-               return $entity->getStatus() >= $minStatus;
+                return $entity->getStatus() >= $minStatus;
             }
         );
     }

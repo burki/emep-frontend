@@ -1,4 +1,5 @@
 <?php
+
 namespace AppBundle\Utils;
 
 abstract class DnbData

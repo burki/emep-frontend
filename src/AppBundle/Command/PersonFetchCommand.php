@@ -1,6 +1,7 @@
 <?php
 
 // src/AppBundle/Command/PersonCommand.php
+
 namespace AppBundle\Command;
 
 use Symfony\Component\Console\Command\Command;
@@ -10,11 +11,9 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
-
 use Doctrine\ORM\EntityManagerInterface;
 
-class PersonFetchCommand
-extends Command
+class PersonFetchCommand extends Command
 {
     protected $em;
 
@@ -36,12 +35,12 @@ extends Command
                 'what you want to fetch (wikilinks / wikistats)'
             )
             ->addOption(
-               'overwrite',
-               null,
-               InputOption::VALUE_NONE,
-               'If set, existing entities will be overwritten'
+                'overwrite',
+                null,
+                InputOption::VALUE_NONE,
+                'If set, existing entities will be overwritten'
             )
-            ;
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -56,8 +55,10 @@ extends Command
                 break;
 
             default:
-                $output->writeln(sprintf('<error>invalid action: %s</error>',
-                                         $input->getArgument('action')));
+                $output->writeln(sprintf(
+                    '<error>invalid action: %s</error>',
+                    $input->getArgument('action')
+                ));
                 return 1;
         }
     }
@@ -65,28 +66,28 @@ extends Command
     protected function findWikilinks($sparqlClient, $entityId)
     {
         $query = <<<EOT
-PREFIX wd: <http://www.wikidata.org/entity/>
-#
-SELECT DISTINCT ?wd (group_concat(DISTINCT ?sitelink;separator="|") as ?sitelinks)
-WHERE {
-    BIND(wd:{$entityId} AS ?wd)
+            PREFIX wd: <http://www.wikidata.org/entity/>
+            #
+            SELECT DISTINCT ?wd (group_concat(DISTINCT ?sitelink;separator="|") as ?sitelinks)
+            WHERE {
+                BIND(wd:{$entityId} AS ?wd)
 
-      VALUES ( ?language ) {
-        ( 'en' )
-        ( 'fr' )
-        ( 'de' )
-    }
+                  VALUES ( ?language ) {
+                    ( 'en' )
+                    ( 'fr' )
+                    ( 'de' )
+                }
 
-    # get site links (only from ?language wikipedia sites)
-    ?sitelink schema:about ?wd ;
-            schema:inLanguage ?language .
-    FILTER (contains(str(?sitelink), 'wikipedia'))
-} GROUP BY ?wd
-EOT;
+                # get site links (only from ?language wikipedia sites)
+                ?sitelink schema:about ?wd ;
+                        schema:inLanguage ?language .
+                FILTER (contains(str(?sitelink), 'wikipedia'))
+            } GROUP BY ?wd
+            EOT;
         $result = $sparqlClient->query($query);
 
         foreach ($result as $row) {
-            $sitelinks = (string)$row->sitelinks;
+            $sitelinks = (string) $row->sitelinks;
             if (empty($sitelinks)) {
                 continue;
             }
@@ -114,7 +115,8 @@ EOT;
 
         $criteria = new \Doctrine\Common\Collections\Criteria();
         $criteria->where($criteria->expr()->neq(
-            'wikidata', null
+            'wikidata',
+            null
         ))
         ->andWhere($criteria->expr()->neq('status', -1))
         // ->andWhere($criteria->expr()->eq('ulan', '500004793'))
@@ -156,11 +158,12 @@ EOT;
 
         $criteria = new \Doctrine\Common\Collections\Criteria();
         $criteria->where($criteria->expr()->neq(
-                'wikidata', null
-            ))
+            'wikidata',
+            null
+        ))
             ->andWhere($criteria->expr()->neq('status', -1))
             // ->andWhere($criteria->expr()->eq('ulan', '500004793'))
-            ;
+        ;
 
         // $criteria->setMaxResults(5); // testing
 
@@ -171,24 +174,27 @@ EOT;
             $additional = $person->getAdditional();
             if (is_null($additional)
                 || !array_key_exists('wikilinks', $additional)
-                || !is_array($additional['wikilinks']))
-            {
+                || !is_array($additional['wikilinks'])) {
                 continue;
             }
 
             foreach ($additional['wikilinks'] as $lang => $article) {
                 if (array_key_exists('wikistats', $additional)
                     && array_key_exists($lang, $additional['wikistats'])
-                    && !$update)
-                {
+                    && !$update) {
                     continue;
                 };
 
                 // monthly for the last year
                 // https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia.org/all-access/user/Bernard_Adeney/monthly/2016010100/2016123100
                 $year = date('Y') - 1;
-                $url = sprintf('https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/%s.wikipedia.org/all-access/user/%s/monthly/%d010100/%d123100',
-                               $lang, $article, $year, $year);
+                $url = sprintf(
+                    'https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/%s.wikipedia.org/all-access/user/%s/monthly/%d010100/%d123100',
+                    $lang,
+                    $article,
+                    $year,
+                    $year
+                );
                 try {
                     $stats = json_decode(file_get_contents($url), true);
                 }

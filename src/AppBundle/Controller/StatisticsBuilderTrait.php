@@ -103,8 +103,10 @@ trait StatisticsBuilderTrait
         $xCategories = array_keys($nationalities);
         if (count($xCategories) > $maxNationality) {
             // trim down and add 'other'
-            $xCategories = array_merge(array_slice($xCategories, 0, $maxNationality - 1),
-                                       [ 'unknown', 'other' ]);
+            $xCategories = array_merge(
+                array_slice($xCategories, 0, $maxNationality - 1),
+                [ 'unknown', 'other' ]
+            );
         }
 
         $valuesFinal = [];
@@ -168,7 +170,7 @@ trait StatisticsBuilderTrait
                 $gender = 'female';
             }
 
-            $how_many = (int)$row['how_many'];
+            $how_many = (int) $row['how_many'];
             $stats[$key] = [
                 'label' => $gender,
                 'count' => $how_many,
@@ -201,12 +203,12 @@ trait StatisticsBuilderTrait
         $min_year = -1;
         while ($row = $stmt->fetch()) {
             if ($min_year < 0) {
-                $min_year = (int)$row['start_year'];
+                $min_year = (int) $row['start_year'];
             }
 
             $key = $row['start_year'] . sprintf('%02d', $row['start_month']);
 
-            $how_many = (int)$row['how_many'];
+            $how_many = (int) $row['how_many'];
             $frequency_count[$key] = $how_many;
         }
         $max_year = $min_year;
@@ -224,8 +226,11 @@ trait StatisticsBuilderTrait
 
         while ($i <= $max) {
             $key = $i;
-            $categories[] = sprintf('%04d-%02d',
-                                    $year = intval($i / 100), $month = $i % 100);
+            $categories[] = sprintf(
+                '%04d-%02d',
+                $year = intval($i / 100),
+                $month = $i % 100
+            );
 
             if (!array_key_exists($year, $data_yearly)) {
                 $data_yearly[$year] = 0;
@@ -247,7 +252,7 @@ trait StatisticsBuilderTrait
                         'y' => $year - $min_year,
                         'x' => $month - 1,
                         'count' => $count, 'year' => $year,
-                        'marker' => [ 'radius' => intval(2 * sqrt($count) + 0.5) ]
+                        'marker' => [ 'radius' => intval(2 * sqrt($count) + 0.5) ],
                     ];
                 }
             }
@@ -284,10 +289,10 @@ trait StatisticsBuilderTrait
         $ageCount = [];
         while ($row = $stmt->fetch()) {
             if (0 == $min_age) {
-                $min_age = (int)$row['age'];
+                $min_age = (int) $row['age'];
             }
 
-            $max_age = $age = (int)$row['age'];
+            $max_age = $age = (int) $row['age'];
             if (!array_key_exists($age, $ageCount)) {
                 $ageCount[$age] = [];
             }
@@ -346,7 +351,7 @@ trait StatisticsBuilderTrait
             $percentage = 100.0 * $count / $total;
             $dataEntry = [
                 'name' => $place,
-                'y' => (int)$count,
+                'y' => (int) $count,
             ];
             if ($percentage < 5) {
                 $dataEntry['dataLabels'] = [ 'enabled' => false ];
@@ -380,7 +385,7 @@ trait StatisticsBuilderTrait
             $percentage = 100.0 * $count / $total;
             $dataEntry = [
                 'name' => $type,
-                'y' => (int)$count,
+                'y' => (int) $count,
             ];
 
             if ($percentage < 5) {
@@ -405,7 +410,7 @@ trait StatisticsBuilderTrait
                 'name' => empty($row['nationality'])
                     ? '[unknown]'
                     : $this->expandCountryCode($row['nationality']),
-                'y' => (int)$row['how_many'],
+                'y' => (int) $row['how_many'],
                 'id' => empty($row['nationality']) ? '' : $row['nationality'],
             ];
         }
@@ -489,7 +494,7 @@ trait StatisticsBuilderTrait
             $stmt = $query->execute();
             $frequency_count = [];
             while ($row = $stmt->fetch()) {
-                $how_many = (int)$row['how_many'];
+                $how_many = (int) $row['how_many'];
                 if (!array_key_exists($how_many, $frequency_count)) {
                     $frequency_count[$how_many] = 0;
                 }
@@ -499,7 +504,8 @@ trait StatisticsBuilderTrait
             if (!empty($frequency_count)) {
                 ksort($frequency_count);
                 $keys = array_keys($frequency_count);
-                $min = $keys[0]; $max = $keys[count($keys) - 1];
+                $min = $keys[0];
+                $max = $keys[count($keys) - 1];
             }
             else {
                 $min = $max = 1; // 1 and not 0 because of log
@@ -548,14 +554,13 @@ trait StatisticsBuilderTrait
             $how_many = $row['count_exhibition'];
             $additional = json_decode($row['additional'], true);
             if (array_key_exists('wikistats', $additional)
-                && array_key_exists($lang, $additional['wikistats']))
-            {
+                && array_key_exists($lang, $additional['wikistats'])) {
                 $single_data = [
                     'name' => $row['person'], // person
-                    'num' => (int)$how_many,
+                    'num' => (int) $how_many,
                     'id' => $row['person_id'],
-                    'x' => (int)$how_many + 0.3 * rand(-1, 1), //
-                    'y' => (int)$additional['wikistats'][$lang], // num hits
+                    'x' => (int) $how_many + 0.3 * rand(-1, 1), //
+                    'y' => (int) $additional['wikistats'][$lang], // num hits
                 ];
                 $data[] = $single_data;
             }
@@ -591,7 +596,7 @@ trait StatisticsBuilderTrait
 
             $data[] = [
                 'name' => $name,
-                'y' => (int)$row['how_many'],
+                'y' => (int) $row['how_many'],
             ];
         }
 
@@ -607,7 +612,7 @@ trait StatisticsBuilderTrait
         while ($row = $stmt->fetch()) {
             $data[] = [
                 'name' => empty($row['type']) ? '[not set]' : $row['type'],
-                'y' => (int)$row['how_many'],
+                'y' => (int) $row['how_many'],
                 'id' => empty($row['type']) ? '' : $row['type'],
             ];
         }
@@ -623,7 +628,7 @@ trait StatisticsBuilderTrait
         while ($row = $stmt->fetch()) {
             $data[] = [
                 'name' => $this->expandCountryCode($row['country_code']),
-                'y' => (int)$row['how_many'],
+                'y' => (int) $row['how_many'],
                 'id' => !empty($row['country_code'])
                     ? 'cc:' . $row['country_code']
                     : '',
@@ -648,8 +653,10 @@ trait StatisticsBuilderTrait
         $renderParams = $this->processExhibitionGender($stmt);
         if (!empty($renderParams)) {
             $renderParams['filter'] = $listBuilder->getQueryFilters();
-            $charts[] = $this->renderView('Statistics/exhibition-gender-index.html.twig',
-                                          $renderParams);
+            $charts[] = $this->renderView(
+                'Statistics/exhibition-gender-index.html.twig',
+                $renderParams
+            );
         }
 
         // exhibition country-nationality matrix
@@ -660,8 +667,10 @@ trait StatisticsBuilderTrait
         $stmt = $query->execute();
         $renderParams = $this->processExhibitionNationality($stmt);
         if (!empty($renderParams)) {
-            $charts[] = $this->renderView('Statistics/exhibition-nationality-index.html.twig',
-                                          $renderParams);
+            $charts[] = $this->renderView(
+                'Statistics/exhibition-nationality-index.html.twig',
+                $renderParams
+            );
         }
 
         // by month
@@ -673,8 +682,10 @@ trait StatisticsBuilderTrait
         $stmt = $query->execute();
         $renderParams = $this->processExhibitionByMonth($stmt);
         if (!empty($renderParams)) {
-            $charts[] = $this->renderView('Statistics/exhibition-by-month-index.html.twig',
-                                          $renderParams);
+            $charts[] = $this->renderView(
+                'Statistics/exhibition-by-month-index.html.twig',
+                $renderParams
+            );
         }
 
         // exhibition age
@@ -684,30 +695,34 @@ trait StatisticsBuilderTrait
         $innerSql = $query->getSQL();
 
         $sql = <<<EOT
-SELECT COUNT(*) AS how_many,
-YEAR(EB.startdate) - YEAR(EB.birthdate) AS age,
-IF (EB.deathdate IS NOT NULL AND YEAR(EB.deathdate) < YEAR(EB.startdate), 'deceased', 'living') AS state
-FROM
-({$innerSql}) AS EB
-GROUP BY age, state
-ORDER BY age, state, how_many
-EOT;
+            SELECT COUNT(*) AS how_many,
+            YEAR(EB.startdate) - YEAR(EB.birthdate) AS age,
+            IF (EB.deathdate IS NOT NULL AND YEAR(EB.deathdate) < YEAR(EB.startdate), 'deceased', 'living') AS state
+            FROM
+            ({$innerSql}) AS EB
+            GROUP BY age, state
+            ORDER BY age, state, how_many
+            EOT;
 
         $params = $query->getParameters();
         $connection = $query->getConnection();
         foreach ($params as $key => $values) {
             if (is_array($values)) {
-                $sql = str_replace(':' . $key,
-                                   join(', ', array_map(function ($val) use ($connection)  { return is_int($val) ? $val : $connection->quote($val); }, $values)),
-                                   $sql);
+                $sql = str_replace(
+                    ':' . $key,
+                    join(', ', array_map(function ($val) use ($connection) { return is_int($val) ? $val : $connection->quote($val); }, $values)),
+                    $sql
+                );
             }
         }
 
         $stmt = $connection->executeQuery($sql, $params);
         $renderParams = $this->processExhibitionAge($stmt);
         if (!empty($renderParams)) {
-            $charts[] = $this->renderView('Statistics/person-exhibition-age-index.html.twig',
-                                          $renderParams);
+            $charts[] = $this->renderView(
+                'Statistics/person-exhibition-age-index.html.twig',
+                $renderParams
+            );
         }
 
         // place
@@ -718,8 +733,10 @@ EOT;
         $stmt = $query->execute();
         $renderParams = $this->processExhibitionPlace($stmt);
         if (!empty($renderParams)) {
-            $charts[] = $this->renderView('Statistics/exhibition-city-index.html.twig',
-                                          $renderParams);
+            $charts[] = $this->renderView(
+                'Statistics/exhibition-city-index.html.twig',
+                $renderParams
+            );
         }
 
         // type of organizer
@@ -730,8 +747,10 @@ EOT;
         $stmt = $query->execute();
         $renderParams = $this->processExhibitionOrganizerType($stmt);
         if (!empty($renderParams)) {
-            $charts[] = $this->renderView('Statistics/exhibition-organizer-index.html.twig',
-                                          $renderParams);
+            $charts[] = $this->renderView(
+                'Statistics/exhibition-organizer-index.html.twig',
+                $renderParams
+            );
         }
 
         return $charts;
@@ -768,8 +787,10 @@ EOT;
         ]);
 
         if (!empty($renderParams)) {
-            $charts[] = $this->renderView('Statistics/person-by-year-index.html.twig',
-                                          $renderParams);
+            $charts[] = $this->renderView(
+                'Statistics/person-by-year-index.html.twig',
+                $renderParams
+            );
         }
 
         // exhibition-distribution
@@ -780,8 +801,10 @@ EOT;
         $stmt = $query->execute();
         $renderParams = $this->processDistribution([ 'exhibition' => $query ]);
         if (!empty($renderParams)) {
-            $charts[] = $this->renderView('Statistics/person-distribution-index.html.twig',
-                                          $renderParams);
+            $charts[] = $this->renderView(
+                'Statistics/person-distribution-index.html.twig',
+                $renderParams
+            );
         }
 
         // wikipedia
@@ -795,8 +818,10 @@ EOT;
         $stmt = $query->execute();
         $renderParams = $this->processPersonPopularity($stmt, $lang);
         if (!empty($renderParams)) {
-            $charts[] = $this->renderView('Statistics/person-wikipedia-index.html.twig',
-                                          $renderParams);
+            $charts[] = $this->renderView(
+                'Statistics/person-wikipedia-index.html.twig',
+                $renderParams
+            );
         }
 
         return $charts;
@@ -820,8 +845,10 @@ EOT;
         $renderParams = $this->processLocationType($stmt);
         if (!empty($renderParams)) {
             $renderParams['filter'] = $listBuilder->getQueryFilters();
-            $charts[] = $this->renderView('Statistics/' . $prefix . '-type-index.html.twig',
-                                          $renderParams);
+            $charts[] = $this->renderView(
+                'Statistics/' . $prefix . '-type-index.html.twig',
+                $renderParams
+            );
         }
 
         // country
@@ -833,8 +860,10 @@ EOT;
         $renderParams = $this->processLocationCountry($stmt);
         if (!empty($renderParams)) {
             $renderParams['filter'] = $listBuilder->getQueryFilters();
-            $charts[] = $this->renderView('Statistics/' . $prefix . '-country-index.html.twig',
-                                          $renderParams);
+            $charts[] = $this->renderView(
+                'Statistics/' . $prefix . '-country-index.html.twig',
+                $renderParams
+            );
         }
 
         return $charts;
@@ -856,8 +885,10 @@ EOT;
         $renderParams = $this->processLocationCountry($stmt);
         if (!empty($renderParams)) {
             $renderParams['filter'] = $listBuilder->getQueryFilters();
-            $charts[] = $this->renderView('Statistics/place-country-index.html.twig',
-                                          $renderParams);
+            $charts[] = $this->renderView(
+                'Statistics/place-country-index.html.twig',
+                $renderParams
+            );
         }
 
         $listBuilder = $this->instantiateListBuilder($request, $urlGenerator, 'stats-exhibition-distribution', $listBuilder->getEntity());
@@ -867,8 +898,10 @@ EOT;
         $stmt = $query->execute();
         $renderParams = $this->processDistribution([ 'exhibition' => $query ]);
         if (!empty($renderParams)) {
-            $charts[] = $this->renderView('Statistics/place-distribution-index.html.twig',
-                                          $renderParams);
+            $charts[] = $this->renderView(
+                'Statistics/place-distribution-index.html.twig',
+                $renderParams
+            );
         }
 
         return $charts;

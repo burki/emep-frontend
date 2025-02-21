@@ -5,8 +5,7 @@ namespace AppBundle\Utils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class PlaceListBuilder
-extends SearchListBuilder
+class PlaceListBuilder extends SearchListBuilder
 {
     protected $entity = 'Place';
     protected $alias = 'PL';
@@ -112,12 +111,13 @@ extends SearchListBuilder
         ],
     ];
 
-    public function __construct(\Doctrine\DBAL\Connection $connection,
-                                ?Request $request = null,
-                                ?UrlGeneratorInterface $urlGenerator = null,
-                                $queryFilters = null,
-                                $mode = '')
-    {
+    public function __construct(
+        \Doctrine\DBAL\Connection $connection,
+        ?Request $request = null,
+        ?UrlGeneratorInterface $urlGenerator = null,
+        $queryFilters = null,
+        $mode = ''
+    ) {
         $this->mode = $mode;
 
         parent::__construct($connection, $request, $urlGenerator, $queryFilters);
@@ -189,9 +189,11 @@ extends SearchListBuilder
 
                         $routeParams['filter']['location']['geoname'] = [ 'tgn:' . $row['place_tgn'] ];
 
-                        return sprintf('<a href="%s">%s</a>',
-                                       $this->urlGenerator->generate('search-index', $routeParams),
-                                       $this->formatRowValue($val, [], $format));
+                        return sprintf(
+                            '<a href="%s">%s</a>',
+                            $this->urlGenerator->generate('search-index', $routeParams),
+                            $this->formatRowValue($val, [], $format)
+                        );
                     };
 
 
@@ -204,9 +206,11 @@ extends SearchListBuilder
 
                         $routeParams['filter']['location']['geoname'] = [ 'tgn:' . $row['place_tgn'] ];
 
-                        return sprintf('<a href="%s">%s</a>',
-                                       $this->urlGenerator->generate('search-index', $routeParams),
-                                       $this->formatRowValue($val, [], $format));
+                        return sprintf(
+                            '<a href="%s">%s</a>',
+                            $this->urlGenerator->generate('search-index', $routeParams),
+                            $this->formatRowValue($val, [], $format)
+                        );
                     };
 
                 $routeParams['entity'] = 'ItemExhibition';
@@ -218,9 +222,11 @@ extends SearchListBuilder
 
                         $routeParams['filter']['location']['geoname'] = [ 'tgn:' . $row['place_tgn'] ];
 
-                        return sprintf('<a href="%s">%s</a>',
-                                       $this->urlGenerator->generate('search-index', $routeParams),
-                                       $this->formatRowValue($val, [], $format));
+                        return sprintf(
+                            '<a href="%s">%s</a>',
+                            $this->urlGenerator->generate('search-index', $routeParams),
+                            $this->formatRowValue($val, [], $format)
+                        );
                     };
             }
         }
@@ -280,9 +286,7 @@ extends SearchListBuilder
         return $this;
     }
 
-    protected function setExhibitionJoin($queryBuilder)
-    {
-    }
+    protected function setExhibitionJoin($queryBuilder) {}
 
     protected function setJoin($queryBuilder)
     {
@@ -296,42 +300,66 @@ extends SearchListBuilder
             $queryBuilder->groupBy($this->alias . '.id');
         }
 
-        $queryBuilder->leftJoin($this->alias,
-                                'Country', 'C',
-                                $this->alias . '.country_code=C.cc');
+        $queryBuilder->leftJoin(
+            $this->alias,
+            'Country',
+            'C',
+            $this->alias . '.country_code=C.cc'
+        );
 
-        $queryBuilder->innerJoin($this->alias,
-                                'Location', 'L',
-                                $this->alias . '.tgn=' . 'L.place_tgn');
+        $queryBuilder->innerJoin(
+            $this->alias,
+            'Location',
+            'L',
+            $this->alias . '.tgn=' . 'L.place_tgn'
+        );
 
-        $queryBuilder->innerJoin('L',
-                                'Exhibition', 'E',
-                                'E.id_location=L.id AND ' . $this->buildExhibitionVisibleCondition('E'));
+        $queryBuilder->innerJoin(
+            'L',
+            'Exhibition',
+            'E',
+            'E.id_location=L.id AND ' . $this->buildExhibitionVisibleCondition('E')
+        );
 
-        $queryBuilder->leftJoin('E',
-                                'ItemExhibition', 'IE',
-                                'E.id=IE.id_exhibition AND (IE.title IS NOT NULL OR IE.id_item IS NULL)');
+        $queryBuilder->leftJoin(
+            'E',
+            'ItemExhibition',
+            'IE',
+            'E.id=IE.id_exhibition AND (IE.title IS NOT NULL OR IE.id_item IS NULL)'
+        );
 
         if (array_key_exists('person', $this->queryFilters)) {
             // so we can filter on P.*
-            $queryBuilder->join('IE',
-                                'Person', 'P',
-                                'P.id=IE.id_person AND P.status <> -1');
+            $queryBuilder->join(
+                'IE',
+                'Person',
+                'P',
+                'P.id=IE.id_person AND P.status <> -1'
+            );
         }
 
         if (array_key_exists('organizer', $this->queryFilters)) {
             // so we can filter on O.*
-            $queryBuilder->innerJoin('E',
-                                    'ExhibitionLocation', 'EL',
-                                    'EL.id_exhibition=E.id AND ' . $this->buildExhibitionVisibleCondition('E'));
-            $queryBuilder->innerJoin('EL',
-                                    'Location', 'O',
-                                    'EL.id_location=O.id AND EL.role = 0');
+            $queryBuilder->innerJoin(
+                'E',
+                'ExhibitionLocation',
+                'EL',
+                'EL.id_exhibition=E.id AND ' . $this->buildExhibitionVisibleCondition('E')
+            );
+            $queryBuilder->innerJoin(
+                'EL',
+                'Location',
+                'O',
+                'EL.id_location=O.id AND EL.role = 0'
+            );
 
             // so we can filter on PO.*
-            $queryBuilder->leftJoin('O',
-                                    'Geoname', 'PO',
-                                    'O.place_tgn=PO.tgn');
+            $queryBuilder->leftJoin(
+                'O',
+                'Geoname',
+                'PO',
+                'O.place_tgn=PO.tgn'
+            );
         }
 
         return $this;
@@ -357,8 +385,8 @@ extends SearchListBuilder
         return $this;
     }
 
-	public function getAlias()
-	{
-		return $this->alias;
-	}
+    public function getAlias()
+    {
+        return $this->alias;
+    }
 }

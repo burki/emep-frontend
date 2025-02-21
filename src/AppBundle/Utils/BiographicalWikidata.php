@@ -24,7 +24,7 @@ class BiographicalWikidata
 
     static $nationalityToIso = null;
 
-    static function mapNationality ($nationality)
+    static function mapNationality($nationality)
     {
         if (is_null(self::$nationalityToIso)) {
             // TODO: build
@@ -59,51 +59,51 @@ class BiographicalWikidata
         $sparql = new \EasyRdf\Sparql\Client(self::SPARQL_URL);
 
         $query = <<<EOT
-SELECT ?item ?itemLabel
-    ?viaf ?gnd ?ulan
-    ?sexLabel
-    ?birthDate ?birthPlaceLabel
-    ?deathDate ?deathPlaceLabel
-    (group_concat(?citizenship;separator="|") as ?citizenships)
-WHERE
-{
-    BIND("{$value}" as ?queryby)
+            SELECT ?item ?itemLabel
+                ?viaf ?gnd ?ulan
+                ?sexLabel
+                ?birthDate ?birthPlaceLabel
+                ?deathDate ?deathPlaceLabel
+                (group_concat(?citizenship;separator="|") as ?citizenships)
+            WHERE
+            {
+                BIND("{$value}" as ?queryby)
 
-    ?item wdt:P31 wd:Q5;
-    wdt:P{$property} ?queryby;
-        wdt:P27/wdt:P297 ?citizenship.
+                ?item wdt:P31 wd:Q5;
+                wdt:P{$property} ?queryby;
+                    wdt:P27/wdt:P297 ?citizenship.
 
-    OPTIONAL {
-      ?item wdt:P214 ?viaf.
-    }
-    OPTIONAL {
-      ?item wdt:P227 ?gnd.
-    }
-    OPTIONAL {
-      ?item wdt:P245 ?ulan.
-    }
-    OPTIONAL {
-      ?item wdt:P21 ?sex
-    }
-    OPTIONAL {
-      ?item wdt:P569 ?birthDate.
-    }
-    OPTIONAL {
-      ?item wdt:P19 ?birthPlace.
-    }
-    OPTIONAL {
-      ?item wdt:P570 ?deathDate.
-    }
-    OPTIONAL {
-      ?item wdt:P20 ?deathPlace.
-    }
+                OPTIONAL {
+                  ?item wdt:P214 ?viaf.
+                }
+                OPTIONAL {
+                  ?item wdt:P227 ?gnd.
+                }
+                OPTIONAL {
+                  ?item wdt:P245 ?ulan.
+                }
+                OPTIONAL {
+                  ?item wdt:P21 ?sex
+                }
+                OPTIONAL {
+                  ?item wdt:P569 ?birthDate.
+                }
+                OPTIONAL {
+                  ?item wdt:P19 ?birthPlace.
+                }
+                OPTIONAL {
+                  ?item wdt:P570 ?deathDate.
+                }
+                OPTIONAL {
+                  ?item wdt:P20 ?deathPlace.
+                }
 
-    SERVICE wikibase:label { bd:serviceParam wikibase:language "{$locale}" }
-} GROUP BY ?item ?itemLabel ?viaf ?gnd ?ulan
-?sex ?sexLabel
-?birthDate ?birthPlace ?birthPlaceLabel
-?deathDate ?deathPlace ?deathPlaceLabel
-EOT;
+                SERVICE wikibase:label { bd:serviceParam wikibase:language "{$locale}" }
+            } GROUP BY ?item ?itemLabel ?viaf ?gnd ?ulan
+            ?sex ?sexLabel
+            ?birthDate ?birthPlace ?birthPlaceLabel
+            ?deathDate ?deathPlace ?deathPlaceLabel
+            EOT;
 
         $result = $sparql->query($query);
         if (count($result) > 0) {
@@ -126,11 +126,10 @@ EOT;
                     'birthPlaceLabel' => 'placeOfBirth',
                     'deathDate' => 'dateOfDeath',
                     'deathPlaceLabel' => 'placeOfDeath',
-                ] as $src => $target)
-                {
+                ] as $src => $target) {
                     if (property_exists($row, $src)) {
                         $property = $row->$src;
-                        $value = (string)$property;
+                        $value = (string) $property;
                         if (in_array($target, [ 'nationality' ])) {
                             $value = self::mapNationality($value);
                         }

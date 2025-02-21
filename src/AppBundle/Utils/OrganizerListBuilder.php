@@ -5,8 +5,7 @@ namespace AppBundle\Utils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class OrganizerListBuilder
-extends LocationListBuilder
+class OrganizerListBuilder extends LocationListBuilder
 {
     protected $alias = 'O'; // change from L so we can both join Venue and Organizer
 
@@ -106,12 +105,18 @@ extends LocationListBuilder
     public function setExhibitionJoin($queryBuilder)
     {
         // Organizer joins to Exhibition through ExhibitionLocation
-        $queryBuilder->innerJoin($this->alias,
-                                'ExhibitionLocation', 'EL',
-                                'EL.id_location=' . $this->alias . '.id AND EL.role = 0');
-        $queryBuilder->innerJoin('EL',
-                                'Exhibition', 'E',
-                                'EL.id_exhibition=E.id AND ' . $this->buildExhibitionVisibleCondition('E'));
+        $queryBuilder->innerJoin(
+            $this->alias,
+            'ExhibitionLocation',
+            'EL',
+            'EL.id_location=' . $this->alias . '.id AND EL.role = 0'
+        );
+        $queryBuilder->innerJoin(
+            'EL',
+            'Exhibition',
+            'E',
+            'EL.id_exhibition=E.id AND ' . $this->buildExhibitionVisibleCondition('E')
+        );
     }
 
     protected function setFilter($queryBuilder)
@@ -120,12 +125,18 @@ extends LocationListBuilder
 
         if (array_key_exists('location', $this->queryFilters)) {
             // so we can filter on L.*
-            $queryBuilder->leftJoin('E',
-                                    'Location', 'L',
-                                    'E.id_location=L.id AND L.status <> -1');
-            $queryBuilder->leftJoin('L',
-                                    'Geoname', 'PL',
-                                    'L.place_tgn=PL.tgn');
+            $queryBuilder->leftJoin(
+                'E',
+                'Location',
+                'L',
+                'E.id_location=L.id AND L.status <> -1'
+            );
+            $queryBuilder->leftJoin(
+                'L',
+                'Geoname',
+                'PL',
+                'L.place_tgn=PL.tgn'
+            );
         }
 
         return $this;

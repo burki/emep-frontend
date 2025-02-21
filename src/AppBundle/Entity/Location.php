@@ -4,7 +4,6 @@ namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo; // alias for Gedmo extensions annotations
-
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -15,8 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity
  * @ORM\Table(name="Location")
  */
-class Location
-implements \JsonSerializable, JsonLdSerializable
+class Location implements \JsonSerializable, JsonLdSerializable
 {
     use AddressesTrait;
 
@@ -591,7 +589,7 @@ implements \JsonSerializable, JsonLdSerializable
 
         return $this->exhibitions->filter(
             function ($entity) {
-               return $entity->checkStatus(-1);
+                return $entity->checkStatus(-1);
             }
         );
     }

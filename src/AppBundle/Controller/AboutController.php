@@ -11,8 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  *
  */
-class AboutController
-extends DefaultController
+class AboutController extends DefaultController
 {
     protected function sendMessage(MailerInterface $mailer, $data)
     {
@@ -26,7 +25,7 @@ extends DefaultController
             ->from('burckhardtd@geschichte.hu-berlin.de')
             ->to('burckhardtd@geschichte.hu-berlin.de')
             ->replyTo($data['email']);
-            ;
+        ;
 
         if (!empty($htmlBody)) {
             $message->html($htmlBody)
@@ -140,10 +139,11 @@ extends DefaultController
     /**
      * @Route("/contact", name="contact", options={"sitemap" = true})
      */
-    public function contactAction(Request $request,
-                                  TranslatorInterface $translator,
-                                  MailerInterface $mailer)
-    {
+    public function contactAction(
+        Request $request,
+        TranslatorInterface $translator,
+        MailerInterface $mailer
+    ) {
         $form = $this->createForm(\AppBundle\Form\Type\ContactType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {

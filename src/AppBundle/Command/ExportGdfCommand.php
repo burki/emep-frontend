@@ -1,6 +1,7 @@
 <?php
 
 // src/AppBundle/Command/ExportGdfCommand.php
+
 namespace AppBundle\Command;
 
 use Symfony\Component\Console\Command\Command;
@@ -12,20 +13,19 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
-
 use Doctrine\ORM\EntityManagerInterface;
 
-class ExportGdfCommand
-extends Command
+class ExportGdfCommand extends Command
 {
     protected $em;
     protected $kernel;
     protected $params;
 
-    public function __construct(EntityManagerInterface $em,
-                                KernelInterface $kernel,
-                                ParameterBagInterface $params)
-    {
+    public function __construct(
+        EntityManagerInterface $em,
+        KernelInterface $kernel,
+        ParameterBagInterface $params
+    ) {
         parent::__construct();
 
         $this->em = $em;
@@ -60,22 +60,28 @@ extends Command
                 : $this->kernel->getProjectDir() . '/../site/htdocs/uploads/export';
 
             if (!file_exists($exportPath)) {
-                $output->writeln(sprintf('<error>app.export.path: %s does not exist</error>',
-                                         $exportPath));
+                $output->writeln(sprintf(
+                    '<error>app.export.path: %s does not exist</error>',
+                    $exportPath
+                ));
                 return 1;
             }
 
             $type = $input->getArgument('type');
             if (!in_array($type, [ 'person', 'location' ])) {
-                $output->writeln(sprintf('<error>invalid type: %s</error>',
-                                         $input->getArgument('type')));
+                $output->writeln(sprintf(
+                    '<error>invalid type: %s</error>',
+                    $input->getArgument('type')
+                ));
                 return 1;
             }
 
             $fnameLock = realpath($exportPath) . DIRECTORY_SEPARATOR . $type . '.lock';
             if (file_exists($fnameLock)) {
-                $output->writeln(sprintf('<error>Execution is alread in progress (%s)</error>',
-                                         $fnameLock));
+                $output->writeln(sprintf(
+                    '<error>Execution is alread in progress (%s)</error>',
+                    $fnameLock
+                ));
                 return 2;
             }
 
@@ -96,8 +102,10 @@ extends Command
                 break;
 
             default:
-                $output->writeln(sprintf('<error>invalid type: %s</error>',
-                                         $input->getArgument('type')));
+                $output->writeln(sprintf(
+                    '<error>invalid type: %s</error>',
+                    $input->getArgument('type')
+                ));
                 return 1;
         }
 
@@ -138,9 +146,9 @@ extends Command
         $qb = $this->em->createQueryBuilder();
 
         $qb->select([
-                'P',
-                'COUNT(DISTINCT E.id) AS numExhibitionSort',
-            ])
+            'P',
+            'COUNT(DISTINCT E.id) AS numExhibitionSort',
+        ])
             ->from('AppBundle\Entity\Person', 'P')
             ->leftJoin('P.exhibitions', 'E')
             ->where('P.status <> -1')
@@ -149,7 +157,7 @@ extends Command
             ->having('numExhibitionSort >= 2')
             ->orderBy('numExhibitionSort', 'DESC')
             // ->setMaxResults(5)
-            ;
+        ;
 
         $query = $qb->getQuery();
         $results = $query->getResult();
@@ -179,12 +187,18 @@ extends Command
         $qb->select('E.id as exhibitionId', 'P.id as personId')
             ->distinct()
             ->from('AppBundle\Entity\ItemExhibition', 'IE')
-            ->join('AppBundle\Entity\Exhibition', 'E',
-                   \Doctrine\ORM\Query\Expr\Join::WITH,
-                   'E = IE.exhibition')
-            ->join('AppBundle\Entity\Person', 'P',
-                   \Doctrine\ORM\Query\Expr\Join::WITH,
-                   'P = IE.person')
+            ->join(
+                'AppBundle\Entity\Exhibition',
+                'E',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'E = IE.exhibition'
+            )
+            ->join(
+                'AppBundle\Entity\Person',
+                'P',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'P = IE.person'
+            )
             ->orderBy('exhibitionId', 'ASC');
 
         $results = $qb->getQuery()->getResult();
@@ -222,25 +236,31 @@ extends Command
         $qb = $this->em->createQueryBuilder();
 
         $qb->select([
-                'L',
-                'COUNT(DISTINCT E.id) AS numExhibitionSort',
-                'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-            ])
+            'L',
+            'COUNT(DISTINCT E.id) AS numExhibitionSort',
+            'COUNT(DISTINCT IE.id) AS numCatEntrySort',
+        ])
             ->from('AppBundle\Entity\Location', 'L')
             ->leftJoin('L.place', 'P')
             ->leftJoin('P.country', 'C')
-            ->innerJoin('AppBundle\Entity\Exhibition', 'E',
-                       \Doctrine\ORM\Query\Expr\Join::WITH,
-                       'E.location = L AND ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
-            ->innerJoin('AppBundle\Entity\ItemExhibition', 'IE',
-                       \Doctrine\ORM\Query\Expr\Join::WITH,
-                       'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
+            ->innerJoin(
+                'AppBundle\Entity\Exhibition',
+                'E',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'E.location = L AND ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E')
+            )
+            ->innerJoin(
+                'AppBundle\Entity\ItemExhibition',
+                'IE',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)'
+            )
             ->where('L.status <> -1')
             ->groupBy('L.id')
             ->having('numExhibitionSort >= 1')
             ->orderBy('numExhibitionSort', 'DESC')
             // ->setMaxResults(30)
-            ;
+        ;
 
         $query = $qb->getQuery();
         $results = $query->getResult();
@@ -263,13 +283,19 @@ extends Command
         $qb->select('L.id as locationId', 'P.id as personId')
             ->distinct()
             ->from('AppBundle\Entity\ItemExhibition', 'IE')
-            ->join('AppBundle\Entity\Exhibition', 'E',
-                   \Doctrine\ORM\Query\Expr\Join::WITH,
-                   'E = IE.exhibition')
+            ->join(
+                'AppBundle\Entity\Exhibition',
+                'E',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'E = IE.exhibition'
+            )
             ->join('E.location', 'L')
-            ->join('AppBundle\Entity\Person', 'P',
-                   \Doctrine\ORM\Query\Expr\Join::WITH,
-                   'P = IE.person')
+            ->join(
+                'AppBundle\Entity\Person',
+                'P',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'P = IE.person'
+            )
             ->orderBy('personId', 'ASC');
 
         $results = $qb->getQuery()->getResult();

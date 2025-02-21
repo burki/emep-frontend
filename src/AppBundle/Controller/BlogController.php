@@ -8,8 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  *
  */
-class BlogController
-extends DefaultController
+class BlogController extends DefaultController
 {
     /**
      * @Route("/blog", name="blog-index", options={"sitemap" = { "section" = "default" }})
@@ -87,11 +86,16 @@ extends DefaultController
                 $post['media_url'] = $media['media_details']['sizes']['onepress-small'];
             }
 
-            $post['content']['rendered'] = preg_replace_callback("#(<span class='easy-footnote'><a href='(.*?)'\s*title='(.*?)'>)#",
-                                                                 function ($matches) {
-                                                                    return sprintf('<a data-toggle="tooltip" href="#" title="%s">',
-                                                                                  $matches[3]);
-                                                                 }, $post['content']['rendered']);
+            $post['content']['rendered'] = preg_replace_callback(
+                "#(<span class='easy-footnote'><a href='(.*?)'\s*title='(.*?)'>)#",
+                function ($matches) {
+                    return sprintf(
+                        '<a data-toggle="tooltip" href="#" title="%s">',
+                        $matches[3]
+                    );
+                },
+                $post['content']['rendered']
+            );
         }
 
         return $this->render('Blog/detail.html.twig', [

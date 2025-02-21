@@ -7,24 +7,23 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 use Symfony\Component\Routing\Annotation\Route;
-
 use Cocur\BackgroundProcess\BackgroundProcess;
 
 /**
  *
  */
-class GraphController
-extends BaseController
+class GraphController extends BaseController
 {
     static function getPhpBin()
     {
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
             // we don't seem to have a reliable way on windows, so assume it is in same dir as php.ini
-            return dirname(php_ini_loaded_file()) . DIRECTORY_SEPARATOR . 'php.exe';;
+            return dirname(php_ini_loaded_file()) . DIRECTORY_SEPARATOR . 'php.exe';
+            ;
         }
 
 
-        $phpFinder = new \Symfony\Component\Process\PhpExecutableFinder;
+        $phpFinder = new \Symfony\Component\Process\PhpExecutableFinder();
         if (!$phpPath = $phpFinder->find()) {
             throw new \Exception('The php executable could not be found, add it to your PATH environment variable and try again');
         }
@@ -67,10 +66,10 @@ extends BaseController
 
                 $processArguments = [
                     $phpBin = self::getPhpBin(),
-                    realpath(__DIR__ .'/../../../bin/console'),
+                    realpath(__DIR__ . '/../../../bin/console'),
                     'export:gdf',
                     'person',
-                    '--save-export-path'
+                    '--save-export-path',
                 ];
 
                 $command = (new Process($processArguments))
@@ -83,11 +82,15 @@ extends BaseController
             $response = new Response();
 
             $response->setStatusCode(200);
-            $url = $this->generateUrl($route, [],
-                                      \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
+            $url = $this->generateUrl(
+                $route,
+                [],
+                \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL
+            );
 
 
-            $response->setContent(sprintf('<!DOCTYPE html>
+            $response->setContent(sprintf(
+                '<!DOCTYPE html>
 <html>
     <head>
         <meta charset="UTF-8" />
@@ -98,7 +101,9 @@ extends BaseController
         Regeneration of %2$s is currently in progress. Please wait.
     </body>
 </html>',
-            htmlspecialchars($url, ENT_QUOTES, 'UTF-8'), $fname . '.gdf'));
+                htmlspecialchars($url, ENT_QUOTES, 'UTF-8'),
+                $fname . '.gdf'
+            ));
 
             // $response->headers->set('Refresh', '5; url=' . $url);
 
@@ -106,15 +111,17 @@ extends BaseController
         }
 
         if (!file_exists($fnameFull)) {
-           throw $this->createNotFoundException($fname . '.gdf' . ' does not exist');
+            throw $this->createNotFoundException($fname . '.gdf' . ' does not exist');
         }
 
         return new \Symfony\Component\HttpFoundation\StreamedResponse(
             function () use ($fnameFull) {
                 readfile($fnameFull);
-            }, Response::HTTP_OK, [
+            },
+            Response::HTTP_OK,
+            [
                 'Content-Type' => 'text/plain',
-                'Content-Disposition' => 'attachment; filename="' . $fname . '.gdf' . '"'
+                'Content-Disposition' => 'attachment; filename="' . $fname . '.gdf' . '"',
             ]
         );
     }

@@ -76,21 +76,25 @@ class BibitemHolder
         return $this;
     }
 
-    public function getSignature() {
+    public function getSignature()
+    {
         return $this->signature;
     }
 
-    public function setSignature($signature) {
+    public function setSignature($signature)
+    {
         $this->signature = $signature;
 
         return $this;
     }
 
-    public function getUrl() {
+    public function getUrl()
+    {
         return $this->url;
     }
 
-    public function setUrl($url) {
+    public function setUrl($url)
+    {
         $this->url = $url;
 
         return $this;

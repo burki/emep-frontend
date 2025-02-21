@@ -1,13 +1,13 @@
 <?php
+
 // MapFilterType.php
+
 namespace AppBundle\Filter;
 
 use Symfony\Component\Form\FormBuilderInterface;
-
 use Spiriit\Bundle\FormFilterBundle\Filter\Form\Type as Filters;
 
-class MapFilterType
-extends \Symfony\Component\Form\AbstractType
+class MapFilterType extends \Symfony\Component\Form\AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {

@@ -5,8 +5,7 @@ namespace AppBundle\Utils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class HolderListBuilder
-extends SearchListBuilder
+class HolderListBuilder extends SearchListBuilder
 {
     protected $entity = 'Holder';
     protected $alias = 'H';
@@ -21,7 +20,7 @@ extends SearchListBuilder
             . " LEFT JOIN ExhibitionPublication BE ON BE.id_publication = B.id AND BE.role = 1"
             . " LEFT JOIN Exhibition E ON BE.id_exhibition=E.id"
             . " WHERE H.id=?"
-            ;
+        ;
 
         $stmt = $connection->executeQuery($querystr, [ $id ]);
         if ($row = $stmt->fetch()) {
@@ -68,12 +67,13 @@ extends SearchListBuilder
         ],
     ];
 
-    public function __construct(\Doctrine\DBAL\Connection $connection,
-                                ?Request $request = null,
-                                ?UrlGeneratorInterface $urlGenerator = null,
-                                $queryFilters = null,
-                                $mode = '')
-    {
+    public function __construct(
+        \Doctrine\DBAL\Connection $connection,
+        ?Request $request = null,
+        ?UrlGeneratorInterface $urlGenerator = null,
+        $queryFilters = null,
+        $mode = ''
+    ) {
         $this->mode = $mode;
 
         parent::__construct($connection, $request, $urlGenerator, $queryFilters);
@@ -192,15 +192,24 @@ extends SearchListBuilder
 
     protected function setBibitemJoin($queryBuilder)
     {
-        $queryBuilder->innerJoin($this->alias,
-                                'HolderPublication', 'BH',
-                                'BH.id_holder = ' . $this->alias . '.id');
-        $queryBuilder->innerJoin('BH',
-                                'Publication', 'B',
-                                'BH.id_publication = B.id AND B.status <> -1');
-        $queryBuilder->leftJoin('BH',
-                                'ExhibitionPublication', 'BE',
-                                'BE.id_publication = B.id AND BE.role = 1');// catalogues only
+        $queryBuilder->innerJoin(
+            $this->alias,
+            'HolderPublication',
+            'BH',
+            'BH.id_holder = ' . $this->alias . '.id'
+        );
+        $queryBuilder->innerJoin(
+            'BH',
+            'Publication',
+            'B',
+            'BH.id_publication = B.id AND B.status <> -1'
+        );
+        $queryBuilder->leftJoin(
+            'BH',
+            'ExhibitionPublication',
+            'BE',
+            'BE.id_publication = B.id AND BE.role = 1'
+        );// catalogues only
     }
 
     protected function setJoin($queryBuilder)
@@ -215,10 +224,12 @@ extends SearchListBuilder
             $queryBuilder->groupBy($this->alias . '.id');
         }
 
-        $queryBuilder->leftJoin($this->alias,
-                                'Geoname', 'P' . $this->alias,
-                                '1=0' // 'P' . $this->alias . '.tgn=' . $this->alias.'.place_tgn'
-                                );
+        $queryBuilder->leftJoin(
+            $this->alias,
+            'Geoname',
+            'P' . $this->alias,
+            '1=0' // 'P' . $this->alias . '.tgn=' . $this->alias.'.place_tgn'
+        );
 
         $this->setBibitemJoin($queryBuilder);
 
@@ -244,8 +255,8 @@ extends SearchListBuilder
         return $this;
     }
 
-	public function getAlias()
-	{
-		return $this->alias;
-	}
+    public function getAlias()
+    {
+        return $this->alias;
+    }
 }

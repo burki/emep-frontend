@@ -16,8 +16,8 @@ use Doctrine\ORM\Mapping as ORM;
 abstract class Media
 {
     static $MEDIA_EXTENSIONS = [
-      'image/gif' => '.gif', 'image/jpeg' => '.jpg', 'image/png' => '.png',
-      'application/pdf' => '.pdf',
+        'image/gif' => '.gif', 'image/jpeg' => '.jpg', 'image/png' => '.png',
+        'application/pdf' => '.pdf',
     ];
 
     /**
@@ -168,16 +168,21 @@ abstract class Media
     {
         $id = $this->getReferencedId();
 
-        return sprintf('%s.%03d/id%05d',
-                       $this->getPathPrefix(),
-                       intval($id / 32768), $id % 32768);
+        return sprintf(
+            '%s.%03d/id%05d',
+            $this->getPathPrefix(),
+            intval($id / 32768),
+            $id % 32768
+        );
     }
 
     public function getFilename($variant = '')
     {
-        return sprintf('%s%s',
-                       $this->name . ('' !== $variant ? '_' . $variant : ''),
-                       self::$MEDIA_EXTENSIONS[$this->mimetype]);
+        return sprintf(
+            '%s%s',
+            $this->name . ('' !== $variant ? '_' . $variant : ''),
+            self::$MEDIA_EXTENSIONS[$this->mimetype]
+        );
     }
 
     public function getImgUrl($variant = '')

@@ -1,15 +1,14 @@
 <?php
+
 // LocationFilterType.php
+
 namespace AppBundle\Filter;
 
 use Symfony\Component\Form\FormBuilderInterface;
-
 use Spiriit\Bundle\FormFilterBundle\Filter\Form\Type as Filters;
-
 use Tetranz\Select2EntityBundle\Form\Type\Select2EntityType;
 
-class OrganizerFilterType
-extends CrudFilterType
+class OrganizerFilterType extends CrudFilterType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {

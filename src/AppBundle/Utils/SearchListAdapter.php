@@ -2,8 +2,7 @@
 
 namespace AppBundle\Utils;
 
-class SearchListAdapter
-implements \Pagerfanta\Adapter\AdapterInterface
+class SearchListAdapter implements \Pagerfanta\Adapter\AdapterInterface
 {
     var $listPaginationResult = null;
 

@@ -1,17 +1,16 @@
 <?php
+
 // PersonFilterType.php
+
 namespace AppBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
-
 use Tetranz\Select2EntityBundle\Form\Type\Select2EntityType;
 
-class PersonFilterType
-extends AbstractType
+class PersonFilterType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

@@ -8,19 +8,15 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-
 use Ifedko\DoctrineDbalPagination\ListBuilder;
-
 use Pagerfanta\Pagerfanta;
-
 use AppBundle\Utils\SearchListPagination;
 use AppBundle\Utils\SearchListAdapter;
 
 /**
  *
  */
-class SearchController
-extends CrudController
+class SearchController extends CrudController
 {
     use MapBuilderTrait;
     use StatisticsBuilderTrait;
@@ -42,11 +38,12 @@ extends CrudController
      * @Route("/organizer", name="organizer-index", options={"sitemap" = true})
      * @Route("/place/exhibiting", name="place-index", options={"sitemap" = true})
      */
-    public function searchAction(Request $request,
-                                 UrlGeneratorInterface $urlGenerator,
-                                 TranslatorInterface $translator,
-                                 ?UserInterface $user = null)
-    {
+    public function searchAction(
+        Request $request,
+        UrlGeneratorInterface $urlGenerator,
+        TranslatorInterface $translator,
+        ?UserInterface $user = null
+    ) {
         $settings = $this->lookupSettingsFromRequest($request);
 
         $response = $this->handleUserAction($request, $user, $settings['base']);
@@ -109,11 +106,12 @@ extends CrudController
     /**
      * @Route("/search/save", name="search-save")
      */
-    public function saveSearchAction(Request $request,
-                                     UrlGeneratorInterface $urlGenerator,
-                                     UserInterface $user,
-                                     TranslatorInterface $translator)
-    {
+    public function saveSearchAction(
+        Request $request,
+        UrlGeneratorInterface $urlGenerator,
+        UserInterface $user,
+        TranslatorInterface $translator
+    ) {
         return $this->handleSaveSearchAction($request, $urlGenerator, $user, $translator);
     }
 
@@ -155,11 +153,12 @@ extends CrudController
      * @Route("/itemexhibition/stats", name="itemexhibition-index-stats")
      * @Route("/place/exhibiting/stats", name="place-index-stats")
      */
-    public function statsAction(Request $request,
-                                UrlGeneratorInterface $urlGenerator,
-                                TranslatorInterface $translator,
-                                ?UserInterface $user = null)
-    {
+    public function statsAction(
+        Request $request,
+        UrlGeneratorInterface $urlGenerator,
+        TranslatorInterface $translator,
+        ?UserInterface $user = null
+    ) {
         $settings = $this->lookupSettingsFromRequest($request);
 
         $response = $this->handleUserAction($request, $user, $settings['base']);
@@ -191,8 +190,10 @@ extends CrudController
                 $stmt = $query->execute();
                 $renderParams = $this->processItemExhibitionType($stmt);
                 if (!empty($renderParams)) {
-                    $charts[] = $this->renderView('Statistics/exhibition-type-index.html.twig',
-                                                  $renderParams);
+                    $charts[] = $this->renderView(
+                        'Statistics/exhibition-type-index.html.twig',
+                        $renderParams
+                    );
                 }
 
                 break;
@@ -225,7 +226,7 @@ extends CrudController
             'form' => $this->form->createView(),
             'searches' => $this->lookupSearches($user, $settings['base']),
 
-            'charts' => implode("\n", $charts)
+            'charts' => implode("\n", $charts),
         ]);
     }
 
@@ -237,11 +238,12 @@ extends CrudController
      * @Route("/organizer/map", name="organizer-index-map")
      * @Route("/place/exhibiting/map", name="place-index-map")
      */
-    public function mapAction(Request $request,
-                              UrlGeneratorInterface $urlGenerator,
-                              TranslatorInterface $translator,
-                              ?UserInterface $user = null)
-    {
+    public function mapAction(
+        Request $request,
+        UrlGeneratorInterface $urlGenerator,
+        TranslatorInterface $translator,
+        ?UserInterface $user = null
+    ) {
         $settings = $this->lookupSettingsFromRequest($request);
 
         $response = $this->handleUserAction($request, $user, $settings['base']);
@@ -313,7 +315,7 @@ extends CrudController
                         ->from('Person', 'P')
                         ->andWhere('P.status <> -1')
                         ->select("P.id AS id, COALESCE(CONCAT(P.lastname, ', ', P.firstname), P.lastname) AS text")
-                        ;
+                    ;
                     break;
 
                 case 'search-select-location':
@@ -325,7 +327,7 @@ extends CrudController
                         ->from('Location', 'L')
                         ->andWhere('L.status <> -1 AND 0 = (L.flags & 256)')
                         ->select("L.id AS id, COALESCE(CONCAT(L.name, ' [', L.name_translit, ']'), L.name) AS text")
-                        ;
+                    ;
                     break;
 
                 case 'search-select-holder':
@@ -337,7 +339,7 @@ extends CrudController
                         ->from('Holder', 'H')
                         ->andWhere('H.status <> -1')
                         ->select("H.id AS id, H.name AS text")
-                        ;
+                    ;
                     break;
 
                 case 'search-select-organizer':
@@ -349,7 +351,7 @@ extends CrudController
                         ->from('Location', 'O')
                         ->andWhere('O.status <> -1')
                         ->select("DISTINCT O.id AS id, COALESCE(CONCAT(O.name, ' [', O.name_translit, ']'), O.name) AS text")
-                        ;
+                    ;
                     $listBuilder->setExhibitionJoin($queryBuilder);
                     break;
 
@@ -362,7 +364,7 @@ extends CrudController
                         ->from('Exhibition', 'E')
                         ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
                         ->select("E.id AS id, E.title AS text, E.startdate, E.enddate, E.displaydate")
-                        ;
+                    ;
                     break;
 
                 case 'search-select-birthplace':
@@ -373,14 +375,17 @@ extends CrudController
 
                     $queryBuilder
                         ->from('Geoname', 'PL')
-                        ->innerJoin('PL',
-                                    'Person', 'P',
-                                    'PL.tgn = P.'
+                        ->innerJoin(
+                            'PL',
+                            'Person',
+                            'P',
+                            'PL.tgn = P.'
                                     . str_replace('search-select-', '', $request->get('_route'))
-                                    . '_tgn AND P.status <> -1')
+                                    . '_tgn AND P.status <> -1'
+                        )
                         ->select("PL.tgn AS id, COALESCE(PL.name_alternate, PL.name) AS text")
                         ->distinct()
-                        ;
+                    ;
                     break;
             }
 
@@ -433,11 +438,12 @@ extends CrudController
         return new JsonResponse($data);
     }
 
-    protected function instantiateListBuilder(Request $request,
-                                              UrlGeneratorInterface $urlGenerator,
-                                              $mode = false,
-                                              $entity = null)
-    {
+    protected function instantiateListBuilder(
+        Request $request,
+        UrlGeneratorInterface $urlGenerator,
+        $mode = false,
+        $entity = null
+    ) {
         if (is_null($entity) || !in_array($entity, self::$entities)) {
             if ('search-export' == $request->get('_route') && 'Holder' == $entity) {
                 // Holder has only export functionality

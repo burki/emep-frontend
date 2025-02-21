@@ -69,11 +69,13 @@ class BibitemExhibition
         return $this;
     }
 
-    public function getRole() {
+    public function getRole()
+    {
         return $this->role;
     }
 
-    public function setRole($role) {
+    public function setRole($role)
+    {
         $this->role = $role;
 
         return $this;

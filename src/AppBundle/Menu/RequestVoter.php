@@ -4,11 +4,9 @@ namespace AppBundle\Menu;
 
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Matcher\Voter\VoterInterface;
-
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class RequestVoter
-implements VoterInterface
+class RequestVoter implements VoterInterface
 {
     protected $requestStack;
 
@@ -24,7 +22,8 @@ implements VoterInterface
         if ($item->getUri() === $requestUri) {
             // URL's completely match
             return true;
-        } else if ($item->getUri() !== $this->requestStack->getCurrentRequest()->getBaseUrl() . '/'
+        }
+        else if ($item->getUri() !== $this->requestStack->getCurrentRequest()->getBaseUrl() . '/'
                   && (substr($requestUri, 0, strlen($item->getUri())) === $item->getUri())) {
             // URL isn't just "/" and the first part of the URL match
             return true;

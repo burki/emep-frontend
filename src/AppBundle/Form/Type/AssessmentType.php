@@ -3,18 +3,14 @@
 namespace AppBundle\Form\Type;
 
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-
 use Shapecode\Bundle\HiddenEntityTypeBundle\Form\Type\HiddenEntityType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-
 use Symfony\Component\Validator\Constraints as Assert;
 
-class AssessmentType
-extends AbstractType
+class AssessmentType extends AbstractType
 {
     public function configureOptions(\Symfony\Component\OptionsResolver\OptionsResolver $resolver): void
     {

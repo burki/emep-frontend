@@ -5,8 +5,7 @@ namespace AppBundle\Utils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class ItemExhibitionListBuilder
-extends SearchListBuilder
+class ItemExhibitionListBuilder extends SearchListBuilder
 {
     protected $entity = 'ItemExhibition';
 
@@ -187,12 +186,13 @@ extends SearchListBuilder
         ],
     ];
 
-    public function __construct(\Doctrine\DBAL\Connection $connection,
-                                ?Request $request = null,
-                                ?UrlGeneratorInterface $urlGenerator = null,
-                                $queryFilters = null,
-                                $mode = '')
-    {
+    public function __construct(
+        \Doctrine\DBAL\Connection $connection,
+        ?Request $request = null,
+        ?UrlGeneratorInterface $urlGenerator = null,
+        $queryFilters = null,
+        $mode = ''
+    ) {
         $this->mode = $mode;
 
         parent::__construct($connection, $request, $urlGenerator, $queryFilters);
@@ -345,8 +345,10 @@ extends SearchListBuilder
 
         $selectTitle = 'IE.title AS title';
         if (!is_null(\AppBundle\Entity\ItemExhibition::TYPE_OTHER_MEDIA)) {
-            $selectTitle = sprintf("IF(IE.type = %d, '', IE.title) AS title",
-                                   \AppBundle\Entity\ItemExhibition::TYPE_OTHER_MEDIA);
+            $selectTitle = sprintf(
+                "IF(IE.type = %d, '', IE.title) AS title",
+                \AppBundle\Entity\ItemExhibition::TYPE_OTHER_MEDIA
+            );
         }
 
         $queryBuilder->select([
@@ -358,7 +360,7 @@ extends SearchListBuilder
             'P.sex AS gender',
             'P.country AS nationality',
             'IE.catalogueId AS catalogueId',
-             $selectTitle,
+            $selectTitle,
             'IE.title_alternate AS title_alternate',
             'IE.title_translit AS title_translit',
             'TypeTerm.name AS type',
@@ -406,27 +408,48 @@ extends SearchListBuilder
             $queryBuilder->groupBy('IE.id');
         }
 
-        $queryBuilder->leftJoin('IE',
-                                'Person', 'P',
-                                'P.id=IE.id_person AND P.status <> -1');
-        $queryBuilder->join('IE',
-                                'Exhibition', 'E',
-                                'E.id=IE.id_exhibition AND ' . $this->buildExhibitionVisibleCondition('E'));
-        $queryBuilder->leftJoin('IE',
-                                'Term', 'TypeTerm',
-                                'IE.type=TypeTerm.id');
-        $queryBuilder->leftJoin('E',
-                                'Location', 'L',
-                                'E.id_location=L.id AND L.status <> -1');
-        $queryBuilder->leftJoin('L',
-                                'Geoname', 'PL',
-                                'L.place_tgn=PL.tgn');
-        $queryBuilder->leftJoin('E',
-                                'ExhibitionLocation', 'EL',
-                                'E.id=EL.id_exhibition AND EL.role = 0');
-        $queryBuilder->leftJoin('EL',
-                                'Location', 'O',
-                                'O.id=EL.id_location');
+        $queryBuilder->leftJoin(
+            'IE',
+            'Person',
+            'P',
+            'P.id=IE.id_person AND P.status <> -1'
+        );
+        $queryBuilder->join(
+            'IE',
+            'Exhibition',
+            'E',
+            'E.id=IE.id_exhibition AND ' . $this->buildExhibitionVisibleCondition('E')
+        );
+        $queryBuilder->leftJoin(
+            'IE',
+            'Term',
+            'TypeTerm',
+            'IE.type=TypeTerm.id'
+        );
+        $queryBuilder->leftJoin(
+            'E',
+            'Location',
+            'L',
+            'E.id_location=L.id AND L.status <> -1'
+        );
+        $queryBuilder->leftJoin(
+            'L',
+            'Geoname',
+            'PL',
+            'L.place_tgn=PL.tgn'
+        );
+        $queryBuilder->leftJoin(
+            'E',
+            'ExhibitionLocation',
+            'EL',
+            'E.id=EL.id_exhibition AND EL.role = 0'
+        );
+        $queryBuilder->leftJoin(
+            'EL',
+            'Location',
+            'O',
+            'O.id=EL.id_location'
+        );
 
         return $this;
     }
@@ -463,9 +486,12 @@ extends SearchListBuilder
 
         if (array_key_exists('organizer', $this->queryFilters)) {
             // so we can filter on PO.*
-            $queryBuilder->leftJoin('O',
-                                    'Geoname', 'PO',
-                                    'O.place_tgn=PO.tgn');
+            $queryBuilder->leftJoin(
+                'O',
+                'Geoname',
+                'PO',
+                'O.place_tgn=PO.tgn'
+            );
         }
 
         return $this;

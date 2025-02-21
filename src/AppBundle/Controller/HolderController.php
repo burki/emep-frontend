@@ -7,9 +7,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-
 use Pagerfanta\Pagerfanta;
-
 use AppBundle\Utils\CsvResponse;
 use AppBundle\Utils\SearchListPagination;
 use AppBundle\Utils\SearchListAdapter;
@@ -17,8 +15,7 @@ use AppBundle\Utils\SearchListAdapter;
 /**
  *
  */
-class HolderController
-extends CrudController
+class HolderController extends CrudController
 {
     use SharingBuilderTrait;
 
@@ -29,12 +26,12 @@ extends CrudController
                 ->createQueryBuilder();
 
         $qb->select([
-                'H.countryCode',
-            ])
+            'H.countryCode',
+        ])
             ->distinct()
             ->from('AppBundle\Entity\Holder', 'H')
             ->where('H.status <> -1 AND H.countryCode IS NOT NULL')
-            ;
+        ;
 
         return $this->buildActiveCountries($qb);
     }
@@ -51,11 +48,12 @@ extends CrudController
     /**
      * @Route("/holder", name="holder-index")
      */
-    public function indexAction(Request $request,
-                                UrlGeneratorInterface $urlGenerator,
-                                TranslatorInterface $translator,
-                                ?UserInterface $user = null)
-    {
+    public function indexAction(
+        Request $request,
+        UrlGeneratorInterface $urlGenerator,
+        TranslatorInterface $translator,
+        ?UserInterface $user = null
+    ) {
         $settings = $this->lookupSettingsFromRequest($request);
 
         $response = $this->handleUserAction($request, $user, $settings['base']);
@@ -110,11 +108,12 @@ extends CrudController
     /**
      * @Route("/holder/save", name="holder-save")
      */
-    public function saveSearchAction(Request $request,
-                                     UrlGeneratorInterface $urlGenerator,
-                                     UserInterface $user,
-                                     TranslatorInterface $translator)
-    {
+    public function saveSearchAction(
+        Request $request,
+        UrlGeneratorInterface $urlGenerator,
+        UserInterface $user,
+        TranslatorInterface $translator
+    ) {
         return $this->handleSaveSearchAction($request, $urlGenerator, $user, $translator);
     }
 
@@ -124,7 +123,8 @@ extends CrudController
      */
     public function detailAction(Request $request, $id = null, $ulan = null, $gnd = null)
     {
-        $routeName = $request->get('_route'); $routeParams = [];
+        $routeName = $request->get('_route');
+        $routeParams = [];
 
         $repo = $this->getDoctrine()
                 ->getRepository('AppBundle\Entity\Holder');
@@ -154,17 +154,20 @@ extends CrudController
                 ->createQueryBuilder();
 
             $qb->select([
-                    'H',
-                    'H.placeLabel',
-                    'P.latitude',
-                    'P.longitude'
-                ])
+                'H',
+                'H.placeLabel',
+                'P.latitude',
+                'P.longitude',
+            ])
                 ->from('AppBundle\Entity\Holder', 'H')
-                ->leftJoin('AppBundle\Entity\Place', 'P',
-                           \Doctrine\ORM\Query\Expr\Join::WITH,
-                           "P.type='inhabited places' AND (P.name = H.placeLabel OR P.alternateName = H.placeLabel)")
+                ->leftJoin(
+                    'AppBundle\Entity\Place',
+                    'P',
+                    \Doctrine\ORM\Query\Expr\Join::WITH,
+                    "P.type='inhabited places' AND (P.name = H.placeLabel OR P.alternateName = H.placeLabel)"
+                )
                 ->where('H.id = ' . $id)
-                ;
+            ;
 
             $holderPlace = $qb->getQuery()->execute();
             $place = $holderPlace[0];
@@ -191,7 +194,8 @@ extends CrudController
      */
     public function detailActionCatalogueCsv(Request $request, $id = null, $ulan = null, $gnd = null)
     {
-        $routeName = $request->get('_route'); $routeParams = [];
+        $routeName = $request->get('_route');
+        $routeParams = [];
 
         $repo = $this->getDoctrine()
             ->getRepository('AppBundle\Entity\Holder');
@@ -252,10 +256,10 @@ extends CrudController
         }
 
         return new CsvResponse($csvResult, 200, [
-                'Title', 'Place of Publication', 'Publisher', 'Year of Publication',
-                'Signature', 'URL',
-                'Start Date', 'End Date', 'Display Date',
-                'Venue',
-            ], 'catalogues.xlsx');
+            'Title', 'Place of Publication', 'Publisher', 'Year of Publication',
+            'Signature', 'URL',
+            'Start Date', 'End Date', 'Display Date',
+            'Venue',
+        ], 'catalogues.xlsx');
     }
 }

@@ -9,12 +9,10 @@ namespace AppBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-
 use Cocur\Slugify\SlugifyInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
-abstract class BaseController
-extends AbstractController
+abstract class BaseController extends AbstractController
 {
     protected $kernel;
     protected $translator;
@@ -24,12 +22,13 @@ extends AbstractController
 
     private $globals = null;
 
-    public function __construct(KernelInterface $kernel,
-                                TranslatorInterface $translator,
-                                ManagerRegistry $doctrine,
-                                SlugifyInterface $slugify,
-                                \Twig\Environment $twig)
-    {
+    public function __construct(
+        KernelInterface $kernel,
+        TranslatorInterface $translator,
+        ManagerRegistry $doctrine,
+        SlugifyInterface $slugify,
+        \Twig\Environment $twig
+    ) {
         $this->kernel = $kernel;
         $this->translator = $translator;
         $this->doctrine = $doctrine;

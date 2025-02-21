@@ -1,4 +1,5 @@
 <?php
+
 // src/AppBundle/Twig/AppExtension.php
 
 /**
@@ -21,15 +22,15 @@ namespace AppBundle\Twig;
 use Symfony\Component\Intl\Countries;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class AppExtension
-extends \Twig\Extension\AbstractExtension
+class AppExtension extends \Twig\Extension\AbstractExtension
 {
     private $translator;
     private $slugifyer;
 
-    public function __construct(TranslatorInterface $translator = null,
-                                $slugifyer = null)
-    {
+    public function __construct(
+        TranslatorInterface $translator = null,
+        $slugifyer = null
+    ) {
         $this->translator = $translator;
         $this->slugifyer = $slugifyer;
         if (!is_null($slugifyer)) {
@@ -63,8 +64,11 @@ extends \Twig\Extension\AbstractExtension
             // appbundle-specific
             new \Twig\TwigFilter('placeTypeLabel', [ $this, 'placeTypeLabelFilter' ]),
             new \Twig\TwigFilter('currencySymbol', [ $this, 'buildCurrencySymbol' ]),
-            new \Twig\TwigFilter('renderCitation', [ $this, 'renderCitation' ],
-                                 [ 'is_safe' => [ 'html' ] ]),
+            new \Twig\TwigFilter(
+                'renderCitation',
+                [ $this, 'renderCitation' ],
+                [ 'is_safe' => [ 'html' ] ]
+            ),
         ];
     }
 
@@ -176,7 +180,7 @@ extends \Twig\Extension\AbstractExtension
             . (!empty($parsed['path']) && '/' !== $parsed['path'] ? $parsed['path'] : '')
             . (!empty($parsed['query']) ? '?' . $parsed['query'] : '')
             . (!empty($parsed['fragment']) ? '#' . $parsed['fragment'] : '')
-            ;
+        ;
     }
 
     public function buildCurrencySymbol($currency, $extended = false)
@@ -216,8 +220,10 @@ extends \Twig\Extension\AbstractExtension
 
         $path = __DIR__ . '/../Resources/csl/infoclio-de.csl.xml';
 
-        $citeProc = new \AcademicPuma\CiteProc\CiteProc(file_get_contents($path),
-                                                        $locale);
+        $citeProc = new \AcademicPuma\CiteProc\CiteProc(
+            file_get_contents($path),
+            $locale
+        );
 
         return $citeProc->render(json_decode($encoded));
     }

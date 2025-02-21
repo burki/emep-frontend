@@ -684,7 +684,7 @@ class Item
                 $assoc = $classMetadata->associationMappings[$field];
 
                 // Only owning side of x-1 associations can have a FK column.
-                if ( ! $assoc['isOwningSide'] || ! ($assoc['type'] & \Doctrine\ORM\Mapping\ClassMetadata::TO_ONE)) {
+                if (! $assoc['isOwningSide'] || ! ($assoc['type'] & \Doctrine\ORM\Mapping\ClassMetadata::TO_ONE)) {
                     continue;
                 }
 
@@ -701,13 +701,16 @@ class Item
 
                     if ($value === null) {
                         $result[$sourceColumn] = null;
-                    } else if ($targetClass->containsForeignIdentifier) {
+                    }
+                    else if ($targetClass->containsForeignIdentifier) {
                         $result[$sourceColumn] = $newValId[$targetClass->getFieldForColumn($targetColumn)];
-                    } else {
+                    }
+                    else {
                         $result[$sourceColumn] = $newValId[$targetClass->fieldNames[$targetColumn]];
                     }
                 }
-            } else if (isset($classMetadata->columnNames[$field])) {
+            }
+            else if (isset($classMetadata->columnNames[$field])) {
                 $columnName = $classMetadata->columnNames[$field];
                 $result[$columnName] = $value;
             }

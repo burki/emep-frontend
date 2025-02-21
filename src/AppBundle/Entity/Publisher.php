@@ -16,8 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity
  * @ORM\Table(name="Publisher")
  */
-class Publisher
-implements \JsonSerializable, JsonLdSerializable
+class Publisher implements \JsonSerializable, JsonLdSerializable
 {
     static function formatDateIncomplete($dateStr)
     {

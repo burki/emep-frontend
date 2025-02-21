@@ -4,8 +4,7 @@ namespace AppBundle\Utils;
 
 use Symfony\Component\HttpFoundation\Response;
 
-class CsvResponse
-extends Response
+class CsvResponse extends Response
 {
     protected $filename;
 

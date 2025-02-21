@@ -7,16 +7,13 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-
 use Knp\Component\Pager\PaginatorInterface;
-
 use AppBundle\Utils\CsvResponse;
 
 /**
  *
  */
-class ExhibitionController
-extends CrudController
+class ExhibitionController extends CrudController
 {
     use MapBuilderTrait;
     use StatisticsBuilderTrait;
@@ -29,15 +26,15 @@ extends CrudController
                 ->createQueryBuilder();
 
         $qb->select([
-                'PL.countryCode',
-            ])
+            'PL.countryCode',
+        ])
             ->distinct()
             ->from('AppBundle\Entity\Exhibition', 'E')
             ->innerJoin('E.location', 'L')
             ->innerJoin('L.place', 'PL')
             ->where(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->andWhere('PL.countryCode IS NOT NULL')
-            ;
+        ;
 
         return $this->buildActiveCountries($qb);
     }
@@ -65,11 +62,12 @@ extends CrudController
     /**
      * @Route("/exhibition/save", name="exhibition-save")
      */
-    public function saveSearchAction(Request $request,
-                                     UrlGeneratorInterface $urlGenerator,
-                                     UserInterface $user,
-                                     TranslatorInterface $translator)
-    {
+    public function saveSearchAction(
+        Request $request,
+        UrlGeneratorInterface $urlGenerator,
+        UserInterface $user,
+        TranslatorInterface $translator
+    ) {
         return $this->handleSaveSearchAction($request, $urlGenerator, $user, $translator);
     }
 
@@ -77,11 +75,12 @@ extends CrudController
      * @Route("/exhibition/shared.embed/{persons}", name="exhibition-shared-partial")
      * @Route("/exhibition/shared/{persons}", name="exhibition-shared")
      */
-    public function sharedAction(Request $request,
-                                 PaginatorInterface $paginator,
-                                 TranslatorInterface $translator,
-                                 $persons = null)
-    {
+    public function sharedAction(
+        Request $request,
+        PaginatorInterface $paginator,
+        TranslatorInterface $translator,
+        $persons = null
+    ) {
         if (!is_null($persons)) {
             $persons = explode(',', $persons);
         }
@@ -113,30 +112,42 @@ extends CrudController
                 ->createQueryBuilder();
 
         $qb->select([
-                'E',
-                "E.startdate HIDDEN dateSort",
-                "CONCAT(COALESCE(P.alternateName, P.name), E.startdate) HIDDEN placeSort"
-            ])
+            'E',
+            "E.startdate HIDDEN dateSort",
+            "CONCAT(COALESCE(P.alternateName, P.name), E.startdate) HIDDEN placeSort",
+        ])
             ->from('AppBundle\Entity\Exhibition', 'E')
             ->leftJoin('E.location', 'L')
             ->leftJoin('L.place', 'P')
-            ->innerJoin('AppBundle\Entity\ItemExhibition', 'IE1',
-                       \Doctrine\ORM\Query\Expr\Join::WITH,
-                       'IE1.exhibition = E')
-            ->innerJoin('AppBundle\Entity\Person', 'P1',
-                       \Doctrine\ORM\Query\Expr\Join::WITH,
-                       'IE1.person = P1 AND P1.id=:person1')
-            ->innerJoin('AppBundle\Entity\ItemExhibition', 'IE2',
-                       \Doctrine\ORM\Query\Expr\Join::WITH,
-                       'IE2.exhibition = E')
-            ->innerJoin('AppBundle\Entity\Person', 'P2',
-                       \Doctrine\ORM\Query\Expr\Join::WITH,
-                       'IE2.person = P2 AND P2.id=:person2')
+            ->innerJoin(
+                'AppBundle\Entity\ItemExhibition',
+                'IE1',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE1.exhibition = E'
+            )
+            ->innerJoin(
+                'AppBundle\Entity\Person',
+                'P1',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE1.person = P1 AND P1.id=:person1'
+            )
+            ->innerJoin(
+                'AppBundle\Entity\ItemExhibition',
+                'IE2',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE2.exhibition = E'
+            )
+            ->innerJoin(
+                'AppBundle\Entity\Person',
+                'P2',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE2.person = P2 AND P2.id=:person2'
+            )
             ->setParameters([ 'person1' => $persons[0], 'person2' => $persons[1] ])
             ->where(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->groupBy('E.id')
             ->orderBy('dateSort')
-            ;
+        ;
 
         $pagination = $this->buildPagination($request, $paginator, $qb->getQuery(), [
             'defaultSortFieldName' => 'dateSort', 'defaultSortDirection' => 'asc',
@@ -209,7 +220,8 @@ extends CrudController
                 ];
             }
 
-            uasort($jaccardIndex,
+            uasort(
+                $jaccardIndex,
                 function ($a, $b) {
                     if ($a['coefficient'] == $b['coefficient']) {
                         return 0;
@@ -247,13 +259,13 @@ extends CrudController
                 ->createQueryBuilder();
 
         $qb->select([
-                'IE',
-            ])
+            'IE',
+        ])
             ->from('AppBundle\Entity\ItemExhibition', 'IE')
             ->leftJoin('IE.person', 'P')
             ->where("IE.exhibition = :exhibition")
             ->andWhere('IE.title IS NOT NULL OR IE.item IS NULL')
-            ;
+        ;
 
         $results = $qb->getQuery()
             ->setParameter('exhibition', $exhibition)
@@ -284,7 +296,8 @@ extends CrudController
      */
     public function detailActionCatalogueCsv(Request $request, $id = null)
     {
-        $routeName = $request->get('_route'); $routeParams = [];
+        $routeName = $request->get('_route');
+        $routeParams = [];
 
         $repo = $this->getDoctrine()
             ->getRepository('AppBundle\Entity\Exhibition');
@@ -315,12 +328,15 @@ extends CrudController
                 $catEntry->getDisplaydate(),
                 $catEntry->getOwnerFull(),
                 $catEntry->isForsale() ? 'Y' : '',
-                $catEntry->getPrice()
+                $catEntry->getPrice(),
             ];
         }
 
-        return new CsvResponse($csvResult, 200,
-                               explode(', ', 'Cat. No., Title, Person, Room, Type, Additional, Creation Date, Owner, For Sale, Price'));
+        return new CsvResponse(
+            $csvResult,
+            200,
+            explode(', ', 'Cat. No., Title, Person, Room, Type, Additional, Creation Date, Owner, For Sale, Price')
+        );
     }
 
     /**
@@ -328,7 +344,8 @@ extends CrudController
      */
     public function detailActionSimilarsCsv(Request $request, $id = null)
     {
-        $routeName = $request->get('_route'); $routeParams = [];
+        $routeName = $request->get('_route');
+        $routeParams = [];
 
         $repo = $this->getDoctrine()
             ->getRepository('AppBundle\Entity\Exhibition');
@@ -355,7 +372,7 @@ extends CrudController
                     $exhibition->getTitle(),
                     $exhibition->getLocation()->getPlaceLabel(),
                     $exhibition->getLocation()->getName(),
-                    $value['count']
+                    $value['count'],
                 ];
             }
         }
@@ -382,13 +399,13 @@ extends CrudController
 
         $catalogueEntries = $this->findCatalogueEntries($exhibition, $request->get('sort'));
 
-        list($artists, $catalogueEntriesByPersonCount) = $this->buildArtistsCount($catalogueEntries, true);
+        [$artists, $catalogueEntriesByPersonCount] = $this->buildArtistsCount($catalogueEntries, true);
 
         $csvResult = array_map(function ($person) use ($catalogueEntriesByPersonCount) {
-                $count = array_key_exists($person->getId(), $catalogueEntriesByPersonCount)
-                    ? $catalogueEntriesByPersonCount[$person->getId()] : 0;
-                return [ $person->getFullname(false), $person->getNationality(), $person->getBirthDate(), $person->getDeathDate(), $count ];
-            }, $artists);
+            $count = array_key_exists($person->getId(), $catalogueEntriesByPersonCount)
+                ? $catalogueEntriesByPersonCount[$person->getId()] : 0;
+            return [ $person->getFullname(false), $person->getNationality(), $person->getBirthDate(), $person->getDeathDate(), $count ];
+        }, $artists);
 
         return new CsvResponse($csvResult, 200, explode(', ', 'Name, Nationality, Date of Birth, Date of Death, # of Cat. Entries'));
     }
@@ -417,7 +434,7 @@ extends CrudController
             ->from('ExhibitionGroup', 'EG')
             ->where('id_exhibition=:id_exhibition')
             ->setParameter('id_exhibition', $ids[0])
-            ;
+        ;
 
         $ids = array_merge($ids, $queryBuilder->execute()->fetchAll(\PDO::FETCH_COLUMN));
 
@@ -433,7 +450,8 @@ extends CrudController
 
     private function buildArtistsCount($catalogueEntries, $sortByName = false)
     {
-        $artists = []; $catalogueEntriesByPersonCount = [];
+        $artists = [];
+        $catalogueEntriesByPersonCount = [];
         foreach ($catalogueEntries as $entry) {
             $person = $entry->getPerson();
             if (!is_null($person)) {
@@ -460,7 +478,8 @@ extends CrudController
      */
     public function detailAction(Request $request, UrlGeneratorInterface $urlGenerator, $id, $itemexhibitionId = null)
     {
-        $routeName = $request->get('_route'); $routeParams = [];
+        $routeName = $request->get('_route');
+        $routeParams = [];
 
         $repo = $this->getDoctrine()
             ->getRepository('AppBundle\Entity\Exhibition');
@@ -484,7 +503,7 @@ extends CrudController
 
         $catalogueEntries = $this->findCatalogueEntries($exhibition, $request->get('sort'));
 
-        list($artists, $catalogueEntriesByPersonCount) = $this->buildArtistsCount($catalogueEntries);
+        [$artists, $catalogueEntriesByPersonCount] = $this->buildArtistsCount($catalogueEntries);
 
         $artistsCountries = [];
         $genderSplit = [ 'M' => 0, 'F' => 0 ]; // first male, second female
@@ -519,7 +538,7 @@ extends CrudController
             ? $this->lookupExhibitionGroup($em, $exhibition)
             : [];
 
-        list($charts, $placesActivityAvailable, $catalogueEntriesByTypeCount)
+        [$charts, $placesActivityAvailable, $catalogueEntriesByTypeCount]
             = $this->buildDetailCharts($exhibition, $artists);
 
         $similar = $this->findSimilar($exhibition);
@@ -626,10 +645,12 @@ extends CrudController
 
                     foreach ($placesByTgn[$tgn]['persons'] as $entry) {
                         $person = & $entry['person'];
-                        list($route, $routeParams) = $person->getRouteInfo();
-                        $entriesByFullname[$person->getFullname()] = sprintf('<a href="%s">%s</a>',
-                                                                             $this->generateUrl($route, $routeParams),
-                                                                             htmlspecialchars($person->getFullname(true), ENT_QUOTES));
+                        [$route, $routeParams] = $person->getRouteInfo();
+                        $entriesByFullname[$person->getFullname()] = sprintf(
+                            '<a href="%s">%s</a>',
+                            $this->generateUrl($route, $routeParams),
+                            htmlspecialchars($person->getFullname(true), ENT_QUOTES)
+                        );
                     }
 
                     ksort($entriesByFullname);
@@ -658,13 +679,15 @@ extends CrudController
                     $group = 'birthDeath';
                     $value = [
                         'icon' => 'yellowIcon',
-                        'html' => sprintf('<b>%s</b>: <a href="%s">%s</a><br />%s',
-                                          $place['label'],
-                                          htmlspecialchars($this->generateUrl('place-by-tgn', [
-                                               'tgn' => $place['info']['tgn'],
-                                          ])),
-                                          htmlspecialchars($place['info']['name'], ENT_QUOTES),
-                                          $place['html'])
+                        'html' => sprintf(
+                            '<b>%s</b>: <a href="%s">%s</a><br />%s',
+                            $place['label'],
+                            htmlspecialchars($this->generateUrl('place-by-tgn', [
+                                'tgn' => $place['info']['tgn'],
+                            ])),
+                            htmlspecialchars($place['info']['name'], ENT_QUOTES),
+                            $place['html']
+                        ),
                     ];
                     break;
 
@@ -673,16 +696,17 @@ extends CrudController
                     $exhibition = $place['info']['exhibition'];
                     $value = [
                         'icon' => 'blueIcon',
-                        'html' =>  sprintf('<a href="%s">%s</a> at <a href="%s">%s</a> (%s)',
-                                htmlspecialchars($this->generateUrl('exhibition', [
-                                    'id' => $exhibition->getId(),
-                                ])),
-                                htmlspecialchars($exhibition->getTitleListing(), ENT_QUOTES),
-                                htmlspecialchars($this->generateUrl('location', [
-                                    'id' => $exhibition->getLocation()->getId(),
-                                ])),
-                                htmlspecialchars($exhibition->getLocation()->getNameListing(), ENT_QUOTES),
-                                $this->buildDisplayDate($exhibition)
+                        'html' =>  sprintf(
+                            '<a href="%s">%s</a> at <a href="%s">%s</a> (%s)',
+                            htmlspecialchars($this->generateUrl('exhibition', [
+                                'id' => $exhibition->getId(),
+                            ])),
+                            htmlspecialchars($exhibition->getTitleListing(), ENT_QUOTES),
+                            htmlspecialchars($this->generateUrl('location', [
+                                'id' => $exhibition->getLocation()->getId(),
+                            ])),
+                            htmlspecialchars($exhibition->getLocation()->getNameListing(), ENT_QUOTES),
+                            $this->buildDisplayDate($exhibition)
                         ),
                     ];
                     break;
@@ -828,7 +852,7 @@ extends CrudController
             $percentage = 100.0 * $count / $stats['total'];
             $dataEntry = [
                 'name' => $descr['name'],
-                'y' => (int)$count,
+                'y' => (int) $count,
                 'id' => $id,
             ];
 
@@ -839,7 +863,7 @@ extends CrudController
             $data[] = $dataEntry;
 
             if (in_array($descr['name'], [ 'other medium', 'unknown'])) {
-                $countByType[$descr['name']] = (int)$descr['count'];
+                $countByType[$descr['name']] = (int) $descr['count'];
             }
         }
 
@@ -873,7 +897,7 @@ extends CrudController
             $percentage = 100.0 * $count / $stats['total' . $key];
             $dataEntry = [
                 'name' => $counts['label'],
-                'y' => (int)$count,
+                'y' => (int) $count,
                 'id' => $nationality,
                 'artists' => $counts['countArtists'],
                 'itemExhibition' => $counts['countItemExhibition'],
@@ -911,17 +935,17 @@ extends CrudController
             : '';
 
         $querystr = <<<EOT
-SELECT id,
-IF (EB.deathdate IS NOT NULL AND YEAR(EB.deathdate) < YEAR(EB.startdate), 'deceased', 'living') AS state
-FROM
-(SELECT DISTINCT Person.id AS id, Exhibition.startdate AS startdate, Exhibition.id AS id_exhibition, Person.id AS id_person, Person.birthdate AS birthdate, Person.deathdate AS deathdate
-FROM Exhibition
-INNER JOIN ItemExhibition ON ItemExhibition.id_exhibition=Exhibition.id
-INNER JOIN Person ON ItemExhibition.id_person=Person.id AND Person.birthdate IS NOT NULL
-$where
-GROUP BY Exhibition.id, Person.id) AS EB
-WHERE YEAR(EB.startdate) - YEAR(EB.birthdate) = :age
-EOT;
+            SELECT id,
+            IF (EB.deathdate IS NOT NULL AND YEAR(EB.deathdate) < YEAR(EB.startdate), 'deceased', 'living') AS state
+            FROM
+            (SELECT DISTINCT Person.id AS id, Exhibition.startdate AS startdate, Exhibition.id AS id_exhibition, Person.id AS id_person, Person.birthdate AS birthdate, Person.deathdate AS deathdate
+            FROM Exhibition
+            INNER JOIN ItemExhibition ON ItemExhibition.id_exhibition=Exhibition.id
+            INNER JOIN Person ON ItemExhibition.id_person=Person.id AND Person.birthdate IS NOT NULL
+            $where
+            GROUP BY Exhibition.id, Person.id) AS EB
+            WHERE YEAR(EB.startdate) - YEAR(EB.birthdate) = :age
+            EOT;
 
         $stmt = $stmt = $em->getConnection()->prepare($querystr);
         $stmt->bindValue(':age', $age, \PDO::PARAM_INT);
@@ -957,22 +981,22 @@ EOT;
                 ]);
                 break;
 
-            /*
-            case 'container-countries':
-                $personIds = $this->exhibitionNationalityPersonIds($em = $this->getDoctrine()->getManager(), $request->get('point'), $id);
+                /*
+                case 'container-countries':
+                    $personIds = $this->exhibitionNationalityPersonIds($em = $this->getDoctrine()->getManager(), $request->get('point'), $id);
 
-                foreach ($personIds as $type => $ids) {
-                    $personIds[$type] = $this->hydratePersons($ids);
-                }
+                    foreach ($personIds as $type => $ids) {
+                        $personIds[$type] = $this->hydratePersons($ids);
+                    }
 
-                return $this->render('Shared/modal.html.twig', [
-                    'heading' => 'Artists exhibiting in ' . $request->get('point'),
-                    'elements' => $personIds['artists'],
-                    'type' => 'person'
-                ]);
-                break;
+                    return $this->render('Shared/modal.html.twig', [
+                        'heading' => 'Artists exhibiting in ' . $request->get('point'),
+                        'elements' => $personIds['artists'],
+                        'type' => 'person'
+                    ]);
+                    break;
 
-            */
+                */
 
             default:
                 die('Currently not handling chart: ' . $chart);
@@ -983,8 +1007,10 @@ EOT;
     {
         $dbconn = $em->getConnection();
 
-        $where = sprintf(' WHERE ItemExhibition.id_exhibition=%d AND (ItemExhibition.title IS NOT NULL OR ItemExhibition.id_item IS NULL)',
-                         intval($exhibitionId));
+        $where = sprintf(
+            ' WHERE ItemExhibition.id_exhibition=%d AND (ItemExhibition.title IS NOT NULL OR ItemExhibition.id_item IS NULL)',
+            intval($exhibitionId)
+        );
 
         $querystr = "SELECT TypeTerm.id, TypeTerm.name, TypeTerm.aat, COUNT(*) AS how_many"
                   . " FROM ItemExhibition"
@@ -1024,19 +1050,19 @@ EOT;
         $where = ' WHERE ' . implode(' AND ', $andConditions);
 
         $querystr = <<<EOT
-SELECT COUNT(*) AS how_many,
-YEAR(EB.startdate) - YEAR(EB.birthdate) AS age,
-IF (EB.deathdate IS NOT NULL AND YEAR(EB.deathdate) < YEAR(EB.startdate), 'deceased', 'living') AS state
-FROM
-(SELECT DISTINCT Exhibition.startdate AS startdate, Exhibition.id AS id_exhibition, Person.id AS id_person, Person.birthdate AS birthdate, Person.deathdate AS deathdate
-FROM Exhibition
-INNER JOIN ItemExhibition ON ItemExhibition.id_exhibition=Exhibition.id
-INNER JOIN Person ON ItemExhibition.id_person=Person.id AND Person.status <> -1 AND Person.birthdate IS NOT NULL
-$where
-GROUP BY Exhibition.id, Person.id) AS EB
-GROUP BY age, state
-ORDER BY age, state, how_many
-EOT;
+            SELECT COUNT(*) AS how_many,
+            YEAR(EB.startdate) - YEAR(EB.birthdate) AS age,
+            IF (EB.deathdate IS NOT NULL AND YEAR(EB.deathdate) < YEAR(EB.startdate), 'deceased', 'living') AS state
+            FROM
+            (SELECT DISTINCT Exhibition.startdate AS startdate, Exhibition.id AS id_exhibition, Person.id AS id_person, Person.birthdate AS birthdate, Person.deathdate AS deathdate
+            FROM Exhibition
+            INNER JOIN ItemExhibition ON ItemExhibition.id_exhibition=Exhibition.id
+            INNER JOIN Person ON ItemExhibition.id_person=Person.id AND Person.status <> -1 AND Person.birthdate IS NOT NULL
+            $where
+            GROUP BY Exhibition.id, Person.id) AS EB
+            GROUP BY age, state
+            ORDER BY age, state, how_many
+            EOT;
 
         $min_age = $max_age = 0;
 
@@ -1044,9 +1070,9 @@ EOT;
         $ageCount = [];
         while ($row = $stmt->fetch()) {
             if (0 == $min_age) {
-                $min_age = (int)$row['age'];
+                $min_age = (int) $row['age'];
             }
-            $max_age = $age = (int)$row['age'];
+            $max_age = $age = (int) $row['age'];
             if (!array_key_exists($age, $ageCount)) {
                 $ageCount[$age] = [];
             }
@@ -1065,20 +1091,23 @@ EOT;
         $qb = $em->createQueryBuilder();
 
         $qb->select([
-                'P.nationality',
-                'COUNT(DISTINCT P.id) AS numArtists',
-                'COUNT(DISTINCT IE.id) AS numEntries'
-            ])
+            'P.nationality',
+            'COUNT(DISTINCT P.id) AS numArtists',
+            'COUNT(DISTINCT IE.id) AS numEntries',
+        ])
             ->from('AppBundle\Entity\ItemExhibition', 'IE')
             ->innerJoin('IE.person', 'P')
             ->where('IE.title IS NOT NULL OR IE.item IS NULL')
             ->groupBy('P.nationality')
-            ;
+        ;
 
         if (!is_null($exhibitionId)) {
-            $qb->innerJoin('AppBundle\Entity\Exhibition', 'E',
-                       \Doctrine\ORM\Query\Expr\Join::WITH,
-                       'IE.exhibition = E AND E.id = :exhibitionId')
+            $qb->innerJoin(
+                'AppBundle\Entity\Exhibition',
+                'E',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE.exhibition = E AND E.id = :exhibitionId'
+            )
                 ->setParameter('exhibitionId', $exhibitionId);
         }
 
@@ -1115,20 +1144,22 @@ EOT;
             $totalItemExhibition += $row['numEntries'];
         }
 
-        uasort($statsByNationality,
-               function ($a, $b) {
-                    if ($a['countItemExhibition'] == $b['countItemExhibition']) {
-                        return 0;
-                    }
+        uasort(
+            $statsByNationality,
+            function ($a, $b) {
+                if ($a['countItemExhibition'] == $b['countItemExhibition']) {
+                    return 0;
+                }
 
-                    return $a['countItemExhibition'] < $b['countItemExhibition'] ? 1 : -1;
-                });
+                return $a['countItemExhibition'] < $b['countItemExhibition'] ? 1 : -1;
+            }
+        );
 
         return [
             'totalArtists' => $totalArtists,
             'totalItemExhibition' => $totalItemExhibition,
             'nationalities' => $statsByNationality,
-            'exhibitionId' => $exhibitionId
+            'exhibitionId' => $exhibitionId,
         ];
     }
 
@@ -1159,12 +1190,12 @@ EOT;
             ->createQueryBuilder();
 
         $qb->select([
-                'P'
-            ])
+            'P',
+        ])
             ->from('AppBundle\Entity\Person', 'P')
             ->where('P.id IN (:artists) AND P.status <> -1')
-            ->setParameter('artists', $artists )
-            ;
+            ->setParameter('artists', $artists)
+        ;
 
         $exhibitionCities = [];
 
@@ -1188,21 +1219,27 @@ EOT;
             ->createQueryBuilder();
 
         $qb->select([
-                'P.id AS id',
-                'P.nationality AS nationality'
-            ])
+            'P.id AS id',
+            'P.nationality AS nationality',
+        ])
             ->from('AppBundle\Entity\Exhibition', 'E')
-            ->leftJoin('AppBundle\Entity\ItemExhibition', 'IE',
+            ->leftJoin(
+                'AppBundle\Entity\ItemExhibition',
+                'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
-            ->leftJoin('AppBundle\Entity\Person', 'P',
+                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)'
+            )
+            ->leftJoin(
+                'AppBundle\Entity\Person',
+                'P',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
-                'P.id = IE.person AND P.id IS NOT NULL')
+                'P.id = IE.person AND P.id IS NOT NULL'
+            )
             // ->leftJoin('IE.person', 'P')
-            ->where('E.id = :exhibitionId AND P.id IS NOT NULL' )
+            ->where('E.id = :exhibitionId AND P.id IS NOT NULL')
             ->groupBy('P.id')
             ->setParameter('exhibitionId', $exhibitionId)
-            ;
+        ;
 
         return $qb->getQuery()->getResult();
     }
@@ -1214,20 +1251,26 @@ EOT;
             ->createQueryBuilder();
 
         $qb->select([
-                'COUNT(DISTINCT P.id) AS howMany',
-                'P.nationality AS nationality'
-            ])
+            'COUNT(DISTINCT P.id) AS howMany',
+            'P.nationality AS nationality',
+        ])
             ->from('AppBundle\Entity\Exhibition', 'E')
-            ->innerJoin('AppBundle\Entity\ItemExhibition', 'IE',
+            ->innerJoin(
+                'AppBundle\Entity\ItemExhibition',
+                'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
-            ->innerJoin('AppBundle\Entity\Person', 'P',
+                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)'
+            )
+            ->innerJoin(
+                'AppBundle\Entity\Person',
+                'P',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
-                'P.id = IE.person AND P.status <> -1')
-            ->where('E.id = :exhibitionId' )
+                'P.id = IE.person AND P.status <> -1'
+            )
+            ->where('E.id = :exhibitionId')
             ->setParameter('exhibitionId', $exhibitionId)
             ->groupBy('P.nationality')
-            ;
+        ;
 
         $nationalityCounts = [];
         foreach ($qb->getQuery()->getResult() as $row) {
@@ -1237,7 +1280,7 @@ EOT;
             ];
         }
 
-        uasort($nationalityCounts, function($a, $b) {
+        uasort($nationalityCounts, function ($a, $b) {
             return $b['count'] <=> $a['count'];
         });
 
@@ -1251,24 +1294,30 @@ EOT;
             ->createQueryBuilder();
 
         $qb->select([
-                'P.id AS id',
-                'P.gender as gender'
-            ])
+            'P.id AS id',
+            'P.gender as gender',
+        ])
             ->from('AppBundle\Entity\Exhibition', 'E')
-            ->innerJoin('AppBundle\Entity\ItemExhibition', 'IE',
+            ->innerJoin(
+                'AppBundle\Entity\ItemExhibition',
+                'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
-            ->innerJoin('AppBundle\Entity\Person', 'P',
+                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)'
+            )
+            ->innerJoin(
+                'AppBundle\Entity\Person',
+                'P',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
-                'P.id = IE.person AND P.status <> -1')
-            ->where('E.id = :exhibitionId' )
+                'P.id = IE.person AND P.status <> -1'
+            )
+            ->where('E.id = :exhibitionId')
             ->groupBy('P.id')
             ->setParameter('exhibitionId', $exhibitionId)
-            ;
+        ;
 
         $allArtists = $qb->getQuery()->getResult();
 
-        $allArtists = array_unique($allArtists, SORT_REGULAR );
+        $allArtists = array_unique($allArtists, SORT_REGULAR);
         $gendersOnly = array_column($allArtists, 'gender');
         $gendersOnly = array_replace($gendersOnly, array_fill_keys(array_keys($gendersOnly, null), '')); // remove null values if existing
         $genderStats = array_count_values($gendersOnly);
@@ -1297,8 +1346,10 @@ EOT;
         $ret = '#FORMAT: BEACON' . "\n"
              . '#PREFIX: http://www.worldcat.org/oclc/'
              . "\n";
-        $ret .= sprintf('#TARGET: %s/{ID}',
-                        $this->generateUrl('exhibition-index', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL))
+        $ret .= sprintf(
+            '#TARGET: %s/{ID}',
+            $this->generateUrl('exhibition-index', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL)
+        )
               . "\n";
 
         $globals = $twig->getGlobals();
@@ -1328,7 +1379,10 @@ EOT;
             $ret .=  $oclc . '||' . $exhibitionId . "\n";
         }
 
-        return new \Symfony\Component\HttpFoundation\Response($ret, \Symfony\Component\HttpFoundation\Response::HTTP_OK,
-                                                              [ 'Content-Type' => 'text/plain; charset=UTF-8' ]);
+        return new \Symfony\Component\HttpFoundation\Response(
+            $ret,
+            \Symfony\Component\HttpFoundation\Response::HTTP_OK,
+            [ 'Content-Type' => 'text/plain; charset=UTF-8' ]
+        );
     }
 }

@@ -2,8 +2,7 @@
 
 namespace AppBundle\Controller;
 
-class JsonLdResponse
-extends \Symfony\Component\HttpFoundation\JsonResponse
+class JsonLdResponse extends \Symfony\Component\HttpFoundation\JsonResponse
 {
     public function __construct($data = null, $status = 200, $headers = [ 'Content-Type' => 'application/ld+json' ], $json = false)
     {

@@ -7,9 +7,9 @@ use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
 // see https://github.com/ikoene/symfony-micro
-final class MicroKernel
-extends Kernel
+final class MicroKernel extends Kernel
 {
+    use MicroKernelTrait;
     /*
      * Set an Environment Variable in Apache Configuration
      *   SetEnv APP_ENVIRONMENT prod
@@ -36,8 +36,6 @@ extends Kernel
 
         return new self($env, $debug);
     }
-
-    use MicroKernelTrait;
 
     /*
      * {@inheritDoc}
@@ -103,17 +101,17 @@ extends Kernel
     // see https://github.com/symfony/symfony-standard/blob/master/app/AppKernel.php
     public function getCacheDir(): string
     {
-        return $this->getProjectDir().'/var/cache/'.$this->getEnvironment();
+        return $this->getProjectDir() . '/var/cache/' . $this->getEnvironment();
     }
 
     public function getLogDir(): string
     {
-        return $this->getProjectDir().'/var/logs';
+        return $this->getProjectDir() . '/var/logs';
     }
 
     public function getConfigDir(): string
     {
-        return $this->getProjectDir().'/config';
+        return $this->getProjectDir() . '/config';
     }
 
     /*
@@ -121,8 +119,8 @@ extends Kernel
      */
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader)
     {
-        $loader->load($this->getConfigDir().'/config_'.$this->getEnvironment().'.yaml');
-        $loader->load($this->getConfigDir().'/services.yaml');
+        $loader->load($this->getConfigDir() . '/config_' . $this->getEnvironment() . '.yaml');
+        $loader->load($this->getConfigDir() . '/services.yaml');
     }
 
     /*
@@ -152,10 +150,11 @@ extends Kernel
 
         $routes->import('../config/{routes}/*.yaml');
 
-        if (is_file($confDir.'/routes.yaml')) {
-            $routes->import($confDir.'/routes.yaml');
-        } else {
-            $routes->import($confDir.'/{routes}.php');
+        if (is_file($confDir . '/routes.yaml')) {
+            $routes->import($confDir . '/routes.yaml');
+        }
+        else {
+            $routes->import($confDir . '/{routes}.php');
         }
     }
 }

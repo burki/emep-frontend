@@ -12,8 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="Exhibition")
  * @ORM\Entity
  */
-class Exhibition
-implements JsonLdSerializable
+class Exhibition implements JsonLdSerializable
 {
     use InfoTrait;
 
@@ -320,8 +319,10 @@ implements JsonLdSerializable
         $dateParts = explode('-', $gregorian = self::stripTime($datetime));
         if (3 == count($dateParts) && $dateParts[2] != 0) {
             // only convert complete dates
-            $dateParts = explode('/',
-                                 jdtojulian(gregoriantojd($dateParts[1], $dateParts[2], $dateParts[0])));
+            $dateParts = explode(
+                '/',
+                jdtojulian(gregoriantojd($dateParts[1], $dateParts[2], $dateParts[0]))
+            );
 
             return sprintf('%04d-%02d-%02d', $dateParts[2], $dateParts[0], $dateParts[1]);
         }
@@ -337,7 +338,7 @@ implements JsonLdSerializable
         }
 
         if (preg_match('/^([\d]+)\-/', $datetime, $matches)) {
-            return (int)($matches[1]);
+            return (int) ($matches[1]);
         }
     }
 
@@ -578,8 +579,8 @@ implements JsonLdSerializable
         }
 
         return $this->items->filter(
-            function($entity) use ($minStatus) {
-               return $entity->getStatus() >= $minStatus;
+            function ($entity) use ($minStatus) {
+                return $entity->getStatus() >= $minStatus;
             }
         );
     }
@@ -593,16 +594,16 @@ implements JsonLdSerializable
     {
         $qb = $em->createQueryBuilder();
         $qb->select([
-                'B',
-                "COALESCE(B.author, B.editor) HIDDEN creatorSort",
-            ])
+            'B',
+            "COALESCE(B.author, B.editor) HIDDEN creatorSort",
+        ])
             ->distinct()
             ->from('AppBundle\Entity\Bibitem', 'B')
             ->innerJoin('AppBundle\Entity\BibitemExhibition', 'BE', 'WITH', 'BE.bibitem=B')
             ->innerJoin('AppBundle\Entity\Exhibition', 'E', 'WITH', 'BE.exhibition=E')
             ->where('E = :exhibition AND B.status <> -1')
             ->orderBy('creatorSort, B.datePublished, B.title')
-            ;
+        ;
 
         if (!is_null($role)) {
             $qb->andWhere('BE.role = :role')
@@ -704,7 +705,7 @@ implements JsonLdSerializable
 
         return $this->catalogueEntries->filter(
             function ($entity) {
-               return $entity->isRegularEntry(); // corresponds to IE.title IS NOT NULL OR IE.item IS NULL
+                return $entity->isRegularEntry(); // corresponds to IE.title IS NOT NULL OR IE.item IS NULL
             }
         );
     }

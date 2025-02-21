@@ -1,6 +1,7 @@
 <?php
 
 // src/AppBundle/Command/EntityEnhanceCommand.php
+
 namespace AppBundle\Command;
 
 use Symfony\Component\Console\Command\Command;
@@ -8,25 +9,22 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
-
 use Doctrine\ORM\EntityManagerInterface;
 
-class EntityEnhanceCommand
-extends Command
+class EntityEnhanceCommand extends Command
 {
     protected $em;
     protected $googleapisKey = '';
     protected $projectDir;
 
-    public function __construct(EntityManagerInterface $em,
-                                ParameterBagInterface $params,
-                                string $projectDir)
-    {
+    public function __construct(
+        EntityManagerInterface $em,
+        ParameterBagInterface $params,
+        string $projectDir
+    ) {
         parent::__construct();
 
         $this->em = $em;
@@ -48,7 +46,7 @@ extends Command
                 InputArgument::REQUIRED,
                 'which entities do you want to enhance (person / location / country / bibitem)'
             )
-            ;
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -58,11 +56,11 @@ extends Command
                 return $this->enhancePerson();
                 break;
 
-            /*
-            case 'place':
-                return $this->enhancePlace();
-                break;
-            */
+                /*
+                case 'place':
+                    return $this->enhancePlace();
+                    break;
+                */
 
             case 'location':
                 return $this->enhanceLocation();
@@ -77,8 +75,10 @@ extends Command
                 break;
 
             default:
-                $output->writeln(sprintf('<error>invalid type: %s</error>',
-                                         $input->getArgument('type')));
+                $output->writeln(sprintf(
+                    '<error>invalid type: %s</error>',
+                    $input->getArgument('type')
+                ));
 
                 return 1;
         }
@@ -128,7 +128,8 @@ extends Command
             if ($response->getStatus() < 400) {
                 $content = $response->getBody();
             }
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e) {
             $content = null;
         }
 
@@ -150,8 +151,7 @@ extends Command
     {
         $gndBeacon = [];
 
-        foreach ($files as $key => $fname)
-        {
+        foreach ($files as $key => $fname) {
             $info = [];
 
             $fnameFull = $this->projectDir
@@ -210,22 +210,22 @@ extends Command
         $qb = $this->em->createQueryBuilder();
 
         $qb->select([
-                'P',
-                "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort"
-            ])
+            'P',
+            "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort",
+        ])
             ->from('AppBundle\Entity\Person', 'P')
             ->where('P.status <> -1')
             ->andWhere('P.gnd IS NOT NULL OR P.ulan IS NOT NULL')
             ->andWhere('P.birthDate IS NULL OR P.birthPlaceLabel IS NULL OR P.deathDate IS NULL OR P.deathPlaceLabel IS NULL')
             ->orderBy('nameSort')
-            ;
+        ;
 
         $query = $qb->getQuery()
             /*
             ->setMaxResults(10) // for testing
             ->setFirstResult(10)
             */
-            ;
+        ;
 
         $UPDATE_PROPERTIES =  [
             'gender' => 'gender',
@@ -383,19 +383,19 @@ extends Command
         $qb = $this->em->createQueryBuilder();
 
         $qb->select([
-                'P',
-            ])
+            'P',
+        ])
             ->from('AppBundle\Entity\Person', 'P')
             ->where('P.status <> -1')
             ->andWhere('P.gnd IS NOT NULL')
             ->andWhere('P.entityfacts IS NULL')
             ->orderBy('P.id', 'DESC')
-            ;
+        ;
 
         $query = $qb->getQuery()
             //->setMaxResults(25) // for testing
             //->setFirstResult(10)
-            ;
+        ;
 
         $persistCount = 0;
         foreach ($query->getResult() as $person) {
@@ -469,11 +469,10 @@ extends Command
 
             // properties we currently want to fetch
             foreach ([
-                    'dateOfEstablishment',
-                    'dateOfTermination',
-                    'homepage',
-                ] as $src)
-            {
+                'dateOfEstablishment',
+                'dateOfTermination',
+                'homepage',
+            ] as $src) {
                 if (!empty($corporateBody->{$src})) {
                     switch ($src) {
                         case 'dateOfEstablishment':
@@ -566,7 +565,7 @@ extends Command
                         [ $info['north'], $info['east'] ],
                     ];
 
-                    foreach ( [ 'areaInSqKm', 'population' ] as $key) {
+                    foreach ([ 'areaInSqKm', 'population' ] as $key) {
                         if (array_key_exists($key, $info)) {
                             $additional[$key] = $info[$key];
                         }
@@ -599,9 +598,11 @@ extends Command
 
             $additional = $item->getAdditional();
             if (is_null($additional) || !array_key_exists('googleapis-books', $additional)) {
-                $url = sprintf('https://www.googleapis.com/books/v1/volumes?q=isbn:%s&key=%s',
-                               $isbns[0],
-                               $this->googleapisKey);
+                $url = sprintf(
+                    'https://www.googleapis.com/books/v1/volumes?q=isbn:%s&key=%s',
+                    $isbns[0],
+                    $this->googleapisKey
+                );
                 // var_dump($url);
                 $result = $this->executeJsonQuery($url, [
                     'Accept' => 'application/json',

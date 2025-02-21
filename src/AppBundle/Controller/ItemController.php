@@ -10,8 +10,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Various functions for work-related analysis, currently not tested in public front-end
  */
-class ItemController
-extends BaseController
+class ItemController extends BaseController
 {
     use SharingBuilderTrait;
 
@@ -39,9 +38,10 @@ extends BaseController
      * @Route("/work/by-exhibition", name="item-by-exhibition")
      * @Route("/work/by-style", name="item-by-style")
      */
-    public function indexAction(Request $request,
-                                TranslatorInterface $translator)
-    {
+    public function indexAction(
+        Request $request,
+        TranslatorInterface $translator
+    ) {
         $route = $request->get('_route');
 
         $qb = $this->getDoctrine()
@@ -64,11 +64,11 @@ extends BaseController
         if ('item-by-exhibition' == $route) {
             $templateAppend = '-by-exhibition';
             $qb->select([
-                    'E',
-                    "P.familyName HIDDEN nameSort",
-                    "COALESCE(I.earliestdate, I.creatordate) HIDDEN dateSort",
-                    "I.catalogueId HIDDEN catSort",
-                ])
+                'E',
+                "P.familyName HIDDEN nameSort",
+                "COALESCE(I.earliestdate, I.creatordate) HIDDEN dateSort",
+                "I.catalogueId HIDDEN catSort",
+            ])
                 ->from('AppBundle\Entity\Exhibition', 'E')
                 ->innerJoin('E.items', 'I')
                 ->leftJoin('I.creators', 'P')
@@ -76,7 +76,7 @@ extends BaseController
                 ->where('E.status <> -1 AND I.status <> -1')
                 ->orderBy('E.startdate, E.id')
                 // , nameSort, dateSort, catSort')
-                ;
+            ;
 
             $qbPerson
                 ->innerJoin('I.exhibitions', 'E');
@@ -84,33 +84,33 @@ extends BaseController
         else if ('item-by-style' == $route) {
             $templateAppend = '-by-style';
             $qb->select([
-                    'I',
-                    'T.name HIDDEN styleSort',
-                    "COALESCE(I.earliestdate, I.creatordate) HIDDEN dateSort",
-                    "P.familyName HIDDEN nameSort",
-                    "I.catalogueId HIDDEN catSort",
-                ])
+                'I',
+                'T.name HIDDEN styleSort',
+                "COALESCE(I.earliestdate, I.creatordate) HIDDEN dateSort",
+                "P.familyName HIDDEN nameSort",
+                "I.catalogueId HIDDEN catSort",
+            ])
                 ->from('AppBundle\Entity\Item', 'I')
                 ->leftJoin('I.creators', 'P')
                 ->leftJoin('I.style', 'T')
                 ->where('I.status <> -1 AND P.status <> -1')
                 ->orderBy('styleSort DESC, dateSort, nameSort, catSort')
-                ;
+            ;
             $qbPerson
                 ->innerJoin('I.style', 'T');
         }
         else {
             $qb->select([
-                    'I',
-                    "P.familyName HIDDEN nameSort",
-                    "COALESCE(I.earliestdate, I.creatordate) HIDDEN dateSort",
-                    "I.catalogueId HIDDEN catSort",
-                ])
+                'I',
+                "P.familyName HIDDEN nameSort",
+                "COALESCE(I.earliestdate, I.creatordate) HIDDEN dateSort",
+                "I.catalogueId HIDDEN catSort",
+            ])
                 ->from('AppBundle\Entity\Item', 'I')
                 ->leftJoin('I.creators', 'P')
                 ->where('I.status <> -1 AND P.status <> -1')
                 ->orderBy('nameSort, dateSort, catSort')
-                ;
+            ;
             unset($qbPerson);
         }
 
@@ -139,12 +139,12 @@ extends BaseController
         return $this->render('Item/index'
                              . $templateAppend
                              . '.html.twig', [
-            'pageTitle' => $translator->trans('Works'),
-            'results' => $results,
-            'persons' => $persons,
-            'collections' => $collections,
-            'collection' => $collection,
-        ]);
+                                 'pageTitle' => $translator->trans('Works'),
+                                 'results' => $results,
+                                 'persons' => $persons,
+                                 'collections' => $collections,
+                                 'collection' => $collection,
+                             ]);
     }
 
     /**
@@ -152,7 +152,8 @@ extends BaseController
      */
     public function detailAction(Request $request, $id = null)
     {
-        $routeName = $request->get('_route'); $routeParams = [];
+        $routeName = $request->get('_route');
+        $routeParams = [];
 
         $repo = $this->getDoctrine()
                 ->getRepository('AppBundle\Entity\Item');
@@ -196,8 +197,10 @@ extends BaseController
 
         $collectionCondition = '';
         if (!empty($collection) && array_key_exists($collection, $collections)) {
-            $collectionCondition = sprintf(' AND Item.collection=%d',
-                                           intval($collection));
+            $collectionCondition = sprintf(
+                ' AND Item.collection=%d',
+                intval($collection)
+            );
         }
 
         // display the number of works / exhibited works by artist
@@ -208,7 +211,7 @@ extends BaseController
         $querystr = "SELECT 'items' AS type, COUNT(*) AS how_many FROM Item"
                   . " WHERE status <> -1"
                   . $collectionCondition
-                  ;
+        ;
 
         $querystr .= " UNION SELECT 'total' AS type, COUNT(ItemExhibition.id) AS how_many"
                    . " FROM Item INNER JOIN ItemExhibition ON Item.id=ItemExhibition.id_item"
@@ -217,11 +220,11 @@ extends BaseController
         $stmt = $dbconn->query($querystr);
         $subtitle_parts = [];
         while ($row = $stmt->fetch()) {
-          if ('active' == $row['type']) {
-            $total_active = $row['how_many'];
-          }
+            if ('active' == $row['type']) {
+                $total_active = $row['how_many'];
+            }
 
-          $subtitle_parts[] = $row['how_many'];
+            $subtitle_parts[] = $row['how_many'];
         }
 
         $subtitle = implode(' out of ', $subtitle_parts) . ' persons';
@@ -239,7 +242,7 @@ extends BaseController
                           . ' WHERE Person.status <> -1 AND Item.status <> -1'
                           . ' GROUP BY Person.id'
                           . ' ORDER BY Person.lastname, Person.firstname, Person.id'
-                          ;
+                ;
             }
             else if ('exhibitions' == $key) {
                 $querystr = 'SELECT COUNT(DISTINCT ItemExhibition.id_exhibition) AS how_many, Person.lastname, Person.firstname'
@@ -250,7 +253,7 @@ extends BaseController
                           . ' WHERE Person.status <> -1 AND Item.status <> -1'
                           . ' GROUP BY Person.id'
                           . ' ORDER BY Person.lastname, Person.firstname, Person.id'
-                          ;
+                ;
             }
             else {
                 $querystr = "SELECT COUNT(Item.id) AS how_many, Person.lastname, Person.firstname, IFNULL(Term.name, 'unknown') AS style"
@@ -261,7 +264,7 @@ extends BaseController
                           . ' WHERE Person.status <> -1 AND Item.status <> -1'
                           . ' GROUP BY Person.id, style'
                           . ' ORDER BY Person.lastname, Person.firstname, Person.id, style'
-                          ;
+                ;
             }
 
             $stmt = $dbconn->query($querystr);
@@ -286,9 +289,7 @@ extends BaseController
         $categories = array_keys($data);
         for ($i = 0; $i < count($categories); $i++) {
             $category = $categories[$i];
-            foreach ([ 'works', 'works_exhibited', 'exhibitions' ]
-                     as $key)
-            {
+            foreach ([ 'works', 'works_exhibited', 'exhibitions' ] as $key) {
                 if ('works' == $key) {
                     foreach ($styles as $style) {
                         $total[$key][$style][] = [
@@ -322,7 +323,7 @@ extends BaseController
                             . " " . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('Exhibition')
                           . ' GROUP BY Geoname.tgn'
                           . ' ORDER BY Geoname.country_code, place'
-                          ;
+                ;
             }
             else if ('exhibitions' == $key) {
                 $querystr = 'SELECT COUNT(DISTINCT Exhibition.id) AS how_many, COALESCE(Geoname.name_alternate, Geoname.name) AS place'
@@ -335,7 +336,7 @@ extends BaseController
                             . " " . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('Exhibition')
                           . ' GROUP BY Geoname.tgn'
                           . ' ORDER BY Geoname.country_code, place'
-                          ;
+                ;
             }
             else {
                 $querystr = 'SELECT COUNT(DISTINCT Item.id) AS how_many, COALESCE(Geoname.name_alternate, Geoname.name) AS place'
@@ -348,7 +349,7 @@ extends BaseController
                             . " " . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('Exhibition')
                           . ' GROUP BY Geoname.tgn'
                           . ' ORDER BY Geoname.country_code, place'
-                          ;
+                ;
             }
 
             $stmt = $dbconn->query($querystr);
@@ -363,8 +364,7 @@ extends BaseController
         $place_categories = array_keys($place_data);
         for ($i = 0; $i < count($place_categories); $i++) {
             $category = $place_categories[$i];
-            foreach (['works', 'works_exhibited', 'exhibitions']
-                     as $key) {
+            foreach (['works', 'works_exhibited', 'exhibitions'] as $key) {
                 $place_total[$key][$category] = [
                     'name' => $category,
                     'y' => isset($place_data[$category][$key])
@@ -385,7 +385,7 @@ extends BaseController
                     . ' INNER JOIN Person ON ItemPerson.id_person=Person.id AND Person.status <> -1'
                     . " WHERE " . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('Exhibition')
                   . ' ORDER BY Geoname.country_code, place, place_tgn, Person.id, exhibition_id'
-                  ;
+        ;
 
         $stmt = $dbconn->query($querystr);
 
@@ -437,7 +437,7 @@ extends BaseController
                     . ' INNER JOIN Person ON ItemPerson.id_person=Person.id AND Person.status <> -1'
                     . " WHERE " . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('Exhibition')
                   . ' ORDER BY year, Person.id, exhibition_id'
-                  ;
+        ;
 
         $stmt = $dbconn->query($querystr);
 

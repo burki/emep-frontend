@@ -1,14 +1,14 @@
 <?php
+
 // PlaceFilterType.php
+
 namespace AppBundle\Filter;
 
 use Symfony\Component\Form\FormBuilderInterface;
-
 use Spiriit\Bundle\FormFilterBundle\Filter\Query\QueryInterface;
 use Spiriit\Bundle\FormFilterBundle\Filter\Form\Type as Filters;
 
-class PlaceFilterType
-extends CrudFilterType
+class PlaceFilterType extends CrudFilterType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -26,7 +26,7 @@ extends CrudFilterType
                 $paramName = sprintf('p_%s', str_replace('.', '_', $field));
 
                 // expression that represent the condition
-                $expression = $filterQuery->getExpr()->eq(/* $field */ 'P.countryCode', ':'.$paramName);
+                $expression = $filterQuery->getExpr()->eq(/* $field */ 'P.countryCode', ':' . $paramName);
 
                 // expression parameters
                 $parameters = [ $paramName => $values['value'] ];

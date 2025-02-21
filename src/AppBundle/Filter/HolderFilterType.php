@@ -1,15 +1,14 @@
 <?php
+
 // HolderFilterType.php
+
 namespace AppBundle\Filter;
 
 use Symfony\Component\Form\FormBuilderInterface;
-
 use Spiriit\Bundle\FormFilterBundle\Filter\Form\Type as Filters;
-
 use Tetranz\Select2EntityBundle\Form\Type\Select2EntityType;
 
-class HolderFilterType
-extends CrudFilterType
+class HolderFilterType extends CrudFilterType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -39,20 +38,20 @@ extends CrudFilterType
                 ]);
 
                 $builder->add('holder', Select2EntityType::class, [
-                   'multiple' => true,
-                   'label' => 'Holder',
-                   'remote_route' => 'search-select-holder',
-                   'class' => '\AppBundle\Entity\Holder',
-                   'primary_key' => 'id',
-                   'text_property' => 'name',
-                   'minimum_input_length' => 2,
-                   'page_limit' => 10,
-                   'allow_clear' => false,
-                   'delay' => 25,
-                   'cache' => true,
-                   'cache_timeout' => 60000, // if 'cache' is true
-                   'language' => 'en',
-                   'placeholder' => '- all -',
+                    'multiple' => true,
+                    'label' => 'Holder',
+                    'remote_route' => 'search-select-holder',
+                    'class' => '\AppBundle\Entity\Holder',
+                    'primary_key' => 'id',
+                    'text_property' => 'name',
+                    'minimum_input_length' => 2,
+                    'page_limit' => 10,
+                    'allow_clear' => false,
+                    'delay' => 25,
+                    'cache' => true,
+                    'cache_timeout' => 60000, // if 'cache' is true
+                    'language' => 'en',
+                    'placeholder' => '- all -',
                 ]);
             }
 

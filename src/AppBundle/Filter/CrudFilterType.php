@@ -1,16 +1,16 @@
 <?php
+
 // CrudFilterType.php
+
 namespace AppBundle\Filter;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Spiriit\Bundle\FormFilterBundle\Filter\Query\QueryInterface;
 use Spiriit\Bundle\FormFilterBundle\Filter\Form\Type as Filters;
 
-class CrudFilterType
-extends AbstractType
+class CrudFilterType extends AbstractType
 {
     /**
      * probably only used in /place at the moment
@@ -23,8 +23,7 @@ extends AbstractType
                 'placeholder' => 'Search',
                 'class' => 'text-field-class w-input search-input input-text-search',
             ],
-            'apply_filter' => function (QueryInterface $filterQuery, $field, $values) use ($searchFields, $useFulltext)
-            {
+            'apply_filter' => function (QueryInterface $filterQuery, $field, $values) use ($searchFields, $useFulltext) {
                 if (empty($values['value'])) {
                     return null;
                 }
@@ -34,9 +33,11 @@ extends AbstractType
                     $fulltextCondition = \AppBundle\Utils\MysqlFulltextSimpleParser::parseFulltextBoolean($values['value'], true);
 
                     // requires "beberlei/DoctrineExtensions"
-                    $expression = sprintf("MATCH (%s) AGAINST ('%s' BOOLEAN) = TRUE",
-                                          implode(', ', $searchFields),
-                                          $fulltextCondition);
+                    $expression = sprintf(
+                        "MATCH (%s) AGAINST ('%s' BOOLEAN) = TRUE",
+                        implode(', ', $searchFields),
+                        $fulltextCondition
+                    );
                     $parameters = [];
                 }
                 else {
@@ -45,7 +46,7 @@ extends AbstractType
                     //print_r('value');
                     //print_r($values['value']);
 
-                    $orWords = explode(";", $values['value'] );
+                    $orWords = explode(";", $values['value']);
 
                     $orExpressions = [];
                     // build a matching REGEXP
@@ -70,8 +71,11 @@ extends AbstractType
                                 $orParts = [];
                                 for ($j = 0; $j < count($searchFields); $j++) {
                                     // see https://stackoverflow.com/a/29034983/2114681
-                                    $orParts[] = sprintf("REGEXP(%s, :%s) = true",
-                                                         $searchFields[$j], $bindKey);
+                                    $orParts[] = sprintf(
+                                        "REGEXP(%s, :%s) = true",
+                                        $searchFields[$j],
+                                        $bindKey
+                                    );
                                 }
 
                                 $andParts[] = '(' . implode(' OR ', $orParts) . ')';
@@ -146,7 +150,7 @@ extends AbstractType
     {
         $resolver->setDefaults([
             'csrf_protection'   => false,
-            'validation_groups' => ['filtering'] // avoid NotBlank() constraint-related message
+            'validation_groups' => ['filtering'], // avoid NotBlank() constraint-related message
         ]);
     }
 }

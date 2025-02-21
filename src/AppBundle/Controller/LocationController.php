@@ -8,14 +8,12 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-
 use AppBundle\Utils\CsvResponse;
 
 /**
  *
  */
-class LocationController
-extends CrudController
+class LocationController extends CrudController
 {
     use MapBuilderTrait;
     use StatisticsBuilderTrait;
@@ -29,13 +27,13 @@ extends CrudController
                 ->createQueryBuilder();
 
         $qb->select([
-                'P.countryCode',
-            ])
+            'P.countryCode',
+        ])
             ->distinct()
             ->from('AppBundle\Entity\Location', 'L')
             ->leftJoin('L.place', 'P')
             ->where('L.status <> -1 AND 0 = BIT_AND(L.flags, 256) AND P.countryCode IS NOT NULL')
-            ;
+        ;
 
         return $this->buildActiveCountries($qb);
     }
@@ -87,11 +85,12 @@ extends CrudController
      * @Route("/location/save", name="venue-save")
      * @Route("/organizer/save", name="organizer-save")
      */
-    public function saveSearchAction(Request $request,
-                                     UrlGeneratorInterface $urlGenerator,
-                                     UserInterface $user,
-                                     TranslatorInterface $translator)
-    {
+    public function saveSearchAction(
+        Request $request,
+        UrlGeneratorInterface $urlGenerator,
+        UserInterface $user,
+        TranslatorInterface $translator
+    ) {
         return $this->handleSaveSearchAction($request, $urlGenerator, $user, $translator);
     }
 
@@ -108,8 +107,11 @@ extends CrudController
         $exhibitions = $location->getOrganizerOf();
         if (!is_null($exhibitions)) {
             $exhibitionIds = array_unique(
-                array_merge($exhibitionIds,
-                            array_map(function ($exhibition) { return $exhibition->getId(); }, $exhibitions->toArray())));
+                array_merge(
+                    $exhibitionIds,
+                    array_map(function ($exhibition) { return $exhibition->getId(); }, $exhibitions->toArray())
+                )
+            );
         }
 
         return $exhibitionIds;
@@ -127,22 +129,25 @@ extends CrudController
                 ->createQueryBuilder();
 
         $qb->select([
-                'P',
-                'COUNT(DISTINCT E.id) AS numExhibitionSort',
-                'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-                "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort"
-            ])
+            'P',
+            'COUNT(DISTINCT E.id) AS numExhibitionSort',
+            'COUNT(DISTINCT IE.id) AS numCatEntrySort',
+            "CONCAT(COALESCE(P.familyName,P.givenName), ' ', COALESCE(P.givenName, '')) HIDDEN nameSort",
+        ])
             ->from('AppBundle\Entity\Person', 'P')
-            ->innerJoin('AppBundle\Entity\ItemExhibition', 'IE',
-                       \Doctrine\ORM\Query\Expr\Join::WITH,
-                       'IE.person = P AND (IE.title IS NOT NULL OR IE.item IS NULL)')
+            ->innerJoin(
+                'AppBundle\Entity\ItemExhibition',
+                'IE',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE.person = P AND (IE.title IS NOT NULL OR IE.item IS NULL)'
+            )
             ->innerJoin('IE.exhibition', 'E')
             ->where('E.id IN(:ids)')
             ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('ids', $exhibitionIds)
             ->groupBy('P.id')
             ->orderBy('nameSort')
-            ;
+        ;
 
         return $qb->getQuery()->getResult();
     }
@@ -159,19 +164,22 @@ extends CrudController
             ->createQueryBuilder();
 
         $qb->select([
-                'P.gender as gender',
-                'COUNT(DISTINCT P.id) AS how_many',
-            ])
+            'P.gender as gender',
+            'COUNT(DISTINCT P.id) AS how_many',
+        ])
             ->from('AppBundle\Entity\Person', 'P')
-            ->innerJoin('AppBundle\Entity\ItemExhibition', 'IE',
+            ->innerJoin(
+                'AppBundle\Entity\ItemExhibition',
+                'IE',
                 \Doctrine\ORM\Query\Expr\Join::WITH,
-                'IE.person = P AND (IE.title IS NOT NULL OR IE.item IS NULL)')
+                'IE.person = P AND (IE.title IS NOT NULL OR IE.item IS NULL)'
+            )
             ->innerJoin('IE.exhibition', 'E')
             ->where('E.id IN(:ids) AND P.status <> -1')
             ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('ids', $exhibitionIds)
             ->groupBy('gender')
-            ;
+        ;
 
         $results = $qb->getQuery()->getResult();
 
@@ -206,23 +214,26 @@ extends CrudController
                 ->getManager()
                 ->createQueryBuilder();
         $qb->select([
-                'E.id AS id',
-                'COUNT(DISTINCT IE.id) AS numCatEntrySort',
-                'COUNT(DISTINCT P.id) AS numPersonSort',
-            ])
+            'E.id AS id',
+            'COUNT(DISTINCT IE.id) AS numCatEntrySort',
+            'COUNT(DISTINCT P.id) AS numPersonSort',
+        ])
             ->from('AppBundle\Entity\Exhibition', 'E')
-            ->leftJoin('AppBundle\Entity\ItemExhibition', 'IE',
-                       \Doctrine\ORM\Query\Expr\Join::WITH,
-                       'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)')
+            ->leftJoin(
+                'AppBundle\Entity\ItemExhibition',
+                'IE',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'IE.exhibition = E AND (IE.title IS NOT NULL OR IE.item IS NULL)'
+            )
             ->leftJoin('IE.person', 'P')
             ->where('E.id IN (:ids)')
             ->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
             ->setParameter('ids', $exhibitionIds)
             ->groupBy('E.id')
-            ;
+        ;
 
         foreach ($qb->getQuery()->getResult() as $row) {
-           $exhibitionStats[$row['id']] = $row;
+            $exhibitionStats[$row['id']] = $row;
         }
 
         return $exhibitionStats;
@@ -233,7 +244,8 @@ extends CrudController
      */
     public function detailActionArtists(Request $request, $id = null, $ulan = null, $gnd = null)
     {
-        $routeName = $request->get('_route'); $routeParams = [];
+        $routeName = $request->get('_route');
+        $routeParams = [];
 
         $repo = $this->getDoctrine()
             ->getRepository('AppBundle\Entity\Location');
@@ -252,16 +264,16 @@ extends CrudController
         $artists = $this->getArtistsByExhibitionIds($exhibitionIds);
 
         $csvResult = array_map(function ($values) {
-                $person = $values[0];
-                return [
-                    $person->getFullname(false),
-                    $person->getBirthDate(), $person->getDeathDate(),
-                    $person->getNationality(),
-                    $values['numExhibitionSort'], $values['numCatEntrySort'],
-                ];
-            }, $artists);
+            $person = $values[0];
+            return [
+                $person->getFullname(false),
+                $person->getBirthDate(), $person->getDeathDate(),
+                $person->getNationality(),
+                $values['numExhibitionSort'], $values['numCatEntrySort'],
+            ];
+        }, $artists);
 
-        return new CsvResponse($csvResult, 200, explode( ', ', 'Name, Date of Birth, Date of Death, Nationality, # of Exhibitions, # of Cat. Entries'));
+        return new CsvResponse($csvResult, 200, explode(', ', 'Name, Date of Birth, Date of Death, Nationality, # of Exhibitions, # of Cat. Entries'));
     }
 
     /**
@@ -269,7 +281,8 @@ extends CrudController
      */
     public function detailActionExhibitions(Request $request, $id = null)
     {
-        $routeName = $request->get('_route'); $routeParams = [];
+        $routeName = $request->get('_route');
+        $routeParams = [];
 
         $repo = $this->getDoctrine()
             ->getRepository('AppBundle\Entity\Location');
@@ -290,18 +303,22 @@ extends CrudController
 
         foreach ($location->getAllExhibitions() as $exhibition) {
             $innerArray = [];
-            array_push($innerArray,
-                       $exhibition->getStartdate(), $exhibition->getEnddate(), $exhibition->getDisplaydate(),
-                       $exhibition->getTitle(),
-                       $exhibition->getLocation()->getPlaceLabel(),
-                       $exhibition->getLocation()->getName(),
-                       $exhibition->getOrganizerType(),
-                       $exhibitionStats[$exhibition->getId()]['numCatEntrySort']);
+            array_push(
+                $innerArray,
+                $exhibition->getStartdate(),
+                $exhibition->getEnddate(),
+                $exhibition->getDisplaydate(),
+                $exhibition->getTitle(),
+                $exhibition->getLocation()->getPlaceLabel(),
+                $exhibition->getLocation()->getName(),
+                $exhibition->getOrganizerType(),
+                $exhibitionStats[$exhibition->getId()]['numCatEntrySort']
+            );
 
             array_push($csvResult, $innerArray);
         }
 
-        return new CsvResponse($csvResult, 200, explode( ', ', 'Start Date, End Date, Display Date, Title, City, Venue, Type of Org. Body, # of Cat. Entries'));
+        return new CsvResponse($csvResult, 200, explode(', ', 'Start Date, End Date, Display Date, Title, City, Venue, Type of Org. Body, # of Cat. Entries'));
     }
 
     /**
@@ -312,7 +329,8 @@ extends CrudController
      */
     public function detailAction(Request $request, $id = null, $ulan = null, $gnd = null)
     {
-        $routeName = $request->get('_route'); $routeParams = [];
+        $routeName = $request->get('_route');
+        $routeParams = [];
 
         $repo = $this->getDoctrine()
                 ->getRepository('AppBundle\Entity\Location');
@@ -375,8 +393,10 @@ extends CrudController
         $dbconn = $em->getConnection();
 
         // build all the ids
-        $personIds = array_map(function ($person) { return $person[0]->getId(); },
-                               $persons);
+        $personIds = array_map(
+            function ($person) { return $person[0]->getId(); },
+            $persons
+        );
 
         $numArtists = count($personIds);
         if (0 == $numArtists) {
@@ -425,7 +445,8 @@ extends CrudController
                 ];
             }
 
-            uasort($jaccardIndex,
+            uasort(
+                $jaccardIndex,
                 function ($a, $b) {
                     if ($a['coefficient'] == $b['coefficient']) {
                         return 0;
@@ -467,7 +488,7 @@ extends CrudController
             foreach ($entries as $entry) {
                 if ($entry->type) {
                     $currType = $entry->type->getName();
-                    array_push($types, (string)$currType == '0_unknown' ? 'unknown' : $currType);
+                    array_push($types, (string) $currType == '0_unknown' ? 'unknown' : $currType);
                 }
             };
         }
@@ -475,10 +496,12 @@ extends CrudController
         $typesTotal = array_count_values($types);
         arsort($typesTotal);
 
-        $finalData = array_map(function ($key) use ($typesTotal) {
-                return [ 'name' => $key, 'y' => (int)$typesTotal[$key]];
+        $finalData = array_map(
+            function ($key) use ($typesTotal) {
+                return [ 'name' => $key, 'y' => (int) $typesTotal[$key]];
             },
-            array_keys($typesTotal));
+            array_keys($typesTotal)
+        );
 
         $sumOfAllTypes = array_sum(array_values($typesTotal));
 
@@ -487,7 +510,7 @@ extends CrudController
 
     private function detailDataNumberOfArtistsPerCountry($artists)
     {
-        $artistNationalities = array_map(function ($artist) { return (string)$artist[0]->getNationality(); }, $artists);
+        $artistNationalities = array_map(function ($artist) { return (string) $artist[0]->getNationality(); }, $artists);
 
         $artistNationalitiesTotal = array_count_values($artistNationalities);
         arsort($artistNationalitiesTotal);
@@ -497,7 +520,7 @@ extends CrudController
         foreach ($artistNationalitiesTotal as $key => $count) {
             $finalData[] = [
                 'name' => $this->expandCountryCode($key),
-                'y' => (int)$count,
+                'y' => (int) $count,
                 'id' => $key,
             ];
         }

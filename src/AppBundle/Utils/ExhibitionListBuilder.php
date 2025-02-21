@@ -5,8 +5,7 @@ namespace AppBundle\Utils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class ExhibitionListBuilder
-extends SearchListBuilder
+class ExhibitionListBuilder extends SearchListBuilder
 {
     protected $entity = 'Exhibition';
     var $mode = '';
@@ -170,12 +169,13 @@ extends SearchListBuilder
         ],
     ];
 
-    public function __construct(\Doctrine\DBAL\Connection $connection,
-                                ?Request $request = null,
-                                ?UrlGeneratorInterface $urlGenerator = null,
-                                $queryFilters = null,
-                                $mode = '')
-    {
+    public function __construct(
+        \Doctrine\DBAL\Connection $connection,
+        ?Request $request = null,
+        ?UrlGeneratorInterface $urlGenerator = null,
+        $queryFilters = null,
+        $mode = ''
+    ) {
         $this->mode = $mode;
 
         parent::__construct($connection, $request, $urlGenerator, $queryFilters);
@@ -287,9 +287,11 @@ extends SearchListBuilder
 
                         $routeParams['filter']['exhibition']['exhibition'] = [ $row['exhibition_id'] ];
 
-                        return sprintf('<a href="%s">%s</a>',
-                                       $this->urlGenerator->generate('search-index', $routeParams),
-                                       $this->formatRowValue($val, [], $format));
+                        return sprintf(
+                            '<a href="%s">%s</a>',
+                            $this->urlGenerator->generate('search-index', $routeParams),
+                            $this->formatRowValue($val, [], $format)
+                        );
                     };
 
                 $routeParams = [
@@ -307,9 +309,11 @@ extends SearchListBuilder
 
                         $routeParams['filter']['exhibition']['exhibition'] = [ $row['exhibition_id'] ];
 
-                        return sprintf('<a href="%s">%s</a>',
-                                       $this->urlGenerator->generate('search-index', $routeParams),
-                                       $this->formatRowValue($val, [], $format));
+                        return sprintf(
+                            '<a href="%s">%s</a>',
+                            $this->urlGenerator->generate('search-index', $routeParams),
+                            $this->formatRowValue($val, [], $format)
+                        );
                     };
             }
         }
@@ -443,30 +447,47 @@ extends SearchListBuilder
             $queryBuilder->groupBy('E.id');
         }
 
-        $queryBuilder->leftJoin('E',
-                                'ItemExhibition', 'IE',
-                                'E.id=IE.id_exhibition AND (IE.title IS NOT NULL OR IE.id_item IS NULL)');
-        $queryBuilder->leftJoin('E',
-                                'Location', 'L',
-                                'E.id_location=L.id AND L.status <> -1');
-        $queryBuilder->leftJoin('L',
-                                'Geoname', 'PL',
-                                'L.place_tgn=PL.tgn');
-        $queryBuilder->leftJoin('E',
-                                'ExhibitionLocation', 'EL',
-                                'E.id=EL.id_exhibition AND EL.role = 0');
-        $queryBuilder->leftJoin('EL',
-                                'Location', 'O',
-                                'O.id=EL.id_location');
+        $queryBuilder->leftJoin(
+            'E',
+            'ItemExhibition',
+            'IE',
+            'E.id=IE.id_exhibition AND (IE.title IS NOT NULL OR IE.id_item IS NULL)'
+        );
+        $queryBuilder->leftJoin(
+            'E',
+            'Location',
+            'L',
+            'E.id_location=L.id AND L.status <> -1'
+        );
+        $queryBuilder->leftJoin(
+            'L',
+            'Geoname',
+            'PL',
+            'L.place_tgn=PL.tgn'
+        );
+        $queryBuilder->leftJoin(
+            'E',
+            'ExhibitionLocation',
+            'EL',
+            'E.id=EL.id_exhibition AND EL.role = 0'
+        );
+        $queryBuilder->leftJoin(
+            'EL',
+            'Location',
+            'O',
+            'O.id=EL.id_location'
+        );
 
         if (array_key_exists('person', $this->queryFilters)
             || array_key_exists('search', $this->queryFilters)
-            || in_array($this->mode, [ 'stats-nationality', 'stats-age', 'stats-gender' ]))
-        {
+            || in_array($this->mode, [ 'stats-nationality', 'stats-age', 'stats-gender' ])) {
             // so we can filter on P.*
-            $queryBuilder->leftJoin('IE',
-                                    'Person', 'P',
-                                    'P.id=IE.id_person AND P.status <> -1');
+            $queryBuilder->leftJoin(
+                'IE',
+                'Person',
+                'P',
+                'P.id=IE.id_person AND P.status <> -1'
+            );
         }
 
         return $this;
@@ -500,9 +521,12 @@ extends SearchListBuilder
 
         if (array_key_exists('organizer', $this->queryFilters)) {
             // so we can filter on PO.*
-            $queryBuilder->leftJoin('O',
-                                    'Geoname', 'PO',
-                                    'O.place_tgn=PO.tgn');
+            $queryBuilder->leftJoin(
+                'O',
+                'Geoname',
+                'PO',
+                'O.place_tgn=PO.tgn'
+            );
         }
 
         return $this;

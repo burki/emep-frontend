@@ -1,19 +1,18 @@
 <?php
+
 // YearRangeType.php
+
 namespace AppBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
-
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 # use ibanu\MainBundle\Form\DataTransformer\DurationToIntegerTransformer;
 
-class YearRangeType
-extends AbstractType
+class YearRangeType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -46,7 +45,7 @@ extends AbstractType
             */
             'error_bubbling' => false,
             'compound'       => true,
-            'required'       => false
+            'required'       => false,
         ]);
     }
 

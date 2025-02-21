@@ -1,6 +1,7 @@
 <?php
 
 // src/AppBundle/Entity/User.php
+
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -14,8 +15,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @ORM\Entity(repositoryClass="AppBundle\Repository\UserRepository")
  * @UniqueEntity(fields="email", message="This E-Mail is already registered")
  * */
-class User
-implements UserInterface, PasswordAuthenticatedUserInterface, \Serializable
+class User implements UserInterface, PasswordAuthenticatedUserInterface, \Serializable
 {
     static $ROLE_TO_PRIVS = [
         'ROLE_EXPERT' => 0x10, // access to works
@@ -170,9 +170,7 @@ implements UserInterface, PasswordAuthenticatedUserInterface, \Serializable
         return $roles;
     }
 
-    public function eraseCredentials()
-    {
-    }
+    public function eraseCredentials() {}
 
     /** @see \Serializable::serialize() */
     public function serialize()
@@ -189,12 +187,12 @@ implements UserInterface, PasswordAuthenticatedUserInterface, \Serializable
     /** @see \Serializable::unserialize() */
     public function unserialize($serialized)
     {
-        list (
+        [
             $this->id,
             $this->email,
             $this->password,
             // see section on salt below
             // $this->salt
-        ) = unserialize($serialized);
+        ] = unserialize($serialized);
     }
 }

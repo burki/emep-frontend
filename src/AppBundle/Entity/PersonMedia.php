@@ -9,8 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Entity
  */
-class PersonMedia
-extends Media
+class PersonMedia extends Media
 {
     /**
      *

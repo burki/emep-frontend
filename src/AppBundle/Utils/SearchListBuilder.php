@@ -4,11 +4,9 @@ namespace AppBundle\Utils;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-
 use Ifedko\DoctrineDbalPagination\ListBuilder;
 
-abstract class SearchListBuilder
-extends ListBuilder
+abstract class SearchListBuilder extends ListBuilder
 {
     const STATUS_DELETED = -1;
     const STATUS_EDIT = 0;
@@ -55,10 +53,12 @@ extends ListBuilder
 
     static function exhibitionVisibleCondition($alias = 'Exhibition')
     {
-        return sprintf('%s.status NOT BETWEEN %d AND %d',
-                       $alias,
-                       min(self::STATUS_INTERNALONLY, self::STATUS_DELETED),
-                       max(self::STATUS_INTERNALONLY, self::STATUS_DELETED));
+        return sprintf(
+            '%s.status NOT BETWEEN %d AND %d',
+            $alias,
+            min(self::STATUS_INTERNALONLY, self::STATUS_DELETED),
+            max(self::STATUS_INTERNALONLY, self::STATUS_DELETED)
+        );
     }
 
     static function buildExhibitionTitleListing(&$row)
@@ -71,8 +71,10 @@ extends ListBuilder
                 $parts[] = $row['exhibition_alternate'];
             }
 
-            return sprintf('[%s]',
-                           join(' : ', $parts));
+            return sprintf(
+                '[%s]',
+                join(' : ', $parts)
+            );
         }
 
         return $row['exhibition'];
@@ -88,8 +90,10 @@ extends ListBuilder
                 $parts[] = $row['location_alternate'];
             }
 
-            return sprintf('[%s]',
-                           join(' : ', $parts));
+            return sprintf(
+                '[%s]',
+                join(' : ', $parts)
+            );
         }
 
         return $row['location'];
@@ -110,8 +114,10 @@ extends ListBuilder
                 : $row['place'] . ', ';
 
             return $prefix
-                . sprintf('[%s]',
-                          join(' : ', $parts));
+                . sprintf(
+                    '[%s]',
+                    join(' : ', $parts)
+                );
         }
 
         return $row['holder'];
@@ -127,8 +133,10 @@ extends ListBuilder
                 $parts[] = $row['title_alternate'];
             }
 
-            return sprintf('[%s]',
-                           join(' : ', $parts));
+            return sprintf(
+                '[%s]',
+                join(' : ', $parts)
+            );
         }
 
         return $row['title'];
@@ -140,11 +148,12 @@ extends ListBuilder
     var $queryFilters = [];
     var $mode = null;
 
-    public function __construct(\Doctrine\DBAL\Connection $connection,
-                                ?Request $request = null,
-                                ?UrlGeneratorInterface $urlGenerator = null,
-                                $queryFilters = null)
-    {
+    public function __construct(
+        \Doctrine\DBAL\Connection $connection,
+        ?Request $request = null,
+        ?UrlGeneratorInterface $urlGenerator = null,
+        $queryFilters = null
+    ) {
         parent::__construct($connection);
 
         $this->request = $request;
@@ -224,7 +233,7 @@ extends ListBuilder
 
         unset($params['order']);
 
-        list($sort, $order) = $this->determineSortOrder();
+        [$sort, $order] = $this->determineSortOrder();
         if ($sort == $key) {
             $info['active'] = $order;
             // determine next order
@@ -249,7 +258,7 @@ extends ListBuilder
             return $this;
         }
 
-        list($sort, $order) = $this->determineSortOrder();
+        [$sort, $order] = $this->determineSortOrder();
 
         foreach ($this->orders[$sort][$order] as $orderBy) {
             $dir = 'ASC';
@@ -356,8 +365,7 @@ extends ListBuilder
 
             for ($j = 0; $j < count($fields); $j++) {
                 if (!is_null(\AppBundle\Entity\ItemExhibition::TYPE_OTHER_MEDIA)
-                    && preg_match('/^IE\./', $fields[$j]))
-                {
+                    && preg_match('/^IE\./', $fields[$j])) {
                     $orPartsOtherMedia[] = $fields[$j] . " LIKE :" . $key;
                 }
                 else {
@@ -366,9 +374,11 @@ extends ListBuilder
             }
 
             if (!empty($orPartsOtherMedia)) {
-                $orParts[] = sprintf('(IE.type <> %s AND (%s))',
-                                     \AppBundle\Entity\ItemExhibition::TYPE_OTHER_MEDIA,
-                                     implode(' OR ', $orPartsOtherMedia));
+                $orParts[] = sprintf(
+                    '(IE.type <> %s AND (%s))',
+                    \AppBundle\Entity\ItemExhibition::TYPE_OTHER_MEDIA,
+                    implode(' OR ', $orPartsOtherMedia)
+                );
             }
 
             $andParts[] = '(' . implode(' OR ', $orParts) . ')';
@@ -414,13 +424,19 @@ extends ListBuilder
             if (is_scalar($filterValues)) {
                 if ($filterValues < 0) {
                     // negate
-                    $queryBuilder->andWhere(sprintf('%s <> %s',
-                                                    $field, ':' . $key))
+                    $queryBuilder->andWhere(sprintf(
+                        '%s <> %s',
+                        $field,
+                        ':' . $key
+                    ))
                         ->setParameter($key, - $filterValues);
                 }
                 else {
-                    $queryBuilder->andWhere(sprintf('%s = %s',
-                                                    $field, ':' . $key))
+                    $queryBuilder->andWhere(sprintf(
+                        '%s = %s',
+                        $field,
+                        ':' . $key
+                    ))
                         ->setParameter($key, $filterValues);
                 }
             }
@@ -438,26 +454,36 @@ extends ListBuilder
                 });
 
                 if (count($filterValues) > 0) {
-                    $queryBuilder->andWhere(sprintf('%s IN (%s)',
-                                                    $field, ':' . $key))
-                        ->setParameter($key,
-                                       array_map(function ($val) {
-                                            return is_object($val)
-                                                ? $this->getObjectIdentifier($val)
-                                                : $val;
-                                        }, $filterValues),
-                                       \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);
+                    $queryBuilder->andWhere(sprintf(
+                        '%s IN (%s)',
+                        $field,
+                        ':' . $key
+                    ))
+                        ->setParameter(
+                            $key,
+                            array_map(function ($val) {
+                                return is_object($val)
+                                    ? $this->getObjectIdentifier($val)
+                                    : $val;
+                            }, $filterValues),
+                            \Doctrine\DBAL\Connection::PARAM_STR_ARRAY
+                        );
                 }
 
                 if (count($negated) > 0) {
                     $key = 'not_' . $key;
-                    $queryBuilder->andWhere(sprintf('%s NOT IN (%s)',
-                                                    $field, ':' . $key))
-                        ->setParameter($key,
-                                       array_map(function ($val) {
-                                            return - (is_object($val) ? $val->getId() : $val);
-                                        }, $negated),
-                                       \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);
+                    $queryBuilder->andWhere(sprintf(
+                        '%s NOT IN (%s)',
+                        $field,
+                        ':' . $key
+                    ))
+                        ->setParameter(
+                            $key,
+                            array_map(function ($val) {
+                                return - (is_object($val) ? $val->getId() : $val);
+                            }, $negated),
+                            \Doctrine\DBAL\Connection::PARAM_STR_ARRAY
+                        );
                 }
             }
         }
@@ -489,13 +515,19 @@ extends ListBuilder
                 $field = $fieldMap[$type];
                 $parameter = $key . '_' . $type;
                 if (1 == count($active)) {
-                    $orParts[] = sprintf('%s = %s',
-                                         $field, ':' . $parameter);
+                    $orParts[] = sprintf(
+                        '%s = %s',
+                        $field,
+                        ':' . $parameter
+                    );
                     $queryBuilder->setParameter($parameter, $active[0]);
                 }
                 else {
-                    $orParts[] = sprintf('%s IN(%s)',
-                                         $field, ':' . $parameter);
+                    $orParts[] = sprintf(
+                        '%s IN(%s)',
+                        $field,
+                        ':' . $parameter
+                    );
                     $queryBuilder->setParameter($parameter, $active, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);
                 }
             }
@@ -515,10 +547,13 @@ extends ListBuilder
                 'type' => 'E.type',
                 // 'organizer_type' => 'E.organizer_type',
                 'exhibition' => 'E.id',
-                ] as $key => $field)
-            {
-                $this->addInFilter($queryBuilder, $field, 'exhibition_' . $key,
-                                   array_key_exists($key,  $exhibitionFilters) ? $exhibitionFilters[$key] : null);
+            ] as $key => $field) {
+                $this->addInFilter(
+                    $queryBuilder,
+                    $field,
+                    'exhibition_' . $key,
+                    array_key_exists($key, $exhibitionFilters) ? $exhibitionFilters[$key] : null
+                );
             }
 
             foreach ([ 'date' => 'E.startdate' ] as $key => $field) {
@@ -526,13 +561,17 @@ extends ListBuilder
                     foreach ([ 'from', 'until' ] as $part) {
                         if (array_key_exists($part, $exhibitionFilters[$key])) {
                             $paramName = $key . '_' . $part;
-                            $queryBuilder->andWhere(sprintf('YEAR(%s) %s %s',
-                                                            $field,
-                                                            'from' == $part ? '>=' : '<',
-                                                            ':' . $paramName))
-                                ->setParameter($paramName,
-                                               intval($exhibitionFilters[$key][$part])
-                                               + ('until' == $part ? 1 : 0));
+                            $queryBuilder->andWhere(sprintf(
+                                'YEAR(%s) %s %s',
+                                $field,
+                                'from' == $part ? '>=' : '<',
+                                ':' . $paramName
+                            ))
+                                ->setParameter(
+                                    $paramName,
+                                    intval($exhibitionFilters[$key][$part])
+                                               + ('until' == $part ? 1 : 0)
+                                );
                         }
                     }
                 }
@@ -552,8 +591,10 @@ extends ListBuilder
                     }
                     else if (0 <> intval($flag)) {
                         $paramName = 'exhibition_flags_' . $i;
-                        $queryBuilder->andWhere(sprintf('(E.flags & %s) <> 0',
-                                                        ':' . $paramName))
+                        $queryBuilder->andWhere(sprintf(
+                            '(E.flags & %s) <> 0',
+                            ':' . $paramName
+                        ))
                             ->setParameter($paramName, intval($flag));
                     }
                 }
@@ -569,10 +610,13 @@ extends ListBuilder
                 'birthplace' => 'P.birthplace_tgn',
                 'deathplace' => 'P.deathplace_tgn',
                 'person' => 'P.id',
-                ] as $key => $field)
-            {
-                $this->addInFilter($queryBuilder, $field, $key,
-                                   array_key_exists($key,  $personFilters) ? $personFilters[$key] : null);
+            ] as $key => $field) {
+                $this->addInFilter(
+                    $queryBuilder,
+                    $field,
+                    $key,
+                    array_key_exists($key, $personFilters) ? $personFilters[$key] : null
+                );
             }
 
             foreach ([ 'birthdate' => 'P.birthdate', 'deathdate' => 'P.deathdate' ] as $key => $field) {
@@ -580,13 +624,17 @@ extends ListBuilder
                     foreach ([ 'from', 'until'] as $part) {
                         if (array_key_exists($part, $personFilters[$key])) {
                             $paramName = $key . '_' . $part;
-                            $queryBuilder->andWhere(sprintf('YEAR(%s) %s %s',
-                                                            $field,
-                                                            'from' == $part ? '>=' : '<',
-                                                            ':' . $paramName))
-                                ->setParameter($paramName,
-                                               intval($personFilters[$key][$part])
-                                               + ('until' == $part ? 1 : 0));
+                            $queryBuilder->andWhere(sprintf(
+                                'YEAR(%s) %s %s',
+                                $field,
+                                'from' == $part ? '>=' : '<',
+                                ':' . $paramName
+                            ))
+                                ->setParameter(
+                                    $paramName,
+                                    intval($personFilters[$key][$part])
+                                               + ('until' == $part ? 1 : 0)
+                                );
                         }
                     }
                 }
@@ -607,30 +655,38 @@ extends ListBuilder
             $locationFilters = & $this->queryFilters['location'];
 
             foreach ([ 'type' => 'L.type', 'location' => 'L.id' ] as $key => $field) {
-                $this->addInFilter($queryBuilder, $field, 'location_' . $key,
-                                   array_key_exists($key,  $locationFilters) ? $locationFilters[$key] : null);
+                $this->addInFilter(
+                    $queryBuilder,
+                    $field,
+                    'location_' . $key,
+                    array_key_exists($key, $locationFilters) ? $locationFilters[$key] : null
+                );
             }
 
             if (!empty($locationFilters[$key = 'geoname'])) {
                 $this->addGeonameFilter($queryBuilder, [
-                                            'cc' => 'PL.country_code',
-                                            'tgn' => 'L.place_tgn',
-                                        ], $key, $locationFilters[$key]);
+                    'cc' => 'PL.country_code',
+                    'tgn' => 'L.place_tgn',
+                ], $key, $locationFilters[$key]);
             }
         }
 
         if (array_key_exists('organizer', $this->queryFilters)) {
             $organizerFilters = & $this->queryFilters['organizer'];
             foreach ([ 'type' => 'O.type', 'organizer' => 'O.id' ] as $key => $field) {
-                $this->addInFilter($queryBuilder, $field, 'organizer_' . $key,
-                                   array_key_exists($key,  $organizerFilters) ? $organizerFilters[$key] : null);
+                $this->addInFilter(
+                    $queryBuilder,
+                    $field,
+                    'organizer_' . $key,
+                    array_key_exists($key, $organizerFilters) ? $organizerFilters[$key] : null
+                );
             }
 
             if (!empty($organizerFilters[$key = 'geoname'])) {
                 $this->addGeonameFilter($queryBuilder, [
-                                            'cc' => 'PO.country_code',
-                                            'tgn' => 'O.place_tgn',
-                                        ], $key . '_organizer', $organizerFilters[$key]);
+                    'cc' => 'PO.country_code',
+                    'tgn' => 'O.place_tgn',
+                ], $key . '_organizer', $organizerFilters[$key]);
             }
         }
 
@@ -638,15 +694,19 @@ extends ListBuilder
             $holderFilters = & $this->queryFilters['holder'];
 
             foreach ([ 'holder' => 'H.id' ] as $key => $field) {
-                $this->addInFilter($queryBuilder, $field, 'holder_' . $key,
-                                   array_key_exists($key,  $holderFilters) ? $holderFilters[$key] : null);
+                $this->addInFilter(
+                    $queryBuilder,
+                    $field,
+                    'holder_' . $key,
+                    array_key_exists($key, $holderFilters) ? $holderFilters[$key] : null
+                );
             }
 
             if (!empty($holderFilters[$key = 'geoname'])) {
                 $this->addGeonameFilter($queryBuilder, [
-                                            'cc' => 'H.country',
-                                            'tgn' => 'H.place_tgn',
-                                        ], $key, $holderFilters[$key]);
+                    'cc' => 'H.country',
+                    'tgn' => 'H.place_tgn',
+                ], $key, $holderFilters[$key]);
             }
         }
 
@@ -655,9 +715,9 @@ extends ListBuilder
 
             if (!empty($placeFilters[$key = 'geoname'])) {
                 $this->addGeonameFilter($queryBuilder, [
-                                            'cc' => 'PL.country_code',
-                                            'tgn' => 'PL.tgn',
-                                        ], $key, $placeFilters[$key]);
+                    'cc' => 'PL.country_code',
+                    'tgn' => 'PL.tgn',
+                ], $key, $placeFilters[$key]);
             }
         }
 
@@ -665,8 +725,12 @@ extends ListBuilder
             $itemExhibitionFilters = & $this->queryFilters['catentry'];
 
             foreach ([ 'type' => 'IE.type', 'forsale' => 'IE.forsale' ] as $key => $field) {
-                $this->addInFilter($queryBuilder, $field, 'itemexhibition_' . $key,
-                                   array_key_exists($key,  $itemExhibitionFilters) ? $itemExhibitionFilters[$key] : null);
+                $this->addInFilter(
+                    $queryBuilder,
+                    $field,
+                    'itemexhibition_' . $key,
+                    array_key_exists($key, $itemExhibitionFilters) ? $itemExhibitionFilters[$key] : null
+                );
             }
 
             if (!empty($itemExhibitionFilters['price_available'])) {
@@ -691,9 +755,11 @@ extends ListBuilder
             return false;
         }
 
-        return sprintf('<a href="%s">%s</a>',
-                       $this->urlGenerator->generate($route, $routeParams),
-                       $this->formatRowValue($val, [], $format));
+        return sprintf(
+            '<a href="%s">%s</a>',
+            $this->urlGenerator->generate($route, $routeParams),
+            $this->formatRowValue($val, [], $format)
+        );
     }
 
     protected function buildLinkedExhibition(&$row, $val, $format)
@@ -704,9 +770,11 @@ extends ListBuilder
 
         $val = self::buildExhibitionTitleListing($row);
 
-        return sprintf('<a href="%s">%s</a>',
-                       $this->urlGenerator->generate('exhibition', [ 'id' => $row['exhibition_id'] ]),
-                       $this->formatRowValue($val, [], $format));
+        return sprintf(
+            '<a href="%s">%s</a>',
+            $this->urlGenerator->generate('exhibition', [ 'id' => $row['exhibition_id'] ]),
+            $this->formatRowValue($val, [], $format)
+        );
     }
 
     protected function buildLinkedItemExhibition(&$row, $val, $format)
@@ -717,13 +785,15 @@ extends ListBuilder
 
         $val = self::buildItemExhibitionTitleListing($row);
 
-        return sprintf('<a href="%s#%s">%s</a>',
-                       $this->urlGenerator->generate('itemexhibition', [
-                            'id' => $row['exhibition_id'],
-                            'itemexhibitionId' => $row['id'],
-                       ]),
-                       $row['id'],
-                       $this->formatRowValue($val, [], $format));
+        return sprintf(
+            '<a href="%s#%s">%s</a>',
+            $this->urlGenerator->generate('itemexhibition', [
+                'id' => $row['exhibition_id'],
+                'itemexhibitionId' => $row['id'],
+            ]),
+            $row['id'],
+            $this->formatRowValue($val, [], $format)
+        );
     }
 
     protected function buildLinkedLocation(&$row, $val, $format, $route_name = 'location')
@@ -734,9 +804,11 @@ extends ListBuilder
 
         $val = self::buildLocationNameListing($row);
 
-        return sprintf('<a href="%s">%s</a>',
-                       $this->urlGenerator->generate($route_name, [ 'id' => $row['location_id'] ]),
-                       $this->formatRowValue($val, [], $format));
+        return sprintf(
+            '<a href="%s">%s</a>',
+            $this->urlGenerator->generate($route_name, [ 'id' => $row['location_id'] ]),
+            $this->formatRowValue($val, [], $format)
+        );
     }
 
     protected function buildLinkedOrganizer(&$row, $val, $format)
@@ -752,11 +824,13 @@ extends ListBuilder
 
         $val = self::buildHolderNameListing($row);
 
-        return sprintf('<a href="%s">%s</a>',
-                       $this->urlGenerator->generate('holder', [
-                            'id' => $row['holder_id'],
-                       ]),
-                       $this->formatRowValue($val, [], $format));
+        return sprintf(
+            '<a href="%s">%s</a>',
+            $this->urlGenerator->generate('holder', [
+                'id' => $row['holder_id'],
+            ]),
+            $this->formatRowValue($val, [], $format)
+        );
     }
 
     public function buildHeaderRow()
@@ -836,8 +910,13 @@ extends ListBuilder
             $val = null;
 
             if (array_key_exists('buildValue', $descr)) {
-                $val = $descr['buildValue']($row, array_key_exists($key, $row) ? $row[$key] : $val,
-                                            $this, $key, $format);
+                $val = $descr['buildValue'](
+                    $row,
+                    array_key_exists($key, $row) ? $row[$key] : $val,
+                    $this,
+                    $key,
+                    $format
+                );
                 if (false === $val && array_key_exists($key, $row)) {
                     // fall back to default
                     $val = $this->formatRowValue($row[$key], $descr, $format);

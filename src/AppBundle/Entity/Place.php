@@ -14,8 +14,7 @@ use Gedmo\Mapping\Annotation as Gedmo; // alias for Gedmo extensions annotations
  * @ORM\Table(name="Geoname")
  *
  */
-class Place
-implements \JsonSerializable, JsonLdSerializable
+class Place implements \JsonSerializable, JsonLdSerializable
 {
     static $zoomLevelByType = [
         'neighborhood' => 12,
@@ -66,7 +65,7 @@ implements \JsonSerializable, JsonLdSerializable
         }
 
         // make sure order is as in $language_preferred_ordered
-        uksort($assoc, function($langA, $langB) use ($language_preferred_ordered) {
+        uksort($assoc, function ($langA, $langB) use ($language_preferred_ordered) {
             if ($langA == $langB) {
                 return 0;
             }
@@ -296,8 +295,8 @@ implements \JsonSerializable, JsonLdSerializable
         }
 
         return $this->locations->filter(
-            function($entity) {
-               return -1 != $entity->getStatus();
+            function ($entity) {
+                return -1 != $entity->getStatus();
             }
         );
     }
@@ -309,8 +308,8 @@ implements \JsonSerializable, JsonLdSerializable
         }
 
         return $this->locations->filter(
-            function($entity) {
-               return $entity->isVenue() && -1 != $entity->getStatus();
+            function ($entity) {
+                return $entity->isVenue() && -1 != $entity->getStatus();
             }
         );
     }
@@ -502,14 +501,14 @@ implements \JsonSerializable, JsonLdSerializable
         $qb = $em->createQueryBuilder();
 
         $qb->select([
-                'P',
-                "COALESCE(P.alternateName,P.name) HIDDEN nameSort"
-            ])
+            'P',
+            "COALESCE(P.alternateName,P.name) HIDDEN nameSort",
+        ])
             ->from('AppBundle\Entity\Place', 'P')
             ->where("P.parentTgn = :tgn")
             ->setParameter('tgn', $this->tgn)
             ->orderBy('nameSort')
-            ;
+        ;
 
         return $qb->getQuery()->getResult();
     }
@@ -544,7 +543,7 @@ implements \JsonSerializable, JsonLdSerializable
             'archipelagos' => 20,
         ];
 
-        uksort($ret, function($typeA, $typeB) use ($typeWeights) {
+        uksort($ret, function ($typeA, $typeB) use ($typeWeights) {
             if ($typeA == $typeB) {
                 return 0;
             }

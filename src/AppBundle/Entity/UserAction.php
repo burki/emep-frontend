@@ -1,12 +1,11 @@
 <?php
 
 // src/AppBundle/Entity/UserAction.php
+
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
 use Gedmo\Mapping\Annotation as Gedmo; // this will be like an alias for Gedmo extensions annotations
-
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**

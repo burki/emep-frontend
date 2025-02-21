@@ -4,9 +4,7 @@ namespace AppBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-
 use Gedmo\Mapping\Annotation as Gedmo; // alias for Gedmo extensions annotations
-
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -18,8 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Table(name="Journal")
  *
  */
-class Journal
-implements \JsonSerializable, JsonLdSerializable /*, OgSerializable, TwitterSerializable */
+class Journal implements \JsonSerializable, JsonLdSerializable /*, OgSerializable, TwitterSerializable */
 {
     use InfoTrait;
 
@@ -274,25 +271,36 @@ implements \JsonSerializable, JsonLdSerializable /*, OgSerializable, TwitterSeri
         /* vertical-align: super doesn't render nicely:
            http://stackoverflow.com/a/1530819/2114681
         */
-        $ret = preg_replace('/style="([^"]*)vertical\-align\:\s*super;([^"]*)"/',
-                            'style="\1vertical-align: super; font-size: 66%;\2"', $ret);
+        $ret = preg_replace(
+            '/style="([^"]*)vertical\-align\:\s*super;([^"]*)"/',
+            'style="\1vertical-align: super; font-size: 66%;\2"',
+            $ret
+        );
 
         if ($extended) {
             // make links clickable
-            $ret = preg_replace_callback('/(<span class="citeproc\-URL">&lt;)(.*?)(&gt;)/',
+            $ret = preg_replace_callback(
+                '/(<span class="citeproc\-URL">&lt;)(.*?)(&gt;)/',
                 function ($matches) {
                     return $matches[1]
-                        . sprintf('<a href="%s" target="_blank">%s</a>',
-                              $matches[2], $matches[2])
+                        . sprintf(
+                            '<a href="%s" target="_blank">%s</a>',
+                            $matches[2],
+                            $matches[2]
+                        )
                     . $matches[3];
                 },
-                $ret);
+                $ret
+            );
 
             $append = [];
         }
 
-        return preg_replace('~^<div class="csl\-bib\-body"><div style="text\-indent: \-25px; padding\-left: 25px;"><div class="csl-entry">(.*?)</div></div></div>$~',
-                            '\1', $ret);
+        return preg_replace(
+            '~^<div class="csl\-bib\-body"><div style="text\-indent: \-25px; padding\-left: 25px;"><div class="csl-entry">(.*?)</div></div></div>$~',
+            '\1',
+            $ret
+        );
     }
 
     private static function mb_ucfirst($string, $encoding = 'UTF-8')

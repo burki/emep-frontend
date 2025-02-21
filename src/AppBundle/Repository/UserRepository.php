@@ -6,12 +6,9 @@ namespace AppBundle\Repository;
 
 use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
 use Doctrine\ORM\EntityRepository;
-
 use AppBundle\Entity\User;
 
-class UserRepository
-extends EntityRepository
-implements UserLoaderInterface
+class UserRepository extends EntityRepository implements UserLoaderInterface
 {
     // see https://symfony.com/doc/5.4/security/user_providers.html
     public function loadUserByIdentifier(string $usernameOrEmail): ?User

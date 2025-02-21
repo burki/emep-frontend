@@ -5,8 +5,7 @@ namespace AppBundle\Utils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class PersonListBuilder
-extends SearchListBuilder
+class PersonListBuilder extends SearchListBuilder
 {
     protected $entity = 'Person';
     var $mode = '';
@@ -204,12 +203,13 @@ extends SearchListBuilder
         ],
     ];
 
-    public function __construct(\Doctrine\DBAL\Connection $connection,
-                                ?Request $request = null,
-                                ?UrlGeneratorInterface $urlGenerator = null,
-                                $queryFilters = null,
-                                $mode = '')
-    {
+    public function __construct(
+        \Doctrine\DBAL\Connection $connection,
+        ?Request $request = null,
+        ?UrlGeneratorInterface $urlGenerator = null,
+        $queryFilters = null,
+        $mode = ''
+    ) {
         $this->mode = $mode;
 
         parent::__construct($connection, $request, $urlGenerator, $queryFilters);
@@ -326,9 +326,11 @@ extends SearchListBuilder
 
                         $routeParams['filter']['person']['person'] = [ $row['person_id'] ];
 
-                        return sprintf('<a href="%s">%s</a>',
-                                       $this->urlGenerator->generate('search-index', $routeParams),
-                                       $this->formatRowValue($val, [], $format));
+                        return sprintf(
+                            '<a href="%s">%s</a>',
+                            $this->urlGenerator->generate('search-index', $routeParams),
+                            $this->formatRowValue($val, [], $format)
+                        );
                     };
 
                 $routeParams = [
@@ -344,9 +346,11 @@ extends SearchListBuilder
 
                         $routeParams['filter']['person']['person'] = [ $row['person_id'] ];
 
-                        return sprintf('<a href="%s">%s</a>',
-                                       $this->urlGenerator->generate('search-index', $routeParams),
-                                       $this->formatRowValue($val, [], $format));
+                        return sprintf(
+                            '<a href="%s">%s</a>',
+                            $this->urlGenerator->generate('search-index', $routeParams),
+                            $this->formatRowValue($val, [], $format)
+                        );
                     };
             }
         }
@@ -391,7 +395,7 @@ extends SearchListBuilder
 
         if (in_array($this->mode, [ 'stats-by-year-birth', 'stats-by-year-death' ])) {
             $queryBuilder->select([
-                'YEAR(P.' . ( 'stats-by-year-death' == $this->mode ? 'death' : 'birth' ) . 'date) AS year',
+                'YEAR(P.' . ('stats-by-year-death' == $this->mode ? 'death' : 'birth') . 'date) AS year',
                 'COUNT(DISTINCT P.id) AS how_many',
             ]);
 
@@ -479,54 +483,80 @@ extends SearchListBuilder
                                 'IE.id_person=P.id AND (IE.title IS NOT NULL OR IE.id_item IS NULL)');
         */
         // new mode is to exclude those without cat entry
-        $queryBuilder->innerJoin('P',
-                                '(SELECT ItemExhibition.* FROM ItemExhibition'
-                                . ' INNER JOIN Exhibition ON ItemExhibition.id_exhibition=Exhibition.id AND ' . $this->buildExhibitionVisibleCondition('Exhibition') . ')', 'IE',
-                                'IE.id_person=P.id AND (IE.title IS NOT NULL OR IE.id_item IS NULL)');
+        $queryBuilder->innerJoin(
+            'P',
+            '(SELECT ItemExhibition.* FROM ItemExhibition'
+                                . ' INNER JOIN Exhibition ON ItemExhibition.id_exhibition=Exhibition.id AND ' . $this->buildExhibitionVisibleCondition('Exhibition') . ')',
+            'IE',
+            'IE.id_person=P.id AND (IE.title IS NOT NULL OR IE.id_item IS NULL)'
+        );
 
         if (array_key_exists('exhibition', $this->queryFilters)
             || array_key_exists('location', $this->queryFilters)
-            || array_key_exists('organizer', $this->queryFilters))
-        {
+            || array_key_exists('organizer', $this->queryFilters)) {
             // so we can filter on E.*
-            $queryBuilder->leftJoin('IE',
-                                    'Exhibition', 'E',
-                                    'E.id=IE.id_exhibition AND ' . $this->buildExhibitionVisibleCondition('E')
-                                    . ' AND (IE.title IS NOT NULL OR IE.id_item IS NULL)');
+            $queryBuilder->leftJoin(
+                'IE',
+                'Exhibition',
+                'E',
+                'E.id=IE.id_exhibition AND ' . $this->buildExhibitionVisibleCondition('E')
+                                    . ' AND (IE.title IS NOT NULL OR IE.id_item IS NULL)'
+            );
 
             if (array_key_exists('location', $this->queryFilters)) {
                 // so we can filter on L.*
-                $queryBuilder->leftJoin('E',
-                                        'Location', 'L',
-                                        'E.id_location=L.id AND L.status <> -1');
-                $queryBuilder->leftJoin('L',
-                                        'Geoname', 'PL',
-                                        'L.place_tgn=PL.tgn');
+                $queryBuilder->leftJoin(
+                    'E',
+                    'Location',
+                    'L',
+                    'E.id_location=L.id AND L.status <> -1'
+                );
+                $queryBuilder->leftJoin(
+                    'L',
+                    'Geoname',
+                    'PL',
+                    'L.place_tgn=PL.tgn'
+                );
             }
 
             if (array_key_exists('organizer', $this->queryFilters)) {
                 // so we can filter on O.*
-                $queryBuilder->innerJoin('E',
-                                        'ExhibitionLocation', 'EL',
-                                        'EL.id_exhibition=E.id AND ' . $this->buildExhibitionVisibleCondition('E'));
-                $queryBuilder->innerJoin('EL',
-                                        'Location', 'O',
-                                        'EL.id_location=O.id AND EL.role = 0');
+                $queryBuilder->innerJoin(
+                    'E',
+                    'ExhibitionLocation',
+                    'EL',
+                    'EL.id_exhibition=E.id AND ' . $this->buildExhibitionVisibleCondition('E')
+                );
+                $queryBuilder->innerJoin(
+                    'EL',
+                    'Location',
+                    'O',
+                    'EL.id_location=O.id AND EL.role = 0'
+                );
 
                 // so we can filter on PO.*
-                $queryBuilder->leftJoin('O',
-                                        'Geoname', 'PO',
-                                        'O.place_tgn=PO.tgn');
+                $queryBuilder->leftJoin(
+                    'O',
+                    'Geoname',
+                    'PO',
+                    'O.place_tgn=PO.tgn'
+                );
             }
         }
 
         if ($this->joinLatLong) {
-            $queryBuilder->leftJoin('P',
-                                    'Geoname', 'PB',
-                                    'P.birthplace_tgn=PB.tgn');
-            $queryBuilder->leftJoin('P',
-                                    'Geoname', 'PD',
-                                    'P.deathplace_tgn=PD.tgn');
+            $queryBuilder->leftJoin(
+                'P',
+                'Geoname',
+                'PB',
+                'P.birthplace_tgn=PB.tgn'
+            );
+            $queryBuilder->leftJoin(
+                'P',
+                'Geoname',
+                'PD',
+                'P.deathplace_tgn=PD.tgn'
+            );
         }
 
         return $this;
@@ -541,7 +571,7 @@ extends SearchListBuilder
             $queryBuilder->andWhere('P.wikidata IS NOT NULL');
         }
         else if (in_array($this->mode, [ 'stats-by-year-birth', 'stats-by-year-death' ])) {
-            $queryBuilder->andWhere('P.' . ( 'stats-by-year-death' == $this->mode ? 'death' : 'birth' ) . 'date IS NOT NULL');
+            $queryBuilder->andWhere('P.' . ('stats-by-year-death' == $this->mode ? 'death' : 'birth') . 'date IS NOT NULL');
         }
         else if ('stats-exhibition-distribution' == $this->mode) {
             $queryBuilder->having('how_many >= 1');

@@ -1,12 +1,13 @@
 <?php
+
 // src/AppBundle/Menu/Builder.php
 
 // registered in services.yml to pass $securityContext and $requestStack
 // see http://symfony.com/doc/current/bundles/KnpMenuBundle/index.html
+
 namespace AppBundle\Menu;
 
 use Knp\Menu\FactoryInterface;
-
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\PhpBridgeSessionStorage;
@@ -25,10 +26,11 @@ class Builder
      *
      * Add any other dependency you need
      */
-    public function __construct(FactoryInterface $factory,
-                                AuthorizationCheckerInterface $authorizationChecker,
-                                RequestStack $requestStack)
-    {
+    public function __construct(
+        FactoryInterface $factory,
+        AuthorizationCheckerInterface $authorizationChecker,
+        RequestStack $requestStack
+    ) {
         $this->factory = $factory;
         $this->authorizationChecker = $authorizationChecker;
         $this->requestStack = $requestStack;

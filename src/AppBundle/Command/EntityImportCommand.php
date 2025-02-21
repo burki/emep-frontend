@@ -1,6 +1,7 @@
 <?php
 
 // src/AppBundle/Command/EntityEnhanceCommand.php
+
 namespace AppBundle\Command;
 
 use Symfony\Component\Console\Command\Command;
@@ -11,11 +12,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Intl\Countries;
-
 use Doctrine\ORM\EntityManagerInterface;
 
-class EntityImportCommand
-extends Command
+class EntityImportCommand extends Command
 {
     protected $em;
 
@@ -36,7 +35,7 @@ extends Command
                 InputArgument::REQUIRED,
                 'which entities do you want to import (country)'
             )
-            ;
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -47,8 +46,10 @@ extends Command
                 break;
 
             default:
-                $output->writeln(sprintf('<error>invalid type: %s</error>',
-                                         $input->getArgument('type')));
+                $output->writeln(sprintf(
+                    '<error>invalid type: %s</error>',
+                    $input->getArgument('type')
+                ));
                 return 1;
         }
     }
@@ -58,15 +59,15 @@ extends Command
         $qb = $this->em->createQueryBuilder();
 
         $qb->select([
-                'P.countryCode',
-                'C.countryCode AS ignore',
-            ])
+            'P.countryCode',
+            'C.countryCode AS ignore',
+        ])
             ->distinct()
             ->from('AppBundle\Entity\Place', 'P')
             ->leftJoin('P.country', 'C')
             ->where("P.type IN ('inhabited places') AND P.countryCode IS NOT NULL")
             ->having('C.countryCode IS NULL')
-            ;
+        ;
 
         $flush = false;
         foreach ($qb->getQuery()->getResult() as $result) {

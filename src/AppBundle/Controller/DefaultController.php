@@ -5,14 +5,12 @@ namespace AppBundle\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Annotation\Route;
-
 use AppBundle\Utils\SearchListPagination;
 
 /**
  * Base Controller for home-page and other blog- and info-pages
  */
-class DefaultController
-extends BaseController
+class DefaultController extends BaseController
 {
     protected function instantiateWpApiClient()
     {
@@ -26,9 +24,12 @@ extends BaseController
 
             $client = new \Vnn\WpApiClient\WpClient(
                 new \Vnn\WpApiClient\Http\GuzzleAdapter(new \GuzzleHttp\Client()),
-                    $url);
-            $client->setCredentials(new \Vnn\WpApiClient\Auth\WpBasicAuth($this->getParameter('app.wp-rest.user'),
-                                                                          $this->getParameter('app.wp-rest.password')));
+                $url
+            );
+            $client->setCredentials(new \Vnn\WpApiClient\Auth\WpBasicAuth(
+                $this->getParameter('app.wp-rest.user'),
+                $this->getParameter('app.wp-rest.password')
+            ));
 
             return $client;
         }
@@ -47,7 +48,7 @@ extends BaseController
         $connection = $this->getDoctrine()->getManager()->getConnection();
 
         $counts = [];
-        foreach ([ 'ItemExhibition' , 'Exhibition', 'Venue', 'Organizer', 'Person', 'Place' ] as $entity) {
+        foreach ([ 'ItemExhibition', 'Exhibition', 'Venue', 'Organizer', 'Person', 'Place' ] as $entity) {
             switch ($entity) {
                 case 'ItemExhibition':
                     $listBuilder = new \AppBundle\Utils\ItemExhibitionListBuilder($connection, $request, $urlGenerator, []);

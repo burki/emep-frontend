@@ -5,8 +5,7 @@ namespace AppBundle\Utils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-abstract class LocationListBuilder
-extends SearchListBuilder
+abstract class LocationListBuilder extends SearchListBuilder
 {
     protected $entity = 'Location';
     protected $alias = 'L';
@@ -139,12 +138,13 @@ extends SearchListBuilder
         ],
     ];
 
-    public function __construct(\Doctrine\DBAL\Connection $connection,
-                                ?Request $request = null,
-                                ?UrlGeneratorInterface $urlGenerator = null,
-                                $queryFilters = null,
-                                $mode = '')
-    {
+    public function __construct(
+        \Doctrine\DBAL\Connection $connection,
+        ?Request $request = null,
+        ?UrlGeneratorInterface $urlGenerator = null,
+        $queryFilters = null,
+        $mode = ''
+    ) {
         $this->mode = $mode;
 
         parent::__construct($connection, $request, $urlGenerator, $queryFilters);
@@ -237,9 +237,11 @@ extends SearchListBuilder
 
                         $routeParams['filter'][$key][$key] = [ $row['id'] ];
 
-                        return sprintf('<a href="%s">%s</a>',
-                                       $this->urlGenerator->generate('search-index', $routeParams),
-                                       $this->formatRowValue($val, [], $format));
+                        return sprintf(
+                            '<a href="%s">%s</a>',
+                            $this->urlGenerator->generate('search-index', $routeParams),
+                            $this->formatRowValue($val, [], $format)
+                        );
                     };
 
                 $routeParams = [
@@ -257,9 +259,11 @@ extends SearchListBuilder
 
                         $routeParams['filter'][$key][$key] = [ $row['id'] ];
 
-                        return sprintf('<a href="%s">%s</a>',
-                                       $this->urlGenerator->generate('search-index', $routeParams),
-                                       $this->formatRowValue($val, [], $format));
+                        return sprintf(
+                            '<a href="%s">%s</a>',
+                            $this->urlGenerator->generate('search-index', $routeParams),
+                            $this->formatRowValue($val, [], $format)
+                        );
                     };
 
                 $routeParams['entity'] = 'Person';
@@ -273,9 +277,11 @@ extends SearchListBuilder
 
                         $routeParams['filter'][$key][$key] = [ $row['id'] ];
 
-                        return sprintf('<a href="%s">%s</a>',
-                                       $this->urlGenerator->generate('search-index', $routeParams),
-                                       $this->formatRowValue($val, [], $format));
+                        return sprintf(
+                            '<a href="%s">%s</a>',
+                            $this->urlGenerator->generate('search-index', $routeParams),
+                            $this->formatRowValue($val, [], $format)
+                        );
                     };
             }
         }
@@ -345,9 +351,12 @@ extends SearchListBuilder
 
     protected function setExhibitionJoin($queryBuilder)
     {
-        $queryBuilder->innerJoin($this->alias,
-                                'Exhibition', 'E',
-                                'E.id_location=' . $this->alias . '.id AND ' . $this->buildExhibitionVisibleCondition('E'));
+        $queryBuilder->innerJoin(
+            $this->alias,
+            'Exhibition',
+            'E',
+            'E.id_location=' . $this->alias . '.id AND ' . $this->buildExhibitionVisibleCondition('E')
+        );
     }
 
     protected function setJoin($queryBuilder)
@@ -362,21 +371,30 @@ extends SearchListBuilder
             $queryBuilder->groupBy($this->alias . '.id');
         }
 
-        $queryBuilder->leftJoin($this->alias,
-                                'Geoname', 'P' . $this->alias,
-                                'P' . $this->alias . '.tgn=' . $this->alias . '.place_tgn');
+        $queryBuilder->leftJoin(
+            $this->alias,
+            'Geoname',
+            'P' . $this->alias,
+            'P' . $this->alias . '.tgn=' . $this->alias . '.place_tgn'
+        );
 
         $this->setExhibitionJoin($queryBuilder);
 
-        $queryBuilder->leftJoin('E',
-                                'ItemExhibition', 'IE',
-                                'E.id=IE.id_exhibition AND (IE.title IS NOT NULL OR IE.id_item IS NULL)');
+        $queryBuilder->leftJoin(
+            'E',
+            'ItemExhibition',
+            'IE',
+            'E.id=IE.id_exhibition AND (IE.title IS NOT NULL OR IE.id_item IS NULL)'
+        );
 
         if (array_key_exists('person', $this->queryFilters)) {
             // so we can filter on P.*
-            $queryBuilder->join('IE',
-                                'Person', 'P',
-                                'P.id=IE.id_person AND P.status <> -1');
+            $queryBuilder->join(
+                'IE',
+                'Person',
+                'P',
+                'P.id=IE.id_person AND P.status <> -1'
+            );
         }
 
         return $this;
@@ -400,8 +418,8 @@ extends SearchListBuilder
         return $this;
     }
 
-	public function getAlias()
-	{
-		return $this->alias;
-	}
+    public function getAlias()
+    {
+        return $this->alias;
+    }
 }

@@ -1,17 +1,15 @@
 <?php
+
 // ExhibitionFilterType.php
 
 namespace AppBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-
 use Tetranz\Select2EntityBundle\Form\Type\Select2EntityType;
 
-class ExhibitionFilterType
-extends AbstractType
+class ExhibitionFilterType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

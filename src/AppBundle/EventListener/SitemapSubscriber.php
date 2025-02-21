@@ -9,15 +9,12 @@ namespace AppBundle\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-
 use Doctrine\ORM\EntityManagerInterface;
-
 use Presta\SitemapBundle\Event\SitemapPopulateEvent;
 use Presta\SitemapBundle\Service\UrlContainerInterface;
 use Presta\SitemapBundle\Sitemap\Url\UrlConcrete;
 
-class SitemapSubscriber
-implements EventSubscriberInterface
+class SitemapSubscriber implements EventSubscriberInterface
 {
     /**
      * @var UrlGeneratorInterface
@@ -38,10 +35,11 @@ implements EventSubscriberInterface
      * @param UrlGeneratorInterface $urlGenerator
      * @param EntityManagerInterface $entityManager
      */
-    public function __construct(UrlGeneratorInterface $urlGenerator,
-                                EntityManagerInterface $entityManager,
-                                ParameterBagInterface $params)
-    {
+    public function __construct(
+        UrlGeneratorInterface $urlGenerator,
+        EntityManagerInterface $entityManager,
+        ParameterBagInterface $params
+    ) {
         $this->urlGenerator = $urlGenerator;
         $this->entityManager = $entityManager;
         $this->params = $params;
@@ -57,12 +55,14 @@ implements EventSubscriberInterface
         ];
     }
 
-    private function registerFromListBuilder(UrlContainerInterface $urls,
-                                             \AppBundle\Utils\SearchListBuilder $listBuilder, $section,
-                                             $routeParamsBuilder = null): void
-    {
+    private function registerFromListBuilder(
+        UrlContainerInterface $urls,
+        \AppBundle\Utils\SearchListBuilder $listBuilder,
+        $section,
+        $routeParamsBuilder = null
+    ): void {
         foreach ($listBuilder->query()->execute()->fetchAll() as $row) {
-            list($route, $routeParams) = !is_null($routeParamsBuilder)
+            [$route, $routeParams] = !is_null($routeParamsBuilder)
                 ? $routeParamsBuilder($row)
                 : [ $section, [ 'id' => $row['id'] ] ];
 
@@ -101,8 +101,13 @@ implements EventSubscriberInterface
      */
     public function registerExhibitionUrls(UrlContainerInterface $urls): void
     {
-        $listBuilder = new \AppBundle\Utils\ExhibitionListBuilder($this->entityManager->getConnection(),
-                                                                  null, $this->urlGenerator, [], 'sitemap');
+        $listBuilder = new \AppBundle\Utils\ExhibitionListBuilder(
+            $this->entityManager->getConnection(),
+            null,
+            $this->urlGenerator,
+            [],
+            'sitemap'
+        );
 
         $this->registerFromListBuilder($urls, $listBuilder, 'exhibition');
     }
@@ -112,8 +117,13 @@ implements EventSubscriberInterface
      */
     public function registerVenueUrls(UrlContainerInterface $urls): void
     {
-        $listBuilder = new \AppBundle\Utils\VenueListBuilder($this->entityManager->getConnection(),
-                                                             null, $this->urlGenerator, [], 'sitemap');
+        $listBuilder = new \AppBundle\Utils\VenueListBuilder(
+            $this->entityManager->getConnection(),
+            null,
+            $this->urlGenerator,
+            [],
+            'sitemap'
+        );
 
         $this->registerFromListBuilder($urls, $listBuilder, 'location');
     }
@@ -123,8 +133,13 @@ implements EventSubscriberInterface
      */
     public function registerOrganizerUrls(UrlContainerInterface $urls): void
     {
-        $listBuilder = new \AppBundle\Utils\OrganizerListBuilder($this->entityManager->getConnection(),
-                                                                 null, $this->urlGenerator, [], 'sitemap');
+        $listBuilder = new \AppBundle\Utils\OrganizerListBuilder(
+            $this->entityManager->getConnection(),
+            null,
+            $this->urlGenerator,
+            [],
+            'sitemap'
+        );
 
         $this->registerFromListBuilder($urls, $listBuilder, 'organizer');
     }
@@ -143,7 +158,7 @@ implements EventSubscriberInterface
                 ->where('P.status >= 0')
                 ->orderBy('P.id')
                 ->getQuery()
-                ;
+        ;
 
         foreach ($query->execute() as $person) {
             $route = 'person';
@@ -177,11 +192,20 @@ implements EventSubscriberInterface
      */
     public function registerPlaceUrls(UrlContainerInterface $urls): void
     {
-        $listBuilder = new \AppBundle\Utils\PlaceListBuilder($this->entityManager->getConnection(),
-                                                             null, $this->urlGenerator, [], 'sitemap');
+        $listBuilder = new \AppBundle\Utils\PlaceListBuilder(
+            $this->entityManager->getConnection(),
+            null,
+            $this->urlGenerator,
+            [],
+            'sitemap'
+        );
 
-        $this->registerFromListBuilder($urls, $listBuilder, 'place',
-                                       function ($row) { return [ 'place-by-tgn', [ 'tgn' => $row['tgn']] ]; });
+        $this->registerFromListBuilder(
+            $urls,
+            $listBuilder,
+            'place',
+            function ($row) { return [ 'place-by-tgn', [ 'tgn' => $row['tgn']] ]; }
+        );
     }
 
     /**
@@ -201,8 +225,10 @@ implements EventSubscriberInterface
             new \Vnn\WpApiClient\Http\GuzzleAdapter(new \GuzzleHttp\Client()),
             $url
         );
-        $client->setCredentials(new \Vnn\WpApiClient\Auth\WpBasicAuth($this->params->get('app.wp-rest.user'),
-                                                                      $this->params->get('app.wp-rest.password')));
+        $client->setCredentials(new \Vnn\WpApiClient\Auth\WpBasicAuth(
+            $this->params->get('app.wp-rest.user'),
+            $this->params->get('app.wp-rest.password')
+        ));
         $posts = [];
 
         if (false !== $client) {
@@ -240,8 +266,13 @@ implements EventSubscriberInterface
      */
     public function registerHolderUrls(UrlContainerInterface $urls): void
     {
-        $listBuilder = new \AppBundle\Utils\HolderListBuilder($this->entityManager->getConnection(),
-                                                              null, $this->urlGenerator, [], 'sitemap');
+        $listBuilder = new \AppBundle\Utils\HolderListBuilder(
+            $this->entityManager->getConnection(),
+            null,
+            $this->urlGenerator,
+            [],
+            'sitemap'
+        );
 
         $this->registerFromListBuilder($urls, $listBuilder, 'holder');
     }

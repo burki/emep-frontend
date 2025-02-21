@@ -1,8 +1,8 @@
 <?php
+
 namespace AppBundle\Utils;
 
-class CorporateBodyData
-extends DnbData
+class CorporateBodyData extends DnbData
 {
     function processTriple($triple)
     {
@@ -15,13 +15,13 @@ extends DnbData
                 $this->dateOfEstablishment = self::buildDateIncomplete($triple['o']);
                 break;
 
-            /*
-            case 'http://d-nb.info/standards/elementset/gnd#placeOfBirth':
-                $placeOfBirth = self::fetchGeographicLocation($triple['o']);
-                if (!empty($placeOfBirth))
-                    $this->placeOfBirth = $placeOfBirth;
-                break;
-            */
+                /*
+                case 'http://d-nb.info/standards/elementset/gnd#placeOfBirth':
+                    $placeOfBirth = self::fetchGeographicLocation($triple['o']);
+                    if (!empty($placeOfBirth))
+                        $this->placeOfBirth = $placeOfBirth;
+                    break;
+                */
 
             case 'http://d-nb.info/standards/elementset/gnd#placeOfBusiness':
                 $placeOfBusiness = self::fetchGeographicLocation($triple['o']);
@@ -34,17 +34,18 @@ extends DnbData
                 $this->dateOfTermination = self::buildDateIncomplete($triple['o']);
                 break;
 
-            /*
-            case 'http://d-nb.info/standards/elementset/gnd#placeOfDeath':
-                $placeOfDeath = self::fetchGeographicLocation($triple['o']);
-                if (!empty($placeOfDeath))
-                    $this->placeOfDeath = $placeOfDeath;
-                break;
-            */
+                /*
+                case 'http://d-nb.info/standards/elementset/gnd#placeOfDeath':
+                    $placeOfDeath = self::fetchGeographicLocation($triple['o']);
+                    if (!empty($placeOfDeath))
+                        $this->placeOfDeath = $placeOfDeath;
+                    break;
+                */
 
             case 'http://d-nb.info/standards/elementset/gnd#preferredNameForTheCorporateBody':
-                if (!isset($this->preferredName) && 'literal' == $triple['o_type'])
+                if (!isset($this->preferredName) && 'literal' == $triple['o_type']) {
                     $this->preferredName = self::normalizeString($triple['o']);
+                }
                 /*
                 else if ('bnode' == $triple['o_type']) {
                     $nameRecord = $index[$triple['o']];

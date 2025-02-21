@@ -61,8 +61,7 @@ trait AddressesTrait
                 ? $addresses['id_exhibition'][$i] : [];
 
             if (!is_null($filterExhibition)) {
-                if (!in_array($filterExhibition, $id_exhibitions))
-                {
+                if (!in_array($filterExhibition, $id_exhibitions)) {
                     continue;
                 }
             }
@@ -90,17 +89,18 @@ trait AddressesTrait
             }
 
             foreach ([ [ 'address', 'place' ],
-                       $showCountry ? [ 'street', 'zip', 'country' ] : [ 'street', 'zip' ],
-                       // [ 'geo' ],
-                       ] as $keys)
-            {
+                $showCountry ? [ 'street', 'zip', 'country' ] : [ 'street', 'zip' ],
+                // [ 'geo' ],
+            ] as $keys) {
                 $parts = [];
                 foreach ($keys as $key) {
                     if (!empty($addresses[$key][$i])) {
                         if ($linkPlace && 'place' == $key && !empty($addresses['place_tgn'][$i])) {
-                            $parts[] = sprintf('<a href="%%basepath%%/place/tgn/%s">%s</a>',
-                                               $addresses['place_tgn'][$i],
-                                               htmlspecialchars($addresses[$key][$i], ENT_COMPAT, 'utf-8'));
+                            $parts[] = sprintf(
+                                '<a href="%%basepath%%/place/tgn/%s">%s</a>',
+                                $addresses['place_tgn'][$i],
+                                htmlspecialchars($addresses[$key][$i], ENT_COMPAT, 'utf-8')
+                            );
                         }
                         else {
                             $parts[] = $linkPlace

@@ -7,14 +7,12 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Intl\Countries;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-
 use Knp\Component\Pager\PaginatorInterface;
 
 /**
  * Shared settings and methods for the various Controllers
  */
-abstract class CrudController
-extends BaseController
+abstract class CrudController extends BaseController
 {
     protected $pageSize = 50;
     protected $form;
@@ -74,12 +72,12 @@ extends BaseController
             ->getManager()
             ->createQueryBuilder();
         $qb->select([
-                'P.nationality',
-            ])
+            'P.nationality',
+        ])
             ->distinct()
             ->from('AppBundle\Entity\Person', 'P')
             ->where('P.status <> -1 AND P.nationality IS NOT NULL')
-            ;
+        ;
 
         $countriesActive = [];
 
@@ -132,7 +130,7 @@ extends BaseController
 
         $queryBuilder->select('DISTINCT O.type AS type')
             ->orderBy('type')
-            ;
+        ;
 
         return $queryBuilder->execute()->fetchAll(\PDO::FETCH_COLUMN);
     }
@@ -149,18 +147,18 @@ extends BaseController
                 ->createQueryBuilder();
 
         $qb->select([
-                'PL.countryCode',
-                'C.name AS country',
-                'PL.tgn',
-                'COALESCE(PL.alternateName,PL.name) AS name'
-            ])
+            'PL.countryCode',
+            'C.name AS country',
+            'PL.tgn',
+            'COALESCE(PL.alternateName,PL.name) AS name',
+        ])
             ->distinct()
             ->from('AppBundle\Entity\Location', 'L')
             ->leftJoin('L.place', 'PL')
             ->leftJoin('PL.country', 'C')
             ->where('L.status <> -1 AND 0 = BIT_AND(L.flags, 256) AND PL.countryCode IS NOT NULL')
             ->orderBy('country, name')
-            ;
+        ;
 
         $lastCountryCode = '';
 
@@ -188,26 +186,38 @@ extends BaseController
         $queryBuilder = $conn->createQueryBuilder();
 
         $queryBuilder->select([
-                'DISTINCT C.cc AS countryCode',
-                'C.name AS country',
-                'P' . $alias . '.tgn',
-                'COALESCE(P' . $alias . '.name_alternate, P' . $alias . '.name) AS name',
-            ])
+            'DISTINCT C.cc AS countryCode',
+            'C.name AS country',
+            'P' . $alias . '.tgn',
+            'COALESCE(P' . $alias . '.name_alternate, P' . $alias . '.name) AS name',
+        ])
             ->from('Location', $alias)
-            ->innerJoin($alias,
-                                'Geoname', 'P' . $alias,
-                                'P' . $alias . '.tgn=' . $alias.'.place_tgn')
-            ->innerJoin('P' . $alias,
-                                'Country', 'C',
-                                'P' . $alias . '.country_code=' . 'C.cc')
-            ->innerJoin($alias,
-                                'ExhibitionLocation', 'EL',
-                                'EL.id_location=' . $alias . '.id AND EL.role = 0')
-            ->innerJoin('EL',
-                                'Exhibition', 'E',
-                                'EL.id_exhibition=E.id AND ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'))
+            ->innerJoin(
+                $alias,
+                'Geoname',
+                'P' . $alias,
+                'P' . $alias . '.tgn=' . $alias . '.place_tgn'
+            )
+            ->innerJoin(
+                'P' . $alias,
+                'Country',
+                'C',
+                'P' . $alias . '.country_code=' . 'C.cc'
+            )
+            ->innerJoin(
+                $alias,
+                'ExhibitionLocation',
+                'EL',
+                'EL.id_location=' . $alias . '.id AND EL.role = 0'
+            )
+            ->innerJoin(
+                'EL',
+                'Exhibition',
+                'E',
+                'EL.id_exhibition=E.id AND ' . \AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E')
+            )
             ->orderBy('country, name')
-            ;
+        ;
 
         $geonames = [];
 
@@ -238,14 +248,14 @@ extends BaseController
                 ->createQueryBuilder();
 
         $qb->select([
-                'H.countryCode',
-                'H.countryCode AS country',
-            ])
+            'H.countryCode',
+            'H.countryCode AS country',
+        ])
             ->distinct()
             ->from('AppBundle\Entity\Holder', 'H')
             ->where('H.status <> -1')
             ->orderBy('country')
-            ;
+        ;
 
         $lastCountryCode = '';
 
@@ -264,7 +274,7 @@ extends BaseController
         $ret = [];
 
         foreach ($keyValue as $key => $value) {
-            $ret[] = [ 'name' => $key, 'y' => (float)$value ];
+            $ret[] = [ 'name' => $key, 'y' => (float) $value ];
         }
 
         return $ret;
@@ -277,7 +287,7 @@ extends BaseController
         foreach ($idDescr as $id => $descr) {
             $ret[] = [
                 'name' => $descr['name'],
-                'y' => (float)$descr['count'],
+                'y' => (float) $descr['count'],
                 'id' => $id,
             ];
         }
@@ -349,11 +359,13 @@ extends BaseController
                         'user' => $user,
                         'route' => $route,
                     ])
-                    ;
+                ;
 
                 if (!is_null($userAction)) {
-                    return $this->redirectToRoute($this->expandSaveSearchRoute($userAction->getRoute()),
-                                                  $userAction->getRouteParams());
+                    return $this->redirectToRoute(
+                        $this->expandSaveSearchRoute($userAction->getRoute()),
+                        $userAction->getRouteParams()
+                    );
                 }
             }
         }
@@ -364,12 +376,13 @@ extends BaseController
     /**
      * Saves a search
      */
-    protected function handleSaveSearchAction(Request $request,
-                                              UrlGeneratorInterface $urlGenerator,
-                                              UserInterface $user,
-                                              TranslatorInterface $translator)
-    {
-        list($route, $routeParams) = $this->buildSaveSearchParams($request, $urlGenerator);
+    protected function handleSaveSearchAction(
+        Request $request,
+        UrlGeneratorInterface $urlGenerator,
+        UserInterface $user,
+        TranslatorInterface $translator
+    ) {
+        [$route, $routeParams] = $this->buildSaveSearchParams($request, $urlGenerator);
 
         if (empty($routeParams)) {
             // nothing to save
@@ -425,7 +438,7 @@ extends BaseController
             ->orderBy("UA.createdAt", "DESC")
             ->setParameter('route', $routeName)
             ->setParameter('user', $user)
-            ;
+        ;
 
         $searches = [];
 
@@ -447,7 +460,7 @@ extends BaseController
         $queryBuilder->select('DISTINCT IE.type')
             ->from('ItemExhibition', 'IE')
             ->where('IE.type IS NOT NULL')
-            ;
+        ;
 
         $termIds = $queryBuilder->execute()->fetchAll(\PDO::FETCH_COLUMN);
 
@@ -457,11 +470,11 @@ extends BaseController
             ->where('T.id IN (:ids)')
             ->setParameter('ids', $termIds, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
             ->orderBy('T.name')
-            ;
+        ;
 
         $types = [];
 
-        foreach ($queryBuilder->execute()->fetchAll() as $row)  {
+        foreach ($queryBuilder->execute()->fetchAll() as $row) {
             if ('0_unknown' == $row['name']) {
                 $types[$row['id']] = 'unknown';
                 continue;
@@ -479,10 +492,12 @@ extends BaseController
         return $types;
     }
 
-    protected function buildPagination(Request $request,
-                                       PaginatorInterface $paginator,
-                                       $query, $options = [])
-    {
+    protected function buildPagination(
+        Request $request,
+        PaginatorInterface $paginator,
+        $query,
+        $options = []
+    ) {
         $limit = $this->pageSize;
         if (array_key_exists('pageSize', $options)) {
             $limit = $options['pageSize'];
@@ -578,11 +593,12 @@ extends BaseController
         return $filters;
     }
 
-    protected function instantiateListBuilder(Request $request,
-                                              UrlGeneratorInterface $urlGenerator,
-                                              $mode = false,
-                                              $entity = null)
-    {
+    protected function instantiateListBuilder(
+        Request $request,
+        UrlGeneratorInterface $urlGenerator,
+        $mode = false,
+        $entity = null
+    ) {
         $connection = $this->getDoctrine()->getManager()->getConnection();
 
         $parameters = $request->query->all();
@@ -637,7 +653,7 @@ extends BaseController
             ->from('AppBundle\Entity\Exhibition', 'E')
             ->where('E.id IN (:ids)')
             ->orderBy($preserveOrder ? 'field' : 'dateSort')
-            ;
+        ;
 
         if ($filterVisible) {
             $qb->andWhere(\AppBundle\Utils\SearchListBuilder::exhibitionVisibleCondition('E'));
@@ -660,7 +676,7 @@ extends BaseController
             ->from('AppBundle\Entity\Location', 'L')
             ->where('L.id IN (:ids)')
             ->orderBy($preserveOrder ? 'field' : 'nameSort')
-            ;
+        ;
 
         $hydrationQuery = $qb->getQuery();
         $hydrationQuery->setParameter('ids', $ids);
@@ -679,7 +695,7 @@ extends BaseController
             ->where('P.id IN (:ids)')
             ->orderBy($preserveOrder ? 'field' : 'nameSort')
             ->getQuery();
-            ;
+        ;
 
         $hydrationQuery->setParameter('ids', $ids);
 
@@ -697,7 +713,7 @@ extends BaseController
             ->where('PL.tgn IN (:tgns)')
             ->orderBy($preserveOrder ? 'field' : 'nameSort')
             ->getQuery();
-            ;
+        ;
 
         $hydrationQuery->setParameter('tgns', $tgns);
 

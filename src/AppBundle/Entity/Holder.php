@@ -4,7 +4,6 @@ namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo; // alias for Gedmo extensions annotations
-
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -15,8 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity
  * @ORM\Table(name="Holder")
  */
-class Holder
-implements \JsonSerializable, JsonLdSerializable
+class Holder implements \JsonSerializable, JsonLdSerializable
 {
     static function formatDateIncomplete($dateStr)
     {
@@ -654,10 +652,10 @@ implements \JsonSerializable, JsonLdSerializable
     {
         $qb = $em->createQueryBuilder();
         $qb->select([
-                'B',
-                'BH.signature', 'BH.url',
-                "COALESCE(B.author, B.editor) HIDDEN creatorSort",
-            ])
+            'B',
+            'BH.signature', 'BH.url',
+            "COALESCE(B.author, B.editor) HIDDEN creatorSort",
+        ])
             ->distinct()
             ->from('AppBundle\Entity\Bibitem', 'B')
             ->innerJoin('AppBundle\Entity\BibitemHolder', 'BH', 'WITH', 'BH.bibitem=B')
@@ -666,9 +664,12 @@ implements \JsonSerializable, JsonLdSerializable
             ->orderBy('B.datePublished, creatorSort, B.title');
 
         if ($catalogueEntriesOnly) {
-            $qb->innerJoin('AppBundle\Entity\BibitemExhibition', 'BE',
-                           \Doctrine\ORM\Query\Expr\Join::WITH,
-                           'BE.bibitem = B AND BE.role = 1'); // catalogues only
+            $qb->innerJoin(
+                'AppBundle\Entity\BibitemExhibition',
+                'BE',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'BE.bibitem = B AND BE.role = 1'
+            ); // catalogues only
         }
 
         $results = $qb->getQuery()

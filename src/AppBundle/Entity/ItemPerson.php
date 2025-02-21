@@ -70,19 +70,23 @@ class ItemPerson
         $this->person = $person;
     }
 
-    public function getOrd() {
+    public function getOrd()
+    {
         return $this->ord;
     }
 
-    public function setOrd($ord) {
+    public function setOrd($ord)
+    {
         $this->ord = $ord;
     }
 
-    public function getRole() {
+    public function getRole()
+    {
         return $this->role;
     }
 
-    public function setRole($role) {
+    public function setRole($role)
+    {
         $this->role = $role;
     }
 }
