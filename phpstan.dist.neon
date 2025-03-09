@@ -1,0 +1,7 @@
+parameters:
+    level: 0
+    paths:
+        - bin/
+        - config/
+        - web/
+        - src/
