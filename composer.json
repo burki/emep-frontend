@@ -16,6 +16,11 @@
         },
         {
             "type": "vcs",
+            "url": "https://github.com/Furex/PHP-MySQLi-Database-Class"
+
+        },
+        {
+            "type": "vcs",
             "url": "https://github.com/burki/wordpress-rest-api-client"
         },
         {
@@ -92,6 +97,7 @@
 
         "wikimedia/utfnormal": "^2.0",
 
+        "thingengineer/mysqli-database-class": "dev-master#c14716f as 2.9.5",
         "semsol/arc2": "dev-master",
         "sweetrdf/easyrdf": "^1.16",
 
