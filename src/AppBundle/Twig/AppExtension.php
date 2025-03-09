@@ -28,7 +28,7 @@ class AppExtension extends \Twig\Extension\AbstractExtension
     private $slugifyer;
 
     public function __construct(
-        TranslatorInterface $translator = null,
+        ?TranslatorInterface $translator = null,
         $slugifyer = null
     ) {
         $this->translator = $translator;
@@ -39,7 +39,7 @@ class AppExtension extends \Twig\Extension\AbstractExtension
         }
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new \Twig\TwigFunction('countryName', [ $this, 'getCountryName' ]),
@@ -48,7 +48,7 @@ class AppExtension extends \Twig\Extension\AbstractExtension
         ];
     }
 
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
             // general
@@ -237,7 +237,7 @@ class AppExtension extends \Twig\Extension\AbstractExtension
         return \AppBundle\Entity\Place::buildPluralizedTypeLabel($placeType, $count);
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'app_extension';
     }

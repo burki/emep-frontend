@@ -64,14 +64,14 @@ class Holder implements \JsonSerializable, JsonLdSerializable
     protected $country;
 
     /**
-     * @var string A short description of the item.
+     * @var string|null A short description of the item.
      *
      * @ORM\Column(type="string", nullable=true)
      */
     protected $description;
 
     /**
-     * @var string The date that this organization was dissolved.
+     * @var string|null The date that this organization was dissolved.
      *
      * @Assert\Date
      * @ORM\Column(type="string", nullable=true)
@@ -79,14 +79,14 @@ class Holder implements \JsonSerializable, JsonLdSerializable
     // protected $dissolutionDate;
 
     /**
-     * @var string The date that this organization was founded.
+     * @var string|null The date that this organization was founded.
      *
      * #ORM\Column(type="string", nullable=true)
      */
     protected $foundingDate;
 
     /**
-     * @var string The name of the item.
+     * @var string|null The name of the item.
      *
      * @Assert\Type(type="string")
      * @ORM\Column(nullable=true)
@@ -94,28 +94,28 @@ class Holder implements \JsonSerializable, JsonLdSerializable
     protected $name;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ORM\Column(name="name_translit", type="string", length=255, nullable=true)
      */
     private $nameTransliterated;
 
     /**
-     * @var string Label of the address.
+     * @var string|null Label of the address.
      *
-     * @ORM\Column(nullable=true,name="address")
+     * @ORM\Column(name="address", nullable=true)
      */
     protected $placeAddress;
 
     /**
-     * @var string Label of the place.
+     * @var string|null Label of the place.
      *
-     * @ORM\Column(nullable=true,name="town")
+     * @ORM\Column(name="town", nullable=true)
      */
     protected $placeLabel;
 
     /**
-     * @var string URL of the item.
+     * @var string|null URL of the item.
      *
      * @Assert\Url
      * @ORM\Column(nullable=true)
@@ -123,13 +123,13 @@ class Holder implements \JsonSerializable, JsonLdSerializable
     protected $url;
 
     /**
-     * @var string
+     * @var string|null
      * @ORM\Column(type="string", length=32, nullable=true)
      */
     protected $gnd;
 
     /**
-     * @var string
+     * @var string|null
      * @ORM\Column(type="string", nullable=true)
      */
     protected $ulan;
@@ -140,7 +140,7 @@ class Holder implements \JsonSerializable, JsonLdSerializable
     protected $holderOf;
 
     /**
-     * @var Organization The organization that preceded this on.
+     * @var Organization|null The organization that preceded this on.
      *
      * @ORM\OneToOne(targetEntity="AppBundle\Entity\Organization", inversedBy="succeedingOrganization")
      * @ORM\JoinColumn(name="precedingId", referencedColumnName="id")
@@ -148,7 +148,7 @@ class Holder implements \JsonSerializable, JsonLdSerializable
     // protected $precedingOrganization;
 
     /**
-     * @var Organization The organization that suceeded this on.
+     * @var Organization|null The organization that suceeded this on.
      *
      * @ORM\OneToOne(targetEntity="AppBundle\Entity\Organization", mappedBy="precedingOrganization")
      */
@@ -255,7 +255,7 @@ class Holder implements \JsonSerializable, JsonLdSerializable
     /**
      * Gets placeAdress.
      *
-     * @return string
+     * @return string|null
      */
     public function getPlaceAddress()
     {
@@ -265,7 +265,7 @@ class Holder implements \JsonSerializable, JsonLdSerializable
     /**
      * Gets placeLabel.
      *
-     * @return string
+     * @return string|null
      */
     public function getPlaceLabel()
     {
@@ -289,7 +289,7 @@ class Holder implements \JsonSerializable, JsonLdSerializable
     /**
      * Gets countryCode.
      *
-     * @return string
+     * @return string|null
      */
     public function getCountryCode()
     {
@@ -313,7 +313,7 @@ class Holder implements \JsonSerializable, JsonLdSerializable
     /**
      * Gets description.
      *
-     * @return string
+     * @return string|null
      */
     public function getDescription()
     {
@@ -323,7 +323,7 @@ class Holder implements \JsonSerializable, JsonLdSerializable
     /**
      * Sets dissolutionDate.
      *
-     * @param string $dissolutionDate
+     * @param string|null $dissolutionDate
      *
      * @return $this
      */
@@ -339,7 +339,7 @@ class Holder implements \JsonSerializable, JsonLdSerializable
     /**
      * Gets dissolutionDate.
      *
-     * @return string
+     * @return string|null
      */
     /*
     public function getDissolutionDate()
@@ -351,7 +351,7 @@ class Holder implements \JsonSerializable, JsonLdSerializable
     /**
      * Sets foundingDate.
      *
-     * @param string $foundingDate
+     * @param string|null $foundingDate
      *
      * @return $this
      */
@@ -367,7 +367,7 @@ class Holder implements \JsonSerializable, JsonLdSerializable
     /**
      * Gets foundingDate.
      *
-     * @return string
+     * @return string|null
      */
 
     public function getFoundingDate()
@@ -402,7 +402,7 @@ class Holder implements \JsonSerializable, JsonLdSerializable
     /**
      * Sets nameTransliterated.
      *
-     * @param string $nameTransliterated
+     * @param string|null $nameTransliterated
      *
      * @return $this
      */
@@ -416,7 +416,7 @@ class Holder implements \JsonSerializable, JsonLdSerializable
     /**
      * Gets nameTransliterated.
      *
-     * @return string
+     * @return string|null
      */
     public function getNameTransliterated()
     {
@@ -469,7 +469,7 @@ class Holder implements \JsonSerializable, JsonLdSerializable
     /**
      * Gets url.
      *
-     * @return string
+     * @return string|null
      */
     public function getUrl()
     {
@@ -479,12 +479,12 @@ class Holder implements \JsonSerializable, JsonLdSerializable
     /**
      * Sets foundingLocation.
      *
-     * @param Place $foundingLocation
+     * @param Place|null $foundingLocation
      *
      * @return $this
      */
     /*
-    public function setFoundingLocation(Place $foundingLocation = null)
+    public function setFoundingLocation(?Place $foundingLocation = null)
     {
         $this->foundingLocation = $foundingLocation;
 
@@ -495,7 +495,7 @@ class Holder implements \JsonSerializable, JsonLdSerializable
     /**
      * Gets foundingLocation.
      *
-     * @return Place
+     * @return Place|null
      */
     /*
     public function getFoundingLocation()
@@ -507,12 +507,12 @@ class Holder implements \JsonSerializable, JsonLdSerializable
     /**
      * Sets precedingOrganization.
      *
-     * @param Organization $precedingOrganization
+     * @param Organization|null $precedingOrganization
      *
      * @return $this
      */
     /*
-    public function setPrecedingOrganization(Organization $precedingOrganization = null)
+    public function setPrecedingOrganization(?Organization $precedingOrganization = null)
     {
         $this->precedingOrganization = $precedingOrganization;
 
@@ -523,7 +523,7 @@ class Holder implements \JsonSerializable, JsonLdSerializable
     /**
      * Gets precedingOrganization.
      *
-     * @return Organization
+     * @return Organization|null
      */
     /*
     public function getPrecedingOrganization()
@@ -535,7 +535,7 @@ class Holder implements \JsonSerializable, JsonLdSerializable
     /**
      * Gets succeedingOrganization.
      *
-     * @return Organization
+     * @return Organization|null
      */
     /*
     public function getSucceedingOrganization()
@@ -561,7 +561,7 @@ class Holder implements \JsonSerializable, JsonLdSerializable
     /**
      * Gets gnd.
      *
-     * @return string
+     * @return string|null
      */
     public function getGnd()
     {
@@ -585,7 +585,7 @@ class Holder implements \JsonSerializable, JsonLdSerializable
     /**
      * Gets ulan.
      *
-     * @return string
+     * @return string|null
      */
     public function getUlan()
     {
@@ -595,12 +595,12 @@ class Holder implements \JsonSerializable, JsonLdSerializable
     /**
      * Sets foundingLocation.
      *
-     * @param Place $foundingLocation
+     * @param Place|null $foundingLocation
      *
      * @return $this
      */
     /*
-    public function setFoundingLocation(Place $foundingLocation = null)
+    public function setFoundingLocation(?Place $foundingLocation = null)
     {
         $this->foundingLocation = $foundingLocation;
 
@@ -611,7 +611,7 @@ class Holder implements \JsonSerializable, JsonLdSerializable
     /**
      * Gets foundingLocation.
      *
-     * @return Place
+     * @return Place|null
      */
     /*
     public function getFoundingLocation()
@@ -623,11 +623,11 @@ class Holder implements \JsonSerializable, JsonLdSerializable
     /**
      * Sets dateModified.
      *
-     * @param \DateTime $dateModified
+     * @param \DateTime|null $dateModified
      *
      * @return $this
      */
-    public function setDateModified(\DateTime $dateModified = null)
+    public function setDateModified(?\DateTime $dateModified = null)
     {
         $this->dateModified = $dateModified;
 
