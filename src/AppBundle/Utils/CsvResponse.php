@@ -19,15 +19,15 @@ class CsvResponse extends Response
     {
         set_time_limit(5 * 60); // ItemExhibition is large
 
-        $writer = \Box\Spout\Writer\WriterFactory::create(\Box\Spout\Common\Type::XLSX);
+        $writer = new \OpenSpout\Writer\XLSX\Writer();
         $writer->openToBrowser($this->filename);
 
         if (!empty($this->headers)) {
-            $writer->addRow($this->headers);
+            $writer->addRow(\OpenSpout\Common\Entity\Row::fromValues($this->headers));
         }
 
         foreach ($data as $row) {
-            $writer->addRow($row);
+            $writer->addRow(\OpenSpout\Common\Entity\Row::fromValues($row));
         }
 
         $writer->close();

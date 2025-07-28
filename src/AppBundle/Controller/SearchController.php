@@ -127,16 +127,16 @@ class SearchController extends CrudController
 
         set_time_limit(5 * 60); // ItemExhibition is large
 
-        $writer = \Box\Spout\Writer\WriterFactory::create(\Box\Spout\Common\Type::XLSX);
+        $writer = new \OpenSpout\Writer\XLSX\Writer();
         $writer->openToBrowser($listBuilder->getEntity() . '.xlsx');
 
-        $writer->addRow($listBuilder->buildHeaderRow());
+        $writer->addRow(\OpenSpout\Common\Entity\Row::fromValues($listBuilder->buildHeaderRow()));
 
         $query = $listBuilder->query();
 
         $stmt = $query->execute();
         while ($row = $stmt->fetch()) {
-            $writer->addRow($listBuilder->buildRow($row));
+            $writer->addRow(\OpenSpout\Common\Entity\Row::fromValues($listBuilder->buildRow($row)));
         }
 
         $writer->close();
