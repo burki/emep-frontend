@@ -2,7 +2,7 @@
     "license": "AGPL-3.0-or-later",
     "config": {
         "platform": {
-            "php": "8.1.0"
+            "php": "8.2.0"
         }
     },
     "repositories": [
@@ -36,7 +36,7 @@
         }
     ],
     "require": {
-        "php": ">= 8.1",
+        "php": ">= 8.2",
 
         "symfony/yaml": "^6.4",
         "symfony/console": "^6.4",
