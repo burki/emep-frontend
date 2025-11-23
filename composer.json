@@ -112,8 +112,6 @@
         "seboettg/citeproc-php": "^2.6",
         "fale/isbn": "^3.1",
 
-        "ddeboer/data-import": "0.20.*",
-        "phpoffice/phpexcel": "1.8.*",
         "openspout/openspout": "^4.25",
 
         "cocur/background-process": "0.7.*",
