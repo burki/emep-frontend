@@ -19,6 +19,7 @@ class EntityEnhanceCommand extends Command
     protected $em;
     protected $googleapisKey = '';
     protected $projectDir;
+    protected $client = null;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -113,7 +114,7 @@ class EntityEnhanceCommand extends Command
      */
     protected function executeJsonQuery($url, $headers = [], $assoc = false)
     {
-        if (!isset($this->client)) {
+        if (is_null($this->client)) {
             $this->client = new \EasyRdf\Http\Client();
         }
 
@@ -347,15 +348,20 @@ class EntityEnhanceCommand extends Command
         }
 
         if (!empty($items)) {
-            // write to csv
+            // write to csv - not tested
             $headers = array_merge(['id', 'name', 'identifier'], array_values($UPDATE_PROPERTIES));
 
             $fname = $this->projectDir
                         . '/person-enhance.csv';
-            $writer = new \Ddeboer\DataImport\Writer\CsvWriter();
-            $writer->setStream(fopen($fname, 'w'));
-            $writer->prepare();
-            $writer->writeItem($headers);
+
+            $options = new \OpenSpout\Writer\CSV\Options();
+            $options->SHOULD_ADD_BOM = false;
+
+            $writer = new \OpenSpout\Writer\CSV\Writer($options);
+            $writer->openToFile($fname);
+
+            $rowFromValues = \OpenSpout\Common\Entity\Row::fromValues($headers);
+            $writer->addRows($rowFromValues);
             foreach ($items as $id => $item) {
                 $row = [];
                 foreach ($headers as $key) {
@@ -367,9 +373,11 @@ class EntityEnhanceCommand extends Command
                             ? $item[$key] : '';
                     }
                 }
-                $writer->writeItem($row);
+
+                $rowFromValues = \OpenSpout\Common\Entity\Row::fromValues($row);
+                $writer->addRows($row);
             }
-            $writer->finish();
+            $writer->close();
         }
     }
 
