@@ -967,7 +967,7 @@ class Bibitem implements \JsonSerializable, JsonLdSerializable, OgSerializable /
         $data = json_decode(json_encode($this->jsonSerialize()));
         // var_dump($data);
 
-        $ret = $citeProc->render([ $data ]);
+        $ret = @ $citeProc->render([ $data ]);
 
         /* vertical-align: super doesn't render nicely:
            http://stackoverflow.com/a/1530819/2114681
