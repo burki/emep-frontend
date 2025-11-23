@@ -104,8 +104,8 @@ trait SharingBuilderTrait
         $twitter['twitter:card'] = 'summary';
         $twitter['twitter:site'] = '@' . $globals['twitterSite'];
 
-        $request = $this->get('request_stack')->getCurrentRequest();
         /*
+        $request = $this->get('request_stack')->getCurrentRequest();
         // TwitterSerializable currently not defined
         if ($entity instanceof \AppBundle\Entity\TwitterSerializable) {
             $baseUri = $request->getUriForPath('/');
