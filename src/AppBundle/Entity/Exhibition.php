@@ -735,7 +735,9 @@ class Exhibition implements JsonLdSerializable
                 'name' => $this->location->getName(),
             ];
 
-            $addresses = array_map(function ($address) { return $address['info']; }, $this->location->getAddressesSeparated());
+            $addresses = array_map(function ($address) {
+                return $address['info'];
+            }, $this->location->getAddressesSeparated());
             if (!empty($addresses)) {
                 $ret['location']['address'] = join(', ', $addresses);
             }

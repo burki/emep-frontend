@@ -204,7 +204,9 @@ class SitemapSubscriber implements EventSubscriberInterface
             $urls,
             $listBuilder,
             'place',
-            function ($row) { return [ 'place-by-tgn', [ 'tgn' => $row['tgn']] ]; }
+            function ($row) {
+                return [ 'place-by-tgn', [ 'tgn' => $row['tgn']] ];
+            }
         );
     }
 

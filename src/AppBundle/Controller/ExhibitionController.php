@@ -243,7 +243,9 @@ class ExhibitionController extends CrudController
         if (!empty($exhibitionIds)) {
             $exhibitions = $this->hydrateExhibitions($exhibitionIds);
             $exhibitionsByIds = array_combine(
-                array_map(function ($exhibition) { return $exhibition->getId(); }, $exhibitions),
+                array_map(function ($exhibition) {
+                    return $exhibition->getId();
+                }, $exhibitions),
                 $exhibitions
             );
         }
@@ -465,7 +467,9 @@ class ExhibitionController extends CrudController
         }
 
         if ($sortByName) {
-            usort($artists, function ($personA, $personB) { return strcmp($personA->getFullname(), $personB->getFullname()); });
+            usort($artists, function ($personA, $personB) {
+                return strcmp($personA->getFullname(), $personB->getFullname());
+            });
         }
 
         return [ $artists, $catalogueEntriesByPersonCount];

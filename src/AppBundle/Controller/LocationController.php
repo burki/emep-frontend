@@ -101,7 +101,9 @@ class LocationController extends CrudController
 
         $exhibitions = $location->getExhibitions();
         if (!is_null($exhibitions)) {
-            $exhibitionIds = array_map(function ($exhibition) { return $exhibition->getId(); }, $exhibitions->toArray());
+            $exhibitionIds = array_map(function ($exhibition) {
+                return $exhibition->getId();
+            }, $exhibitions->toArray());
         }
 
         $exhibitions = $location->getOrganizerOf();
@@ -109,7 +111,9 @@ class LocationController extends CrudController
             $exhibitionIds = array_unique(
                 array_merge(
                     $exhibitionIds,
-                    array_map(function ($exhibition) { return $exhibition->getId(); }, $exhibitions->toArray())
+                    array_map(function ($exhibition) {
+                        return $exhibition->getId();
+                    }, $exhibitions->toArray())
                 )
             );
         }
@@ -394,7 +398,9 @@ class LocationController extends CrudController
 
         // build all the ids
         $personIds = array_map(
-            function ($person) { return $person[0]->getId(); },
+            function ($person) {
+                return $person[0]->getId();
+            },
             $persons
         );
 
@@ -468,7 +474,9 @@ class LocationController extends CrudController
         if (!empty($locationIds)) {
             $locations = $this->hydrateLocations($locationIds);
             $locationsByIds = array_combine(
-                array_map(function ($location) { return $location->getId(); }, $locations),
+                array_map(function ($location) {
+                    return $location->getId();
+                }, $locations),
                 $locations
             );
         }
@@ -510,7 +518,9 @@ class LocationController extends CrudController
 
     private function detailDataNumberOfArtistsPerCountry($artists)
     {
-        $artistNationalities = array_map(function ($artist) { return (string) $artist[0]->getNationality(); }, $artists);
+        $artistNationalities = array_map(function ($artist) {
+            return (string) $artist[0]->getNationality();
+        }, $artists);
 
         $artistNationalitiesTotal = array_count_values($artistNationalities);
         arsort($artistNationalitiesTotal);

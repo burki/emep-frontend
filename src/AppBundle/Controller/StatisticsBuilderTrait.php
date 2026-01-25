@@ -710,7 +710,9 @@ trait StatisticsBuilderTrait
             if (is_array($values)) {
                 $sql = str_replace(
                     ':' . $key,
-                    join(', ', array_map(function ($val) use ($connection) { return is_int($val) ? $val : $connection->quote($val); }, $values)),
+                    join(', ', array_map(function ($val) use ($connection) {
+                        return is_int($val) ? $val : $connection->quote($val);
+                    }, $values)),
                     $sql
                 );
             }

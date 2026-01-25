@@ -341,7 +341,9 @@ class PersonController extends CrudController
         if (!empty($personIds)) {
             $persons = $this->hydratePersons($personIds);
             $personsByIds = array_combine(
-                array_map(function ($person) { return $person->getId(); }, $persons),
+                array_map(function ($person) {
+                    return $person->getId();
+                }, $persons),
                 $persons
             );
         }
