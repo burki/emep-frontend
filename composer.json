@@ -2,7 +2,7 @@
     "license": "AGPL-3.0-or-later",
     "config": {
         "platform": {
-            "php": "7.4.0"
+            "php": "8.1.0"
         }
     },
     "repositories": [
@@ -19,6 +19,10 @@
             "url": "https://github.com/cwilby/wordpress-rest-api-client"
         },
         {
+            "type": "vcs",
+            "url": "https://github.com/holyfork/phpoffice-phpexcel"
+        },
+        {
             "type": "package",
             "package": {
                 "name": "citation-style-language/styles-distribution",
@@ -32,9 +36,19 @@
         }
     ],
     "require": {
+        "php": ">=8.1",
+
         "symfony/yaml": "^5.4",
         "symfony/console": "^5.4",
         "symfony/framework-bundle": "^5.4",
+        "symfony/dependency-injection": "^5.4",
+        "symfony/event-dispatcher": "^5.4",
+        "symfony/error-handler": "^5.4",
+        "symfony/http-kernel": "^5.4",
+        "symfony/http-foundation": "^5.4",
+        "symfony/property-info": "^5.4",
+        "symfony/property-access": "^5.4",
+        "symfony/mime": "^5.4",
 
         "symfony/templating": "^5.4",
         "symfony/translation": "^5.4",
@@ -50,8 +64,6 @@
         "symfony/debug-bundle": "^5.4",
         "symfony/var-dumper": "^5.4",
         "symfony/var-exporter": "^5.4",
-        "symfony/http-foundation": "^5.4",
-        "symfony/mime": "^5.4",
 
         "symfony/validator": "^5.4",
         "symfony/form": "^5.4",
@@ -79,6 +91,7 @@
         "liip/url-auto-converter-bundle": "dev-master",
 
         "doctrine/doctrine-bundle": "^2.0",
+        "doctrine/annotations": "^1.4",
         "symfony/cache": "^5.4",
 
         "stof/doctrine-extensions-bundle": "^1.4",
@@ -96,7 +109,7 @@
         "fale/isbn": "^3.1",
 
         "ddeboer/data-import": "0.20.*",
-        "phpoffice/phpexcel": "1.8.*",
+        "phpoffice/phpexcel": "dev-next#f839dd6 as 1.8.3",
         "box/spout": "^2.7",
 
         "cocur/background-process": "0.7.*",
